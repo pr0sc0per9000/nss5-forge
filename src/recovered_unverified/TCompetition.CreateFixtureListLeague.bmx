@@ -1,47 +1,49 @@
 ' TCompetition.CreateFixtureListLeague -- NOT VERIFIED (worker boot_FixturesLeague)
 ' VA 0x0050B420   1530 bytes   vtable slot 0x68   sig ()i
-' Ours: 1518 bytes (delta -12, orig 1530), as of this pass. Was 1548/+18/207-of-1530
-' matched (13.5%) at the start of this pass. localise_diff.py now reports 9
-' length-changing gaps (-12 total, COMPLETE) and 3 same-length subs, first real
-' divergence at ORIGINAL +617 -- up from 26 gaps/+18/39 subs/first_diff=+3.
+' Ours: 1524 bytes (delta -6, orig 1530). localise_diff.py reports 3 length-changing
+' gaps (-6 total, COMPLETE), no same-length subs, first real divergence at ORIGINAL
+' +1044 (a near-vs-short `je` encoding, itself a downstream consequence of the one
+' remaining gap below). The single residual cluster is documented under RESIDUAL.
 '
-' THIS PASS's FIX -- a THIRD codegen shape was missing from the prior notes below: a
-' block-scoped boolean Local (`Local x:Int = False` then a couple of `If`s that set it,
-' then `If x Then ...`) that stands in for what the ORIGINAL compiles as ONE compound
-' `And`/`Or` condition directly on the `If`/`While`, with NO Local at all. Confirmed by
-' `localise_diff.py` for FIVE separate occurrences in this body (each one an `insert`
-' gap showing OURS doing an extra `mov reg,0`/register init that the original simply
-' does not have at that point, immediately followed downstream by matching materialize-
-' then-branch bytes once the compound condition is inlined):
-'   * Case 1 of the `navailweeks` Select (`wk`) -> `If d.GetWeek()<48 And d.GetWeek()>6`
-'   * the `special` flag -> folded directly into the cascade's first test:
-'     `If level = 1 And duration < 9 ... ElseIf shortfall>0 And matchnum Mod
-'     shortfallstep=0 ... Else ... EndIf` (no `special` Local; this ALSO fixed the loop
-'     shape underneath -- see next point)
-'   * `dok`, `ok3`, `ok2` -- each was a `Repeat/Forever` with a Local materializing the
-'     exit test; the original is a `While/Wend` (a forward `jmp` straight to the
-'     condition check before the first body execution, THEN loop back -- the classic
-'     goto-while shape, not Repeat's fall-into-body-first shape) with the condition
-'     written directly as the `And`/`Or` compound, and with `CheckFixtureClash(d)` used
-'     BARE (no `<> 0`) whenever it is the trailing operand of an Or feeding a branch --
-'     writing the explicit `<>0` on a bare-call-as-condition costs an extra
-'     setne/movzx that the original does not pay.
-'   * `clash` (final fallback branch's second While) -- same story, no Local:
-'     `While CheckFixtureClash(d) <> 0 ... Wend` calls it fresh each iteration; the
-'     original never caches the first call into a Local before the loop.
-' Two more (small, `sub`-level, not gap-level) fixes alongside these:
-'   * `poolsize`/`extra` initialisation order was swapped (`extra=0` before
-'     `poolsize=nqual` in the old draft; the original stores poolsize's slot BEFORE
-'     extra's -- plain statement-order, not a register issue).
-'   * `navailweeks < matchesneeded` vs `matchesneeded > navailweeks` -- same truth
-'     table, but the original's `cmp esi,[mem]/jle` puts the register operand FIRST,
-'     which only the second spelling reproduces (10.1's "relational spelling" note,
-'     same family as the `groups>=5` vs `groups>4` swap already noted below).
-' The `(g/2)+(matchnum-1)*4` formula also needed its literal (and otherwise pointless)
-' `+1 ... -1` round trip restored -- `(g / 2 + 1) + (matchnum - 1) * 4 - 1` -- Ghidra's
-' decompile silently constant-folds it away, but the raw bytes keep both the `add eax,1`
-' and the later `sub eax,1` as separate instructions (confirmed by a GAP showing OURS
-' missing exactly those 5 bytes), so the original source really did write it that way.
+' Every compound `And`/`Or` condition in this body (the `Select`/`Case` `wk` test, the
+' `special`/shortfall/normal three-way cascade's guard, the `dok`/`ok2`/`ok3` loop exit
+' tests, the final fallback's `clash` loop) is written directly on the `If`/`While` with
+' NO block-scoped boolean Local standing in for it -- the original never materializes a
+' compound condition into a `Local x:Int = False` intermediate before branching on it.
+' `While`/`Wend` (not `Repeat`/`Forever`) is used everywhere a loop's exit condition is a
+' compound test, matching the original's goto-while shape (forward `jmp` to the condition
+' check, then loop back) rather than `Repeat`'s fall-into-body-first shape. `CheckFixture-
+' Clash(d)` is used BARE (no `<> 0`) whenever it is the trailing operand of an `Or` feeding
+' a branch; the final fallback's second `While CheckFixtureClash(d) <> 0 ... Wend` calls it
+' fresh every iteration rather than caching the first call into a Local.
+'
+' The `poolsize`/`extra` initialisation stores `poolsize` before `extra` (plain statement
+' order). `matchesneeded > navailweeks` (not `navailweeks < matchesneeded`) is the spelling
+' that reproduces the original's `cmp esi,[mem]/jle` with the register operand first
+' (codegen-patterns.md 10.1's "relational spelling" note; same family as the `groups > 4`
+' spelling in finding 5 below). The `(g/2)+(matchnum-1)*4` formula keeps its literal (and
+' otherwise pointless) `+1 ... -1` round trip -- `(g / 2 + 1) + (matchnum - 1) * 4 - 1` --
+' which Ghidra's decompile silently constant-folds away but the raw bytes keep as separate
+' `add eax,1`/`sub eax,1` instructions.
+'
+' The `g`-loop's per-group match count is written as three Locals in this exact order --
+' `grouprounds:Int = (grpsize - 1) * rounds`, THEN `half:Int = grpsize / 2`, THEN
+' `nmatches:Int = half * grouprounds` -- because the original computes `(grpsize-1)*rounds`
+' BEFORE `grpsize/2`, not after: reading the raw bytes shows `esi` holding `(grpsize-1)*
+' rounds` already at the point `half` is being computed, so that product cannot be a single
+' inline sub-expression of the `For i = 0 To half*(grpsize-1)*rounds-1` bound written where
+' the `For` line sits textually -- it is computed earlier and merely referenced (as
+' `nmatches - 1`) once the `For` line is reached, and it survives the intervening
+' `SelectFixtureTable`/`Rand` calls in `esi` (the only free callee-saved register, since
+' `ebx` holds `d` and `edi` holds `Self` for the whole function) without ever needing a
+' stack slot of its own -- `half`, unlike `nmatches`, DOES get a stack slot (`grpsize/2` is
+' still needed later for `i Mod half`), so it is stored and then immediately reloaded by
+' the very next statement, which is exactly what a spilled Local's use looks like. The
+' `secondarymatchday=99` branch's `groups > 4` arm likewise names its computed offset --
+' `Local ndaysoffset:Int = (g / 2 + 1) + (matchnum - 1) * 4 - 1` before `d.AddDays
+' (ndaysoffset)` -- rather than passing the expression inline to `AddDays`; inlining it
+' makes the compiler cache `d` into a scratch register before the offset arithmetic
+' instead of right before the call, which the original does not do.
 '
 ' Builds a league season's round-robin fixture list (docs/game/career/season-structure.md
 ' documents the football-level behaviour this backs). Depends on the now-VERIFIED module
@@ -102,48 +104,32 @@
 '     matters (`spacing<=1`/`spacing>1`, not `spacing<2`/`spacing>=2` -- same truth table,
 '     different immediate operand, guide 10.1's "relational spelling" note).
 '
-' RULED OUT / RESIDUAL -- as of THIS pass, 9 gaps remain (-12 bytes total, COMPLETE) and
-' 3 same-length subs, all in TWO small clusters, both look like REGISTER ALLOCATION
-' (codegen-patterns.md 17/18/22), not remaining logic bugs -- no Local was found still
-' standing in for a compound condition, and no branch was found with the wrong polarity:
-'   * `poolsize+extraflag` / `rounds` product (the `g`-loop's `half`/`grpsize`/the
-'     `(grpsize-1)*rounds` factor of the `i`-loop's upper bound, ORIGINAL offsets
-'     ~617-716): original keeps `grpsize` in `ecx` and the constant divisor `2` in
-'     `esi`, and pre-computes `(grpsize-1)*rounds` into `esi` early (right after the
-'     `grpsize` mod-2 fixup, BEFORE the `SelectFixtureTable`/`Rand` calls), caching it
-'     across those two calls for reuse at the `For i` bound. Ours swaps which of
-'     `ecx`/`esi` holds which value, and computes the `(grpsize-1)*rounds` factor
-'     LATE, inline at the `For i` bound itself, instead of hoisting it early. The
-'     SOURCE TEXT for this stretch (`grpsize`/`half`/the `For i` bound expression) was
-'     re-checked against the decompile and against sibling `For`-loop bound patterns
-'     elsewhere in this project and looks right as written; this reads as the
-'     allocator choosing a different live-range/hoist point for one sub-product, not a
-'     missing statement. Left alone rather than guessing at an artificial intermediate
-'     Local with no textual evidence for one.
-'   * The `special`-branch's `groups > 4` complex-calc tail (ORIGINAL offset ~875,
-'     `push edx` vs ours `push ecx`, one instruction, 0 net bytes at that exact
-'     instruction but shifted by a stray 2-byte `mov ecx,ebx` a few instructions
-'     earlier): which callee-saved register holds the cached copy of `d` across the two
-'     `AddDays`-shaped calls in that branch differs (edx there vs ecx here). Byte-
-'     neutral per 18.1 (`ebx`/`ecx`/`edx`/`esi`/`edi` moves are all the same length) EXCEPT
-'     for the extra `mov ecx,ebx` itself, which is exactly the kind of early-vs-late
-'     cache point the allocator decides on its own (same family as the point above).
+' RESIDUAL -- localise_diff.py's 3 remaining gaps (-6 bytes, COMPLETE, no same-length
+' subs) are ONE cluster, at ORIGINAL offsets ~1044-1173, all downstream of a single
+' branch-polarity question:
 '   * The `d.GetDay() <> primarymatchday And ndays < 7 Then shortfall -= 1` check AFTER
-'     the shortfall-decrement `While` (ORIGINAL offset ~1142-1173) compiles with the
-'     FIRST operand materialized as its OWN NEGATION (`sete`, i.e. `GetDay()=primary`,
-'     `jne`-skip-with-the-stale-true-flag-reused-as-the-join-value) rather than the
-'     direct-polarity `setne`/`je`-skip shape used at this body's OTHER `And`-guards
-'     (the top-of-function guard, `wk`, `special`, `dok`). Logic was re-verified
-'     bit-for-bit against this alternate shape and the source as written
-'     (`d.GetDay() <> primarymatchday And ndays < 7`) is semantically correct either
-'     way; only the polarity of the INTERMEDIATE materialization differs, and no
-'     rewording tried so far (including the `matchesneeded > navailweeks` /
-'     `groups > 4` operand-order trick that fixed two other spots in this pass) flips
-'     it. Likely a genuine allocator/canonicalization quirk specific to this one
-'     `And`-guard's context, not a wording bug -- flagged for the next pass rather than
-'     guessed at further.
-'   * `SUB 1/3`+`SUB 2/3` (ORIGINAL +617/+627, `ecx`/`esi` swap) are the SAME cluster as
-'     the `half`/`grpsize` gap above, not independent findings.
+'     the shortfall-decrement `While` compiles with the FIRST operand materialized as its
+'     OWN NEGATION (`sete`, i.e. `GetDay()=primary`, `jne`-skip-with-the-stale-true-flag-
+'     reused-as-the-join-value, and the `sub` reached BY the join's `je` rather than
+'     skipped by it) rather than the direct-polarity `setne`/`je`-skips-the-action shape
+'     used at this body's other `And`-guards (the top-of-function guard, `wk`, `special`,
+'     the `While d.GetDay() <> primarymatchday And d.GetDay() <> secondarymatchday` loop a
+'     few lines above this same `If`, which uses direct `setne` for an otherwise identical
+'     field comparison). Every other `And`/`Or` guard in this body -- solo relational or
+'     compound, `If` or `While`, comparing a call result to a field or to a Local -- uses
+'     the direct-polarity shape; this is the one exception found so far. Confirmed
+'     semantically correct either way (De Morgan's-equivalent); only the polarity of the
+'     INTERMEDIATE materialization and which side of the final branch is the jump target
+'     differs. Operand-order swaps (`ndays < 7 And ...`, `primarymatchday <> d.GetDay()`),
+'     the `<=6`/`<7` relational-spelling variants, and splitting the `And` into two nested
+'     `If`s were all tried against the raw bytes and none reproduces it -- the nested-`If`
+'     rewrite in particular made the whole function's register allocation reshuffle
+'     (+125 bytes across 46 gaps starting at ORIGINAL +3), a reminder that this allocator
+'     operates on the whole function's interference graph and a change anywhere in the
+'     body can ripple far from its own line. The near-vs-short `je` encoding difference at
+'     ORIGINAL +1044 (a `0F 84`/6-byte original vs a `74`/2-byte here) is a length
+'     consequence of this cluster, not an independent finding: fixing the polarity above
+'     should restore the 4 bytes and the near encoding together.
 '
 ' Field offsets used (object_model.json, TCompetition): +0x08 id, +0x0C name, +0x18 locale
 ' (unused here), +0x1C level, +0x24 comptype, +0x28 startyear, +0x2C startweek, +0x30
@@ -169,18 +155,20 @@
 ' hit that gap if a competition's team pool (after the `groups`-way split and `extra`
 ' remainder) ever lands on 27. Nothing in CreateFixtureListLeague itself guards against it.
 '
-' NEXT PASS: do not re-derive points 1-7, or this pass's boolean-Local/loop-shape/
-' operand-order fixes; all are confirmed against the raw bytes via `localise_diff.py`
-' (`python scripts/localise_diff.py TCompetition.CreateFixtureListLeague
+' NEXT PASS: do not re-derive the structural findings above, or re-try the operand-order/
+' relational-spelling/nested-`If` rewordings already ruled out for the RESIDUAL cluster;
+' all are confirmed against the raw bytes via `localise_diff.py` (`python
+' scripts/localise_diff.py TCompetition.CreateFixtureListLeague
 ' src/recovered_unverified/TCompetition.CreateFixtureListLeague.bmx` -- safe to run
-' repeatedly, builds an isolated per-worker probe, does not touch shared state; just
-' don't run `scripts/assemble.py`). Re-run it first -- 9 gaps / 3 subs / first_diff=+617
-' at this save. The three residual clusters are documented just above ("RULED OUT /
-' RESIDUAL"); all three read as the allocator's own live-range/hoist-point choice, not a
-' missing or misworded statement, so the next lever is 18.1-18.4/22.1-22.4's
-' block_count/degree formula applied to THIS body's specific Locals (`grpsize`, `half`,
-' the `d`-cache register in the `groups>4` branch), not another pass over the control
-' flow -- that has now been checked twice and is believed complete.
+' repeatedly, builds an isolated per-worker probe, does not touch shared state; just don't
+' run `scripts/assemble.py`). Re-run it first -- 3 gaps / 0 subs / first_diff=+1044 at this
+' save. The next lever for the RESIDUAL cluster is reading `cgallocregs.cpp`'s actual
+' spill-cost/scheduling logic (codegen-patterns.md 18.1-18.4) for why a compound `And`'s
+' first operand would materialize as its own negation in exactly this one context and no
+' other in this body, rather than guessing at more source spellings -- the one attempt
+' that changed the shape (splitting into nested `If`s) reshuffled unrelated code 800+
+' bytes earlier in the function, so treat this cluster as high blast-radius and verify
+' with `localise_diff.py` after every single-line change, not after a batch of them.
 	Method CreateFixtureListLeague:Int()
 		LogLine("CreateFixtureListLeague:" + name)
 		If comptype = 0 And duration = 0
@@ -249,10 +237,12 @@
 			If grpsize Mod 2 = 1
 				grpsize = grpsize + 1
 			EndIf
+			Local grouprounds:Int = (grpsize - 1) * rounds
 			Local half:Int = grpsize / 2
+			Local nmatches:Int = half * grouprounds
 			SelectFixtureTable(poolsize + extraflag, 0)
 			Local seed:Int = Rand(poolsize, 1)
-			For Local i:Int = 0 To half * (grpsize - 1) * rounds - 1
+			For Local i:Int = 0 To nmatches - 1
 				GetHomeAndAwayTeam(Varptr home, Varptr away, poolsize + extraflag, seed)
 				If i Mod half = 0
 					matchnum = matchnum + 1
@@ -260,7 +250,8 @@
 						If secondarymatchday = 99
 							d.SetDate(primarymatchday, startweek, startyear)
 							If groups > 4
-								d.AddDays((g / 2 + 1) + (matchnum - 1) * 4 - 1)
+								Local ndaysoffset:Int = (g / 2 + 1) + (matchnum - 1) * 4 - 1
+								d.AddDays(ndaysoffset)
 							Else
 								d.AddDays(groups * (matchnum - 1) + g)
 							EndIf

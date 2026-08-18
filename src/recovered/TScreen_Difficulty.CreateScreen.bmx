@@ -1,5 +1,6 @@
 ' TScreen_Difficulty.CreateScreen
 ' VA 0x0052571f   1498 bytes   class-table slot 0x30   sig ()i   KIND=Function (static)
+' byte-identical vs NSS5.exe (1498/1498, original length from Ghidra's inventory)
 ' Gadget-construction family (codegen-patterns.md 12.2 / 3d) -- same shape as
 ' TScreen_TestMenu.CreateScreen / TScreen_Dilemma.CreateScreen / TScreen_ContinentalComps.
 ' Builds the difficulty-select screen: title bar, a bottom nav panel (empty, present only for

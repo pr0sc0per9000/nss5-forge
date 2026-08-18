@@ -1,5 +1,6 @@
 ' TDate.GetString
 ' VA 0x00536aab   1219 bytes   class-table slot 0x48   sig (i,i)$   KIND=Method
+' byte-identical vs NSS5.exe (1219/1219, original length from Ghidra's inventory)
 ' Formats the date into one of 6 styles (a0 = style 0..5), optionally weekday-prefixed
 ' (a1 <> 0). Ghidra's decompiled C repeatedly MERGES a callee's real args with the pushes
 ' of the following call (codegen-patterns.md header warning) -- `Self.GetWeekday(2," ")`

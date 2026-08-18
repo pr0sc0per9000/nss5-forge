@@ -1,5 +1,6 @@
 ' TScreen_Kits.RefreshKits   (KIND=Function -- static, no Self)
 ' VA 0x00549DB7   686 bytes   class-table slot 0x3C   sig ()i
+' byte-identical vs NSS5.exe (686/686, original length from Ghidra's inventory)
 ' ORACLE: mode=reloc  matched=686/686  STATUS=MATCH
 ' Original length from Ghidra's inventory. NSS5_NO_LEARN=1.
 '

@@ -1,5 +1,6 @@
 ' TScreen_NewPlayer.SetUpScreen
 ' VA 0x00524521   610 bytes   matched 610/610
+' byte-identical vs NSS5.exe (610/610, original length from Ghidra's inventory)
 ' KIND=Function (static method on the Type), SIG=()i, SLOT=0x34
 ' Body-only format: statements only, parameters are a0, a1, ...
 '
@@ -16,7 +17,7 @@
 '     0x00C64240 g_np_combohaircol:TCombo     (slot 0xB0 = SelectItemById)
 '     0x00C596F0 g_nations:TList              (table said Object/low; slot 0x8C
 '                                              ObjectEnumerator proves TList)
-'     0x00C6F028 g_profile_co:TProfile        (3 construction sites)
+'     0x00C6F028 g_profile:TProfile        (3 construction sites)
 '   Slots resolved (each pointer verified to be classtable_va + slot exactly):
 '     [0x00C61C88] = TScreen + 0x5C  = TScreen.SetActive($,$):TScreen
 '     [0x00C59A40] = TNation + 0x78  = TNation.SortListBy(i,i)i
@@ -41,7 +42,7 @@
 '!Global g_np_comboskincol:TCombo
 '!Global g_np_combohaircol:TCombo
 '!Global g_nations:TList
-'!Global g_profile_co:TProfile
+'!Global g_profile:TProfile
 TScreen.SetActive("newplayer", "")
 g_np_page = 0
 If g_np_combonation.CountItems() = 0
@@ -68,12 +69,12 @@ EndIf
 If g_np_combohair.GetSelectedItemId() = 0
 	g_np_combohair.SelectItemById(2)
 EndIf
-g_np_comboskincol.SelectItem(g_profile_co.playercols.skin)
-g_np_combohaircol.SelectItemById(g_profile_co.playercols.hair)
+g_np_comboskincol.SelectItem(g_profile.playercols.skin)
+g_np_combohaircol.SelectItemById(g_profile.playercols.hair)
 ComboSkin()
 ComboHair()
 RefreshKit()
-If g_profile_co.helppages[0] = 0
+If g_profile.helppages[0] = 0
 	TScreen.Tutorial()
-	g_profile_co.helppages[0] = 1
+	g_profile.helppages[0] = 1
 EndIf

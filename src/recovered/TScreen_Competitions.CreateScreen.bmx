@@ -1,5 +1,6 @@
 ' TScreen_Competitions.CreateScreen
 ' VA 0x0052f053   2656 bytes   class-table slot 0x30   sig ()i   KIND=Function (static)
+' byte-identical vs NSS5.exe (2656/2656, original length from Ghidra's inventory)
 ' ORACLE: mode=reloc  matched=2656/2656  STATUS=MATCH.  NSS5_NO_LEARN=1.
 '
 ' No sub esp -- ebx is the ONLY saved register (no spilled Locals at all); every gadget is

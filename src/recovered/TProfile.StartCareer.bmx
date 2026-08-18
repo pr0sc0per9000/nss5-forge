@@ -9,9 +9,14 @@
 '         globals_final says Int/usage/medium -- WRONG. The code retains the incoming value
 '         (FF 40 04) and releases the outgoing one with a conditional _bbGCFree on every
 '         store, and reads [g+8] as a String length, so it holds a String (guide 11.2).
-'     0x00C6E9A8 -> g_datapath:String
+'     0x00C6E9A8 -> g_savedir:String
 '         globals_final says Int/usage/medium -- also a String: it is the left operand of a
-'         _bbStringConcat chain.
+'         _bbStringConcat chain. Named g_savedir, matching TScreen_MainMenu.ButtonDeleteSaveFile
+'         (same address, same DeleteFile/FileType(g_savedir + "Save/" + ...) shape,
+'         byte-exact match), not g_datapath: g_datapath is the corpus-wide spelling for the
+'         DIFFERENT install-path Global at 0x00C6E950 (STRONG, 24 other bodies incl.
+'         TFormation.LoadTactics, which declares both g_datapath and g_userpath/g_savedir's
+'         address side by side in one body -- proof the two are distinct slots, not one).
 '   Slots resolved:
 '     TProfile+0x50 CreateNewInternationalStats, +0x70 SetPlayButtonIcon, +0x40 SaveGame($)
 '       (Self calls); field TProfile+0x130 playbuttontype
@@ -30,7 +35,7 @@
 '     0xC7DD40 "cancel", 0xC8DB0C "SaveFile", 0xC7ED10 ".sav", 0xC6EA20 "Save/",
 '     0xC8DB28 "CMESSAGE_FILEEXISTSOVERWRITE", 0xC5D284 "".
 '!Global g_savename:String
-'!Global g_datapath:String
+'!Global g_savedir:String
 CreateNewInternationalStats()
 TCompetition.SetUpCompetitionsAll()
 Repeat
@@ -39,7 +44,7 @@ Repeat
 		g_savename = "SaveFile"
 	EndIf
 	g_savename = g_savename + ".sav"
-	If FileType(g_datapath + "Save/" + g_savename) = 1
+	If FileType(g_savedir + "Save/" + g_savename) = 1
 		If TScreen.DoMessage(GetText("CMESSAGE_FILEEXISTSOVERWRITE"),1,0) = 0
 			g_savename = ""
 		EndIf

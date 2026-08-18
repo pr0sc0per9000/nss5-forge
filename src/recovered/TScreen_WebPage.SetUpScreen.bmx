@@ -1,5 +1,6 @@
 ' TScreen_WebPage.SetUpScreen   (KIND=Function -- static, no Self)
 ' VA 0x00561066   721 bytes   class-table slot 0x34   sig ($,$)i
+' byte-identical vs NSS5.exe (721/721, original length from Ghidra's inventory)
 ' ORACLE: mode=reloc  matched=721/721  reloc_masked=46  STATUS=MATCH
 ' Original length from Ghidra's inventory. NSS5_NO_LEARN=1.
 '

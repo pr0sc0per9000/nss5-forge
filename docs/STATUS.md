@@ -4,38 +4,38 @@
      Do not edit by hand: your changes will be overwritten, and a
      hand-maintained status file goes stale within hours. -->
 
-**82.5%** of the reconstruction is byte-identical to `NSS5.exe`,
-measured as 650716 of 788482 bytes of machine code across 1768 function bodies.
+**88.1%** of the reconstruction is byte-identical to `NSS5.exe`,
+measured as 692083 of 785430 bytes of machine code across 1764 function bodies.
 
 ```
 RECONSTRUCTION PROGRESS  (measured in bytes of matched machine code)
 
   TREE                              BODIES   MATCHED    BYTES    DONE
-  src/recovered                       1643      1551   696183   91.2%
+  src/recovered                       1643      1581   696183   95.9%
   src/recovered_module                  62        61    16219   99.0%
-  src/recovered_unverified              63         0    76080    0.0%
+  src/recovered_unverified              59         6    73028   11.9%
   ------------------------------ --------- --------- -------- -------
-  TOTAL                               1768      1612   788482   82.5%
+  TOTAL                               1764      1648   785430   88.1%
 
-  650716 of 788482 bytes byte-identical against NSS5.exe.
+  692083 of 785430 bytes byte-identical against NSS5.exe.
 
   Largest bodies not yet byte-identical:
-    TBall.Kick                                       2707 bytes  0x004c91a2
-    TScreen_Competitions.CreateScreen                2656 bytes  0x0052f053
     TPhotographer.SetUpPositions                     2652 bytes  0x004ea682
     TJoy.Update                                      2373 bytes  0x004d9cfa
-    TScreen_EditKits.RefreshKits                     2234 bytes  0x005353d7
-    TEngine.SkipMatchTime                            2223 bytes  0x004d6a80
     TCompetition.CreateCompetition                   2026 bytes  0x005092e3
     TEngine.UpdateOffset                             2004 bytes  0x004cfb35
-    TLabel.Draw                                      1882 bytes  0x00519bd7
     TTraining.SetUpTraining                          1764 bytes  0x0057bf1f
     TScreen_ContinentalComps.CreateScreen            1736 bytes  0x0053357a
     TKit.GetPaintedPlayer                            1729 bytes  0x004db0dd
     TEngine.GoalScored                               1713 bytes  0x004d39d6
-    TBall.UpdateMovement                             1711 bytes  0x004c871f
     TScreen_WorldMap.Draw                            1706 bytes  0x0055b1a0
-    ... and 141 more
+    TScreen_Formation.Draw                           1704 bytes  0x0054c38b
+    TPlayer.UpdateKeeperPosition                     1701 bytes  0x004f2eed
+    TContractOffer.CheckTransferWindow               1647 bytes  0x00571e91
+    TTraining.RenderScoreboard                       1626 bytes  0x005811ea
+    TTraining.SetUpTraining_Pace                     1613 bytes  0x0057c6d2
+    TPlayer.CheckPlayerContactAll                    1577 bytes  0x004f458a
+    ... and 101 more
 ```
 
 Regenerate with:

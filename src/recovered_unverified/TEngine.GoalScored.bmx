@@ -8,31 +8,29 @@
 ' Kick call, and the assist-block Int locals was independently re-derived from the same
 ' disassembly and confirmed correct -- kept unchanged. What was actually wrong:
 '
-' THE REAL DEFECT: outer If/Else BRANCH POLARITY on the two two-way `If cond Then A Else B`
-' sites (everywhere else in this body is either a single-branch `If` with no `Else`, or an
-' `ElseIf` cascade -- both exempt). This is docs/reference/codegen-patterns.md section 21,
-' "the solo-relational If/Else branch-swap rule": a lone relational comparison (`<`,`>`,`<=`,
-' `>=`, or plain `=`) that is the WHOLE condition of an `If...Else` whose two arms hold
-' genuinely different code gets compiled by bcc as the LOGICAL NEGATION of the written
-' comparison, with the Then/Else CONTENT SWAPPED. Verified directly against the disassembly,
-' not just cited:
+' TWO SITES NEED NON-OBVIOUS SHAPES, both verified directly against the disassembly, not
+' just cited. The outer training-mode gate is a GUARD CLAUSE (docs/reference/codegen-
+' patterns.md section 3f), not an If/Else -- item 1 below. The y-sign scoring-end gate is
+' a genuine two-way `If cond Then A Else B` whose arms bcc emits as the LOGICAL NEGATION of
+' the written comparison with the Then/Else CONTENT SWAPPED -- docs/reference/codegen-
+' patterns.md section 21, "the solo-relational If/Else branch-swap rule" -- item 2 below.
+' Every OTHER `If` in this body is single-branch (no `Else` at all) or an `ElseIf` cascade,
+' both exempt from the branch-swap rule; see the paragraph after item 2 for the full list:
 '   1. Outer training-mode gate. Original bytes at 0x0019: `cmp [g_training_int03],0` /
 '      `je 0x4d3a0c` (SHORT jump, +0x14). The je TARGET (0x4d3a0c) is `g_engine_int27 =
 '      g_player_int50`, i.e. the START of the big match-goal block; the FALLTHROUGH (when
 '      g_training_int03<>0) is `push edi / call [TTraining.GoalScored] / mov eax,0 / jmp
-'      epilogue` -- 20 bytes, exactly matching the je's +0x14 displacement. So the SHORT
-'      delegate call is physically FIRST (fallthrough) and the big block is the jump target.
-'      Written naively as `If g_training_int03 = 0 Then <big> Else <delegate> EndIf`, bcc
-'      puts the FIRST-written arm (big) as fallthrough instead -- wrong shape, and it also
-'      means a0 has no reason to be cached in a register before the delegate call, which is
-'      why the previous draft's compiled output was missing edi's `mov edi,[ebp+8]` at
-'      function entry entirely (confirmed: `python scripts/bytematch.py ... TEngine
-'      GoalScored` showed the assembled body reloading `[ebp+8]` into eax at every a0 use
-'      instead of caching it once). Fix: write the NEGATION with arms swapped --
-'      `If g_training_int03 <> 0 Then TTraining.GoalScored(a0) Else <big> EndIf`. With the
-'      delegate call as the physically-first (fallthrough) arm and a0 needed on EVERY path
-'      out of the entry block, bcc caches a0 in a callee-saved register at entry -- the
-'      `mov edi,[ebp+8]` immediately after the prologue that the original has.
+'      epilogue` -- 20 bytes, exactly matching the je's +0x14 displacement. This is
+'      docs/reference/codegen-patterns.md section 3f's guard-pattern shape verbatim
+'      (`cmp [g],0 / jne body / mov eax,0 / jmp end` is an early return, not an If-block):
+'      the delegate call plus its own `mov eax,0` sits physically first as the fallthrough
+'      arm, with the big match-goal block as the jump target and NO shared Else scope
+'      between them. Written as `If g_training_int03 <> 0 Then TTraining.GoalScored(a0) ;
+'      Return 0 ; EndIf` followed by the big block unconditionally (not nested in an Else),
+'      bcc emits exactly this shape: the delegate's own `mov eax,0` right after its call,
+'      and the big block starting fresh at the guard's jump target with a0 (edi) needed on
+'      every path out of the entry block, so bcc caches a0 in a callee-saved register at
+'      entry -- the `mov edi,[ebp+8]` immediately after the prologue that the original has.
 '   2. The y-sign scoring-end gate. Original bytes 0x01A0-0x01B5: `fld [edi+0x1c]` (a0.y) /
 '      `fldz` / `fxch` / `fucompp` / `fnstsw` / `sahf` / `setae al` (setae = a0.y >= 0.0) /
 '      `cmp eax,0` / `jne 0x4d3c6f`. jne fires (jumps) when the setae flag is TRUE, i.e. when
@@ -184,6 +182,28 @@
 ' scorer's position if they are the human ("newstar") player, credits a same-team assist
 ' (AddStat 4) with its own magenta StarShower for a human assister, and bumps the matching
 ' per-team goal counter (g_engine_int31 home / g_engine_int32 away).
+'
+' OPEN DIVERGENCE. `a0` is not register-allocated: every use compiles as a fresh
+' `[ebp+8]` reload instead of the original's single `mov edi,[ebp+8]` at entry, which
+' accounts for essentially the entire remaining byte delta (confirmed with
+' scripts/localise_diff.py -- every gap is a same-length "+3 bytes, extra [ebp+8] reload"
+' substitution). Isolated with standalone probes against the real compiler
+' (scripts/harness.try_method with substitute bodies, not saved to this tree): `a0` keeps
+' its register through the match-goal/Kick block and through the credit/swap/newstar
+' section of the tail on their own; it ALSO keeps its register through the
+' assistkx/assistky/AngleTo/Dist2D/AddStat block on its own (with no later use of `a0`).
+' It only loses its register when BOTH are present together AND `a0` is read again
+' afterward (the closing `a0.lastkickedby.teamid` credit check) -- i.e. two Int Locals
+' surviving two calls (AngleTo then the Dist2D inlined into AddStat's own argument list)
+' while `a0` needs to stay live past them tips bcc's iterated-coalescing spill selection
+' (tools/blitzmax-legacy-src/_src/codegen/cgallocregs.cpp, docs/reference/codegen-
+' patterns.md section 18) against `a0` even though the original manages the identical
+' shape. Giving Dist2D its own `Local` (which does not match the confirmed FPU-stack-
+' passthrough bytes at relative offset 0x0600-0x0603) restores the register in isolation, which locates
+' the sensitivity but is not a usable fix -- it costs the very bytes it would need to
+' recover. Declaration-order permutations of assistkx/assistky/assistang, splitting their
+' declaration from their assignment, and caching a0.assistedby or receivex/receivey into
+' Locals were all tried and none moved it.
 '!Global g_training_int03:Int
 '!Global g_engine_int27:Int
 '!Global g_player_int50:Int
@@ -207,103 +227,103 @@
 LogLine("GoalScored")
 If g_training_int03 <> 0 Then
 	TTraining.GoalScored(a0)
+	Return 0
+EndIf
+g_engine_int27 = g_player_int50
+If g_matchstate = 10 Then
+	PlaySound(g_snd_crowd, g_chan_crowd)
+	Local side:Int = 0
+	Select g_engine_int25 Mod 2
+		Case 0
+			side = 2
+		Case 1
+			side = 1
+	End Select
+	Select side
+		Case 1
+			g_fixture.penscore1 :+ 1
+		Case 2
+			g_fixture.penscore2 :+ 1
+	End Select
+	g_engine_arr01[g_engine_int25] = 1
+	TEngine.DoShootOut()
 Else
-	g_engine_int27 = g_player_int50
-	If g_matchstate = 10 Then
-		PlaySound(g_snd_crowd, g_chan_crowd)
-		Local side:Int = 0
-		Select g_engine_int25 Mod 2
-			Case 0
-				side = 2
-			Case 1
-				side = 1
-		End Select
-		Select side
-			Case 1
-				g_fixture.penscore1 :+ 1
-			Case 2
-				g_fixture.penscore2 :+ 1
-		End Select
-		g_engine_arr01[g_engine_int25] = 1
-		TEngine.DoShootOut()
-	Else
-		If a0.controlledby <> Null Then
-			a0.Kick(a0.controlledby, AngleTo(a0.x, a0.y, 0, Float((g_goalline + 100) * a0.controlledby.GetShootingDirection())), 50.0, 1, 0)
-		EndIf
-		PlaySound(g_snd_crowd, g_chan_crowd)
-		TScreenMessage.Create(0, 0, Lower(GetText("Goal!")), g_engine_int17, g_engine_font, Null, 1.0, "FFFFFF")
-		g_matchstate = 8
-		If a0.y < 0.0 Then
-			Select g_engine_int18
-				Case 1
-					g_fixture.score1 :+ 1
-					g_engine_int26 = 1
-					g_player_int04 = g_hometeam.id
-				Case 2
-					g_fixture.score2 :+ 1
-					g_engine_int26 = 2
-					g_player_int04 = g_awayteam.id
-				Case 3
-					g_fixture.score1 :+ 1
-					g_engine_int26 = 1
-					g_player_int04 = g_hometeam.id
-				Case 4
-					g_fixture.score2 :+ 1
-					g_engine_int26 = 2
-					g_player_int04 = g_awayteam.id
-			End Select
-		Else
-			Select g_engine_int18
-				Case 1
-					g_fixture.score2 :+ 1
-					g_engine_int26 = 2
-					g_player_int04 = g_awayteam.id
-				Case 2
-					g_fixture.score1 :+ 1
-					g_engine_int26 = 1
-					g_player_int04 = g_hometeam.id
-				Case 3
-					g_fixture.score2 :+ 1
-					g_engine_int26 = 2
-					g_player_int04 = g_awayteam.id
-				Case 4
-					g_fixture.score1 :+ 1
-					g_engine_int26 = 1
-					g_player_int04 = g_hometeam.id
-			End Select
-		EndIf
+	If a0.controlledby <> Null Then
+		a0.Kick(a0.controlledby, AngleTo(a0.x, a0.y, 0, Float((g_goalline + 100) * a0.controlledby.GetShootingDirection())), 50.0, 1, 0)
 	EndIf
-	If a0.lasttouchedby <> Null Then
-		g_player_tplayer01 = a0.lasttouchedby
-		g_player_tplayer01.joy.kickenabled = 0
-		Local swap:Int = False
-		If a0.lastkickedby <> a0.lasttouchedby Then swap = (a0.lasttouchedby.selectionno = 0)
-		If swap Then g_player_tplayer01 = a0.lastkickedby
-		Local credit:Int = False
-		If g_matchstate <> 10 Then credit = (g_player_tplayer01.teamid = g_player_int04)
-		If credit Then
-			a0.lastkickedby.AddStat(5, g_player_tplayer01.directiontogoal_opp, g_player_tplayer01.distancetogoal_opp, g_player_tplayer01.kickx, g_player_tplayer01.kicky)
-			If a0.lastkickedby.newstar <> 0 Then
-				TParticle.StarShower(Int(a0.lastkickedby.x), Int(a0.lastkickedby.y), Lower(GetText("Goal!")), "00FF00")
+	PlaySound(g_snd_crowd, g_chan_crowd)
+	TScreenMessage.Create(0, 0, Lower(GetText("Goal!")), g_engine_int17, g_engine_font, Null, 1.0, "FFFFFF")
+	g_matchstate = 8
+	If a0.y < 0.0 Then
+		Select g_engine_int18
+			Case 1
+				g_fixture.score1 :+ 1
+				g_engine_int26 = 1
+				g_player_int04 = g_hometeam.id
+			Case 2
+				g_fixture.score2 :+ 1
+				g_engine_int26 = 2
+				g_player_int04 = g_awayteam.id
+			Case 3
+				g_fixture.score1 :+ 1
+				g_engine_int26 = 1
+				g_player_int04 = g_hometeam.id
+			Case 4
+				g_fixture.score2 :+ 1
+				g_engine_int26 = 2
+				g_player_int04 = g_awayteam.id
+		End Select
+	Else
+		Select g_engine_int18
+			Case 1
+				g_fixture.score2 :+ 1
+				g_engine_int26 = 2
+				g_player_int04 = g_awayteam.id
+			Case 2
+				g_fixture.score1 :+ 1
+				g_engine_int26 = 1
+				g_player_int04 = g_hometeam.id
+			Case 3
+				g_fixture.score2 :+ 1
+				g_engine_int26 = 2
+				g_player_int04 = g_awayteam.id
+			Case 4
+				g_fixture.score1 :+ 1
+				g_engine_int26 = 1
+				g_player_int04 = g_hometeam.id
+		End Select
+	EndIf
+EndIf
+If a0.lasttouchedby <> Null Then
+	g_player_tplayer01 = a0.lasttouchedby
+	g_player_tplayer01.joy.kickenabled = 0
+	Local swap:Int = False
+	If a0.lastkickedby <> a0.lasttouchedby Then swap = (a0.lasttouchedby.selectionno = 0)
+	If swap Then g_player_tplayer01 = a0.lastkickedby
+	Local credit:Int = False
+	If g_matchstate <> 10 Then credit = (g_player_tplayer01.teamid = g_player_int04)
+	If credit Then
+		a0.lastkickedby.AddStat(5, g_player_tplayer01.directiontogoal_opp, g_player_tplayer01.distancetogoal_opp, g_player_tplayer01.kickx, g_player_tplayer01.kicky)
+		If a0.lastkickedby.newstar <> 0 Then
+			TParticle.StarShower(Int(a0.lastkickedby.x), Int(a0.lastkickedby.y), Lower(GetText("Goal!")), "00FF00")
+		EndIf
+		Local hasassist:Int = False
+		If a0.assistedby <> Null Then hasassist = (a0.assistedby <> g_player_tplayer01)
+		Local assistcredit:Int = False
+		If hasassist Then assistcredit = (a0.assistedby.teamid = g_player_tplayer01.teamid)
+		If assistcredit Then
+			Local assistkx:Int = a0.assistedby.kickx
+			Local assistky:Int = a0.assistedby.kicky
+			Local assistang:Float = AngleTo(assistkx, assistky, g_player_tplayer01.receivex, g_player_tplayer01.receivey)
+			a0.assistedby.AddStat(4, assistang, Dist2D(assistkx, assistky, g_player_tplayer01.receivex, g_player_tplayer01.receivey), assistkx, assistky)
+			If a0.assistedby.newstar <> 0 Then
+				TParticle.StarShower(Int(g_player_tplayer01.x), Int(g_player_tplayer01.y), Lower(GetText("Assist")), "990099")
 			EndIf
-			Local hasassist:Int = False
-			If a0.assistedby <> Null Then hasassist = (a0.assistedby <> g_player_tplayer01)
-			Local assistcredit:Int = False
-			If hasassist Then assistcredit = (a0.assistedby.teamid = g_player_tplayer01.teamid)
-			If assistcredit Then
-				Local assistkx:Int = a0.assistedby.kickx
-				Local assistky:Int = a0.assistedby.kicky
-				Local assistang:Float = AngleTo(assistkx, assistky, g_player_tplayer01.receivex, g_player_tplayer01.receivey)
-				a0.assistedby.AddStat(4, assistang, Dist2D(assistkx, assistky, g_player_tplayer01.receivex, g_player_tplayer01.receivey), assistkx, assistky)
-				If a0.assistedby.newstar <> 0 Then
-					TParticle.StarShower(Int(g_player_tplayer01.x), Int(g_player_tplayer01.y), Lower(GetText("Assist")), "990099")
-				EndIf
-			EndIf
-			If a0.lastkickedby.teamid = g_hometeam.id Then
-				g_engine_int31 :+ 1
-			ElseIf a0.lastkickedby.teamid = g_awayteam.id Then
-				g_engine_int32 :+ 1
-			EndIf
+		EndIf
+		If a0.lastkickedby.teamid = g_hometeam.id Then
+			g_engine_int31 :+ 1
+		ElseIf a0.lastkickedby.teamid = g_awayteam.id Then
+			g_engine_int32 :+ 1
 		EndIf
 	EndIf
 EndIf

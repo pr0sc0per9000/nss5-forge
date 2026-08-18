@@ -1,5 +1,6 @@
 ' THelpBox.Create
 ' VA 0x0051b436   1360 bytes   class-table slot 0x30   sig (:TGadget,i,i,i,i,$,i,i):THelpBox
+' byte-identical vs NSS5.exe (1360/1360, original length from Ghidra's inventory)
 ' KIND=Function (static, no implicit Self)
 '
 ' Builds a tooltip/help-bubble box anchored to a TGadget: positions itself relative to the

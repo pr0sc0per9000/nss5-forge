@@ -73,57 +73,56 @@
 	For Local i:Int = 0 To 4
 		g_profile.interestedclubs[i] = 0
 	Next
-	If Not g_profile.TooSoonSinceLastContract()
-		Local club:TClub = g_profile.myclub
-		If g_profile.transferlisted = 4
-			club = TClub.SelectById(g_profile.onloanfrom)
-		EndIf
-		g_profile.GetAge()
-		Local status:Int = GetPlayerValueStatus()
-		LogLine("mystatus:" + status)
-		TClub.SortListBy(35, 0)
-		Local l:TList = CreateList()
-		For Local c:TClub = EachIn g_clubs
-			If c.id <> club.id And c.strength <= status
-				Local comp:TCompetition = TCompetition.SelectById(c.leagueid)
-				If Not comp Or comp.duration < 10 Then Continue
-				If status < 50 And TNation.SelectById(c.nationid).id <> club.nationid Then Continue
-				If status < 60 And TNation.SelectById(c.nationid).continent <> g_profile.mynation.continent Then Continue
-				If g_profile.desiredcontinentid > 0
-					Local n:TNation = TNation.SelectById(comp.based)
-					If n.continent <> g_profile.desiredcontinentid Then Continue
-					If g_profile.desirednationid > 0
-						If n.id <> g_profile.desirednationid Then Continue
-						If g_profile.desiredleagueid > 0
-							If comp.id <> g_profile.desiredleagueid Then Continue
-							If g_profile.desiredclubid > 0
-								If c.id <> g_profile.desiredclubid Then Continue
-							EndIf
+	If g_profile.TooSoonSinceLastContract() Then Return 0
+	Local club:TClub = g_profile.myclub
+	If g_profile.transferlisted = 4
+		club = TClub.SelectById(g_profile.onloanfrom)
+	EndIf
+	g_profile.GetAge()
+	Local status:Int = GetPlayerValueStatus()
+	LogLine("mystatus:" + status)
+	TClub.SortListBy(35, 0)
+	Local l:TList = CreateList()
+	For Local c:TClub = EachIn g_clubs
+		If c.id <> club.id And c.strength <= status
+			Local comp:TCompetition = TCompetition.SelectById(c.leagueid)
+			If Not comp Or comp.duration < 10 Then Continue
+			If status < 50 And TNation.SelectById(c.nationid).id <> club.nationid Then Continue
+			If status < 60 And TNation.SelectById(c.nationid).continent <> g_profile.mynation.continent Then Continue
+			If g_profile.desiredcontinentid > 0
+				Local n:TNation = TNation.SelectById(comp.based)
+				If n.continent <> g_profile.desiredcontinentid Then Continue
+				If g_profile.desirednationid > 0
+					If n.id <> g_profile.desirednationid Then Continue
+					If g_profile.desiredleagueid > 0
+						If comp.id <> g_profile.desiredleagueid Then Continue
+						If g_profile.desiredclubid > 0
+							If c.id <> g_profile.desiredclubid Then Continue
 						EndIf
 					EndIf
 				EndIf
-				Local found:Int = False
-				If g_contractoffers <> Null And Not g_contractoffers.IsEmpty()
-					For Local o:TContractOffer = EachIn g_contractoffers
-						If c.id = o.club.id And o.newbossrel = 0
-							found = True
-							Exit
-						EndIf
-					Next
-				EndIf
-				If Not found Then l.AddLast(c)
 			EndIf
-			If l <> Null And l.Count() >= 5 Then Exit
-		Next
-		If l <> Null
-			For Local i:Int = 0 To 4
-				If Not l.IsEmpty()
-					Local c:TClub = TClub(l.RemoveFirst())
-					If c <> Null
-						g_profile.interestedclubs[i] = c.id
+			Local found:Int = False
+			If g_contractoffers <> Null And Not g_contractoffers.IsEmpty()
+				For Local o:TContractOffer = EachIn g_contractoffers
+					If c.id = o.club.id And o.newbossrel = 0
+						found = True
+						Exit
 					EndIf
-				EndIf
-			Next
+				Next
+			EndIf
+			If Not found Then l.AddLast(c)
 		EndIf
+		If l <> Null And l.Count() >= 5 Then Exit
+	Next
+	If l <> Null
+		For Local i:Int = 0 To 4
+			If Not l.IsEmpty()
+				Local c:TClub = TClub(l.RemoveFirst())
+				If c <> Null
+					g_profile.interestedclubs[i] = c.id
+				EndIf
+			EndIf
+		Next
 	EndIf
 	Return 0

@@ -186,23 +186,29 @@ Select g_training_int05
 				g_traininglabel4.Draw()
 			EndIf
 		Else
-			Local cy:Int = g_screen_h / 2
-			DrawImageRect(g_kits_img1, 0, cy - 200, g_screen_w, 300.0, 0)
-			DrawImageRect(g_kits_img2, 0, cy - 202, g_screen_w, 4.0, 0)
-			DrawImageRect(g_kits_img2, 0, cy + 98, g_screen_w, 4.0, 0)
-			TEngine.DrawMyText(g_training_int08, g_screen_w / 2, cy - 120, 1, 1, 1.0, 1.0, "FFFFFF", 1)
-			TEngine.DrawMyText(g_training_int09, g_screen_w / 2, cy - 20, 1, 1, 1.0, 1.0, "FFFF00", 0)
-			TEngine.DrawMyText(g_training_int10, tickerx, cy + 50, 0, 1, 1.0, 1.0, "FFFFFF", 0)
+			Local cy:Int = g_screen_h / 2 - 170
+			DrawImageRect(g_kits_img1, 0, cy - 30, g_screen_w, 300.0, 0)
+			DrawImageRect(g_kits_img2, 0, cy - 32, g_screen_w, 4.0, 0)
+			DrawImageRect(g_kits_img2, 0, cy + 268, g_screen_w, 4.0, 0)
+			cy :+ 50
+			TEngine.DrawMyText(g_training_int08, g_screen_w / 2, cy, 1, 1, 1.0, 1.0, "FFFFFF", 1)
+			cy :+ 100
+			TEngine.DrawMyText(g_training_int09, g_screen_w / 2, cy, 1, 1, 1.0, 1.0, "FFFF00", 0)
+			cy :+ 70
+			TEngine.DrawMyText(g_training_int10, tickerx, cy, 0, 1, 1.0, 1.0, "FFFFFF", 0)
 		EndIf
 	Case 1
 	Case 2
-		Local cy:Int = g_screen_h / 2
-		DrawImageRect(g_kits_img1, 0, cy - 180, g_screen_w, 300.0, 0)
-		DrawImageRect(g_kits_img2, 0, cy - 182, g_screen_w, 4.0, 0)
-		DrawImageRect(g_kits_img2, 0, cy + 118, g_screen_w, 4.0, 0)
-		TEngine.DrawMyText(g_training_int08, g_screen_w / 2, cy - 100, 1, 1, 1.0, 1.0, "FFFFFF", 1)
+		Local cy:Int = g_screen_h / 2 - 150
+		DrawImageRect(g_kits_img1, 0, cy - 30, g_screen_w, 300.0, 0)
+		DrawImageRect(g_kits_img2, 0, cy - 32, g_screen_w, 4.0, 0)
+		DrawImageRect(g_kits_img2, 0, cy + 268, g_screen_w, 4.0, 0)
+		cy :+ 50
+		TEngine.DrawMyText(g_training_int08, g_screen_w / 2, cy, 1, 1, 1.0, 1.0, "FFFFFF", 1)
+		cy :+ 100
 		TEngine.DrawMyText(g_training_int09, g_screen_w / 2, cy, 1, 1, 1.0, 1.0, "FFFF00", 0)
-		TEngine.DrawMyText(g_training_int10, tickerx, cy + 70, 0, 1, 1.0, 1.0, "FFFFFF", 0)
+		cy :+ 70
+		TEngine.DrawMyText(g_training_int10, tickerx, cy, 0, 1, 1.0, 1.0, "FFFFFF", 0)
 		TPanel_Controls.RenderKickToContinue()
 End Select
 Local icon_x:Int = 40

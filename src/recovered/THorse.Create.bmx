@@ -1,5 +1,6 @@
 ' THorse.Create
 ' VA 0x0058a36b   1372 bytes   class-table slot 0x30   sig (i,$,f,f,f,[]i,i,i,i,i):THorse   KIND=Function (static)
+' byte-identical vs NSS5.exe (1372/1372, original length from Ghidra's inventory)
 ' ORACLE: mode=reloc  matched=1372/1372  STATUS=MATCH.  NSS5_NO_LEARN not set (default corpus run).
 '
 ' Lazy static asset init (guarded by g_horse_shadow, the FIRST global touched) followed by a

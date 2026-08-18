@@ -47,7 +47,15 @@
 ' Every string literal below was read directly out of NSS5.exe with harness.read_string() and
 ' matches the decompiled text exactly; the oracle masks a literal's ADDRESS, never its content.
 '
-' ORACLE: mode=reloc  matched=1736/1736  STATUS=MATCH.  NSS5_NO_LEARN unset (normal run).
+' The right-hand column's gadgets share a running X cursor: a single Int Local starts at
+' 10, and after each of the three widest widgets (combocontinent, combocomp, gotoclubs)
+' is assigned to its Global it is advanced by that widget's width plus a 10px gutter
+' (140, 260, 130) before the AddGadget call for that same widget -- confirmed by
+' localise_diff against the three `add esi, N` sites, which appear in exactly that
+' position (post-store, pre-AddGadget), never anywhere else. The remove-club button's
+' X is that same cursor plus a one-off +210, computed inline and not written back.
+'
+' ORACLE: mode=reloc  matched=1736/1736  STATUS=MATCH.
 '!Global g_promotionplace_int05:String
 '!Global g_screen_continentalcomps:TScreen
 '!Global g_cc_combocontinent:TCombo
@@ -64,28 +72,32 @@
 		g_screen_continentalcomps = TScreen.CreateScreen("continentalcomps", LoadImage(g_promotionplace_int05 + "GameMedia/Images/Backgrounds/Grass.png", -1), Null, Null)
 		g_screen_continentalcomps.AddGadget(TButton.CreateButton("pan_title", GetText("Continental Competitions"), 0, 0, 800, 40, 0, 3, "EEEEEE", "FFFFFF", Null, Null, 1.0, 0, ""))
 		g_screen_continentalcomps.AddGadget(TButton.CreateButton("quit", GetText("Menu"), 690, 10, 100, 20, 1, 2, "FF0000", "000000", Null, ButtonQuit, 1.0, 1, ""))
-		g_cc_combocontinent = TCombo.CreateCombo("cmb_Continent", GetText("Continent"), 10, 50, 130, 30, 1, 2, "FFFF00", "FFFFFF", 1.0, ComboContinent, 1)
+		Local x:Int = 10
+		g_cc_combocontinent = TCombo.CreateCombo("cmb_Continent", GetText("Continent"), x, 50, 130, 30, 1, 2, "FFFF00", "FFFFFF", 1.0, ComboContinent, 1)
+		x :+ 140
 		g_screen_continentalcomps.AddGadget(g_cc_combocontinent)
-		g_cc_combocomp = TCombo.CreateCombo("cmb_Comp", GetText("Competition"), 150, 50, 250, 30, 1, 2, "FFFF00", "FFFFFF", 1.0, ComboComp, 1)
+		g_cc_combocomp = TCombo.CreateCombo("cmb_Comp", GetText("Competition"), x, 50, 250, 30, 1, 2, "FFFF00", "FFFFFF", 1.0, ComboComp, 1)
+		x :+ 260
 		g_screen_continentalcomps.AddGadget(g_cc_combocomp)
-		g_cc_btn_editcomp = TButton.CreateButton("btn_EditComp", GetText("Edit Comp"), 410, 50, 124, 30, 1, 2, "9999FF", "FFFFFF", Null, ButtonEditComp, 1.0, 1, "")
+		g_cc_btn_editcomp = TButton.CreateButton("btn_EditComp", GetText("Edit Comp"), x, 50, 124, 30, 1, 2, "9999FF", "FFFFFF", Null, ButtonEditComp, 1.0, 1, "")
 		g_screen_continentalcomps.AddGadget(g_cc_btn_editcomp)
 		g_cc_tableplaces = TTable.CreateTable("tbl_promotionfromplaces", 10, 90, 24, 0, 1, 2, "0000FF", 1.0, 1, RefreshClubCombo)
 		g_cc_tableplaces.AddColumn(30, GetText("ID"), "000000", "EEEEEE", 1)
 		g_cc_tableplaces.AddColumn(198, GetText("Promotion From Comps"), "000000", "AAAAAA", 0)
 		g_cc_tableplaces.AddColumn(158, GetText("Place"), "000000", "EEEEEE", 1)
 		g_screen_continentalcomps.AddGadget(g_cc_tableplaces)
-		g_cc_btn_editplace = TButton.CreateButton("btn_EditPPComp", GetText("Edit Place"), 410, 90, 120, 30, 1, 2, "9999FF", "FFFFFF", Null, ButtonEditPlaceComp, 1.0, 1, "")
+		g_cc_btn_editplace = TButton.CreateButton("btn_EditPPComp", GetText("Edit Place"), x, 90, 120, 30, 1, 2, "9999FF", "FFFFFF", Null, ButtonEditPlaceComp, 1.0, 1, "")
 		g_screen_continentalcomps.AddGadget(g_cc_btn_editplace)
-		g_cc_btn_editclub = TButton.CreateButton("btn_EditClub", GetText("Edit Club"), 410, 130, 120, 30, 1, 2, "9999FF", "FFFFFF", Null, ButtonEditClub, 1.0, 1, "")
+		g_cc_btn_editclub = TButton.CreateButton("btn_EditClub", GetText("Edit Club"), x, 130, 120, 30, 1, 2, "9999FF", "FFFFFF", Null, ButtonEditClub, 1.0, 1, "")
 		g_screen_continentalcomps.AddGadget(g_cc_btn_editclub)
-		g_cc_btn_gotoclubs = TButton.CreateButton("btn_GoToClubs", GetText("Go To Clubs"), 410, 170, 120, 30, 1, 2, "99FF99", "FFFFFF", Null, ButtonGoToClubs, 1.0, 1, "")
+		g_cc_btn_gotoclubs = TButton.CreateButton("btn_GoToClubs", GetText("Go To Clubs"), x, 170, 120, 30, 1, 2, "99FF99", "FFFFFF", Null, ButtonGoToClubs, 1.0, 1, "")
+		x :+ 130
 		g_screen_continentalcomps.AddGadget(g_cc_btn_gotoclubs)
-		g_cc_combo = TCombo.CreateCombo("cmb_SelectClub", GetText("Select Club"), 540, 50, 200, 30, 1, 2, "99FF99", "FFFFFF", 1.0, ComboSelectClub, 1)
+		g_cc_combo = TCombo.CreateCombo("cmb_SelectClub", GetText("Select Club"), x, 50, 200, 30, 1, 2, "99FF99", "FFFFFF", 1.0, ComboSelectClub, 1)
 		g_screen_continentalcomps.AddGadget(g_cc_combo)
-		g_cc_btn_removeclub = TButton.CreateButton("btn_RemoveClub", "X", 750, 50, 30, 30, 1, 2, "FF9999", "FFFFFF", Null, ButtonRemoveClub, 1.0, 1, "")
+		g_cc_btn_removeclub = TButton.CreateButton("btn_RemoveClub", "X", x + 210, 50, 30, 30, 1, 2, "FF9999", "FFFFFF", Null, ButtonRemoveClub, 1.0, 1, "")
 		g_screen_continentalcomps.AddGadget(g_cc_btn_removeclub)
-		g_cc_table = TTable.CreateTable("tbl_qualifiers", 540, 90, 22, 0, 1, 2, "0000FF", 1.0, 1, Null)
+		g_cc_table = TTable.CreateTable("tbl_qualifiers", x, 90, 22, 0, 1, 2, "0000FF", 1.0, 1, Null)
 		g_cc_table.AddColumn(40, GetText("ID"), "000000", "AAAAAA", 1)
 		g_cc_table.AddColumn(100, GetText("Teams"), "000000", "EEEEEE", 0)
 		g_cc_table.AddColumn(100, GetText("Nation"), "000000", "AAAAAA", 0)

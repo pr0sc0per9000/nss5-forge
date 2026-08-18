@@ -112,10 +112,18 @@
 '     The key-only fallback pairs (`KeyHit(arr07[0]) Or KeyHit(arr08[0])`) are NOT touched by
 '     this fix -- both operands are plain call results already sitting in eax, so `Or`
 '     between two calls needs no synthesised boolean and compiles branch-only either way.
-'   * The two Simon-Read cheat blocks (VA 0x004d29ee/0x004d2a70) are each a single
-'     three-term short-circuit `g_engine_int161<>0 And KeyHit(k) And (name="Simon Read" Or
-'     name="Si Read")`, not three separate nested Ifs -- matches the iVar1/bVar4 staging
-'     exactly and is how TJoy.Update/TPlayer.Update write comparable multi-term chains.
+'   * The two Simon-Read cheat blocks decompile as `iVar1=0; if(g_engine_int161!=0)
+'     iVar1=KeyHit(k); bVar4=false; if(iVar1!=0){bVar4=(name==A); if(!bVar4) bVar4=(name==B);}
+'     if(bVar4) SetUpSetPiece(...)` -- an un-Or'd nested `If g_engine_int161<>0 : If KeyHit(k)
+'     : If name=A Or name=B : SetUpSetPiece(...)` (matching the hit-reuse idiom above, not a
+'     single flat `And`/`Or` chain: a flat chain over these same terms was tried and rejected
+'     by the byte oracle -- it materialises an extra setne/movzx on the `<>0` term, same
+'     defect as the ruled-out form above). OPEN ISSUE: the oracle still wants `g_engine_int161
+'     <> 0` (and, at four other sites above, `g_engine_int164 <> 0`) compiled as `mov eax,[g] /
+'     cmp eax,0` (8 bytes) where every source form tried here compiles it as the shorter
+'     `cmp dword[g],0` (7 bytes) instead -- confirmed on isolated standalone probes too, so it
+'     is not a phrasing issue in this file. Net effect: the oracle's length delta is +18 bytes,
+'     concentrated at these five sites plus the near/far jump-size shifts they cause downstream.
 '   * PTR_FUN_00c5aedc (TBall.GetActiveBall) is called TWICE with 0 args, once per field --
 '     Ghidra shows the second call carrying an apparent argument, but that value is the
 '     PRECEDING statement's result being staged for the enclosing SetUpSetPiece() call, not a
@@ -167,130 +175,144 @@ Local hit:Int = KeyHit(g_options_arr10[0])
 If hit = 0
 	If g_engine_int164 <> 0 Then hit = JoyHit(g_options_arr10[1], joynum)
 EndIf
+If hit <> 0
+	PauseEngine()
+	Return 0
+EndIf
+If KeyHit(120)
+	g_engine_float01 :- 0.25
+	ClampFloat(Varptr g_engine_float01, 0.75, 2.0)
+	UpdateOffset(1.0)
+	g_engine_float09 = g_engine_float01
+EndIf
+If KeyHit(121)
+	g_engine_float01 :+ 0.25
+	ClampFloat(Varptr g_engine_float01, 0.75, 2.0)
+	UpdateOffset(1.0)
+	g_engine_float09 = g_engine_float01
+EndIf
+hit = KeyHit(g_options_arr11[0])
 If hit = 0
-	If KeyHit(120)
-		g_engine_float01 :- 0.25
-		ClampFloat(Varptr g_engine_float01, 0.75, 2.0)
-		UpdateOffset(1.0)
-		g_engine_float09 = g_engine_float01
+	If g_engine_int164 <> 0 Then hit = JoyHit(g_options_arr11[1], joynum)
+EndIf
+If hit <> 0
+	StartReplay()
+EndIf
+If KeyHit(116)
+	PauseEngine()
+	TScreen_MatchPaused.ButtonSkipTime()
+EndIf
+If g_engine_int161 <> 0
+	If KeyHit(70)
+		If g_profile.name = "Simon Read" Or g_profile.name = "Si Read"
+			SetUpSetPiece(4, Rand(2,1), Int(TBall.GetActiveBall().x), Int(TBall.GetActiveBall().y))
+		EndIf
 	EndIf
-	If KeyHit(121)
-		g_engine_float01 :+ 0.25
-		ClampFloat(Varptr g_engine_float01, 0.75, 2.0)
-		UpdateOffset(1.0)
-		g_engine_float09 = g_engine_float01
+EndIf
+If g_engine_int161 <> 0
+	If KeyHit(67)
+		If g_profile.name = "Simon Read" Or g_profile.name = "Si Read"
+			SetUpSetPiece(5, Rand(2,1), Int(TBall.GetActiveBall().x), Int(TBall.GetActiveBall().y))
+		EndIf
 	EndIf
-	hit = KeyHit(g_options_arr11[0])
-	If hit = 0
-		If g_engine_int164 <> 0 Then hit = JoyHit(g_options_arr11[1], joynum)
-	EndIf
-	If hit <> 0
-		StartReplay()
-	EndIf
-	If KeyHit(116)
-		PauseEngine()
-		TScreen_MatchPaused.ButtonSkipTime()
-	EndIf
-	If g_engine_int161 <> 0 And KeyHit(70) And (g_profile.name = "Simon Read" Or g_profile.name = "Si Read")
-		SetUpSetPiece(4, Rand(2,1), Int(TBall.GetActiveBall().x), Int(TBall.GetActiveBall().y))
-	EndIf
-	If g_engine_int161 <> 0 And KeyHit(67) And (g_profile.name = "Simon Read" Or g_profile.name = "Si Read")
-		SetUpSetPiece(5, Rand(2,1), Int(TBall.GetActiveBall().x), Int(TBall.GetActiveBall().y))
-	EndIf
-	If g_engine_int13 = 3
-		CheckReplayInput()
-	Else
-		g_player_int02 = 0
-		If TScreenMessage.Count() > 0
-			hit = KeyHit(g_options_arr06[0])
-			If hit = 0
-				If g_engine_int164 <> 0 Then hit = JoyHit(g_options_arr06[1], joynum)
+EndIf
+If g_engine_int13 = 3
+	CheckReplayInput()
+	Return 0
+Else
+	g_player_int02 = 0
+	If TScreenMessage.Count() > 0
+		hit = KeyHit(g_options_arr06[0])
+		If hit = 0
+			If g_engine_int164 <> 0 Then hit = JoyHit(g_options_arr06[1], joynum)
+		EndIf
+		If hit <> 0
+			TScreenMessage.RemoveFirst()
+			Return 0
+		EndIf
+		If g_player_int14 = 1
+			If KeyHit(g_options_arr07[0]) Or KeyHit(g_options_arr08[0])
+				TScreenMessage.RemoveFirst()
+				Return 0
+			EndIf
+			hit = 0
+			If g_engine_int164 <> 0
+				hit = JoyHit(g_options_arr07[1], joynum)
+				If hit = 0 Then hit = JoyHit(g_options_arr08[1], joynum)
 			EndIf
 			If hit <> 0
 				TScreenMessage.RemoveFirst()
 				Return 0
 			EndIf
-			If g_player_int14 = 1
-				If KeyHit(g_options_arr07[0]) Or KeyHit(g_options_arr08[0])
-					TScreenMessage.RemoveFirst()
-					Return 0
-				EndIf
-				hit = 0
-				If g_engine_int164 <> 0
-					hit = JoyHit(g_options_arr07[1], joynum)
-					If hit = 0 Then hit = JoyHit(g_options_arr08[1], joynum)
-				EndIf
-				If hit <> 0
-					TScreenMessage.RemoveFirst()
-					Return 0
-				EndIf
-			EndIf
 		EndIf
-		Select g_player_int01
-			Case 0
-				g_player_int02 = 1
-			Case 2
-				If g_player_int03 = 0 Then g_player_int02 = 1
-			Case 5
-				If g_player_int03 = 0
-					SkipTime()
-					Return 0
-				EndIf
-			Case 11
-				g_player_int02 = 1
-			Case 12
-				g_player_int02 = 1
-		End Select
-		If g_player_int02 <> 0
-			hit = KeyHit(g_options_arr06[0])
-			If hit = 0
-				If g_engine_int164 <> 0 Then hit = JoyHit(g_options_arr06[1], joynum)
+	EndIf
+	Select g_player_int01
+		Case 0
+			g_player_int02 = 1
+		Case 2
+			If g_player_int03 = 0 Then g_player_int02 = 1
+		Case 5
+			If g_player_int03 = 0
+				SkipTime()
+				Return 0
+			EndIf
+		Case 11
+			g_player_int02 = 1
+		Case 12
+			g_player_int02 = 1
+	End Select
+	If g_player_int02 <> 0
+		hit = KeyHit(g_options_arr06[0])
+		If hit = 0
+			If g_engine_int164 <> 0 Then hit = JoyHit(g_options_arr06[1], joynum)
+		EndIf
+		If hit <> 0
+			SkipTime()
+			Return 0
+		EndIf
+		If g_player_int14 = 1
+			If KeyHit(g_options_arr07[0]) Or KeyHit(g_options_arr08[0])
+				SkipTime()
+				Return 0
+			EndIf
+			hit = 0
+			If g_engine_int164 <> 0
+				hit = JoyHit(g_options_arr07[1], joynum)
+				If hit = 0 Then hit = JoyHit(g_options_arr08[1], joynum)
 			EndIf
 			If hit <> 0
 				SkipTime()
 				Return 0
 			EndIf
-			If g_player_int14 = 1
-				If KeyHit(g_options_arr07[0]) Or KeyHit(g_options_arr08[0])
-					SkipTime()
-					Return 0
-				EndIf
-				hit = 0
-				If g_engine_int164 <> 0
-					hit = JoyHit(g_options_arr07[1], joynum)
-					If hit = 0 Then hit = JoyHit(g_options_arr08[1], joynum)
-				EndIf
-				If hit <> 0
-					SkipTime()
-					Return 0
-				EndIf
-			EndIf
-		EndIf
-		If g_engine_int161 = 2
-			If KeyHit(9) Then End
-			If KeyHit(84) Then g_engine_clock :+ 5
-			If KeyHit(82) Then TFormation.SetUp()
-			If KeyHit(80)
-				g_pitchtype :+ 1
-				If g_pitchtype > 2 Then g_pitchtype = 0
-			EndIf
-			If KeyHit(77)
-				g_pitchcond :+ 1
-				If g_pitchcond > 5 Then g_pitchcond = 0
-			EndIf
-			If KeyHit(87)
-				g_weather_int01 = (KeyDown(162) <> 0)
-				If g_weather_int02 = 1
-					g_weather_int05 = 0
-					g_weather_int06 = g_engine_clock
-				ElseIf g_weather_int02 = 0
-					g_weather_int05 = g_engine_clock
-					g_weather_int06 = 120
-				EndIf
-			EndIf
 		EndIf
 	EndIf
-Else
-	PauseEngine()
+	If g_engine_int161 = 2
+		If KeyHit(9) Then End
+		If KeyHit(84) Then g_engine_clock :+ 5
+		If KeyHit(82) Then TFormation.SetUp()
+		If KeyHit(80)
+			g_pitchtype :+ 1
+			If g_pitchtype > 2 Then g_pitchtype = 0
+		EndIf
+		If KeyHit(77)
+			g_pitchcond :+ 1
+			If g_pitchcond > 5 Then g_pitchcond = 0
+		EndIf
+		If KeyHit(87)
+			If KeyDown(162) <> 0
+				g_weather_int01 = 1
+			Else
+				g_weather_int01 = 0
+			EndIf
+			Select g_weather_int02
+				Case 1
+					g_weather_int05 = 0
+					g_weather_int06 = g_engine_clock
+				Case 0
+					g_weather_int05 = g_engine_clock
+					g_weather_int06 = 120
+			End Select
+		EndIf
+	EndIf
 EndIf
 Return 0

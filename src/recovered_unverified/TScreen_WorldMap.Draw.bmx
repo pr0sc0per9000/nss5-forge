@@ -2,9 +2,16 @@
 ' VA 0x0055B1A0   1706 bytes   KIND=Function (static, no Self)   SIG=()i   class-table slot 0x38
 ' Reconstructed from extracted/decomp/TScreen_WorldMap.Draw@0055b1a0.c CROSS-CHECKED against
 ' the raw disassembly (scripts/disasm.py 0x0055B1A0 .. 0x0055B849) because the Ghidra .c text
-' drops several float arguments outright for this body -- see NOTES below. Not yet run through
-' scripts/reverify.py (that would touch shared state); treat the byte-size claim above as the
-' Ghidra inventory figure, not a confirmed match.
+' drops several float arguments outright for this body -- see NOTES below. The harness oracle
+' (scripts/harness.py try_method) reports MATCH 1706/1706 for this body against NSS5.exe.
+'
+' Two source-level points worth flagging for a reader comparing this against the decompilation:
+' the py1/py2/flagY1/flagY2 block reuses py1 and py2 in place (:+ / :- ) rather than declaring
+' fresh textY1/textY2 Locals, and its guard reads `If vy1 >= vy2` with the Then/Else content
+' swapped relative to Ghidra's own `if (fVar3 < fVar4)` rendering -- Ghidra normalises
+' comparison direction (see codegen-patterns.md 10.1) and does not preserve which physical
+' branch the original placed first, so matching the bytes required writing the negated
+' comparison with its branches swapped, not the natural reading of the decompiled C.
 '
 ' WHAT IT DOES: draws the world map background (panned/zoomed toward the midpoint of the two
 ' fixture teams' stadiums), an optional "route" arrow stretched between the two stadium pins
@@ -105,29 +112,29 @@
 		Local bgW:Float = Float(ImageWidth(g_wm_bg))
 		Local bgH:Float = Float(ImageHeight(g_wm_bg))
 		Local wRatio:Float = bgW / 360.0
-		Local vx1:Float = -wRatio * g_wm_long1
+		Local vx1:Float = g_wm_long1 * -wRatio
 		Local vy1:Float = g_wm_lat1 * wRatio
-		Local vx2:Float = -wRatio * g_wm_long2
+		Local vx2:Float = g_wm_long2 * -wRatio
 		Local vy2:Float = g_wm_lat2 * wRatio
 		Local ang:Float = AngleTo(vx1, vy1, vx2, vy2)
 		Local t:Float = scale - 1.0
-		If 0.999 < t
+		If t > 0.999
 			t = 0.999
 		EndIf
 		Local dist:Float = Dist2D(vx1, vy1, vx2, vy2)
-		If 2000.0 < dist
-			vx2 = -wRatio * (g_wm_long2 + 360.0)
+		If dist > 2000.0
+			vx2 = (g_wm_long2 + 360.0) * -wRatio
 		EndIf
 		vx1 = vx1 * scale
 		vy1 = vy1 * scale
 		vx2 = vx2 * scale
 		vy2 = vy2 * scale
-		ix = (vx2 - (vx2 - vx1) * t) + ix
-		iy = (vy2 - (vy2 - vy1) * t) + iy
+		ix :+ (vx2 - (vx2 - vx1) * t)
+		iy :+ (vy2 - (vy2 - vy1) * t)
 		bgW :* 0.5
 		bgH :* 0.5
 		ClampFloat(Varptr ix, g_screenwidth - bgW * scale, bgW * scale)
-		ClampFloat(Varptr iy, (g_screenheight - 60) - bgH * scale, bgH * scale + 60.0)
+		ClampFloat(Varptr iy, (g_screenheight - 60) - bgH * scale, 60.0 + bgH * scale)
 		SetScale(scale, scale)
 		DrawImage(g_wm_bg, ix, iy, 0)
 		If dist * t > 2.5
@@ -151,23 +158,24 @@
 		Local py2:Int = Int((iy - vy2) - TextHeight(g_wm_team2.labelname) / 2)
 		Local flagX1:Int = px1 + TextWidth(g_wm_team1.labelname) / 2
 		Local flagX2:Int = px2 + TextWidth(g_wm_team2.labelname) / 2
-		Local textY1:Int, textY2:Int, flagY1:Int, flagY2:Int
-		If vy1 < vy2
-			textY1 = py1 + 8
-			textY2 = py2 - 8
-			flagY1 = py1 + 52
-			flagY2 = py2 - 26
+		Local flagY1:Int = py1
+		Local flagY2:Int = py2
+		If vy1 >= vy2
+			py1 :- 8
+			py2 :+ 8
+			flagY1 :- 26
+			flagY2 :+ 52
 		Else
-			textY1 = py1 - 8
-			textY2 = py2 + 8
-			flagY1 = py1 - 26
-			flagY2 = py2 + 52
+			py1 :+ 8
+			py2 :- 8
+			flagY1 :+ 52
+			flagY2 :- 26
 		EndIf
-		DrawText(g_wm_team1.labelname, px1 + 1, textY1 + 1)
-		DrawText(g_wm_team2.labelname, px2 + 1, textY2 + 1)
+		DrawText(g_wm_team1.labelname, px1 + 1, py1 + 1)
+		DrawText(g_wm_team2.labelname, px2 + 1, py2 + 1)
 		SetColor(255, 255, 255)
-		DrawText(g_wm_team1.labelname, px1, textY1)
-		DrawText(g_wm_team2.labelname, px2, textY2)
+		DrawText(g_wm_team1.labelname, px1, py1)
+		DrawText(g_wm_team2.labelname, px2, py2)
 		If g_wm_team1.imgFlag <> Null
 			DrawImage(g_wm_team1.imgFlag, flagX1, flagY1, 0)
 		EndIf

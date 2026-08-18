@@ -83,44 +83,74 @@
 '
 ' STRUCTURE NOTES (preserved, not tidied)
 '   * The idle-wobble Mod-3 test is a genuinely redundant nested pair in the original:
-'     `If g_engine_int20 Mod 3 < 2` wrapping `If g_engine_int20 Mod 3 < 3` -- the inner
-'     test is always true once the outer is true (remainders are < 3 by definition), so
-'     its Else arm is dead code. Reproduced as-is (preserve-by-default): a genuine
-'     original oddity, not a transcription error.
+'     `If wobble > 1` wrapping `If wobble > 2` -- the inner test is always false once the
+'     outer is false (a value under 2 is never over 2), so its Then arm is dead code.
+'     Reproduced as-is (preserve-by-default): a genuine original oddity, not a
+'     transcription error. `wobble` is `g_engine_int20 Mod 3`, computed once into its own
+'     Local and reused by both tests -- writing the `Mod 3` expression out twice instead
+'     costs a second `cdq`/`idiv` pair the original does not pay (confirmed against
+'     0x004F2FED: a single `idiv`, `mov eax,edx`, then two `cmp eax,N` against that same
+'     value). The exact relational spelling matters too: both comparisons compile as
+'     `cmp;jle` jumping *into* the Else arm on failure with the Then arm inline, which only
+'     comes out of `wobble > 1` / `wobble > 2` (not the equivalent `< 2` / `< 3`) -- bcc
+'     encodes the *written* comparison directly rather than picking whichever spelling is
+'     shorter, so an equivalent-but-differently-spelled condition changes the branch bytes
+'     even though the arithmetic result is identical (docs/reference/codegen-patterns.md
+'     11.3, "match the setcc and its immediate, not the meaning").
 '   * `iVar7`/`fVar12` are reused by Ghidra for unrelated values across this body
 '     (a TInterceptPoint pointer, then a scratch Int, then a scratch Float); the BASIC
 '     below uses one Local per distinct concept instead, which is source-equivalent.
+'   * The `ball.x - 0.0` term in the ATan2 call, and the `0.0 +` in both `desx = ... +
+'     dist*Cos(ang)` lines, read from the exact same stack slot in the original
+'     (`[ebp-0x5c]`) as a plain Int local seeded to 0 -- a `goalx` counterpart to `goaly`,
+'     not a bare Float literal (a literal 0.0 elsewhere in this same body compiles to a
+'     one-byte `fldz`, not this int-then-fild roundtrip). Tried reproducing that literally
+'     as a named `Local goalx:Int = 0` reused at all three sites: it does reproduce the
+'     int-then-fild shape at each site, but it also grows our frame by another 72 bytes
+'     (0x94 -> 0xdc) instead of shrinking it, so it was left as the plain `0`/`0.0`
+'     literals below -- worth revisiting once the frame-size root cause immediately below
+'     is understood, since guessing at one spill in isolation while the allocator's overall
+'     behaviour is still unexplained moved the total further from MATCH, not closer.
 '
 ' UNRESOLVED CODEGEN GAP (byte diff, first_diff=byte 3 -- the prologue itself)
 '   `sub esp` differs at the very first instruction: original `83 EC 60` (96-byte frame,
 '   8-bit imm), ours `81 EC 94 00 00 00` (148-byte frame, 32-bit imm) -- 52 bytes / ~13
 '   slots more than the original, and both still push all 3 callee-saved regs (`53 56 57`
 '   identical in both), so the gap is pure stack-resident spill, not register count.
-'   Investigated and ruled out as the cause:
-'     - Named-Local count. All 9 Locals here (goaly/ang/yds/dist/ctrl/ip/ct/dd/gy) are each
-'       required to persist across an intervening call (Cos/Sin/YardsToPixels/
-'       GetInterceptPoint/CleanThrough), matching the original's own single-call-then-reuse
-'       pattern statement-for-statement against the decompile -- none can be inlined
-'       without duplicating a call the original makes once. Per scripts/local_alloc_stats.py
-'       (read-only stats over the ~1770-body verified corpus), frame size correlates with
-'       total Local count only loosely (73% exact, formula max(0,N-3)*4): for N=9 that
-'       predicts a mere 24-byte frame, so named Locals are NOT the dominant term for either
-'       the original's 96 bytes or our 148 -- most of both is anonymous expression-temp
-'       spill from the call-heavy float10 arithmetic, which should be equal between the two
-'       since the arithmetic is identical.
-'     - Declaration order / register colour. The `Self` param sits in esi in the original,
-'       edi in ours (`8B 75 08` vs `8B 7D 08`) -- a real, corpus-attested effect (see
-'       TPlayer.DoKeeperDiveAI's note on `ip`/`goaly` order swapping esi/ebx) -- but colour
-'       swaps don't change which of the 3 callee-saved regs get used vs. spilled, so they
-'       can't move the `sub esp` value and don't explain the 52-byte gap.
-'   No structural difference (extra/missing branch, wrong operand order, wrong field) was
-'   found against the decompile; every statement, condition and call site here matches
-'   FUN_004f2eed 1:1. Left the body UNCHANGED rather than guess at spill/reuse behaviour
-'   that needs an actual bcc compile to observe (this is the class of problem
-'   local_alloc_stats.py's docstring calls out as needing "synthetic probes" against the
-'   real compiler, not static reasoning). A next pass with bcc/FASM access (tools/blitzmax-
-'   legacy-src/bin/) could compile isolated variants of the "not holding ball" block to see
-'   which Local-count/order actually reproduces a 0x60 frame, then reapply that shape here.
+'   Disassembling our own compiled probe directly (not just localise_diff's alignment,
+'   which mis-syncs across this block once the byte drift below accumulates and reports
+'   phantom "moved" code that is not actually reordered) confirms every statement, branch
+'   and call site in the "not holding ball" block lands in the same order as the original,
+'   including the CleanThrough/GetInterceptPoint section that localise_diff's alignment
+'   reports as an insert-here/delete-there pair. That pair is downstream noise from the
+'   frame being bigger, not a second bug: the ~13 extra slots push several later
+'   same-purpose scratch offsets (e.g. the original's `[ebp-0x54]` for `ip`) past the
+'   signed-disp8 range into disp32 encodings, and each such crossing costs 3-4 bytes on
+'   every read of that slot, which is most of the small +1..+12 byte gaps in the report.
+'   Two concrete, register-visible differences are now pinned down:
+'     - `Self` sits in esi in the original, edi in ours (`8B 75 08` vs `8B 7D 08`); `ctrl`
+'       (`g_ball.controlledby`) sits in ebx in the original, esi in ours. Both are real,
+'       corpus-attested colour effects (see TPlayer.DoKeeperDiveAI's note on `ip`/`goaly`
+'       swapping esi/ebx) -- physical colour identity is not staticaly predictable
+'       (docs/reference/codegen-patterns.md 18.2), so this is reported, not chased further.
+'     - The register story is not just a colour swap, though: in the original, `ctrl`
+'       (not-holding-ball branch) and the idle-wobble block's `gy`-adjustment temp share
+'       ebx, because their live ranges never overlap (KeeperHoldingBall() true vs false are
+'       mutually exclusive) and the allocator coalesces them onto one colour. Our build
+'       does NOT make that coalescing: `ctrl` gets its own colour (esi) and the idle-wobble
+'       temp keeps ebx separately, which leaves only edi free for the fourth same-tier
+'       candidate -- `goaly`, referenced across the whole not-holding-ball branch -- and it
+'       loses out and spills to `[ebp-0x88]` instead (confirmed by disassembling our probe
+'       directly). That is the actual mechanism behind the frame gap: not a missing/wrong
+'       statement, and not simply "the wrong Local count", but our build using one more
+'       distinct register colour than the original for values whose live ranges do not
+'       objectively require it. Nudging this from source (declaration order, an explicit
+'       vs. implicit `= 0` initialiser on `ct`, moving `goalx` in or out) was tried several
+'       ways in this pass without shifting the coalescing outcome; per
+'       scripts/local_alloc_stats.py's own docstring this is the class of question that
+'       needs a synthetic probe against the real bcc/FASM toolchain
+'       (tools/blitzmax-legacy-src/bin/) to isolate the ctrl/gy coalescing decision, not
+'       further static guessing.
 '!Global g_matchstate:Int
 '!Global g_goalline:Int
 '!Global g_ball:TBall
@@ -139,8 +169,30 @@ If g_matchstate = 9 Or g_matchstate = 10
 	If g_ball.teaminpossession = Self.teamid
 		Self.desx = -g_penboxside
 	EndIf
-ElseIf g_matchstate = 1
-	If Self.KeeperHoldingBall() = 0
+ElseIf g_matchstate <> 1
+	Self.desx = 0
+	Self.desy = g_goalline * -Self.GetShootingDirection()
+Else
+	If Self.KeeperHoldingBall() <> 0
+		If g_matchclock < Self.keepercatchtime + 750
+			Self.desx = Self.x
+			Self.desy = Self.y
+		Else
+			Self.desx = 0
+			Local gy:Int = g_player_int19
+			Local wobble:Int = g_engine_int20 Mod 3
+			If wobble > 1
+				gy = Int(gy - TPitch.YardsToPixels(1.0))
+			Else
+				If wobble > 2
+					gy = Int(gy - TPitch.YardsToPixels(2.5))
+				Else
+					gy = Int(gy + TPitch.YardsToPixels(1.5))
+				EndIf
+			EndIf
+			Self.desy = gy * -Self.GetShootingDirection()
+		EndIf
+	Else
 		Local goaly:Int = g_goalline * -Self.GetShootingDirection()
 		Self.desx = 0
 		Self.desy = goaly
@@ -153,7 +205,24 @@ ElseIf g_matchstate = 1
 				Self.desx = 0.0 + dist * Cos(ang)
 				Self.desy = goaly + dist * Sin(ang)
 				Local ctrl:TPlayer = g_ball.controlledby
-				If ctrl = Null
+				If ctrl <> Null
+					If g_tr_mode = 0
+						Local ip:TInterceptPoint = GetInterceptPoint(-10 - g_goal_halfw, goaly, g_goal_halfw + 10, goaly, ctrl.x, ctrl.y, ctrl.x + g_player_double11 * Cos(ctrl.direction), ctrl.y + g_player_double10 * Sin(ctrl.direction))
+						Local ct:Int = 0
+						If ctrl.teamid <> Self.teamid And ctrl.distancetogoal_opp < TPitch.YardsToPixels(30.0)
+							ct = ctrl.CleanThrough()
+						EndIf
+						If ct <> 0
+							If ip.intercept Or ctrl.distancetogoal_opp < TPitch.YardsToPixels(12.0)
+								Self.InterceptBall(g_ball)
+							Else
+								Local dd:Float = ctrl.distancetogoal_opp * 0.5
+								Self.desx = 0.0 + dd * Cos(ang)
+								Self.desy = goaly + dd * Sin(ang)
+							EndIf
+						EndIf
+					EndIf
+				Else
 					If TPitch.InsidePenaltyBox(Int(g_ball.x), Int(g_ball.y), -Self.GetShootingDirection())
 						If g_ball.jumpx <> 0.0 And 3.0 < g_ball.velocity And Float(g_player_int33 Shl 1) < g_ball.z And Dist2D(Self.x, Self.y, g_ball.jumpx, g_ball.jumpy) < TPitch.YardsToPixels(10.0)
 							Self.InterceptBall(g_ball)
@@ -163,42 +232,8 @@ ElseIf g_matchstate = 1
 							EndIf
 						EndIf
 					EndIf
-				ElseIf g_tr_mode = 0
-					Local ip:TInterceptPoint = GetInterceptPoint(-10 - g_goal_halfw, goaly, g_goal_halfw + 10, goaly, ctrl.x, ctrl.y, ctrl.x + g_player_double11 * Cos(ctrl.direction), ctrl.y + g_player_double10 * Sin(ctrl.direction))
-					Local ct:Int = 0
-					If ctrl.teamid <> Self.teamid And ctrl.distancetogoal_opp < TPitch.YardsToPixels(30.0)
-						ct = ctrl.CleanThrough()
-					EndIf
-					If ct <> 0
-						If ip.intercept Or ctrl.distancetogoal_opp < TPitch.YardsToPixels(12.0)
-							Self.InterceptBall(g_ball)
-						Else
-							Local dd:Float = ctrl.distancetogoal_opp * 0.5
-							Self.desx = 0.0 + dd * Cos(ang)
-							Self.desy = goaly + dd * Sin(ang)
-						EndIf
-					EndIf
 				EndIf
 			EndIf
 		EndIf
-	ElseIf g_matchclock < Self.keepercatchtime + 750
-		Self.desx = Self.x
-		Self.desy = Self.y
-	Else
-		Self.desx = 0
-		Local gy:Int = g_player_int19
-		If g_engine_int20 Mod 3 < 2
-			If g_engine_int20 Mod 3 < 3
-				gy = Int(gy + TPitch.YardsToPixels(1.5))
-			Else
-				gy = Int(gy - TPitch.YardsToPixels(2.5))
-			EndIf
-		Else
-			gy = Int(gy - TPitch.YardsToPixels(1.0))
-		EndIf
-		Self.desy = gy * -Self.GetShootingDirection()
 	EndIf
-Else
-	Self.desx = 0
-	Self.desy = g_goalline * -Self.GetShootingDirection()
 EndIf

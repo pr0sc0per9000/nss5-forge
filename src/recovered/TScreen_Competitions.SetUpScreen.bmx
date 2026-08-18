@@ -1,5 +1,6 @@
 ' TScreen_Competitions.SetUpScreen   (KIND=Function -- static, no Self)
 ' VA 0x0052FAB3   644 bytes   class-table slot 0x34   sig ()i
+' byte-identical vs NSS5.exe (644/644, original length from Ghidra's inventory)
 ' ORACLE: mode=reloc  matched=644/644  STATUS=MATCH
 ' Original length from Ghidra's inventory. NSS5_NO_LEARN=1.
 '

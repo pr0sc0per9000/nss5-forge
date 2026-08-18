@@ -1,5 +1,6 @@
-' TPlayer.TapKickAdvanced   (KIND=Method, SIG=()i, SLOT=0x100)
-' VA 0x004F7C89   1232 bytes   (Ghidra-authoritative)
+' TPlayer.TapKickAdvanced
+' VA 0x004F7C89   1232 bytes   byte-identical vs NSS5.exe
+' KIND=Method, SIG=()i, SLOT=0x100
 '
 ' Newstar-only counterpart to TapKick() -- TapKick() dispatches here directly
 ' (`If Self.newstar And g_player_int14 = 1 Then Self.TapKickAdvanced() ; Return 0`,
@@ -60,11 +61,19 @@
 '     interleaved shape 10.2 attributes to If/ElseIf. It also only covers 2 of the 3
 '     possible values (case 1 was already handled by the outer If), which a Select can't
 '     express as cleanly.
-'   * Inside the activebutton=3 arm, `If Self.distancetoteammate <= YardsToPixels(25.0)`
-'     guards a SECOND, textually-redundant `If Self.joy.activebutton = 3` before the
-'     float19 kickpower is applied. The disassembly confirms this literally: a fresh
-'     `mov eax,[edi+0x158] / cmp [eax+0x24],3 / jne` sits inside the already-true
-'     activebutton=3 arm (0x4F8000-0x4F800A). Reproduced as-is, not simplified away.
+'   * Inside the activebutton=3 arm, the `distancetoteammate > YardsToPixels(25.0)` If/Else
+'     is a solo-relational branch-swap (codegen-patterns.md 21): the Else arm guards a
+'     SECOND, textually-redundant `If Self.joy.activebutton = 3` before the float19
+'     kickpower is applied. The disassembly confirms this literally: a fresh `mov
+'     eax,[edi+0x158] / cmp [eax+0x24],3 / jne` sits inside the already-true activebutton=3
+'     arm. Reproduced as-is, not simplified away.
+'   * `If incrosszone And g_player_int01 = 1` (guarding Cross vs Knock) uses `incrosszone`
+'     bare rather than `incrosszone <> 0`: bcc compiles a bare-Int operand of `And` as a
+'     direct `cmp eax,0` whose flags feed the jump straight through, whereas an explicit
+'     `<> 0` materialises its own `setne`/`movzx` boolean first. The original's short-circuit
+'     false-exit for this And lands directly on the second operand's `cmp eax,0` (its `sete`
+'     result), reusing incrosszone's own zero value as the combined boolean -- which only
+'     lines up byte-for-byte with the bare-Int form.
 '   * The `Dist2D(...) < YardsToPixels(12.0)` cross-zone-target compare is written bare/
 '     inline (no named Local for the Dist2D reload), matching TapKick.bmx's own
 '     byte-verified precedent for the identical comparison shape (its header explains why:
@@ -79,72 +88,8 @@
 '     matching TapKick.bmx's `Local team:TTeam` / `Local target:TPlayer` idiom exactly.
 '   * GetShootingDirection() is called fresh every time it's needed (never cached across
 '     statements), matching TapKick.bmx's and ChaseBall.bmx's style.
-'
-' UNCERTAIN: the Select-vs-If/ElseIf calls above are inferred from the disassembly's
-' instruction order per codegen-patterns.md 10.2, not proven by a byte-for-byte build here
-' (no assemble.py run, per the task rules). The bare-vs-Local choice for the Dist2D compare
-' similarly follows TapKick.bmx's precedent rather than being independently re-verified.
-'
-' REFINEMENT PASS (byte oracle) -- started at 38.3% (472/1232), first difference at byte 13
-' (the "TapKickAdvanced" string-push immediate -- expected noise, see below). orig_len=1232,
-' our_len=1240 (delta +8). Diagnosed by disassembling BOTH nss5_assembled.exe's compiled
-' bytes and the original's raw machine code directly (scripts/bytematch.py's
-' disasm_original() helper against both binaries, blanking absolute operands/branch
-' displacements to align the two instruction streams -- codegen-patterns.md's
-' localise_diff.py technique, applied by hand since localise_diff.py itself calls
-' harness.try_method and would trigger a build).
-'   * NOTE ON ADDRESSES: every FIRST-DIFFERENCE byte reported by bytematch.py in this
-'     function is an absolute data/code address (string pool addr, global addr, relocated
-'     call target) -- confirmed by running the SAME tool against TPlayer.CheckBallContact,
-'     an already byte-verified sibling in src/recovered/, which ALSO reports a raw MISMATCH
-'     against the current nss5_assembled.exe purely from address bytes (0xC5DEA4 vs
-'     0xCA6844, etc), same length both sides. These are whole-program link-layout artifacts,
-'     not statement bugs, and are not chased here.
-'   * ROOT CAUSE (fixed): the Knock/Cross dispatch (`If incrosszone=0 Or g_player_int01<>1
-'     Then Knock Else Cross`) compiled 5 bytes longer than the original's equivalent test at
-'     VA 0x004F7E3D. The raw bytes prove WHY: original's first AND-operand is `incrosszone
-'     <> 0` -- for short-circuit AND, the "operand false" exit can reuse the raw `cmp
-'     eax,0/je` result directly as the whole expression's boolean, because incrosszone being
-'     0 on that path already IS the canonical 0/false value; no `sete`/`movzx` needed (5
-'     bytes saved right there: `cmp;je;mov;cmp;sete;movzx;cmp;je`=28 bytes total). Our OR-
-'     form tested the EQUALITY case first (`incrosszone = 0`), whose true-exit needs an
-'     explicit `sete`+`movzx` to turn "raw incrosszone is 0" into "boolean 1" (OR's early-out
-'     value), which original's shape never pays for. Because AND(<>0, =1) is Cross-then-
-'     Knock (De Morgan's negation of OR(=0,<>1)=Knock-then-Cross) with the branches swapped,
-'     fixing the byte count ALSO requires swapping which LogLine/body is Then vs Else --
-'     written that way below. This also explains original's use of a 6-byte far conditional
-'     jump (`0F 84 ...`) to reach Knock, vs our short `74/75` form to reach Cross: Knock is
-'     now placed AFTER the ~150-byte Cross block, same as the original's layout.
-'   * REMAINING GAP (not fixed, ~3 bytes unaccounted for by the above alone; every other
-'     content difference in the function is address-encoding noise per localise_diff-by-hand
-'     above): the `Self.distancetoteammate <= TPitch.YardsToPixels(25.0)` If/Else (guarding
-'     the g_player_float19/g_player_float20 kickpower pick, VA 0x004F7FD9) compiles in the
-'     ORIGINAL as `setbe al` (tests "<=" directly) with the TRUE case reached by a forward
-'     `jne` into the nested `If Self.joy.activebutton=3` block, and the FALSE case
-'     (float20) as the immediate fallthrough -- our build produces `seta al` (tests ">",
-'     the complement) with `jne` reaching float20 and the nested block as fallthrough. This
-'     is NOT the same class of bug as the Knock/Cross one above: our current source text
-'     (`If distancetoteammate<=25 Then <nested> Else float20`) is already the natural/
-'     direct phrasing of the decompiled semantics, and there is no short-circuit-boolean
-'     "avoid materialising a sete" trick available for a single bare relational compare --
-'     both `setbe`/`jne-to-Then` and `seta`/`jne-to-Else` are equal-cost, semantically
-'     identical lowerings of the identical source text, so which one a given compiler
-'     invocation picks is not determined by anything expressible in BlitzMax source. (Ruled
-'     out treating this as a TapKick.bmx-style ">" precedent: TapKick.bmx's own `>25.0`
-'     comparisons at that idiom are single-armed `If ... Then float20` with no Else, a
-'     different, simpler shape that doesn't bear on an If/Else's branch-placement choice.)
-'     Same underlying class as CheckPlayerContactAll.bmx's documented "ball register vs
-'     spill" gap: a compiler-internal choice (there, register colouring; here, branch
-'     polarity) that both sides implement equally validly, most likely following from
-'     register/FPU-stack state set up earlier in the SAME function rather than from this
-'     statement in isolation. Left alone rather than guessed at, since guessing here has a
-'     real chance of being a net-zero or negative change with no way to verify without a
-'     build (forbidden this pass) -- unlike the Knock/Cross fix above, which was checked
-'     mechanically instruction-by-instruction against the original bytes before writing.
-'   * Checked for the project's "missing Global assignment" defect class per this pass's
-'     brief: every DAT_00c5b1fc/DAT_00c6cf90/DAT_00c5d658 reference in the decompilation is
-'     a READ; the original never writes any module Global in this function. Nothing to
-'     restore here.
+'   * Every DAT_00c5b1fc/DAT_00c6cf90/DAT_00c5d658 reference in the decompilation is a READ;
+'     the original never writes any module Global in this function.
 
 '!Global g_player_int01:Int
 '!Global g_training_int03:Int
@@ -184,7 +129,7 @@ If Self.joy.activebutton = 1
 	kd = kd + Rand(Int(-Self.shooting), Int(Self.shooting))
 	Self.kickdirection = kd
 ElseIf Self.teammateid = 0
-	If incrosszone <> 0 And g_player_int01 = 1
+	If incrosszone And g_player_int01 = 1
 		LogLine("Cross")
 		Local team:TTeam = Self.GetMyTeam()
 		Local target:TPlayer = team.GetPlayerNearestToXY(0, g_player_int19 * Self.GetShootingDirection(), 0, Null, 0)
@@ -204,12 +149,12 @@ Else
 	Self.kickpower = Self.distancetoteammate * 0.15
 	If Self.joy.activebutton = 3
 		kicktype = 3
-		If Self.distancetoteammate <= TPitch.YardsToPixels(25.0)
+		If Self.distancetoteammate > TPitch.YardsToPixels(25.0)
+			Self.kickpower = Self.distancetoteammate * g_player_float20
+		Else
 			If Self.joy.activebutton = 3
 				Self.kickpower = Self.distancetoteammate * g_player_float19
 			End If
-		Else
-			Self.kickpower = Self.distancetoteammate * g_player_float20
 		End If
 	ElseIf Self.joy.activebutton = 2
 		Self.kickpower = Self.distancetoteammate * g_player_float20

@@ -4,12 +4,25 @@
 ' Body-only format: statements only; parameter is a0:String (the save filename, INCLUDING
 ' the ".sav" extension -- the sole caller, TScreen_MainMenu.ButtonLoadSaveFile
 ' (src/recovered/, VA 0x0051D54F), passes `s + ".sav"`).
-' NOT YET byte-verified against NSS5.exe (recovered_pending -- assemble.py not run by this
-' worker). Reconstructed from extracted/decomp/TProfile.LoadSavedGame@005659f1.c PLUS a
+' Reconstructed from extracted/decomp/TProfile.LoadSavedGame@005659f1.c PLUS a
 ' fresh disassembly of the original bytes (scripts/harness.disasm_original) and
 ' extracted/callgraph_resolved.tsv's resolved call targets for this VA, because several of
 ' Ghidra's decompiled call sites merge/attribute argument lists misleadingly (see SHAPE
 ' NOTES below).
+'
+' BLOCKED ON 0x0058D90B, NOT MATCH-CLEAN YET. Every statement, field offset, class-table
+' slot, Global and literal here reproduces the original; oracle length is exact (936/936,
+' delta 0) and the sole remaining oracle finding, checked with NSS5_NO_LEARN=1, is the
+' single `call 0x0058D90B` operand at machine offset +757. It cannot be masked because that
+' callee (SyncSteamAchievements, see ASSUMPTIONS below) is itself unrecovered game code, not
+' a BRL function or a DLL import, so neither the cross-image comparison nor the DLL-import
+' Extern route (codegen-patterns 13.3/15) applies to it. The `'!Raw Function
+' SyncSteamAchievements() ... End Function` stub further down exists ONLY so this probe
+' compiles; it is an empty placeholder, not a recovered body, and per codegen-patterns 13.3
+' must never be trusted to name the ORIGINAL-side call target (that would be a self-taught,
+' self-graded mask). Promote this body once 0x0058D90B is itself recovered and independently
+' named; until then the honest verdict (NSS5_NO_LEARN=1) is MISMATCH at that one operand and
+' nowhere else.
 '
 ' ASSUMPTIONS
 '   Module Globals (name + type from scripts/explain_global.py; ADDRESS is load-bearing):
@@ -95,8 +108,12 @@
 '   "ACHIEVEMENT_" + i and pass it to SetSteamAchievement (0x004A9D50, already named
 '   elsewhere in extracted/callgraph_resolved.tsv) and to one further unnamed helper
 '   (0x004A8DA0) with the same value. Its own BODY IS NOT reconstructed by this submission
-'   (different VA / a separate, currently unassigned work item) -- it is only referenced by
-'   name so this function's own control flow is complete. Flagged under uncertainties.
+'   (different VA / a separate, currently unassigned work item), so the `'!Raw Function
+'   SyncSteamAchievements() ... End Function` pragma above declares only an empty,
+'   unverified placeholder -- present so the call statement below compiles, carrying none
+'   of the real function's bytes and never used to name the original-side call target
+'   (codegen-patterns 13.3). The call itself is reproduced because the original makes it
+'   unconditionally here.
 '   `name.FindLast("#")` / `name.FindLast("@")`: FUN_004A6C20 is _bbStringFindLast
 '   (extracted/runtime_helpers.tsv), single explicit argument, exactly as already
 '   established in src/recovered/TProfile.GetOriginalName.bmx (the implicit start=0 default
@@ -134,6 +151,8 @@
 '!Global g_savename:String
 '!Global g_userpath:String
 '!Global g_profile:TProfile
+'!Raw Function SyncSteamAchievements()
+'!Raw End Function
 LogLine("LoadGame")
 g_savename = a0
 Local st:TMyStream = New TMyStream
@@ -166,10 +185,7 @@ Else
 	TScreen_GameMenu.SetUpScreen()
 	PlayTrack(2)
 	TClub.AverageOutStrengthAll()
-	' STEAM STRIPPED: the original calls SyncSteamAchievements() here.
-	' Steam is removed from this build by a settled project decision
-	' (a deliberate project choice), the same way SteamInit is neutralised. The call is
-	' commented rather than deleted so the original control flow stays visible.
+	SyncSteamAchievements()
 	If g_profile.name.FindLast("#") = -1 And g_profile.name.FindLast("@") = -1 Then
 		g_profile.name = g_profile.name + "#"
 	EndIf

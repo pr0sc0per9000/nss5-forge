@@ -1,5 +1,6 @@
 ' TPlayer.UpdateTeamMateId_Human
 ' VA 0x004EF619   735 bytes   vtable slot 0x6C   sig ()i   KIND=Method
+' byte-identical vs NSS5.exe (735/735, original length from Ghidra's inventory)
 ' ORACLE: mode=reloc  matched=735/735  STATUS=MATCH
 ' Original length from Ghidra's inventory. NSS5_NO_LEARN=1.
 '

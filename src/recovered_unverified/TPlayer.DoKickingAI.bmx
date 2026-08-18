@@ -56,29 +56,39 @@
 '   0xe4=CleanThrough()i, 0x188=GetOppKeeper():TPlayer.
 '
 ' CODEGEN NOTES
-'   * TOP-LEVEL SHAPE (byte-oracle fix, refine2 pass): the score report's first-difference
-'     bytes showed the original testing `g_training_int03` with a SHORT `jz +0x73` into a
-'     block only ~115 bytes away, while a flat `If g_training_int03 = 0 Then <big AI tree>
-'     ElseIf selectionno<1 ... ElseIf training=9 ... Else PassAI EndIf` (the literal
-'     decompiled shape, matching the PRE-fix body) compiles the huge first Then-branch
-'     inline and needs a near `0F 85` jump instead -- wrong opcode, wrong operand, wrong
-'     everything after it. Ghidra flattens `If A Then S Else Big` into the elseif chain it
-'     prints; re-inverting to `If g_training_int03 <> 0 Then <small dispatch> Else <big AI
-'     tree> EndIf` puts the small dispatch inline (short jumps) and defers the big tree to
-'     the end, matching the oracle's `jz`. The same trick applies one level down: the
-'     decompiled `else if (selectionno < 1) { keeper-button-force }` is written here as
+'   * TOP-LEVEL SHAPE: `If g_training_int03 <> 0 Then <small dispatch> Else <big AI tree>
+'     EndIf` puts the small training dispatch inline (short jumps) and places the big
+'     open-play tree at the end of the body, matching the oracle's short `jz` at the very
+'     top. Ghidra prints this as an elseif chain gated on `g_training_int03 == 0`; the
+'     inverted reading here is the same logic with Then/Else swapped so the SMALL block
+'     lands where the short jump expects it. The same trick applies one level down:
 '     `If Self.selectionno > 0 Then <training9/shoot-or-pass> Else <keeper-button-force>
-'     EndIf` so the comparison keeps the oracle's `cmp X,0` (a literal `< 1` or `>= 1` would
-'     compile against immediate 1, not 0) and the small keeper-button block is the deferred
-'     (Else) side, mirroring the outer inversion. Purely a branch-layout/polarity change --
-'     every condition, block, and side effect is the same as the flat elseif reading.
+'     EndIf` keeps the oracle's `cmp X,0` (a literal `< 1` / `>= 1` would compare against
+'     immediate 1, not 0).
 '   * `If Self.KeeperHoldingBall() And g_player_int50 < Self.keepercatchtime + 2500` has an
-'     EMPTY Then-branch and a real Else holding the whole open-play decision tree -- this is
-'     the same byte-measured idiom TPlayer.UpdateMovement already documents for a bare
+'     EMPTY Then-branch and a real Else holding the whole open-play decision tree -- the same
+'     byte-measured idiom TPlayer.UpdateMovement documents for a bare
 '     `If Self.KeeperHoldingBall() ... Else ...` (`74 02 EB xx`, 2 bytes shorter than an
 '     explicit `= 0`/`Not` spelling), extended here with the trailing `And` term.
-'   * Every `And`-pair below reproduces the decompiled "compute cond1; only if cond1 true is
-'     cond2 even evaluated" shape verbatim -- e.g. `TPitch.InsideCrossZone(...) And (...)`
+'   * SOLO-RELATIONAL BRANCH SWAP (codegen-patterns.md section 21): every `If` below whose
+'     condition is a single relational/equality test AND whose two branches hold genuinely
+'     different statements is written as the LOGICAL NEGATION of the decompiled comparison
+'     with Then/Else swapped, because bcc compiles that shape by negating+swapping again --
+'     the double negation lands on the original's exact `setcc`/jump sense. Sites: the
+'     `distancetogoal_own < TPitch.YardsToPixels(20.0)` gate into the big tree (decompiled as
+'     `>= 20.0`, ShootAI else the tree), the `distancetogoal_opp < TPitch.YardsToPixels(22.5)`
+'     gate (decompiled as `>= 22.5`), and both `Rand(10,1) <> 1` gates (decompiled as `= 1`,
+'     ShootAI/PassAI swapped to PassAI/ShootAI). Does NOT apply to a solo relational with no
+'     Else (every innermost rung of a threshold cascade stays unnegated) or to a comparison
+'     that is one term of a compound And/Or.
+'   * The `distancetogoal_opp >= 35.0 Or g_engine_int20 Mod 4 <> 0` guard (decompiled) is
+'     written here as its De Morgan dual `distancetogoal_opp < 35.0 And g_engine_int20 Mod 4
+'     = 0` with Then/Else swapped (ShootAI directly, the >=22.5 cascade in the Else) -- disas-
+'     sembling the original at this site shows both comparisons compiled UNnegated (`setb`,
+'     `sete`) feeding a shared merge test, which only the De Morgan dual reproduces; the
+'     literal Or (undualed) compiles both terms negated instead.
+'   * Every remaining `And`-pair reproduces the decompiled "compute cond1; only if cond1 true
+'     is cond2 even evaluated" shape verbatim -- e.g. `TPitch.InsideCrossZone(...) And (...)`
 '     only evaluates the parenthesised Or-chain when InsideCrossZone is true.
 '   * Comparison operand order follows which sub-expression the original computes FIRST
 '     (that sub-expression is written first in source, per the corpus-wide fxch-avoidance
@@ -93,17 +103,39 @@
 '     the direction call as the third argument (not a stored Local) because it is used only
 '     once here -- matching TBall.Kick's inline `a0.GetShootingDirection()` rather than
 '     TPlayer.TapKick's stored-Local spelling (which reuses `dir` several times).
-'   * REFINEMENT (byte-diff-guided): disassembling the original directly at the training-mode
-'     keeper-button-force guard (`If Self.KeeperHoldingBall() And ...keepercatchtime...`, the
-'     ONLY one of this body's several KeeperHoldingBall()-And-chains with no Else at all) shows
-'     the second term compiled as `cmp dword ptr [g_player_int50], eax; jge body; jmp skip` --
-'     the global used DIRECTLY as the cmp's first (memory) operand, no register load, no
-'     setcc/movzx. That is only reachable by writing the global FIRST: `g_player_int50 >=
-'     Self.keepercatchtime + 500`, not the algebraically-equal `Self.keepercatchtime + 500 <=
-'     g_player_int50` (which put the computed side first and made the byte-oracle build
-'     materialise a boolean instead, 7 bytes longer). The sibling guard just below
-'     (`g_player_int50 < Self.keepercatchtime + 2500`, the empty-Then/real-Else idiom) already
-'     had the global written first and is unaffected by this pass.
+'   * The training-mode keeper-button-force guard is two NESTED `If`s
+'     (`If Self.KeeperHoldingBall() ... If g_player_int50 >= Self.keepercatchtime + 500 ...`),
+'     not a single compound `And`: the compound spelling makes the byte-oracle build
+'     materialise the second term into a boolean (`setge`/`movzx`) before combining it with
+'     the first, where the original never materialises anything -- it short-circuits on
+'     KeeperHoldingBall() with a single `je`, then compares `g_player_int50` directly against
+'     the computed threshold with no register load and no setcc, using the global as the
+'     `cmp`'s memory operand.
+'
+' KNOWN UNVERIFIED GAP: NOT byte-identical. Oracle: MISMATCH, ours 1477 bytes vs the
+' original's 1483 (delta -6, fully accounted for by 3 length-changing gaps, no unexplained
+' same-length substitutions). All three gaps are a 2-byte discrepancy in how bcc closes out
+' a conditional whose target coincides with what follows it:
+'   - ORIGINAL +107 (0x004F2341): the nested keeper-button-force guard's inner comparison
+'     compiles in the original as `jge body (2 bytes) / jmp skip (2 bytes)` -- direct sense,
+'     two jumps. This build's nested `If` produces the algebraically same test as a single
+'     negated `jl skip` (2 bytes) instead. Tried swapping the comparison's operand order
+'     (`Self.keepercatchtime + 500 <= g_player_int50`); that reproduces neither original
+'     spelling and loses a byte elsewhere. Ruled out: the compound-`And` spelling above
+'     (materialises instead), an explicit empty `Else` on the inner `If` (moves the 2-byte
+'     gap to a spurious new spot rather than closing it).
+'   - ORIGINAL +302 and +448 (Case 3's and Case 4's `Rand(10,1) <> 1` gates): each Else-branch
+'     (the physically-last block, reached via the initial jump) ends in the original with a
+'     redundant `jmp` to the very next instruction (`EB 00`) before the Select's own
+'     `jmp End Select`; this build's Else-branch falls straight into that `jmp End Select`
+'     with no intervening jump. Ruled out: rewriting the gate as `Select Rand(10,1) / Case 1 /
+'     Default` (materially worse -- extra bytes at a different offset), `If Not (Rand(10,1) =
+'     1) Then ...` in place of `<> 1` (also worse). The redundant jump looks like it is
+'     bcc always closing a conditional's last branch with an explicit jump to the merge point
+'     whenever more code follows in the same block (true here, inside a Select Case with more
+'     Cases after), and skipping it only when the conditional is the last code in its
+'     function -- this build's toolchain elides the redundant jump where the original does
+'     not; no source spelling found here reproduces it.
 
 '!Global g_training_int03:Int
 '!Global g_player_int01:Int
@@ -121,9 +153,11 @@ If g_training_int03 <> 0
 			Self.PassAI()
 		EndIf
 	Else
-		If Self.KeeperHoldingBall() And g_player_int50 >= Self.keepercatchtime + 500
-			Self.joy.kickbuttonhits = 1
-			Self.joy.kickbuttondown = 0
+		If Self.KeeperHoldingBall()
+			If g_player_int50 >= Self.keepercatchtime + 500
+				Self.joy.kickbuttonhits = 1
+				Self.joy.kickbuttondown = 0
+			EndIf
 		EndIf
 	EndIf
 Else
@@ -132,17 +166,17 @@ Else
 			Case 2
 				Self.PassAI()
 			Case 3
-				If Rand(10,1) = 1
-					Self.ShootAI()
-				Else
+				If Rand(10,1) <> 1
 					Self.PassAI()
+				Else
+					Self.ShootAI()
 				EndIf
 			Case 4
 				If Self.distancetogoal_opp > TPitch.YardsToPixels(35.0) And Self.distancetogoal_opp < TPitch.YardsToPixels(60.0)
-					If Rand(10,1) = 1
-						Self.ShootAI()
-					Else
+					If Rand(10,1) <> 1
 						Self.PassAI()
+					Else
+						Self.ShootAI()
 					EndIf
 				Else
 					Select Rand(2,1)
@@ -169,7 +203,9 @@ Else
 	Else
 		If Self.KeeperHoldingBall() And g_player_int50 < Self.keepercatchtime + 2500
 		Else
-			If Self.distancetogoal_own >= TPitch.YardsToPixels(20.0)
+			If Self.distancetogoal_own < TPitch.YardsToPixels(20.0)
+				Self.ShootAI()
+			Else
 				If Self.distancetogoal_own < TPitch.YardsToPixels(35.0) And Self.distancetoopponent < TPitch.YardsToPixels(10.0)
 					Self.ShootAI()
 				Else
@@ -180,24 +216,22 @@ Else
 						If Self.CleanThrough() And Self.distancetogoal_opp < TPitch.YardsToPixels(18.0)
 							Self.ShootAI()
 						Else
-							If Self.distancetogoal_opp >= TPitch.YardsToPixels(35.0) Or g_engine_int20 Mod 4 <> 0
-								If Self.distancetogoal_opp >= TPitch.YardsToPixels(22.5)
+							If Self.distancetogoal_opp < TPitch.YardsToPixels(35.0) And g_engine_int20 Mod 4 = 0
+								Self.ShootAI()
+							Else
+								If Self.distancetogoal_opp < TPitch.YardsToPixels(22.5)
+									Self.ShootAI()
+								Else
 									If Self.distancetogoal_opp < TPitch.YardsToPixels(40.0) And Self.GetOppKeeper().distancetogoal_own > TPitch.YardsToPixels(8.0)
 										Self.ShootAI()
 									Else
 										Self.PassAI()
 									EndIf
-								Else
-									Self.ShootAI()
 								EndIf
-							Else
-								Self.ShootAI()
 							EndIf
 						EndIf
 					EndIf
 				EndIf
-			Else
-				Self.ShootAI()
 			EndIf
 		EndIf
 	EndIf

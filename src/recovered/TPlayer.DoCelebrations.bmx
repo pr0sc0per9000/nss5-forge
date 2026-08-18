@@ -1,5 +1,6 @@
 ' TPlayer.DoCelebrations
 ' VA 0x004fd2da   760 bytes   vtable slot 0x1e8   sig ()i   KIND=Method
+' byte-identical vs NSS5.exe (760/760, original length from Ghidra's inventory)
 ' ORACLE: mode=reloc  matched=760/760  STATUS=MATCH.  NSS5_NO_LEARN=1
 ' Disassembled directly (harness.disasm_original) rather than trusted from Ghidra's C,
 ' because several calls in the decompilation dropped their float argument

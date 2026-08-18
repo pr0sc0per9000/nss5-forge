@@ -1,5 +1,6 @@
 ' TInputBox.Draw   (KIND=Method, SIG=()i)
 ' VA 0x00515B92   877 bytes   (Ghidra-authoritative)
+' byte-identical vs NSS5.exe (877/877, original length from Ghidra's inventory)
 ' ORACLE: mode=reloc  matched=877/877  reloc_masked=40  STATUS=MATCH
 '
 ' ASSUMPTIONS / RESOLUTIONS

@@ -1,5 +1,6 @@
 ' TPlayer.DoTacklingAI
 ' VA 0x004F2CA9   302 bytes   vtable slot 0xA4   sig ()i   KIND=Method
+' byte-identical vs NSS5.exe (302/302, original length from Ghidra's inventory)
 ' ORACLE: mode=reloc  matched=302/302  STATUS=MATCH
 ' Original length from Ghidra's inventory. NSS5_NO_LEARN=1.
 '

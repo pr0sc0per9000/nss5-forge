@@ -1,5 +1,6 @@
 ' TScreen_WorldMap.UpdateTravelTime   (KIND=Function -- static, no Self)
 ' VA 0x0055BB02   1385 bytes   (Ghidra-authoritative)
+' byte-identical vs NSS5.exe (1385/1385, original length from Ghidra's inventory)
 ' ORACLE: mode=reloc  matched=1385/1385  reloc_masked=114  STATUS=MATCH
 '
 ' ASSUMPTIONS / RESOLUTIONS

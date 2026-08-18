@@ -95,27 +95,25 @@
 '     per fixture, before the level branch, and reused inside whichever of the two branches
 '     runs -- the decompiled call sites for both methods sit once, above the level dispatch,
 '     not duplicated inside each branch.
-'   * `If g_continents_comp.level = 0 ... Else If g_continents_comp.level = 1` decompiles as
-'     a plain nested if/else-if (one compare, then only on failure a second compare) --
-'     written as ElseIf, not a comptype-style Select, since (unlike the Select/Case shapes
-'     documented elsewhere in this corpus) the two compares are NOT emitted back-to-back
-'     before either body runs.
-'   * REVISED (bytematch pass): `g_continents_comp.level` is read into a Local
-'     (`complevel`) before the dispatch, not read from the field twice. The disasm loads
-'     it into eax ONCE (0x548367) and reuses that same register for BOTH the `=0` test and
-'     the `ElseIf =1` test with no reload in between; re-reading `g_continents_comp.level`
-'     literally at each site (no CSE, per codegen-patterns.md) instead emits a second
-'     `mov eax,[g_continents_comp]` + field load right where the `ElseIf` test is checked.
-'   * Three more solo-relational If/Else sites here each have two genuinely different
-'     bodies, so codegen-patterns.md #21's negation-swap rule applies to all three (confirmed
-'     against the probe exe's disasm, not inferred): `g_continents_comp.comptype = 1` is
-'     actually written `<> 1` with the Round-label/name branches swapped; the fixture-date
-'     year match is actually written `<>` with the WWWW/YY-WW branches swapped; and the
-'     final row-selection is written as `selRow >= 1` / `unplayedRow >= 1` / `lastRow >= 1`
-'     (not `< 1`) with each pair's Then/Else swapped -- so today's row still wins over
-'     first-unplayed, which still wins over last-played, which still wins over row 0, but
-'     each individual `SelectItemByRow` call is the Then (inline) arm of a `>= 1` test, not
-'     the Else (out-of-line) arm of a `< 1` test.
+'   * `Select g_continents_comp.level / Case 0 ... Case 1 ... End Select` (no Default): the
+'     disasm loads the field into eax ONCE and emits both Case compares back to back (`cmp
+'     eax,0/je Case0; cmp eax,1/je Case1; jmp EndSelect`) before either body runs, matching
+'     codegen-patterns.md 10.2's Select signature exactly (a plain If/ElseIf interleaves
+'     test and body and comes out shorter). Each Case body ends with its own `jmp
+'     EndSelect`, including Case 1 (the last one), where that jump's target is the very next
+'     instruction -- an explicit zero-offset `jmp` byte pair that a hand-written If/ElseIf's
+'     final branch would never need, since Select always emits the jump regardless of case
+'     position.
+'   * Two more solo-relational If/Else sites here have two genuinely different bodies, so
+'     codegen-patterns.md #21's negation-swap rule applies to both (confirmed against the
+'     probe exe's disasm, not inferred): `g_continents_comp.comptype = 1` is actually written
+'     `<> 1` with the Round-label/name branches swapped, and the fixture-date year match is
+'     actually written `<>` with the WWWW/YY-WW branches swapped.
+'   * The final row-selection tests are plain `selRow > 0` / `unplayedRow > 0` / `lastRow >
+'     0` (`cmp reg,0 / jle`), not `>= 1` (`cmp reg,1 / jl`) -- same truth table, different
+'     immediate and different jcc, and codegen-patterns.md 10.1 says match the jcc and its
+'     immediate, not the meaning. Today's row still wins over first-unplayed, which still
+'     wins over last-played, which still wins over row 0.
 ' Body-only format: statements only; this Function takes one parameter (a0:Int, the round id).
 '!Global g_continents_btnFixturesFirst:TButton
 '!Global g_continents_btnFixturesLeft:TButton
@@ -172,29 +170,29 @@ For Local fx:TFixture = EachIn g_continents_comp.lfixturelist
 		prevLeg = fx.leg
 		Local homeId:Int = fx.GetHomeTeamId()
 		Local awayId:Int = fx.GetAwayTeamId()
-		Local complevel:Int = g_continents_comp.level
-		If complevel = 0 Then
-			If homeId = g_profile.clubid Or awayId = g_profile.clubid Then
-				If fx.sdate = g_profile.date.sdate Then selRow = row
-				If fx.result = 0 And unplayedRow = 0 Then unplayedRow = row
-				If fx.result = 1 Then lastRow = row
-			End If
-		ElseIf complevel = 1 Then
-			If homeId = g_profile.nationid Or awayId = g_profile.nationid Then
-				If fx.sdate = g_profile.date.sdate Then selRow = row
-				If fx.result = 0 And unplayedRow = 0 Then unplayedRow = row
-				If fx.result = 1 Then lastRow = row
-			End If
-		End If
+		Select g_continents_comp.level
+			Case 0
+				If homeId = g_profile.clubid Or awayId = g_profile.clubid Then
+					If fx.sdate = g_profile.date.sdate Then selRow = row
+					If fx.result = 0 And unplayedRow = 0 Then unplayedRow = row
+					If fx.result = 1 Then lastRow = row
+				End If
+			Case 1
+				If homeId = g_profile.nationid Or awayId = g_profile.nationid Then
+					If fx.sdate = g_profile.date.sdate Then selRow = row
+					If fx.result = 0 And unplayedRow = 0 Then unplayedRow = row
+					If fx.result = 1 Then lastRow = row
+				End If
+		End Select
 	End If
 Next
-If selRow >= 1 Then
+If selRow > 0 Then
 	g_continents_tblFixturesLeague.SelectItemByRow(selRow)
 Else
-	If unplayedRow >= 1 Then
+	If unplayedRow > 0 Then
 		g_continents_tblFixturesLeague.SelectItemByRow(unplayedRow)
 	Else
-		If lastRow >= 1 Then
+		If lastRow > 0 Then
 			g_continents_tblFixturesLeague.SelectItemByRow(lastRow)
 		Else
 			g_continents_tblFixturesLeague.SelectItemByRow(0)

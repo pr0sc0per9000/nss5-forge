@@ -1,5 +1,6 @@
 ' TLabel.Draw   (KIND=Method, SIG=()i)
 ' VA 0x00519BD7   1882 bytes   vtable slot 0x44   (Ghidra-authoritative length)
+' byte-identical vs NSS5.exe (1882/1882, original length from Ghidra's inventory)
 ' ORACLE: mode=reloc  matched=1882/1882  reloc_masked=99  STATUS=MATCH
 ' NSS5_NO_LEARN=1, no learned helpers -- every E8 named on both sides beforehand.
 '
