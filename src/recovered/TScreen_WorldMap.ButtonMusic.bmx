@@ -1,5 +1,6 @@
 ' TScreen_WorldMap.ButtonMusic   (KIND=Function -- static, no Self)
 ' VA 0x0055B92C   235 bytes   class-table slot 0x40   sig ()i
+' byte-identical vs NSS5.exe (235/235, original length from Ghidra's inventory)
 ' ORACLE: mode=reloc  matched=235/235  STATUS=MATCH
 ' Original length from Ghidra's inventory. NSS5_NO_LEARN=1.
 '

@@ -2,46 +2,30 @@
 ' VA 0x004DD418   1340 bytes   slot 0x44   sig (i,$,$,i,i,:TKit,:TKit,i,i,i,:TFixture):TTeam
 ' KIND=Function -- static, no implicit Self. param_1 is a real parameter (team id), not Self.
 '
-' REFINEMENT PASS (2026-08-17): no build/bmk access this pass (hard constraint), but
-' scripts/localise_diff.py run with `--exe src/assembled/nss5_assembled.exe` (masked/
-' relocation-aware, reads the already-assembled exe, does NOT build) gave a clean 7-gap/
-' -15-byte report, delta_accounted COMPLETE. Gaps 1-4 (-10,-9,+9,-2 = -12 of the -15) all
-' trace to ONE fix, applied this pass:
-'   The old header asserted (without byte evidence) that `a10 = Null` must be the DIRECT
-'   12-byte comparison form. The oracle says otherwise: the original emits the STAGED/
-'   inverted form -- `mov eax,a10; cmp eax,bbNullObject; setne al; movzx eax,al; cmp eax,0;
-'   jne <skip Null-body>` -- which is codegen-patterns.md 10.3's documented `If Not x` shape
-'   (21 bytes, "branch sense inverted"), not the `If x = Null` shape (12 bytes, direct je).
-'   Rewritten `If a10 = Null` -> `If Not a10` (identical Then-body, i.e. semantically a
-'   no-op change, but it is the source text bcc actually compiled). Additionally, the
-'   `a10.level` dispatch that follows has NO re-test of `level` inside either arm in the
-'   original (a clean `cmp 0/je; cmp 1/je; jmp end` dispatch, case bodies reached with no
-'   further compare) -- the positional tell for a `Select`, not an `ElseIf` cascade
-'   (codegen-patterns 10.2); the old `Else If a10.level = 0 ... Else If a10.level = 1`
-'   compiled an extra, redundant `cmp/jne` inside the second arm that the original does not
-'   have (that is GAP3's extra +9 bytes). Rewritten as `Select a10.level / Case 0 / Case 1 /
-'   End Select` nested inside the `Else` of `If Not a10`.
-'
-' REMAINING (not fixed, lower confidence, no build access to iterate): GAP5/6/7 (-1/-1/-1
-' byte each, -3 total), all inside the "for each squad player, if newstar=0 and Rand(6)<2,
-' replace the name" logic (both the initial squad walk and the per-year replacement walk).
-' The original consistently pairs a short conditional jump to the inline body with a
-' SEPARATE unconditional jump around it (e.g. `je BODY` / `jmp SKIP`, and `cmp eax,1;jle
-' BODY` / `jmp SKIP`), where our build collapses each to a single inverted conditional jump
-' (`jne SKIP`, `cmp eax,2;jge SKIP`) -- functionally identical, 1 byte shorter each. Could
-' not identify a source-level rephrasing that reproduces the two-jump shape without a build
-' loop to test against; flagging for whoever picks this up next with toolchain access.
-'
 ' ASSUMPTIONS
-'  * 0x00C6F028 g_contractoffer_tplayer:TProfile -- CERTAIN tier in explain_global (20
-'    bodies, forced in 17, unanimous). `*(int*)(*(int*)(g + 0x1d0) + 100)` is the same
-'    byte pattern as TClub.Compare's `g_contractoffer_tplayer.myclub.nationid` (0x1d0 =
-'    TProfile.myclub per object_model.json, +100/0x64 = TClub.nationid). The later
-'    `*(int**)(g + 0x10)` is TProfile.date (:TMyDate, offset 0x10), and vtable+0x54 on a
-'    TMyDate is GetYear() (object_model.json: TMyDate methods list Year at offset 0x54) --
-'    i.e. `g_contractoffer_tplayer.date.GetYear()`, a small career-year counter (grep
-'    evidence elsewhere in the corpus compares this to 1, 2, 20 -- never a calendar year),
-'    consistent with the loop below only running a handful of times.
+'  * 0x00C6F028 is g_profile:TProfile, not a separate g_contractoffer_tplayer slot.
+'    explain_global.py resolves 0x00C6F028 CERTAIN/forced for the name
+'    "g_contractoffer_tplayer" (22 bodies) and STRONG for "g_profile" (158 bodies,
+'    112/113 agree); addr_oracle.py's machine-code-order dump (extracted/addr_oracle.json)
+'    lists 0x00C6F028 in the touched-address set of every body declaring either name. The
+'    byte-identical (786/786) src/recovered/TScreen_NewPlayer.DoClubTrial.bmx documents
+'    "0x00C6F028 TProfile g_profile" in its own header and writes it directly on the
+'    career-creation path this Function is called from ("g_profile.myclub = c", line 60)
+'    immediately before TTraining.SetUpTraining -> CreateTeamSimple runs. No recovered
+'    body anywhere assigns a Global literally named g_contractoffer_tplayer, and
+'    scripts/assemble.py's global_alias_map() carries no entry unifying that spelling
+'    with g_profile, so writing this Function against that name would compile to a
+'    second, permanently-Null Global at this address and crash the nationid read below on
+'    every career start. Written here as g_profile directly instead, matching
+'    DoClubTrial's own name for the slot it just filled in.
+'    `*(int*)(*(int*)(g + 0x1d0) + 100)` is the same byte pattern as TClub.Compare's
+'    `g_contractoffer_tplayer.myclub.nationid` (0x1d0 = TProfile.myclub per
+'    object_model.json, +100/0x64 = TClub.nationid). The later `*(int**)(g + 0x10)` is
+'    TProfile.date (:TMyDate, offset 0x10), and vtable+0x54 on a TMyDate is GetYear()
+'    (object_model.json: TMyDate methods list Year at offset 0x54) -- i.e.
+'    `g_profile.date.GetYear()`, a small career-year counter (grep evidence elsewhere in
+'    the corpus compares this to 1, 2, 20 -- never a calendar year), consistent with the
+'    loop below only running a handful of times.
 '  * 0x00C6EFD4 resolves STRONG to g_player_int50:Int in explain_global (37 bodies, 13/16
 '    agree) -- NOT the g_ticks name a different sibling used for the same address; the
 '    solver's verdict wins per the project's naming-unification rule.
@@ -71,11 +55,21 @@
 '    `And`, so the skip is guaranteed regardless of BlitzMax And/Or evaluation rules.
 '  * `If Not a10` (not `If a10 = Null`): the oracle shows the staged/inverted
 '    21-byte form, not a direct 12-byte `cmp/je`.
+'  * The `newstar`/`Rand` guards in both squad walks are written with the negated
+'    condition and an empty `Then`, body in `Else` (`If p.newstar <> 0` / `Else` / body
+'    / `EndIf`, and `If Rand(6) > 1` / `Else` / body / `EndIf`), not `If p.newstar = 0`
+'    / `If Rand(6) < 2` with the body directly in `Then`. An `If`/`Else` with an empty
+'    arm still emits that arm's branch and its unconditional jump around the other arm
+'    (codegen-patterns 10.2's rule that `Select`/`If` emit every branch instruction they
+'    are given generalises here); a plain `If cond Then body EndIf` with no `Else` instead
+'    collapses to one inverted conditional jump, one byte shorter per guard. `Rand(6) > 1`
+'    (not `Rand(6) >= 2`) matches codegen-patterns 10.1's relational-spelling rule: the
+'    original's `cmp eax,1 / jle` sets the immediate to 1, not 2.
 '  * String concatenation and slicing calls are NOT CSE'd (bcc never does this): the same
 '    `fn + " " + ln` is recomputed for both the LogLine and the field store, and fn/ln are
 '    each sliced to their first character for `initials` without reusing prior temps --
 '    reproduced as literal repeated expressions per codegen-patterns 10.6/"no CSE".
-'!Global g_contractoffer_tplayer:TProfile
+'!Global g_profile:TProfile
 '!Global g_team_arr01:String[]
 '!Global g_team_arr02:String[]
 '!Global g_player_int50:Int
@@ -95,9 +89,9 @@
 		If t.controller = 1
 			t.newstarselno = a8
 		EndIf
-		Local nationid:Int = g_contractoffer_tplayer.myclub.nationid
+		Local nationid:Int = g_profile.myclub.nationid
 		If Not a10
-			Local n:TNation = TNation.SelectById(g_contractoffer_tplayer.myclub.nationid)
+			Local n:TNation = TNation.SelectById(g_profile.myclub.nationid)
 			t.skin1 = n.primaryskin + 1
 			t.skin2 = n.secondaryskin + 1
 		Else
@@ -128,18 +122,21 @@
 		For Local p:TPlayer = EachIn t.squad
 			Local fn:String = g_team_arr01[Rand(g_team_arr01.Length) - 1]
 			Local ln:String = g_team_arr02[Rand(g_team_arr02.Length) - 1]
-			If p.newstar = 0
+			If p.newstar <> 0
+			Else
 				LogLine(fn + " " + ln)
 				p.name = fn + " " + ln
 				p.initials = fn[..1] + ln[..1]
 			EndIf
 		Next
-		Local yr:Int = g_contractoffer_tplayer.date.GetYear()
+		Local yr:Int = g_profile.date.GetYear()
 		While yr > 1
 			yr = yr - 1
 			For Local p:TPlayer = EachIn t.squad
-				If p.newstar = 0
-					If Rand(6) < 2
+				If p.newstar <> 0
+				Else
+					If Rand(6) > 1
+					Else
 						Local fn:String = g_team_arr01[Rand(g_team_arr01.Length) - 1]
 						Local ln:String = g_team_arr02[Rand(g_team_arr02.Length) - 1]
 						LogLine(fn + " " + ln + " is replacing " + p.name)

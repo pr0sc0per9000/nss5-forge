@@ -110,16 +110,23 @@ def colour(pct):
     return "orange"
 
 
-def write_shield(pct):
+def write_shield(pct, done, total):
     """Write docs/progress.json in shields.io endpoint format, and return it.
 
     The README badge reads this file over raw.githubusercontent.com, so the
-    percentage is generated alongside docs/STATUS.md rather than typed into the
+    figures are generated alongside docs/STATUS.md rather than typed into the
     README. A figure written by hand is wrong at the next commit and has no way
     of telling the reader so.
+
+    The badge carries the byte counts as well as the percentage, because a bare
+    percentage does not say what it is a percentage of. Machine code is the
+    denominator here, not files and not functions, and a reader who cannot see
+    that has no way to compare this against any other reconstruction.
     """
     blob = json.dumps({"schemaVersion": 1, "label": "reconstructed",
-                       "message": "%.1f%%" % pct, "color": colour(pct)})
+                       "message": "%.1f%% (%s/%s bytes)"
+                                  % (pct, "{:,}".format(done), "{:,}".format(total)),
+                       "color": colour(pct)})
     out = os.path.join(ROOT, "docs", "progress.json")
     with open(out, "w", encoding="utf-8") as f:
         print(blob, file=f)
@@ -133,7 +140,7 @@ def main():
     done, total, pct = totals(rows)
 
     if "--shield" in sys.argv:
-        print(write_shield(pct))
+        print(write_shield(pct, done, total))
         return 0
 
     if "--csv" in sys.argv:
@@ -187,7 +194,7 @@ def main():
             f.write("```\n%s\n```\n\n" % text)
             f.write("Regenerate with:\n\n```bash\npython scripts/progress.py --write-status\n```\n")
         print("\n  wrote %s" % os.path.relpath(out, ROOT))
-        write_shield(pct)
+        write_shield(pct, done, total)
         print("  wrote %s" % os.path.join("docs", "progress.json"))
     return 0
 

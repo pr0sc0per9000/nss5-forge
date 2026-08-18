@@ -97,6 +97,18 @@
 '     drawn by hand (call [eax+0x44] right after its .txt store, VA 0x0054C817), but
 '     g_lblValue is positioned and text-set every frame and never rendered. Do not add
 '     a g_lblValue.Draw() call here even though it looks symmetric with g_lblName.
+'   * The `d.txt <> ""` guard in the label loop is `If d.txt = "" Then Continue`, not an
+'     `If <> Then ... EndIf` block. Raw bytes at 0x0054C78F are `jne short +5 / jmp near
+'     0x54c860` -- the short jump skips a single unconditional near jmp straight to the
+'     EachIn loop's HasNext check (the Continue target), which is the shape wave12's notes
+'     record for `Continue` once its target is far enough to need a near jmp instead of a
+'     short one. A plain `If d.txt <> "" Then ... EndIf` compiles to a single inverted
+'     `je`, one byte shorter and the wrong shape.
+'   * `g_lblValue.y = py + 14` is written as `py :+ 14` right after `g_lblName.Draw()`,
+'     followed by a bare `g_lblValue.y = py`. The raw bytes increment the register holding
+'     py in place (`add ebx,0xe`) before either store instead of computing `py + 14` fresh
+'     for the second store, and both `g_lblValue` field stores reload the global through
+'     the SAME register (eax) rather than parking it in a second one.
 '!Global g_formlist:TList
 '!Global g_playerteam:TTeam
 '!Global g_imgStar52:TImage
@@ -164,17 +176,17 @@
 
 	SetScale(1.0, 1.0)
 	For Local d:TDrawOb = EachIn g_formlist
-		If d.txt <> ""
-			Local px:Int = Int(d.x - 40.0)
-			Local py:Int = Int(d.y + 5.0)
-			g_lblName.x = px
-			g_lblName.y = py
-			g_lblName.txt = d.txt
-			g_lblName.Draw()
-			g_lblValue.x = px
-			g_lblValue.y = py + 14
-			g_lblValue.txt = d.txt2
-		EndIf
+		If d.txt = "" Then Continue
+		Local px:Int = Int(d.x - 40.0)
+		Local py:Int = Int(d.y + 5.0)
+		g_lblName.x = px
+		g_lblName.y = py
+		g_lblName.txt = d.txt
+		g_lblName.Draw()
+		py :+ 14
+		g_lblValue.x = px
+		g_lblValue.y = py
+		g_lblValue.txt = d.txt2
 	Next
 
 	If g_screen_formation_ready = 0 And g_screen_formation_int06 > 0 And g_screen_formation_int06 <> g_screen_formation_selno

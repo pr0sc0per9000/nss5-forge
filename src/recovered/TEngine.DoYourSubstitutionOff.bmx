@@ -1,5 +1,6 @@
 ' TEngine.DoYourSubstitutionOff   (KIND=Function -- static, no Self)
 ' VA 0x004D648F   829 bytes   class-table slot 0xD4   sig (i)i
+' byte-identical vs NSS5.exe (829/829, original length from Ghidra's inventory)
 ' ORACLE: mode=reloc  matched=829/829  reloc_masked=45  STATUS=MATCH
 ' Original length from Ghidra's inventory. NSS5_NO_LEARN=1.
 '

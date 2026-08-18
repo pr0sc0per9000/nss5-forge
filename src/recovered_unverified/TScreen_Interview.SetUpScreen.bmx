@@ -6,46 +6,28 @@
 ' Body-only format: statements only, no Function/End Function wrapper (matches
 ' TScreen_Interview.ButtonAddText.bmx / TScreen_Interview.Success.bmx in src/recovered/).
 '
-' REFINEMENT PASS (2026-08-17): this pass had no build/bmk access this pass (hard
-' constraint), but DID have read-only oracle access -- scripts/bytematch.py (raw, address
-' literals legitimately differ across two independently-linked images, see
-' docs/reference/codegen-patterns.md 14.2) and, more usefully, scripts/localise_diff.py
-' run with `--exe src/assembled/nss5_assembled.exe` (masked/relocation-aware, does NOT
-' build anything -- it only reads the exe already sitting on disk). That surfaced a clean,
-' fully-accounted 7-gap / -5-byte report (delta_accounted COMPLETE). Two of those gaps traced
-' to one root cause each, both fixed this pass, together explaining gaps 1/2/3/7 and all six
-' `subs`:
-'   1. The interviewskill difficulty cascade was written as `If skill<9 Then <If skill<6...>
-'      Else <int03=15,CreateBody 350,...>>`. Byte evidence (cmp reg,8 / jle, not cmp reg,9 /
-'      jl; cmp reg,5/jle, not cmp reg,6/jl -- codegen-patterns 10.1, "match the setcc/
-'      immediate, not the meaning") plus the physical layout (the `int03=15` block sits as
-'      the FALLTHROUGH immediately after the outer test, i.e. it is textually the Then-arm,
-'      not textually last) show the real source is `If skill>8 Then <int03=15 body> Else <If
-'      skill>5 Then <int03=12 body> Else <250 body>>` -- De Morgan'd relative to the old
-'      phrasing, with Then/Else swapped to match, NOT a bcc branch-swap quirk (standard
-'      "negate for the else-jump" compilation already reproduces every observed byte once the
-'      threshold/direction is right). Confirmed against all four SUBs at this site (0xfa/
-'      0x15e push-immediate swap, 0xc3/0x91 SetPosition-offset swap) and against GAP1/GAP2
-'      (the E9-vs-EB long/short jmp and the misplaced `mov [int03],0xf` both disappear once
-'      the blocks are in the byte-correct positions).
-'   2. The per-button Show/Hide test (buttons 4..15) was `If int03<q Then Hide Else Show`,
-'      matching the decompilation's literal phrasing (and semantically correct -- this was
-'      flagged UNCERTAIN in an earlier version of this header). Byte evidence: `cmp [q],int03;
-'      jg` (operand order q-then-int03, SIGNED greater), with the JUMP target being Hide and
-'      the FALLTHROUGH being Show -- the swapped layout. `If q<=int03 Then Show Else Hide` is
-'      the De Morgan'd/swapped form that reproduces this exactly (same semantics as the
-'      decompilation's `int03<q -> Hide`, just written the way the original apparently was).
-'      Confirmed against SUB5/SUB6 (the 0x54/0x58 Hide/Show slot-call swap at the two sites).
+' The interviewskill difficulty cascade compiles as `If skill>8 Then <int03=15 body> Else
+' <If skill>5 Then <int03=12 body> Else <250 body>>`. Byte evidence: cmp reg,8/jle, not
+' cmp reg,9/jl; cmp reg,5/jle, not cmp reg,6/jl (codegen-patterns 10.1, "match the setcc/
+' immediate, not the meaning"); and the int03=15 block sits as the fallthrough immediately
+' after the outer test, i.e. it is textually the Then-arm.
 '
-' REMAINING (not fixed, lower confidence, no build access to iterate): GAP4 (-7 bytes, a
-' `mov dword[ebp-4],0` the original has immediately before computing `n` -- local_8's slot --
-' that our build elides; possibly a definite-assignment zero-store bcc emits for an Int
-' Local declared at a multi-way CFG join, see codegen-patterns 16.3, but not confirmed) and
-' GAP5/GAP6 (-6/+6 bytes, inside the `For j` inner button-name-collision loop, register/
-' operand-order noise around the `j`-th button's GetGadgetByName/String(j) call that this
-' pass could not pin down without a build loop). All three may be downstream consequences
-' of fix #1 above (the whole-body layout shifts once the difficulty cascade's blocks move),
-' since `delta_accounted` was COMPLETE with no unexplained bytes beyond these 7 gaps.
+' The per-button Show/Hide test (buttons 4..15) is `If q <= g_screen_interview_int03 Then
+' Show Else Hide`. Byte evidence: `cmp [q],int03; jg` (operand order q-then-int03, SIGNED
+' greater), with the jump target Hide and the fallthrough Show.
+'
+' `n` is a bare `Local n:Int` declaration (bcc zero-stores it) followed by a separate
+' assignment statement, not a combined `Local n:Int = expr`: the original stores 0 to
+' [ebp-4] immediately before overwriting that slot with the computed value, which only a
+' declaration-then-assignment split produces (codegen-patterns 16.3).
+'
+' The inner-loop collision test is one inline expression with no named Local for the
+' downcast result: `If TButton(g_iv_screen.GetGadgetByName("btn_" + String(j))).txt.
+' Compare(b.txt) = 0 Then ok = 0`. Evaluating it pushes the simple argument (b.txt) before
+' evaluating the more complex receiver chain (the j-th button's GetGadgetByName/downcast),
+' matching codegen-patterns 16.2's "evaluates a nested first-argument call LAST" rule; a
+' separate `Local b2 = ...` statement pushes both operands back-to-back right before the
+' call instead, which does not match.
 '
 ' WHAT IT DOES: builds the interview mini-game screen. Saves the current screen's name so
 ' ButtonOk can return to it, switches to "interview", pops a "Interview!" toast, derives a
@@ -148,14 +130,11 @@
 '   String literals (harness.read_string): 0x00C91A90 "Interview!", 0x00C7E308 "btn_",
 '     0x00C91AE0 "CLICHE_", 0x00C91AB0 "interview_Instrucs", 0x00C5D680 "FFFFFF".
 '
-' RESOLVED this pass (was UNCERTAIN): the Show/Hide test is `If q <= int03 Then Show Else
-' Hide`, not `If int03 < q Then Hide Else Show` -- byte-confirmed via localise_diff SUB5/
-' SUB6 (see REFINEMENT PASS note above). Same semantics, different source-level phrasing.
-'
-' UNCERTAIN: the b2.txt.Compare(b.txt)=0 receiver/
-' argument order is inferred from which push sits closest to the call (b2.txt) vs which was
-' pushed many instructions earlier and survives the merge (b.txt); Ghidra's own single shown
-' argument for FUN_004A6A30 is b2.txt, consistent with this reading.
+' The Compare receiver/argument order (`<downcast expr>.txt.Compare(b.txt)`, not
+' `b.txt.Compare(<downcast expr>.txt)`) is read from which push sits closest to the call
+' (the downcast expression's .txt) versus which push survives from many instructions
+' earlier (b.txt); Ghidra's own single shown argument for FUN_004A6A30 is the downcast
+' expression's .txt, consistent with this reading.
 '!Global g_curscreen:TScreen
 '!Global g_interview_ret:String
 '!Global g_engine_gfxw:Int
@@ -196,7 +175,8 @@ Else
 		g_iv_panel.SetPosition(Int(g_iv_panel.x), g_screenheight / 2 - 145, 1)
 	End If
 End If
-Local n:Int = g_profile.interviewskill - g_screen_interview_int02
+Local n:Int
+n = g_profile.interviewskill - g_screen_interview_int02
 ClampInt(Varptr n, 0, 3)
 g_screen_interview_int04 = 0
 g_screen_interview_int06 = ""
@@ -219,8 +199,7 @@ For Local q:Int = 4 To 15
 		ok = 1
 		b.SetText(GetText("CLICHE_" + String(Rand(4, 25))), "", -1, -1)
 		For Local j:Int = 1 To q - 1
-			Local b2:TButton = TButton(g_iv_screen.GetGadgetByName("btn_" + String(j)))
-			If b2.txt.Compare(b.txt) = 0 Then ok = 0
+			If TButton(g_iv_screen.GetGadgetByName("btn_" + String(j))).txt.Compare(b.txt) = 0 Then ok = 0
 		Next
 	Until ok <> 0
 Next

@@ -1,36 +1,50 @@
 ' TPitch.SetUpFans
 ' VA 0x004E6014   1533 bytes   KIND=Function (static), SIG (:TTeam,:TTeam,i)i, class-table slot 0x3C
-' NOT YET BYTE-VERIFIED. Reconstructed from extracted/decomp/TPitch.SetUpFans@004e6014.c, cross-
-' checked against src/recovered/TPitch.SetUp.bmx (same CreateKitStrings/CreateKit/GetPaintedFan/
-' LoadAnimImage idiom, same "EngineMedia/Match/Pitch/Fans.png" literal, same g_fansimg slot),
-' src/recovered/TKit.CreateKit.bmx and src/recovered/TKitStrings.CreateKitStrings.bmx (field
-' offsets/argument order for TKit.newcol and TKitStrings), and src/recovered/TPitch.DrawBosses.bmx
-' / src/recovered/TPitch.DrawFans.bmx (the readers of the two Globals this body is the sole writer
-' for -- writing it revives their dead dereferences).
+' byte-identical vs NSS5.exe (1533/1533).
+' Reconstructed from extracted/decomp/TPitch.SetUpFans@004e6014.c, cross-checked against a direct
+' capstone disassembly of the original bytes at 0x004E6014 (binary/NSS5.exe), src/recovered/
+' TPitch.SetUp.bmx (same CreateKitStrings/CreateKit/GetPaintedFan/LoadAnimImage idiom, same
+' "EngineMedia/Match/Pitch/Fans.png" literal, same g_fansimg slot), src/recovered/TKit.CreateKit.bmx
+' and src/recovered/TKitStrings.CreateKitStrings.bmx (field offsets/argument order for TKit.newcol
+' and TKitStrings), and src/recovered/TPitch.DrawBosses.bmx / src/recovered/TPitch.DrawFans.bmx (the
+' readers of the two Globals this body is the sole writer for).
 '
-' PASS 2 (this revision) -- previous draft scored 4.2% (62/1468, first diff at absolute VA byte
-' 0x004E6023, i.e. essentially at the top). Re-derived against a direct capstone disassembly of
-' the ORIGINAL bytes at 0x004E6014 (binary/NSS5.exe, not just the decompilation), which showed
-' two shape errors, both now fixed:
-'   1. There is NO `Local kitH:TKit = a0.kitplayer` (or kitA for a1) in the original. Every access
-'      is the full chain `a0.kitplayer.style` / `a0.kitplayer.newcol[N]`, independently re-fetching
-'      `[a0+0x2c]` from scratch each time (confirmed: the disassembly re-reads [esi+0x2c] FOUR
-'      separate times for the home block alone, once per field, instead of loading a cached kitH
-'      pointer from a stack slot once). This matches the project-wide "bcc does no CSE" fact
-'      already documented in src/recovered/TKit.CreateKit.bmx's own header.
-'   2. `kitH.style` (styleH) is evaluated FIRST, as its own statement, BEFORE shirt1H/shirt2H/
-'      shortsH -- not inline as the CreateKitStrings call's last argument. Evidence: the original
-'      computes style into eax, then shirt1(newcol[1]) into edi, then shirt2(newcol[4]) spilled to
-'      [ebp-8], then shorts(newcol[7]) spilled to [ebp-0x1c], and ONLY THEN emits the five pushes
-'      for the call (style/"000000"/"404040"/shirt2/shirt1, right-to-left per codegen-patterns.md
-'      16.2) -- i.e. style is materialised before any of the three newcol reads, which only makes
-'      sense if it is a separate `Local styleH:String = a0.kitplayer.style` declared textually
-'      first. It costs zero bytes (stays live in eax the whole time, per the same 16.2 rule) since
+' SHAPE FACTS confirmed against the disassembly:
+'   1. There is NO `Local kitH:TKit = a0.kitplayer` (or kitA for a1). Every access is the full
+'      chain `a0.kitplayer.style` / `a0.kitplayer.newcol[N]`, independently re-fetching [a0+0x2c]
+'      from scratch each time (the disassembly re-reads [esi+0x2c] FOUR separate times for the home
+'      block alone, once per field). Matches the project-wide "bcc does no CSE" fact already
+'      documented in src/recovered/TKit.CreateKit.bmx's own header.
+'   2. `a0.kitplayer.style` (styleH) is a separate `Local` declared textually FIRST, evaluated
+'      before shirt1H/shirt2H/shortsH, not inline as the CreateKitStrings call's last argument.
+'      The disassembly computes style into eax, then shirt1(newcol[1]) into edi, then
+'      shirt2(newcol[4]) spilled to [ebp-8], then shorts(newcol[7]) spilled to [ebp-0x1c], and ONLY
+'      THEN emits the five pushes for the call (style/"000000"/"404040"/shirt2/shirt1, right-to-left
+'      per codegen-patterns.md 16.2). It costs zero bytes (stays live in eax the whole time) since
 '      nothing between its declaration and its use touches eax. Same shape for styleA on the away
-'      side (a1.kitplayer.style, evaluated before shirt1A/shirt2A/shortsA).
-' Everything else (skin1/skin2 asymmetry, the shirt1=shorts / shirt1=shirt2 fallback branches and
-' their literal colours, the away block's hardcoded GetPaintedFan(2,-1)/GetPaintedFan(4,-1), the
-' crowd-grid loop) was already confirmed correct against the same disassembly and is unchanged.
+'      side.
+'   3. The a2 dispatch (Case 0 / Case 1, no default) is a `Select a2`, not `If/ElseIf`: a2 is
+'      loaded into eax ONCE, both `cmp/je` sit back to back, then a `jmp` skips both case bodies
+'      when neither matches (codegen-patterns.md 10.2). As If/ElseIf it would reload a2 from
+'      [ebp+0x10] a second time for the ElseIf test, which the disassembly does not do.
+'   4. The two "second fan image" colour-clash fallbacks (shirt1<>shorts, shirt1<>shirt2) are
+'      spelled with `<>`, not `=`: the disassembly falls straight through into the fallback body on
+'      the NOT-equal path and jumps forward over it on the equal path (`cmp eax,0 / je`), the
+'      mirror image of the `=` shape TKit.CreateKit.bmx's `If g_kitfiles[0] = "" Then ...` already
+'      established (there, `jne` skips the Then-body; here the skip is `je`, so the source-level
+'      test itself is inverted).
+'   5. The fallback TKitStrings is written back into `ksH`/`ksA` itself (reassigned), not into a
+'      fresh `Local ksH2`/`ksH3`. `ksH`/`ksA` is a value that must survive across calls (LoadAnimImage/
+'      SetImageHandle/MidHandleImage run between its uses), so it keeps one persistent register
+'      (ebx) for the whole home/away block; every branch's "push ebx" before the second CreateKit
+'      call reads that same slot. Declaring a distinct `ksH2`/`ksH3` Local instead measurably moves
+'      the register allocator's choices for shirt1H/shirt1A (see codegen-patterns.md 22-23 on how
+'      introducing or removing a Local changes the interference graph, not just a tie-break).
+'   6. The function ends with two bare statement calls, `TPhotographer.SetUpPositions()` and
+'      `TCameraMan.SetUpPositions()`, immediately before `Return 0` (extracted/call_sites.tsv:
+'      0x004e65f7 -> 0x00c5dc90 = TPhotographer+0x38, 0x004e65fd -> 0x00c5ddf8 = TCameraMan+0x38,
+'      both zero-arg, both discarding the Int return value). Despite the function's name, it also
+'      repositions the photographer and cameraman for the new lineup.
 '
 ' Builds a team-coloured "boss" (manager) sprite and two team-coloured "fans" sprite variants for
 ' each side, then re-rolls the whole 100x100 crowd-seat grid that DrawFans reads. Despite the name,
@@ -65,13 +79,17 @@
 '   0x005AE2BC = LoadAnimImage(:TPixmap,i,i,i,i,i):TImage   (_brl_max2d_LoadAnimImage)
 '   0x005AE336 = SetImageHandle(:TImage,f,f)i   (_brl_max2d_SetImageHandle)
 '   0x005AE38D = MidHandleImage(:TImage)i       (_brl_max2d_MidHandleImage)
-'   0x004A6A30 = _bbStringCompare, i.e. plain BlitzMax `=` on two Strings (see src/recovered/
-'     TCompetition.SelectByTLA.bmx)
+'   0x004A6A30 = _bbStringCompare, i.e. plain BlitzMax `=`/`<>` on two Strings (see src/recovered/
+'     TCompetition.SelectByTLA.bmx and src/recovered/TKit.CreateKit.bmx for the `=` shape; the
+'     `<>` shape is this body's own colour-clash tests, see SHAPE FACTS 4 above)
 '   0x0059F089 = _brl_random_Rand ; FUN(x,1) is source Rand(x) (brl_functions.tsv and corpus
 '     convention -- see src/recovered/TPitch.RandomPitchType.bmx, TBall.CheckLongShotRating.bmx,
 '     THorse.ResetRands.bmx). Rand(min,max=1): range=max-min; if range>0 the result is
 '     [min,max], otherwise [max,min] -- confirmed against tools/blitzmax-legacy-src/mod/brl.mod/
 '     random.mod/random.bmx.
+'   0x00C5DC90 = TPhotographer+0x38 SetUpPositions()i   0x00C5DDF8 = TCameraMan+0x38
+'     SetUpPositions()i (extracted/globals_classtable_slots.tsv; both called as bare statements,
+'     Int return value discarded)
 '
 ' FIELDS (extracted/object_model.json):
 '   TTeam id=+8(i) kitplayer=+0x2C(:TKit)
@@ -130,15 +148,16 @@ Local shortsH:String = a0.kitplayer.newcol[7]
 Local ksH:TKitStrings = TKitStrings.CreateKitStrings(shirt1H, shirt2H, "404040", "000000", styleH)
 Local skin1:Int = 0
 Local skin2:Int = 0
-If a2 = 0
+Select a2
+Case 0
 	Local natH:TNation = TNation.SelectById(TClub.SelectById(a0.id).nationid)
 	skin1 = natH.primaryskin + 1
 	skin2 = natH.secondaryskin + 1
-ElseIf a2 = 1
+Case 1
 	Local natH:TNation = TNation.SelectById(a0.id)
 	skin1 = natH.primaryskin + 1
 	skin2 = natH.secondaryskin + 1
-EndIf
+End Select
 Local kitBossH:TKit = TKit.CreateKit(ksH, "EngineMedia/Match/Pitch/Boss.png")
 Local pixBossH:TPixmap = kitBossH.GetPaintedFan(skin1, -1)
 g_pitch_arr06[0] = LoadAnimImage(pixBossH, 64, 128, 0, 9, -1)
@@ -148,13 +167,13 @@ Local pixFansH1:TPixmap = kitFansH1.GetPaintedFan(skin1, -1)
 g_fansimg[6] = LoadAnimImage(pixFansH1, 64, 128, 0, 30, -1)
 MidHandleImage(g_fansimg[6])
 Local kitFansH2:TKit
-If shirt1H = shortsH
-	Local ksH2:TKitStrings = TKitStrings.CreateKitStrings(shortsH, shirt2H, "000080", "000000", "PLAIN")
-	kitFansH2 = TKit.CreateKit(ksH2, "EngineMedia/Match/Pitch/Fans.png")
+If shirt1H <> shortsH
+	ksH = TKitStrings.CreateKitStrings(shortsH, shirt2H, "000080", "000000", "PLAIN")
+	kitFansH2 = TKit.CreateKit(ksH, "EngineMedia/Match/Pitch/Fans.png")
 Else
-	If shirt1H = shirt2H
-		Local ksH3:TKitStrings = TKitStrings.CreateKitStrings(shirt2H, shirt1H, "800000", "000000", "PLAIN")
-		kitFansH2 = TKit.CreateKit(ksH3, "EngineMedia/Match/Pitch/Fans.png")
+	If shirt1H <> shirt2H
+		ksH = TKitStrings.CreateKitStrings(shirt2H, shirt1H, "800000", "000000", "PLAIN")
+		kitFansH2 = TKit.CreateKit(ksH, "EngineMedia/Match/Pitch/Fans.png")
 	Else
 		kitFansH2 = TKit.CreateKit(ksH, "EngineMedia/Match/Pitch/Fans.png")
 	EndIf
@@ -167,13 +186,14 @@ Local shirt1A:String = a1.kitplayer.newcol[1]
 Local shirt2A:String = a1.kitplayer.newcol[4]
 Local shortsA:String = a1.kitplayer.newcol[7]
 Local ksA:TKitStrings = TKitStrings.CreateKitStrings(shirt1A, shirt2A, "404040", "000000", styleA)
-If a2 = 0
+Select a2
+Case 0
 	Local natA:TNation = TNation.SelectById(TClub.SelectById(a1.id).nationid)
 	skin1 = natA.primaryskin + 1
-ElseIf a2 = 1
+Case 1
 	Local natA:TNation = TNation.SelectById(a1.id)
 	skin1 = natA.primaryskin + 1
-EndIf
+End Select
 Local kitBossA:TKit = TKit.CreateKit(ksA, "EngineMedia/Match/Pitch/Boss.png")
 Local pixBossA:TPixmap = kitBossA.GetPaintedFan(skin1, -1)
 g_pitch_arr06[1] = LoadAnimImage(pixBossA, 64, 128, 0, 9, -1)
@@ -183,13 +203,13 @@ Local pixFansA1:TPixmap = kitFansA1.GetPaintedFan(2, -1)
 g_fansimg[8] = LoadAnimImage(pixFansA1, 64, 128, 0, 30, -1)
 MidHandleImage(g_fansimg[8])
 Local kitFansA2:TKit
-If shirt1A = shortsA
-	Local ksA2:TKitStrings = TKitStrings.CreateKitStrings(shortsA, shirt1A, "000080", "000000", "PLAIN")
-	kitFansA2 = TKit.CreateKit(ksA2, "EngineMedia/Match/Pitch/Fans.png")
+If shirt1A <> shortsA
+	ksA = TKitStrings.CreateKitStrings(shortsA, shirt1A, "000080", "000000", "PLAIN")
+	kitFansA2 = TKit.CreateKit(ksA, "EngineMedia/Match/Pitch/Fans.png")
 Else
-	If shirt1A = shirt2A
-		Local ksA3:TKitStrings = TKitStrings.CreateKitStrings(shirt2A, shirt1A, "800000", "000000", "PLAIN")
-		kitFansA2 = TKit.CreateKit(ksA3, "EngineMedia/Match/Pitch/Fans.png")
+	If shirt1A <> shirt2A
+		ksA = TKitStrings.CreateKitStrings(shirt2A, shirt1A, "800000", "000000", "PLAIN")
+		kitFansA2 = TKit.CreateKit(ksA, "EngineMedia/Match/Pitch/Fans.png")
 	Else
 		kitFansA2 = TKit.CreateKit(ksA, "EngineMedia/Match/Pitch/Fans.png")
 	EndIf
@@ -211,4 +231,6 @@ For Local i:Int = 0 To 99
 		g_pitch_arr05[2, j, i] = Rand(-1)
 	Next
 Next
+TPhotographer.SetUpPositions()
+TCameraMan.SetUpPositions()
 Return 0

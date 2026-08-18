@@ -1,5 +1,6 @@
 ' TPlayer.HoldKick   (KIND=Method, SIG=()i, SLOT=0x104)
 ' VA 0x004F8159   814 bytes   (Ghidra-authoritative)
+' byte-identical vs NSS5.exe (814/814, original length from Ghidra's inventory)
 ' ORACLE: mode=reloc  matched=814/814  reloc_masked=31  STATUS=MATCH
 '
 ' ASSUMPTIONS / RESOLUTIONS

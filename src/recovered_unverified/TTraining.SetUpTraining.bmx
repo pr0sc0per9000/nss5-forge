@@ -204,7 +204,7 @@ g_training_int03 = a0
 g_training_state = 0
 g_train_scrollx = Float(g_screen_w)
 
-Select a0
+Select g_training_int03
 	Case 1
 		SetUpTraining_Pace()
 	Case 2
@@ -238,4 +238,5 @@ End Select
 Local hometeam:TTeam = TTeam.CreateTeamSimple(g_profile.myclub.id, g_profile.myclub.labelshortname, g_profile.myclub.tla, g_profile.myclub.strength, 1, kithome, kitkeeper, g_profile.myclub.formation, g_profile.newstarselno, 1, Null)
 Local awayteam:TTeam = TTeam.CreateTeamSimple(g_profile.myclub.id + 1, g_profile.myclub.labelshortname, g_profile.myclub.tla, g_training_int04 * 3, 0, kitaway, kitkeeper, tacticid, g_profile.newstarselno, 2, Null)
 
-TEngine.SetUpMatch(New TFixture, hometeam, awayteam, ClearUpTraining)
+Local fixture:TFixture = New TFixture
+TEngine.SetUpMatch(fixture, hometeam, awayteam, ClearUpTraining)

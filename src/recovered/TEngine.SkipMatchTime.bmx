@@ -1,5 +1,6 @@
 ' TEngine.SkipMatchTime   (KIND=Function -- static, no Self)
 ' VA 0x004D6A80   2223 bytes   class-table slot 0xDC   sig ()i
+' byte-identical vs NSS5.exe (2223/2223, original length from Ghidra's inventory)
 ' ORACLE: mode=reloc  matched=2223/2223  reloc_masked=137  STATUS=MATCH
 ' g_engine_int17's original data-section value is 1750 (0x00C5B1F8), read
 ' directly from NSS5.exe. See codegen-patterns 21.1/21.3.

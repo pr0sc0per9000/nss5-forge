@@ -1,5 +1,6 @@
 ' TPlayer.AddStat   (KIND=Method, SIG=(i,f,f,f,f)i, SLOT=0x228)
 ' VA 0x004FF16A   1027 bytes   (Ghidra-authoritative)
+' byte-identical vs NSS5.exe (1027/1027, original length from Ghidra's inventory)
 ' ORACLE: mode=reloc  matched=1027/1027  reloc_masked=54  STATUS=MATCH
 '
 ' ASSUMPTIONS / RESOLUTIONS

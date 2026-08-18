@@ -95,17 +95,35 @@
 '     null-deref-returns-0 (guide 18.26) for safety when there is no current competition;
 '     preserved as found.
 '   * The `comptype<>1,2,3,5` dispatch is the OPPOSITE shape: ONE read into a register,
-'     reused across all four compares -- exactly the Select/Case codegen the sibling
-'     TScreen_Leagues.SetUpLeagueTable.bmx documents for its own comptype dispatch (a
-'     Select WITH a Default). Written here as `Select ... Case 1 / Case 2 / Case 3 / Case 5
-'     / Default <body>`, four SEPARATE empty Case labels rather than one comma-joined
-'     `Case 1,2,3,5` -- every other place in this corpus that had to choose between the two
-'     forms (TTraining.ResetTraining, TScreen_MyContract.ButtonRequestTransfer/
-'     .UpdateDesiredCombos, TProfile.FixturePlayed) found the ORIGINAL used separate Case
-'     labels, each with its own trailing jmp, not the comma form.
+'     reused across all four compares -- exactly the Select/Case codegen (codegen-patterns
+'     10.2: subject read once, every Case compare back to back, then a jmp for the no-match
+'     path, then all the bodies) the sibling TScreen_Leagues.SetUpLeagueTable.bmx documents
+'     for its own comptype dispatch (a Select WITH a Default). Written here as `Select ...
+'     Case 1 / Case 2 / Case 3 / Case 5 / Default <body>`, four SEPARATE empty Case labels
+'     rather than one comma-joined `Case 1,2,3,5` -- every other place in this corpus that
+'     had to choose between the two forms (TTraining.ResetTraining, TScreen_MyContract.
+'     ButtonRequestTransfer/.UpdateDesiredCombos, TProfile.FixturePlayed) found the ORIGINAL
+'     used separate Case labels, each with its own trailing jmp, not the comma form. The
+'     `Default` arm holds ONLY the `SortTableBy(4)` call -- `End Select` follows immediately
+'     -- exactly mirroring the sibling, where each Case/Default arm is a single SortTableBy
+'     call and the row-population loop sits OUTSIDE the Select as shared code. Compiled this
+'     way, the no-match jmp lands right after the compare chain (falling into Default), a
+'     second jmp inside Default's own tail skips over the four `Return 0` case bodies to
+'     reach that shared code, and those trivial case bodies (`mov eax,0`, jump to the
+'     function epilogue) end up close enough to their own `je` that all four encode short
+'     (`74 xx`, 2 bytes). A wider Default arm pushes the case targets far enough away that
+'     the four `je` need the near `0F 84` encoding (6 bytes each) instead, which is the
+'     length tell that pins the Default arm's true extent.
 '   * `If club <> Null And club <> g_profile.myclub` (and the nation equivalent) is the same
 '     two-step short-circuit shape as TScreen_Leagues.SetUpLeagueTable's `If c <> Null And
 '     c <> g_contractoffer_tprofile.myclub`.
+'   * The level dispatch (`comptype<>1,2,3,5`'s sibling test on `.level`) is ALSO a Select,
+'     not an If/ElseIf: `.level` is read into a register once and reused across two back-to-
+'     back compares (`cmp eax,0`/`je`, `cmp eax,1`/`je`), with a single trailing `jmp` for
+'     the no-match path landing on the statement after End Select (`PaintPromotionPlaces`) --
+'     codegen-patterns 10.2's own example of a Select with NO Default, where the fallback is
+'     whatever follows `End Select`. Written as `Select g_continents_comp.level / Case 0
+'     <club body> / Case 1 <nation body> / End Select`.
 '   * SelectItemByText fallback order here is labelname, labelshortname, tla (offsets 0x1c,
 '     0x20, 0x18 in that order) for BOTH the level-0 and level-1 branches -- NOTE this is
 '     the opposite order from TScreen_Leagues.SetUpLeagueTable (labelshortname, labelname,
@@ -158,49 +176,50 @@ ElseIf g_continents_comp.teampool Then
 			Return 0
 		Default
 			g_continents_comp.teampool[g_grouppage].SortTableBy(4)
-			Local row:Int = 1
-			For Local td:TTableData = EachIn g_continents_comp.teampool[g_grouppage].list
-				g_table_league.AddItem(td.GetStringArray(row, 0), "", "")
-				row = row + 1
-			Next
-			If g_continents_comp.level = 0 Then
-				g_table_league.SelectItemByText(g_profile.myclub.labelname, 1)
+	End Select
+	Local row:Int = 1
+	For Local td:TTableData = EachIn g_continents_comp.teampool[g_grouppage].list
+		g_table_league.AddItem(td.GetStringArray(row, 0), "", "")
+		row = row + 1
+	Next
+	Select g_continents_comp.level
+		Case 0
+			g_table_league.SelectItemByText(g_profile.myclub.labelname, 1)
+			If g_table_league.selecteditem = -1 Then
+				g_table_league.SelectItemByText(g_profile.myclub.labelshortname, 1)
+			End If
+			If g_table_league.selecteditem = -1 Then
+				g_table_league.SelectItemByText(g_profile.myclub.tla, 1)
+			End If
+			Local club:TClub = TClub.SelectById(g_continents_cmbTeam.GetSelectedItemId())
+			If club <> Null And club <> g_profile.myclub Then
+				g_table_league.SelectItemByText(club.labelname, 1)
 				If g_table_league.selecteditem = -1 Then
-					g_table_league.SelectItemByText(g_profile.myclub.labelshortname, 1)
-				End If
-				If g_table_league.selecteditem = -1 Then
-					g_table_league.SelectItemByText(g_profile.myclub.tla, 1)
-				End If
-				Local club:TClub = TClub.SelectById(g_continents_cmbTeam.GetSelectedItemId())
-				If club <> Null And club <> g_profile.myclub Then
-					g_table_league.SelectItemByText(club.labelname, 1)
-					If g_table_league.selecteditem = -1 Then
-						g_table_league.SelectItemByText(club.labelshortname, 1)
-					End If
-					If g_table_league.selecteditem = -1 Then
-						g_table_league.SelectItemByText(club.tla, 1)
-					End If
-				End If
-			ElseIf g_continents_comp.level = 1 Then
-				g_table_league.SelectItemByText(g_profile.mynation.labelname, 1)
-				If g_table_league.selecteditem = -1 Then
-					g_table_league.SelectItemByText(g_profile.mynation.labelshortname, 1)
+					g_table_league.SelectItemByText(club.labelshortname, 1)
 				End If
 				If g_table_league.selecteditem = -1 Then
-					g_table_league.SelectItemByText(g_profile.mynation.tla, 1)
-				End If
-				Local nation:TNation = TNation.SelectById(g_continents_cmbTeam.GetSelectedItemId())
-				If nation <> Null And nation <> g_profile.mynation Then
-					g_table_league.SelectItemByText(nation.labelname, 1)
-					If g_table_league.selecteditem = -1 Then
-						g_table_league.SelectItemByText(nation.labelshortname, 1)
-					End If
-					If g_table_league.selecteditem = -1 Then
-						g_table_league.SelectItemByText(nation.tla, 1)
-					End If
+					g_table_league.SelectItemByText(club.tla, 1)
 				End If
 			End If
-			g_continents_comp.PaintPromotionPlaces(g_table_league)
+		Case 1
+			g_table_league.SelectItemByText(g_profile.mynation.labelname, 1)
+			If g_table_league.selecteditem = -1 Then
+				g_table_league.SelectItemByText(g_profile.mynation.labelshortname, 1)
+			End If
+			If g_table_league.selecteditem = -1 Then
+				g_table_league.SelectItemByText(g_profile.mynation.tla, 1)
+			End If
+			Local nation:TNation = TNation.SelectById(g_continents_cmbTeam.GetSelectedItemId())
+			If nation <> Null And nation <> g_profile.mynation Then
+				g_table_league.SelectItemByText(nation.labelname, 1)
+				If g_table_league.selecteditem = -1 Then
+					g_table_league.SelectItemByText(nation.labelshortname, 1)
+				End If
+				If g_table_league.selecteditem = -1 Then
+					g_table_league.SelectItemByText(nation.tla, 1)
+				End If
+			End If
 	End Select
+	g_continents_comp.PaintPromotionPlaces(g_table_league)
 End If
 Return 0

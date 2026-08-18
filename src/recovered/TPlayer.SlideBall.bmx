@@ -1,5 +1,6 @@
 ' TPlayer.SlideBall
 ' VA 0x004F86D6   456 bytes   vtable slot 0x10C   sig ()i   KIND=Method
+' byte-identical vs NSS5.exe (456/456, original length from Ghidra's inventory)
 ' ORACLE: mode=reloc  matched=456/456  STATUS=MATCH
 ' Original length from Ghidra's inventory. NSS5_NO_LEARN=1.
 '

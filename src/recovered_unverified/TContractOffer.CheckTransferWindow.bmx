@@ -63,6 +63,17 @@
 '     `fxch` when bcc's comparison node has rating as the LEFT operand, i.e. the actual source
 '     is `If rating > p.GetSkillRating() / 3` (Ghidra silently canonicalizes `A > B` to
 '     `B < A` for display). Written with rating first below.
+'   RESIDUAL (unresolved): the original loads g_profile into eax for GetStat's self BEFORE
+'     loading g_profile into esi for `p` -- both loads sit back to back, immediately after
+'     UpdateInterestedClubs() and before either push sequence, with esi surviving the GetStat
+'     call for reuse by p.GetSkillRating(). `p` declared ahead of `rating` (as below) reproduces
+'     this exact shape but with the two loads in the opposite order (esi then eax); `rating`
+'     declared ahead of `p` instead defers p's load until after the GetStat call. Neither
+'     ordering of two plain `Local` statements reproduces eax-then-esi; tracing bcc's own
+'     sources (block.cpp Block::eval, stm.cpp LocalDeclStm::eval, exp.cpp CmpExp::_eval) confirms
+'     statements and comparison operands lower strictly in program order with no cross-statement
+'     instruction hoisting, so this exact ordering was not reached. Every other byte in the
+'     function matches; this is a length-neutral 11-byte reorder (first_diff +1549 of 1647).
 '!Global g_profile:TProfile
 '!Global g_contractoffers:TList
 LogLine("CheckTransferWindow")

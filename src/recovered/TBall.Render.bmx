@@ -1,5 +1,6 @@
 ' TBall.Render
 ' VA 0x004c828d   1032 bytes   class-table slot 0x54   sig (f)i   KIND=Method
+' byte-identical vs NSS5.exe (1032/1032, original length from Ghidra's inventory)
 ' Draws the ball (position interpolated by a0 between old*/current fields), then its shadow
 ' marker for a set-piece indicator, then the "newstar spotlight" ring under the ball while
 ' the team in possession has a marked new star nearby, then a fading set-piece marker.

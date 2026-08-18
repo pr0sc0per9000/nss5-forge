@@ -1,45 +1,29 @@
 ' TReplay.CreateReplay
 ' VA 0x00503C37   1496 bytes   class-table slot 0x30   sig (:TTeam,:TTeam,i,i,i,i,i,i,i)$
 ' KIND=Function (static -- param_1/a0 is the first real TTeam parameter, not Self).
+' byte-identical vs NSS5.exe (1496/1496).
 '
-' REFINEMENT PASS (byte oracle was 236/1496, 15.8%, first diff at byte 25, length +2) --
-'   The score report's "first difference" is misleading here: instruction-by-instruction
-'   disassembly of the assembled body against the original (matching all 484 instructions
-'   1:1 by index, ignoring only absolute call/data addresses which drift for reasons
-'   outside this file -- see below) showed the REAL and only two divergences were:
-'   (1) THE FIX -- the `If Not bs` (bank stream creation failed) branch was written as
-'       `fn = ""` followed by a single shared `Return fn` after the whole If/Else. The
-'       original instead has an explicit `Return ""` INSIDE that branch: original
-'       instruction 91 is `mov eax, 0x5c7d40` (load the bbEmptyString pointer straight
-'       into eax, the return register) immediately followed by `jmp` to the function's one
-'       shared epilogue at the very end -- it never touches fn's stack home ([ebp-0x14]) at
-'       all. The success (Else) branch separately does `mov eax,[ebp-0x14]` (reload fn)
-'       right before falling into that SAME shared epilogue -- i.e. the original is
-'       `Return ""` in the If branch and `Return fn` as the Else branch's own last
-'       statement, EXACTLY the shape TReplay.LoadReplayFile.bmx (byte-identical, 575/575)
-'       already uses for its `If Not stream ... Return Null / Else ... Return rep / EndIf`.
-'       Writing `fn = ""` instead compiles to a 7-byte `mov dword ptr [ebp-0x14],imm32`
-'       store in place of the original's 5-byte `mov eax,imm32` load -- the entire +2
-'       byte/length delta this body had, and because every byte after that single
-'       instruction is a raw positional comparison, that one 2-byte miscount was pushing
-'       EVERY subsequent byte in the 1496-byte body out of alignment, which is what was
-'       actually producing the 15.8% score despite the compiled logic already matching
-'       almost everywhere. Fixed by moving `Return ""` into the If branch and `Return fn`
-'       to the end of the Else branch (removing the old trailing shared `Return fn`).
-'   (2) NOT FIXED, left as-is -- `Local dir:Int = ReadDir(...)` / `Local f:String` inside
-'       the outer filename-search loop compile with ebx and esi SWAPPED relative to the
-'       original (original: dir->ebx, f->esi, matching TScreen_MainMenu.UpdateReplayTable
-'       .bmx's byte-identical use of the identical two-line idiom; here: dir->esi, f->ebx).
-'       This does not change any instruction's length (register-in-opcode encoding only),
-'       so it does not cascade, and no restructuring tried during this pass explained or
-'       fixed it without risking the much larger, well-understood win above -- left alone
-'       per rule 4.
-'   All other apparent byte differences the raw oracle report would show are addresses:
-'   this build places TReplay.CreateReplay at a different absolute VA than the original
-'   (confirmed via scripts/bytematch.py's own find_method on both binaries), so every
-'   direct call's rel32 and every data literal's absolute address differs from the
-'   original by a drift amount set by *other*, still-imperfect bodies elsewhere in this
-'   shared build -- not by anything expressible in this file's source.
+' The `If Not bs` (bank stream creation failed) branch returns "" as ITS OWN last
+' statement, and the success (Else) branch returns fn as ITS OWN last statement --
+' there is no shared trailing `Return fn` after the If/Else. Both branches fall into the
+' function's one shared epilogue, exactly the shape TReplay.LoadReplayFile.bmx uses for
+' its `If Not stream ... Return Null / Else ... Return rep / EndIf`.
+' `Local f:String` is declared before `Local dir:Int = ReadDir(...)` (not the field order
+' TScreen_MainMenu.UpdateReplayTable.bmx happens to read in): register colouring for this
+' function's larger live set puts dir in ebx and f in esi only with f declared first;
+' declaring dir first swaps the pair into esi/ebx instead (codegen-patterns.md 18.2 --
+' declaration order is a real tie-break lever once reference counts are equal).
+' `Local bs:TStream = CreateBankStream(bank)` -- not `:TBankStream` -- because harness.py's
+' generated probe has no MODULE_TYPES entry for TBankStream (only TBank, TStream, TList,
+' etc. are redirected to their real BRL module types) and TBankStream is reflected out of
+' NSS5.exe's own class table like a game Type, so an explicit `:TBankStream` local
+' collides with the real BRL.BankStream TBankStream that CreateBankStream returns
+' (`Compile Error: Unable to convert from 'TBankStream' to 'TBankStream'`, the same
+' self-shadowing symptom harness.py documents for TImage/TSound/TChannel/TMap). `bs` is
+' only ever passed as an argument (never itself the receiver of a method call), so typing
+' the local as its real ancestor TStream -- which IS in MODULE_TYPES -- is not observable
+' in the compiled bytes; the assignment from CreateBankStream's TBankStream result is a
+' plain upcast.
 ' Builds a unique "<tla1>v<tla2>_NN.rep" filename, populates a new TReplay from the two
 ' teams plus the passed-in match settings, appends every recorded TReplayFrame (rep's own,
 ' every TBall's, every TPlayer's) to a bank stream via WriteHeader/SaveFrame, zips that
@@ -136,8 +120,8 @@ Repeat
 	Local numstr:String = String(n)
 	If n < 10 Then numstr = "0" + String(n)
 	fn = a0.tla + "v" + a1.tla + "_" + numstr + ".rep"
-	Local dir:Int = ReadDir(g_userpath + "Replays/")
 	Local f:String
+	Local dir:Int = ReadDir(g_userpath + "Replays/")
 	Repeat
 		f = NextFile(dir)
 		If f = fn Then found = True
@@ -147,7 +131,7 @@ Repeat
 Until Not found
 
 Local bank:TBank = CreateBank(0)
-Local bs:TBankStream = CreateBankStream(bank)
+Local bs:TStream = CreateBankStream(bank)
 If Not bs
 	TScreen.DoMessage("Could not save replay!", 0, 0)
 	Return ""

@@ -2,29 +2,33 @@
 ' VA 0x00511ea5   1231 bytes   vtable slot 0x84   sig (i)i   KIND=Method
 ' Body-only format: statements only; parameters are a0, a1, ...
 '
-' REFINE PASS (score was 7.6%, first diff at byte 13, length delta -1): the length delta
-' traced to a genuine codegen-shape mismatch, not a whole-program-layout artifact. Fixed by
-' cross-referencing the byte-VERIFIED TScreen.CreateScreen.bmx (381/381), which contains both
-' an explicit `If s.bg = Null ... EndIf` (compiles DIRECT: `cmp [mem],NullConst ; jne`) and an
-' implicit `If Not g_curscreen ... EndIf` (compiles as a DANCE: `mov eax,[mem] ; cmp
-' eax,NullConst ; setne al ; movzx eax,al ; cmp eax,0 ; jne`) side by side in the SAME
-' function -- proving BCC picks direct-vs-dance codegen from the SOURCE SYNTAX (explicit
-' `X = Null` vs implicit `Not X` / bare `If X`), not from Else-presence or type. The
-' original's `g_activegadget` check and the `best` guard both disassemble as the dance
-' (`mov eax,[..] ; cmp ..,0x5c9c80 ; setne al ; movzx eax,al ; cmp eax,0 ; jne`,
-' byte-for-byte the same shape as CreateScreen's `Not g_curscreen`), so both are written here
-' as `If Not X`, not `If X = Null`/`If X = Null Then...`. The two `g And` prefixes on the
-' inner list-filter conditions are dropped for the same reason: original's disassembly shows
-' only the field/identity checks (hidden=0/alive<>0, and g<>g_activegadget) with NO extra
-' Null test at all -- `g` is already proven non-Null by the EachIn fetch immediately above it
-' (a compiler-synthesized check, direct, distinct from a user `If g`/`Not g`), so a redundant
-' user-written `g And` would show up as an extra dance block the original does not have. Only
-' `best <> Null Then g_activegadget = best` (line 107, a plain one-line Then, no block) keeps
-' its explicit `<>` -- confirmed direct (`cmp [mem],NullConst ; je`) at the original's tail.
-' `best = Null` inside the `d < bestd Or best = Null` Or-conditions (both passes) is left as
-' explicit `=`: Or-chains always compile via the same materialize-and-merge shape regardless
-' of `=`/`Not` phrasing (confirmed against the Or's own float operand, which is forced through
-' an identical dance by FPU compare mechanics alone), so this Or is not evidence either way.
+' CODEGEN NOTES (byte-verified against NSS5.exe -- see docs/reference/codegen-patterns.md
+' 10.2/10.3 for the general patterns cited below).
+'  * The a0 dispatch in both passes is a `Select a0 / Case 1..4 / End Select`, not
+'    `If a0=1 ... ElseIf`: the disassembly is a run of `cmp eax,N / je` back to back, every
+'    target past the last compare, with no Default (no-match falls straight into the shared
+'    tail after End Select) -- the ElseIf shape is shorter and does not match.
+'  * `If Not g_activegadget ... Return 0 ... EndIf` (no Else) is an early return, not an
+'    If/Else: the original preloads `eax,0` before jumping to the shared epilogue, which only
+'    happens when a `Return 0` is actually compiled at that point in the source.
+'  * Each Case's position guard is TWO independent one-line `If Not (...) Then Continue`
+'    statements (not a combined `And`/`Or` on one line). A lone comparison feeding a Continue
+'    fuses straight into `cmp reg,mem / setcc / movzx / cmp / jcc` with no extra materialize
+'    step; combining two terms with `And`/`Or` forces a separate materialize-then-test pass
+'    that costs extra bytes and is not present here.
+'  * The list-filter loop is `If g.hidden <> 0 Then Continue` followed by a separate
+'    `If g.alive <> 0 ... EndIf` -- not one nested/And'd condition. The hidden guard alone
+'    fuses to `cmp [x+0x3c],0 / je / jmp`; wrapping it around the alive check instead changes
+'    that fused encoding and does not match.
+'  * `g_activegadget`/`best` null checks use `If Not X`, which disassembles as the DANCE
+'    (`mov eax,[..] ; cmp ..,NullConst ; setne al ; movzx eax,al ; cmp eax,0 ; jne`) --
+'    including `Not best` inside `d < bestd Or Not best` (both passes), which double-negates
+'    (`setne` then `sete`) exactly like every other `Not <object>` in this body. Only
+'    `best <> Null Then g_activegadget = best` (a plain one-line Then, no block) keeps its
+'    explicit `<>`, confirmed direct (`cmp [mem],NullConst ; je`) at the tail.
+'  * The Dist2D call's centre-point arguments are `desx + w / 2.0` (offset term first, the
+'    half-dimension second), not `w / 2.0 + desx`: the offset field loads and stays on the
+'    FPU stack while the halved dimension is computed on top and merged with `faddp`.
 '
 ' What it does: keyboard/joystick-driven gadget navigation. a0 is the direction code from
 ' TScreen.GetInput (1=up, 2=down, 3=left, 4=right); TScreen.CheckInput's Default case calls
@@ -81,53 +85,60 @@ If g_chanclick.Playing() = 0
 End If
 If Not g_activegadget
 	Self.FindNewActiveGadget()
-Else
-	Local l:TList = CreateList()
-	For Local g:TGadget = EachIn Self.GetGadgetList()
-		If g.hidden = 0 And g.alive <> 0
-			l.AddLast(g)
+	Return 0
+EndIf
+Local l:TList = CreateList()
+For Local g:TGadget = EachIn Self.GetGadgetList()
+	If g.hidden <> 0 Then Continue
+	If g.alive <> 0
+		l.AddLast(g)
+	EndIf
+Next
+Local bestd:Float = g_screen_float09
+Local best:TGadget = Null
+For Local g:TGadget = EachIn l
+	If g <> g_activegadget
+		Select a0
+		Case 1
+			If Not (g.desy < g_activegadget.desy) Then Continue
+			If Not (g.desx = g_activegadget.desx) Then Continue
+		Case 2
+			If Not (g.desy > g_activegadget.desy) Then Continue
+			If Not (g.desx = g_activegadget.desx) Then Continue
+		Case 3
+			If Not (g.desx < g_activegadget.desx) Then Continue
+			If Not (g.desy = g_activegadget.desy) Then Continue
+		Case 4
+			If Not (g.desx > g_activegadget.desx) Then Continue
+			If Not (g.desy = g_activegadget.desy) Then Continue
+		End Select
+		Local d:Float = Dist2D(g_activegadget.desx + g_activegadget.w / 2.0, g_activegadget.desy + g_activegadget.h / 2.0, g.desx + g.w / 2.0, g.desy + g.h / 2.0)
+		If d < bestd Or Not best
+			bestd = d
+			best = g
 		EndIf
-	Next
-	Local bestd:Float = g_screen_float09
-	Local best:TGadget = Null
+	EndIf
+Next
+If Not best
 	For Local g:TGadget = EachIn l
 		If g <> g_activegadget
-			If a0 = 1
-				If g_activegadget.desy <= g.desy Or g.desx <> g_activegadget.desx Then Continue
-			ElseIf a0 = 2
-				If g.desy <= g_activegadget.desy Or g.desx <> g_activegadget.desx Then Continue
-			ElseIf a0 = 3
-				If g_activegadget.desx <= g.desx Or g.desy <> g_activegadget.desy Then Continue
-			ElseIf a0 = 4
-				If g.desx <= g_activegadget.desx Or g.desy <> g_activegadget.desy Then Continue
-			EndIf
-			Local d:Float = Dist2D(g_activegadget.w / 2.0 + g_activegadget.desx, g_activegadget.h / 2.0 + g_activegadget.desy, g.w / 2.0 + g.desx, g.h / 2.0 + g.desy)
-			If d < bestd Or best = Null
+			Select a0
+			Case 1
+				If Not (g.y < g_activegadget.desy) Then Continue
+			Case 2
+				If Not (g.y > g_activegadget.desy) Then Continue
+			Case 3
+				If Not (g.x < g_activegadget.desx) Then Continue
+			Case 4
+				If Not (g.x > g_activegadget.desx) Then Continue
+			End Select
+			Local d:Float = Dist2D(g_activegadget.desx, g_activegadget.desy, g.desx, g.desy)
+			If d < bestd Or Not best
 				bestd = d
 				best = g
 			EndIf
 		EndIf
 	Next
-	If Not best
-		For Local g:TGadget = EachIn l
-			If g <> g_activegadget
-				If a0 = 1
-					If g_activegadget.desy <= g.y Then Continue
-				ElseIf a0 = 2
-					If g.y <= g_activegadget.desy Then Continue
-				ElseIf a0 = 3
-					If g_activegadget.desx <= g.x Then Continue
-				ElseIf a0 = 4
-					If g.x <= g_activegadget.desx Then Continue
-				EndIf
-				Local d:Float = Dist2D(g_activegadget.desx, g_activegadget.desy, g.desx, g.desy)
-				If d < bestd Or best = Null
-					bestd = d
-					best = g
-				EndIf
-			EndIf
-		Next
-	EndIf
-	If best <> Null Then g_activegadget = best
 EndIf
+If best <> Null Then g_activegadget = best
 Return 0

@@ -1,5 +1,6 @@
 ' TScreen_Leagues.SetUpLeagueFixtures
 ' VA 0x00545C5D   1420 bytes   KIND=Function (static, no Self)   SIG=(i)i   class-table slot 0x50
+' byte-identical vs NSS5.exe (1420/1420)
 ' a0 = the round/page number to display (stored into g_leagues_page immediately).
 '
 ' RECONSTRUCTION NOTES (verified against raw disassembly at 0x00545C5D, not just Ghidra's
@@ -42,32 +43,27 @@
 '     per extracted/unify_work/verdicts.json (g_league_comp merge-into decision).
 '   * g_lg_table2/g_lg_table3 (not g_screen_leagues_tplayer02/03) are the CERTAIN-tier names
 '     for 0x00C66F24/0x00C66F28 (2 unanimous bodies each, vs 1 STRONG-tier body each).
-' REFINEMENT PASS (byte oracle was 429/1420, 30.2%, first diff at byte 13, length +7) -- full
-' instruction-by-instruction disassembly of the ORIGINAL body at 0x00545C5D (capstone, all 454
-' instructions), cross-checked against every other instruction in this file, found exactly two
-' real divergences (everything else is address-literal drift from the shared, still-incomplete
-' build, exactly like the CreateReplay/UpdateNavPanel siblings):
-'   (1) A SHAPE-ONLY FIX (same byte count, wrong content) -- the comptype-branch is compiled
-'       with the panel-Show/"Round N" body
-'       FIRST (fall-through) and the panel-Hide/comp-name body SECOND (jumped to): `cmp
-'       [comptype],1 / je HIDE_BLOCK`, i.e. the original source reads `If comptype <> 1 Then
-'       <Show...> Else <Hide...> EndIf`, not `If comptype = 1 Then <Hide> Else <Show>`. Confirmed
-'       against the standard/expected polarity by cross-checking a byte-verified sibling with the
-'       identical shape (src/recovered/TCompetition.DoPromotionPlaces.bmx's `If
-'       club.continentalcompid = 0 Then A Else B`), which compiles `cmp ...,0 / jne
-'       ELSE_LABEL(B) / <A fall-through> / jmp END / ELSE_LABEL: <B>` -- i.e. plain `= k`
-'       compiles Then-first/jne-skip. SetUpLeagueFixtures' `je`-to-second-block shape only
-'       matches that reference pattern when the comparison is inverted to `<> 1` with the two
-'       bodies swapped; behaviour is identical either way (`If A Then X Else Y` == `If Not A
-'       Then Y Else X`), only the compiled byte order changes.
-'   (2) THE +7-BYTES FIX -- the EachIn loop over lfixturelist had this file's `f` wrapped in an
-'       extra, explicit `If f <> Null Then ... EndIf` around the whole loop body. The raw
-'       disassembly shows only ONE null check on the downcast result (`cmp edi,0x5C9C80 / je
-'       LOOP_BOTTOM`), which is EachIn's own implicit null-skip -- the very next instruction
-'       after it reads `f.round` directly with no second cmp/sete/movzx/cmp/je sequence. Unlike
-'       TReplay.CreateReplay's three frame-saving loops (which DO show a genuine doubled check in
-'       their decompilation), this loop's decompilation has no such doubling, so the explicit
-'       wrapper here was never warranted; removed, dedenting the loop body by one level.
+'   * The EachIn loop over lfixturelist relies entirely on EachIn's own implicit null-skip
+'     (`cmp edi,0x5C9C80 / je LOOP_BOTTOM`) on the downcast result; the very next instruction
+'     reads `f.round` directly with no second cmp/sete/movzx/cmp/je sequence, so the loop body
+'     is not wrapped in its own explicit `If f <> Null Then ... EndIf`.
+'   * The comptype guard is a solo-relational If/Else with distinct branches, so it carries
+'     the negate-and-swap shape (guide 21): `cmp [comptype],1 / je HIDE_BLOCK` reads as
+'     `If comptype <> 1 Then <Show/"Round N"> Else <Hide/comp-name> EndIf`, with the Show/
+'     "Round N" body placed fall-through and the Hide/comp-name body placed behind the jump.
+'   * `f.leg > lastleg` is one term of a compound Or, which is excluded from the negate/swap
+'     shape (guide 21): `mov eax,[edi+0x18] / cmp eax,esi / setg` puts f.leg (the freshly
+'     loaded field) first and lastleg (already resident in esi across loop iterations) second,
+'     direct operand order per guide 10.1, no negation.
+'   * `Select g_leagues_comp.level` (Case 0 / Case 1, no Default), not `If/ElseIf`: the level
+'     field is loaded once (`mov eax,[g_leagues_comp] / mov eax,[eax+0x1c]`) and both Case
+'     tests cascade off that one load with no re-fetch, the guide 10.2 Select shape.
+'   * The todayrow/unplayedrow/lastplayedrow cascade at the end is three solo-relational
+'     If/Else levels, each carrying the same negate-and-swap shape as the comptype guard:
+'     `cmp [todayrow],0 / jle NESTED` puts the direct `SelectItemByRow(x)` call fall-through
+'     and the next nested level behind the jump, i.e. `If x > 0 Then SelectItemByRow(x) Else
+'     <next level> EndIf` at every level, terminating in `If lastplayedrow > 0 Then
+'     SelectItemByRow(lastplayedrow) Else SelectItemByRow(0) EndIf`.
 ' Body-only format: statements only; parameters are a0, a1, ...
 '!Global g_object468:TButton
 '!Global g_object469:TButton
@@ -114,7 +110,7 @@ Local lastleg:Int = 0
 If g_leagues_comp.comptype <> 1 Or g_leagues_comp.AllFixturesPopulated() Then
 	For Local f:TFixture = EachIn g_leagues_comp.lfixturelist
 		If f.round = g_leagues_page Or g_leagues_comp.comptype = 1 Then
-			If (lastleg < f.leg And f.leg = 2) Or f.sdate > fdate.sdate Then
+			If (f.leg > lastleg And f.leg = 2) Or f.sdate > fdate.sdate Then
 				fdate.SetDate(f.sdate, 1, 1)
 				g_lg_table2.AddItem(["", fdate.GetString("WWWW")], "", "")
 				rowcount :+ 1
@@ -124,33 +120,34 @@ If g_leagues_comp.comptype <> 1 Or g_leagues_comp.AllFixturesPopulated() Then
 			lastleg = f.leg
 			Local hometeam:Int = f.GetHomeTeamId()
 			Local awayteam:Int = f.GetAwayTeamId()
-			If g_leagues_comp.level = 0 Then
-				If hometeam = g_profile.clubid Or awayteam = g_profile.clubid Then
-					If f.sdate = g_profile.date.sdate Then todayrow = rowcount
-					If f.result = 0 And unplayedrow = 0 Then unplayedrow = rowcount
-					If f.result = 1 Then lastplayedrow = rowcount
-				EndIf
-			ElseIf g_leagues_comp.level = 1 Then
-				If hometeam = g_profile.nationid Or awayteam = g_profile.nationid Then
-					If f.sdate = g_profile.date.sdate Then todayrow = rowcount
-					If f.result = 0 And unplayedrow = 0 Then unplayedrow = rowcount
-					If f.result = 1 Then lastplayedrow = rowcount
-				EndIf
-			EndIf
+			Select g_leagues_comp.level
+				Case 0
+					If hometeam = g_profile.clubid Or awayteam = g_profile.clubid Then
+						If f.sdate = g_profile.date.sdate Then todayrow = rowcount
+						If f.result = 0 And unplayedrow = 0 Then unplayedrow = rowcount
+						If f.result = 1 Then lastplayedrow = rowcount
+					EndIf
+				Case 1
+					If hometeam = g_profile.nationid Or awayteam = g_profile.nationid Then
+						If f.sdate = g_profile.date.sdate Then todayrow = rowcount
+						If f.result = 0 And unplayedrow = 0 Then unplayedrow = rowcount
+						If f.result = 1 Then lastplayedrow = rowcount
+					EndIf
+			End Select
 		EndIf
 	Next
-	If todayrow < 1 Then
-		If unplayedrow < 1 Then
-			If lastplayedrow < 1 Then
-				g_lg_table2.SelectItemByRow(0)
-			Else
-				g_lg_table2.SelectItemByRow(lastplayedrow)
-			EndIf
-		Else
-			g_lg_table2.SelectItemByRow(unplayedrow)
-		EndIf
-	Else
+	If todayrow > 0 Then
 		g_lg_table2.SelectItemByRow(todayrow)
+	Else
+		If unplayedrow > 0 Then
+			g_lg_table2.SelectItemByRow(unplayedrow)
+		Else
+			If lastplayedrow > 0 Then
+				g_lg_table2.SelectItemByRow(lastplayedrow)
+			Else
+				g_lg_table2.SelectItemByRow(0)
+			EndIf
+		EndIf
 	EndIf
 EndIf
 Return 0

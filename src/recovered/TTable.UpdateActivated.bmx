@@ -8,11 +8,12 @@
 ' the loop rendered was never the screen SetActive had set. Byte-neutral; confirmed
 ' with scripts/reverify.py.
 ' Scope check before renaming: g_Object101 resolves to 0x00C61700 and nothing else
-' anywhere in src/recovered. g_screen was renamed ONLY in TScreen.Update.bmx, the one
+' anywhere in src/recovered. g_screen resolves to it only in TScreen.Update.bmx, the one
 ' file that states the address -- the other 8 g_screen declarers record no VA, and the
 ' name->address map is many-to-many, so sweeping it would be a guess.
 ' TTable.UpdateActivated   (KIND=Method, SIG=()i)
 ' VA 0x005168E1   953 bytes   (Ghidra-authoritative)
+' byte-identical vs NSS5.exe (953/953, original length from Ghidra's inventory)
 ' ORACLE: mode=reloc  matched=953/953  reloc_masked=45  STATUS=MATCH
 '
 ' ASSUMPTIONS / RESOLUTIONS

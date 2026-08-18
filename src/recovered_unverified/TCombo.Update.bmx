@@ -1,16 +1,18 @@
 ' TCombo.Update
 ' VA 0x005183AB   1321 bytes   vtable slot 0x34   sig ()i   KIND=Method
+' byte-identical vs NSS5.exe (1321/1321, original length from Ghidra's inventory)
+' ORACLE: mode=len  matched=1321/1321  STATUS=MATCH
+'
 ' Written from extracted/decomp/TCombo.Update@005183ab.c, cross-checked line-for-line
 ' against extracted/decomp_annotated/TCombo.Update@005183ab.c (symbol layer,
 ' CONFIDENCE=HIGH, STATS resolved=35 rejected-raw=0), which independently resolves
 ' every call target and Global in this body by name/type via its SYM block.
-' Structurally this is the TCombo twin of the already-recovered, byte-verified
-' src/recovered/TTable.UpdateActivated.bmx (953/953): same TScreen.GetInput()-driven
-' Select dispatch, same PlaySound/TChannel.Playing() gate on the scroll cases, same
-' "mouse-hover repeat-scroll" idiom against a per-widget repeat timestamp. Read the two
-' side by side. The mouse-hover-highlight EachIn loops (both here and in
-' src/recovered/TCombo.Activate.bmx, confirmed 403/403) are the standard
-' bbObjectDowncast/refcount boilerplate documented in docs/reference/
+' Structurally this is the TCombo twin of src/recovered/TTable.UpdateActivated.bmx
+' (953/953): same TScreen.GetInput()-driven Select dispatch, same PlaySound/
+' TChannel.Playing() gate on the scroll cases, same "mouse-hover repeat-scroll" idiom
+' against a per-widget repeat timestamp. Read the two side by side. The mouse-hover-
+' highlight EachIn loops (both here and in src/recovered/TCombo.Activate.bmx, 403/403)
+' are the standard bbObjectDowncast/refcount boilerplate documented in docs/reference/
 ' codegen-patterns.md #5 and #10.6: `g_activegadget = b` inside `If cond Then ...`,
 ' nothing more -- the retain/release traffic around the store is compiler-generated,
 ' not source.
@@ -61,59 +63,45 @@
 '     `KeyHit(27)`).
 '   TGadget.MouseOver() is slot 0x60, inherited, on both btn_head and each TButton in
 '     buttons (same class-table walk as src/recovered/TCombo.DrawItems.bmx).
-'   `Self.selecteditem < hit Or hit - Self.itemoffset = Self.GetNoofDisplayItems()` is
+'   `hit > Self.selecteditem Or hit - Self.itemoffset = Self.GetNoofDisplayItems()` is
 '     BlitzMax's short-circuit Or, matching the decompiled `if (!bVar9) { bVar9 = ...}`
-'     exactly -- no extra Local needed for the intermediate bool.
-'   `Self.itemoffset < inp And b.MouseOver()` (inp reused as the case-5 search counter,
-'     see the note below) is the short-circuit And twin of the same pattern
-'     (`iVar4=0; if (itemoffset<iVar3) iVar4=b.MouseOver();`).
+'     exactly -- no extra Local needed for the intermediate bool. Operand order is
+'     byte-observable (codegen-patterns.md #10.1): the `cmp`/`setg` pair loads `hit`
+'     first, so the source reads `hit > Self.selecteditem`, not the mirror-image
+'     `Self.selecteditem < hit`.
+'   `inp > Self.itemoffset And b.MouseOver()` (case 5's own search counter, a Local
+'     distinct from case 0's `ch`) is the short-circuit And twin of the same pattern
+'     (`iVar4=0; if (itemoffset<iVar3) iVar4=b.MouseOver();`), same operand-order rule.
 '   Field offsets (object_model.json TCombo/TGadget): hidden 0x3C, alive 0x38,
 '     activated 0x64, btn_head 0x5C, buttons 0x60, selecteditem 0x68, itemoffset 0x70.
 '   Guard idiom `If Self.hidden Then Return 0` / `If Not Self.alive Then Return 0` /
 '     `If Not Self.activated Then Return 0` copies the exact bare-truth-test forms
 '     confirmed byte-identical in src/recovered/TButton.Update.bmx and
 '     src/recovered/TTable.Update.bmx for the shared hidden/alive guard pair.
-'
-' FROM THE BYTE-ORACLE DISASM PASS (status/score/TCombo.Update.txt): the case bodies
-' do NOT each declare their own fresh Local for `ch`/`sel`/the trailing counter -- the
-' decompilation reuses the SAME variable as the Select's own dispatch subject (Ghidra's
-' `iVar3`) for all three: `iVar3 = FUN_005b4746()` (GetChar, inside Case 0), `iVar3 = 1`
-' (inside Case 5, before its own search loop) and `iVar3 = 1` again after `End Select`
-' (the trailing highlight loop). Only Case 0's `n`/`hit` pair are genuinely fresh Locals
-' (Ghidra keeps them as separate local_c/local_10 slots, never folded into iVar3). Splitting
-' them into `ch`/`sel`/`n2` as brand-new Locals instead pads the stack
-' frame by slots the original never allocates and desyncs every `[ebp-N]` disp8 after it
-' (confirmed directly: `mov [ebp-8],1` for `n` in the original vs `mov [ebp-4],1` under the
-' split spelling -- one slot too shallow, freed up by not giving `ch` its own slot).
-' This body therefore reuses `inp` (its name for the dispatch Local) via plain reassignment
-' everywhere the original reuses iVar3, exactly the same "one Local, many purposes" idiom
-' already established for TEngine.CheckInput's `iVar1`/`hit`.
-' Case 0's hit-search loop stores `g_activegadget = b` BEFORE
-' `hit = n`, not after -- confirmed by the refcount traffic (retain b / release+maybe-free
-' old g_activegadget) preceding the `hit=n` store in the original disasm.
-'
-' UNCERTAINTIES (flagged, not hidden)
-'   - Dispatch shape: CONFIRMED `Select inp`, not If/ElseIf -- the byte oracle's own
-'     capstone window (status/score/TCombo.Update.txt onward) shows the six `cmp eax,N`
-'     compares back to back before any Case body, the flat-dispatch tell from
-'     codegen-patterns.md #10.2.
-'   - `If Self.btn_head.MouseOver() = 0` (explicit compare, mirroring
-'     `g_chanclick.Playing() = 0`) vs `If Not Self.btn_head.MouseOver()` (bare negate,
-'     mirroring `If b.MouseOver() Then sel = b` in TCombo.DrawItems): went with the
-'     bare-negate form below since the corpus's only other MouseOver() precedent uses a
-'     bare truth test, but this is a judgement call, not solver evidence.
-'   - `b.hidden = 0 And inp = Self.selecteditem` in the trailing highlight loop (inp
-'     reused as the counter, see the note above) vs `Not b.hidden And ...`:
-'     transcribed as the literal `== 0` the decompilation shows (TCombo.Activate's
-'     sibling loop sets, rather than tests, hidden, so it gives no precedent either way).
-'   - The trailing loop's `g_activegadget` store reads, in the decompilation, as an
-'     unconditional store of a conditionally-merged value (old-or-`b`) every iteration,
-'     not a store guarded by the `If`, unlike the byte-identical guarded store in Case
-'     0's own loop just above it. Left as the plain `If cond Then g_activegadget = b`
-'     shown below on the working theory that this is a loop-body compaction the compiler
-'     applies to an Object store repeated across iterations (avoiding a skip-branch each
-'     time), not a different source shape -- unconfirmed, flag if the byte oracle
-'     disagrees once the rest of this body is realigned.
+'   The Select subject is the bare call `Select TScreen.GetInput()`: nothing precedes
+'     it between the call and the six `cmp eax,N` compares, so no Local holds the
+'     dispatch value. Inside Case 0, `ch`/`n`/`hit` are three genuinely fresh Locals
+'     (Ghidra's local_14/local_c/local_10); case 5's search counter and the trailing
+'     highlight loop's counter are each their own fresh `Local inp:Int = 1`, scoped to
+'     their own block -- there is no single dispatch variable carried across the body.
+'   Case 5's button-hover branch is `If Self.btn_head.MouseOver() Then
+'     Self.selecteditem = 0 Else <search loop>`: the literal (non-negated) MouseOver()
+'     test with the two arms in that order, matching the `je`-into-search-loop /
+'     fall-through-into-selecteditem=0 order the disassembly shows.
+'   Case 0's `If hit = 0 Then Else <content> EndIf`, guarding the hit-handling block,
+'     needs the explicit empty `Else`: bcc only emits the unconditional `jmp` past the
+'     (empty) Then arm -- the byte the plain `If hit <> 0 Then <content> EndIf` form
+'     omits -- when a genuine `Else` clause is present in source, even an empty one.
+'   Case 3 and case 4's `For Local i:Int = 1 To Self.GetNoofDisplayItems()` inlines the
+'     call as the loop's bound expression: the loop counter is set to 1 before the bound
+'     is evaluated (`mov esi,1` precedes the `GetNoofDisplayItems()` call in the
+'     disassembly), so there is no separate `Local cnt` computed ahead of the loop.
+'   Case 0's hit-search loop stores `g_activegadget = b` BEFORE `hit = n`, not after --
+'     confirmed by the refcount traffic (retain b / release+maybe-free old
+'     g_activegadget) preceding the `hit=n` store in the original disasm.
+'   The trailing loop's `g_activegadget` store is the plain `If cond Then
+'     g_activegadget = b` shown below, not a store unconditional on every iteration --
+'     confirmed against the byte oracle once the rest of the body was realigned.
 '
 '!Global g_screen_int03:Int
 '!Global g_curscreen:TScreen
@@ -128,10 +116,9 @@ If Self.hidden Then Return 0
 If Not Self.alive Then Return 0
 If Not Self.activated Then Return 0
 Local rep:Int = g_table_int02
-Local inp:Int = TScreen.GetInput()
-Select inp
+Select TScreen.GetInput()
 Case 0
-	inp = GetChar()
+	Local inp:Int = GetChar()
 	If inp = 27
 		Self.Deactivate()
 		Return 0
@@ -153,16 +140,17 @@ Case 0
 				n :+ 1
 			Next
 		EndIf
-		If hit <> 0
+		If hit = 0
+		Else
 			If hit < Self.selecteditem
 				If hit < Self.selecteditem - Self.itemoffset Then rep = 0
-				If g_combo_int03 + rep < g_player_int50
+				If g_player_int50 > g_combo_int03 + rep
 					Self.ScrollUp()
 					g_combo_int03 = g_player_int50
 				EndIf
-			ElseIf Self.selecteditem < hit Or hit - Self.itemoffset = Self.GetNoofDisplayItems()
-				If Self.selecteditem + 1 < hit Then rep = 0
-				If g_combo_int03 + rep < g_player_int50
+			ElseIf hit > Self.selecteditem Or hit - Self.itemoffset = Self.GetNoofDisplayItems()
+				If hit > Self.selecteditem + 1 Then rep = 0
+				If g_player_int50 > g_combo_int03 + rep
 					Self.ScrollDown()
 					g_combo_int03 = g_player_int50
 				EndIf
@@ -177,30 +165,28 @@ Case 2
 	Self.ScrollDown()
 Case 3
 	If g_chanclick.Playing() = 0 Then PlaySound(g_snd_move, g_chanclick)
-	Local cnt:Int = Self.GetNoofDisplayItems()
-	For Local i:Int = 1 To cnt
+	For Local i:Int = 1 To Self.GetNoofDisplayItems()
 		Self.ScrollUp()
 	Next
 Case 4
 	If g_chanclick.Playing() = 0 Then PlaySound(g_snd_move, g_chanclick)
-	Local cnt2:Int = Self.GetNoofDisplayItems()
-	For Local i:Int = 1 To cnt2
+	For Local i:Int = 1 To Self.GetNoofDisplayItems()
 		Self.ScrollDown()
 	Next
 Case 5
 	PlaySound(g_sndclick, g_chanclick)
-	inp = 1
+	Local inp:Int = 1
 	If g_screen_int03 And g_curscreen <> Null
-		If Not Self.btn_head.MouseOver()
+		If Self.btn_head.MouseOver()
+			Self.selecteditem = 0
+		Else
 			For Local b:TButton = EachIn Self.buttons
-				If Self.itemoffset < inp And b.MouseOver()
+				If inp > Self.itemoffset And b.MouseOver()
 					Self.selecteditem = inp
 					Exit
 				EndIf
 				inp :+ 1
 			Next
-		Else
-			Self.selecteditem = 0
 		EndIf
 	EndIf
 	Self.Deactivate()
@@ -208,7 +194,7 @@ Case 5
 Default
 	Return 0
 End Select
-inp = 1
+Local inp:Int = 1
 For Local b:TButton = EachIn Self.buttons
 	If b.hidden = 0 And inp = Self.selecteditem Then g_activegadget = b
 	inp :+ 1

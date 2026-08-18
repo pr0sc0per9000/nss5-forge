@@ -1,5 +1,6 @@
 ' TBall.Kick   (KIND=Method, SIG=(:TPlayer,f,f,i,i)i, SLOT=0x68)
 ' VA 0x004C91A2   2707 bytes   (Ghidra-authoritative)
+' byte-identical vs NSS5.exe (2707/2707, original length from Ghidra's inventory)
 ' ORACLE: mode=reloc  matched=2707/2707  reloc_masked=142  STATUS=MATCH
 ' verified with NSS5_NO_LEARN=1 (no learned helper names contributed to the pass)
 '

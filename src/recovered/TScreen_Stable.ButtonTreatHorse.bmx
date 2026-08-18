@@ -1,5 +1,6 @@
 ' TScreen_Stable.ButtonTreatHorse   (KIND=Function -- static, no Self)
 ' VA 0x00589D61   339 bytes   class-table slot 0x84   sig ()i
+' byte-identical vs NSS5.exe (339/339, original length from Ghidra's inventory)
 ' ORACLE: mode=reloc  matched=339/339  STATUS=MATCH
 ' Original length from Ghidra's inventory. NSS5_NO_LEARN=1.
 '

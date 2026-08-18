@@ -1,5 +1,6 @@
 ' TTraining.Success   (KIND=Function -- static, no Self)
 ' VA 0x00581969   864 bytes   class-table slot 0x98   sig ()i
+' byte-identical vs NSS5.exe (864/864, original length from Ghidra's inventory)
 ' ORACLE: mode=reloc  matched=864/864  reloc_masked=51  STATUS=MATCH
 ' Original length from Ghidra's inventory. NSS5_NO_LEARN=1.
 '

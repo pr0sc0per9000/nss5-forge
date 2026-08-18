@@ -1,5 +1,6 @@
 ' TScreen_EditKits.RefreshKits
 ' VA 0x005353D7   2234 bytes   class-table slot 0x3c   KIND=Function (static)   sig ()i
+' byte-identical vs NSS5.exe (2234/2234, original length from Ghidra's inventory)
 ' ORACLE: mode=reloc  matched=2234/2234  reloc_masked=167  STATUS=MATCH  (NSS5_NO_LEARN=1,
 ' naming=full -- every E8 call resolved by name on both sides).
 ' Body-only format: statements only, no parameters.

@@ -1,5 +1,6 @@
 ' TProgressBar.Draw   (KIND=Method, SIG=()i)
 ' VA 0x0051A6F3   1079 bytes   (Ghidra-authoritative)
+' byte-identical vs NSS5.exe (1079/1079, original length from Ghidra's inventory)
 ' ORACLE: mode=reloc  matched=1079/1079  reloc_masked=63  STATUS=MATCH
 '
 ' ASSUMPTIONS / RESOLUTIONS

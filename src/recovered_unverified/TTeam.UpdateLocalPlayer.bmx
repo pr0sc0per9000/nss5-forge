@@ -61,11 +61,12 @@
 ' it); confirmed by direct disassembly at 0x004de37a: `push 0x40a00000` immediately before the
 ' `call [0xc5d998]` -- 0x40A00000 = 5.0f. So the call is YardsToPixels(5.0).
 '
-' `If closeToBall Then Return 0` (bare-truthy, direct `cmp eax,0` on the Int local -- no
-' setne/movzx, since closeToBall is already 0/1) immediately precedes the px/py/nearest
-' code, which runs unconditionally afterward with no EndIf/Else machinery of its own --
-' i.e. NOT `If Not closeToBall Then <px,py,nearest> EndIf`. Both source forms are logically
-' identical but (per guide 3f) compile to different bytes; the guard form is what matches.
+' `If human <> Null And human.goalside And human.distancetoball < TPitch.YardsToPixels(5.0)
+' Then Return 0` is ONE guard, not three separate Locals -- `human.goalside` is a bare-truthy
+' AND operand (raw field value reused directly as the chain's accumulator, no setne/movzx),
+' while the Null-test and the final relational operand each materialise their own setcc/movzx
+' as usual for an AND-chain. The guard immediately precedes the px/py/nearest code, which runs
+' unconditionally afterward with no EndIf/Else machinery of its own.
 '
 ' Globals -- names/types are the ones scripts/explain_global.py reports for each address
 ' (checked against extracted/global_alias_unified.tsv's adjudicated canonical name, and
@@ -87,7 +88,7 @@
 		If controller = 0 Then Return 0
 		If newstarselno > 0
 			For Local p:TPlayer = EachIn squad
-				If p.newstar <> 0 And p.matchstats.reds = 0 And p.selectionno < 11
+				If p.newstar And p.matchstats.reds = 0 And p.selectionno < 11
 					p.controller = 1
 				Else
 					p.controller = 0
@@ -107,9 +108,11 @@
 				EndIf
 				Return 0
 			EndIf
-			If ball.controlledby <> Null And ball.controlledby.teamid = id
-				NewLocalPlayer(ball.controlledby)
-				Return 0
+			If ball.controlledby <> Null
+				If ball.controlledby.teamid = id
+					NewLocalPlayer(ball.controlledby)
+					Return 0
+				EndIf
 			EndIf
 			If ball.passtoid = 0 And ball.lastkickedby <> Null And ball.lastkickedby.teamid = id And g_matchtime < ball.kicktime + g_ball_float14
 				NewLocalPlayer(ball.lastkickedby)
@@ -122,16 +125,12 @@
 					Return 0
 				EndIf
 			EndIf
-			If lastchangeplayer = 0 Or lastchangeplayer + 500 < g_matchtime
+			If lastchangeplayer = 0 Or g_matchtime > lastchangeplayer + 500
 				Local human:TPlayer = TPlayer.GetHumanPlayer()
-				Local hgs:Int = 0
-				If human <> Null Then hgs = human.goalside
-				Local closeToBall:Int = False
-				If hgs <> 0 Then closeToBall = human.distancetoball < TPitch.YardsToPixels(5.0)
-				If closeToBall Then Return 0
+				If human <> Null And human.goalside And human.distancetoball < TPitch.YardsToPixels(5.0) Then Return 0
 				Local px:Int = Int(ball.x)
 				Local py:Int = Int(ball.y)
-				If ball.controlledby = Null And ball.lastkickedby <> Null And ball.lastkickedby.teamid = id
+				If ball.controlledby = Null And (ball.lastkickedby <> Null And ball.lastkickedby.teamid = id)
 					px = Int(ball.metax)
 					py = Int(ball.metay)
 				EndIf
