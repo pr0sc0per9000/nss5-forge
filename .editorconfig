@@ -1,0 +1,26 @@
+# Keeps editors from silently reformatting files on save. Without this, a
+# contributor whose editor converts tabs to spaces turns a two-line bugfix into
+# a 400-line diff, and the review becomes impossible. Natively supported by
+# most editors; VS Code needs the EditorConfig extension.
+root = true
+
+[*]
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+charset = utf-8
+indent_style = space
+indent_size = 4
+
+# BlitzMax source is tab-indented, matching the original codebase style.
+[*.bmx]
+indent_style = tab
+
+[*.{json,yml,yaml}]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false
+
+[Makefile]
+indent_style = tab

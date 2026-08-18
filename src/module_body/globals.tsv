@@ -1,0 +1,24 @@
+name	type	note
+g_misc_int62	Int	0x00C6EF18 -- "nettimeout" setting, clamped [3,99]
+g_misc_int63	Int	0x00C6EF1C -- "port" setting, clamped [0,1e8]
+g_misc_int64	String	0x00C6EF20 -- "proxy" setting, no clamp
+g_screen_int20	Int	0x00C6EFD8 -- boot MilliSecs(), also the RNG seed
+g_engine_int167	Int	0x00C6F034 -- fixed-timestep accumulator; starts at one full tick, not 0
+g_timestepMs	Int	0x00C6F02C -- the fixed timestep itself, statically 25 (40 Hz)
+g_Object857	TChannel	0x00C6F088
+g_Object858	TChannel	0x00C6F08C
+g_Object859	TChannel	0x00C6F090
+g_Object860	TSound	0x00C6F0D4 -- GameMedia/Sounds/Cash.ogg
+g_Object861	TSound	0x00C6F124 -- GameMedia/Sounds/Achievement.ogg
+g_Object862	TImage	0x00C6F194 -- ArrowL.png
+g_Object863	TImage	0x00C6F1B8 -- ArrowR.png
+g_Object864	TImage	0x00C6F1DC -- ArrowU.png
+g_Object865	TImage	0x00C6F208 -- ArrowD_Red.png
+g_Object866	TImage	0x00C6F230 -- Refresh.png
+g_Object867	TImage	0x00C6F254 -- Cross.png
+g_Object868	TImage	0x00C6F274 -- Tick.png
+g_Object869	TImage	0x00C6F2A0 -- CrossSmall.png
+g_Object870	TImage	0x00C6F2CC -- TickSmall.png
+g_Object871	TImage	0x00C6F2EC -- Help.png
+g_Object872	TImage	0x00C6F34C -- Interface/MessageBg.png
+g_Object873	TImage	0x00C6F3B0 -- Interface/MessageLine.png

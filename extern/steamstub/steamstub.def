@@ -1,0 +1,8 @@
+LIBRARY STEAMSTUB.DLL
+EXPORTS
+FindLeaderboard
+GetSteamAchievement
+OpenSteam
+ReadSteam
+SetSteamAchievement
+UploadLeaderboardScore

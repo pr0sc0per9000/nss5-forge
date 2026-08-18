@@ -1,0 +1,180 @@
+module	va	type	member	bytes	status
+zipengine	0x0058dbf3	ZipFile	New	56	MATCH(thirdparty)
+zipengine	0x0058dc2b	ZipFile	Delete	53	MATCH(thirdparty)
+zipengine	0x0058dc60	ZipFile	readFileList	148	
+zipengine	0x0058dcf4	ZipFile	clearFileList	49	MATCH(thirdparty)
+zipengine	0x0058dd25	ZipFile	getFileCount	40	
+zipengine	0x0058dd4d	ZipFile	setName	47	MATCH(thirdparty)
+zipengine	0x0058dd7c	ZipFile	getName	15	MATCH(thirdparty)
+zipengine	0x0058dd8b	ZipFile	getFileInfo	28	
+zipengine	0x0058dda7	ZipFile	getFileInfoByName	28	
+zipengine	0x0058ddc3	ZipWriter	New	48	MATCH(thirdparty)
+zipengine	0x0058ddf3	ZipWriter	Delete	32	MATCH(thirdparty)
+zipengine	0x0058de13	ZipWriter	OpenZip	147	
+zipengine	0x0058dea6	ZipWriter	SetCompressionLevel	29	MATCH(thirdparty)
+zipengine	0x0058dec3	ZipWriter	AddFile	35	MATCH(thirdparty)
+zipengine	0x0058dee6	ZipWriter	AddFileToDest	584	
+zipengine	0x0058e12e	ZipWriter	AddStream	764	
+zipengine	0x0058e42a	ZipWriter	CloseZip	92	
+zipengine	0x0058e486	ZipReader	New	41	MATCH(thirdparty)
+zipengine	0x0058e4af	ZipReader	Delete	32	MATCH(thirdparty)
+zipengine	0x0058e4cf	ZipReader	OpenZip	103	
+zipengine	0x0058e536			254	
+zipengine	0x0058e634			395	
+zipengine	0x0058e7bf			66	
+zipengine	0x0058e801	ZipRamStream	New	45	MATCH(thirdparty)
+zipengine	0x0058e82e	ZipRamStream	Delete	51	MATCH(thirdparty)
+zipengine	0x0058e861			112	
+zipengine	0x0058e8d1			110	
+zipengine	0x0058e93f			53	
+zipengine	0x0058e974			143	
+zipengine	0x0058ea03			24	
+zipengine	0x0058ea1b			117	
+zipengine	0x0058ea90			180	
+zipengine	0x0058eb44			385	
+zipengine	0x0058ecc5			268	
+zipengine	0x0058edd1			54	
+zipengine	0x0058ee07	tm	New	97	MATCH(thirdparty)
+zipengine	0x0058ee68	tm	Delete	14	MATCH(thirdparty)
+zipengine	0x0058ee76	tm_zip	New	76	MATCH(thirdparty)
+zipengine	0x0058eec2	tm_zip	Delete	14	MATCH(thirdparty)
+zipengine	0x0058eed0	zip_fileinfo	New	95	
+zipengine	0x0058ef2f	zip_fileinfo	Delete	34	MATCH(thirdparty)
+zipengine	0x0058ef51			183	
+zipengine	0x0058f008	SZIPFileDataDescriptor	New	55	MATCH(thirdparty)
+zipengine	0x0058f03f	SZIPFileDataDescriptor	Delete	14	MATCH(thirdparty)
+zipengine	0x0058f04d	SZIPFileDataDescriptor	fill	60	MATCH(thirdparty)
+zipengine	0x0058f089	SZIPCentralFileHeader	New	216	MATCH(thirdparty)
+zipengine	0x0058f161	SZIPCentralFileHeader	Delete	104	MATCH(thirdparty)
+zipengine	0x0058f1c9	SZIPCentralFileHeader	fill	625	MATCH(thirdparty)
+zipengine	0x0058f43a	SZipFileEntry	New	118	MATCH(thirdparty)
+zipengine	0x0058f4b0	SZipFileEntry	Delete	87	MATCH(thirdparty)
+zipengine	0x0058f507	SZipFileEntry	Create	22	MATCH(thirdparty)
+zipengine	0x0058f51d	SZipFileEntry	IsDirectory	50	MATCH(thirdparty)
+zipengine	0x0058f54f	SZipFileEntry	Less	38	MATCH(thirdparty)
+zipengine	0x0058f575	SZipFileEntry	EqEq	38	MATCH(thirdparty)
+zipengine	0x0058f59b	SZipFileEntry	Compare	75	MATCH(thirdparty)
+zipengine	0x0058f5e6	TZipEngineStreamFactory	New	34	MATCH(thirdparty)
+zipengine	0x0058f608	TZipEngineStreamFactory	Delete	32	MATCH(thirdparty)
+zipengine	0x0058f628			231	
+zipengine	0x0058f70f	TZipEStream	New	81	MATCH(thirdparty)
+zipengine	0x0058f760	TZipEStream	Delete	85	MATCH(thirdparty)
+zipengine	0x0058f7b5	TZipEStream	Create	205	
+zipengine	0x0058f882	TZipEStream	find_file	309	
+zipengine	0x0058f9b7	TZipEStream	Eof	26	
+zipengine	0x0058f9d1	TZipEStream	Pos	26	
+zipengine	0x0058f9eb	TZipEStream	Size	15	MATCH(thirdparty)
+zipengine	0x0058f9fa	TZipEStream	Seek	147	
+zipengine	0x0058fa8d	TZipEStream	Flush	14	MATCH(thirdparty)
+zipengine	0x0058fa9b	TZipEStream	Close	70	
+zipengine	0x0058fae1	TZipEStream	Read	63	
+zipengine	0x0058fb20			127	
+zipengine	0x0058fb9f			67	
+zipengine	0x0058fbe2			67	
+zipengine	0x0058fc25			55	
+zipengine	0x0058fc5c			322	
+zipengine	0x0058fd9e			27	
+zipengine	0x0058fdb9			27	
+zipengine	0x0058fdd4			293	
+fontmachine	0x0058ff89	TBitmapFont	New	118	MATCH(thirdparty)
+fontmachine	0x0058ffff	TBitmapFont	Delete	70	MATCH(thirdparty)
+fontmachine	0x00590045	TBitmapFont	SetDrawShadow	26	MATCH(thirdparty)
+fontmachine	0x0059005f	TBitmapFont	GetDrawShadow	18	MATCH(thirdparty)
+fontmachine	0x00590071	TBitmapFont	SetDrawBorder	26	MATCH(thirdparty)
+fontmachine	0x0059008b	TBitmapFont	GetDrawBorder	18	MATCH(thirdparty)
+fontmachine	0x0059009d	TBitmapFont	SetProgressFunction	26	MATCH(thirdparty)
+fontmachine	0x005900b7	TBitmapFont	Load	1855	
+fontmachine	0x005907f6	TBitmapFont	FontLoaded	18	MATCH(thirdparty)
+fontmachine	0x00590808	TBitmapFont	DrawText	58	MATCH(thirdparty)
+fontmachine	0x00590842	TBitmapFont	DrawTextMaxWidth	755	
+fontmachine	0x00590b35	TBitmapFont	GetTxtWidth	278	
+fontmachine	0x00590c4b	TBitmapFont	GetFontHeight	52	MATCH(thirdparty)
+fontmachine	0x00590c7f			72	
+fontmachine	0x00590cc7			72	
+fontmachine	0x00590d0f			72	
+fontmachine	0x00590d57			132	
+fontmachine	0x00590ddb			132	
+fontmachine	0x00590e5f			132	
+fontmachine	0x00590ee3			72	
+fontmachine	0x00590f2b			114	
+fontmachine	0x00590f9d			142	
+fontmachine	0x0059102b	TBitmapFont	Fn_0059102B	26	MATCH(thirdparty,unreflected,try_function)
+fontmachine	0x00591045	TBitmapFont	Fn_00591045	18	MATCH(thirdparty,unreflected,try_function)
+fontmachine	0x00591057	TBitmapFont	Fn_00591057	26	MATCH(thirdparty,unreflected,try_function)
+fontmachine	0x00591071	TBitmapFont	Fn_00591071	18	MATCH(thirdparty,unreflected,try_function)
+fontmachine	0x00591083	TBitmapFont	Fn_00591083	26	MATCH(thirdparty,unreflected,try_function)
+fontmachine	0x0059109d	TBitmapFont	Fn_0059109D	18	MATCH(thirdparty,unreflected,try_function)
+fontmachine	0x005910af			87	
+fontmachine	0x00591106			376	
+fontmachine	0x0059127e	TPrivateBitmapFont	New	174	MATCH(thirdparty)
+fontmachine	0x0059132c	TPrivateBitmapFont	Delete	87	MATCH(thirdparty)
+fontmachine	0x00591383	TPrivateBitmapFont	DrawFaceText	1428	
+fontmachine	0x00591917	TPrivateBitmapFont	DrawBorderText	1195	
+fontmachine	0x00591dc2	TPrivateBitmapFont	DrawShadowText	666	
+fontmachine	0x0059205c	TPrivateBitmapFont	DrawTextLine	431	MATCH(thirdparty)
+fontmachine	0x0059220b	TRenderStatus	New	56	MATCH(thirdparty)
+fontmachine	0x00592243	TRenderStatus	Delete	14	MATCH(thirdparty)
+fontmachine	0x00592251			34	
+fontmachine	0x00592273	EConstBlend	Delete	14	MATCH(thirdparty)
+fontmachine	0x00592281	EConstBlend	GetCurrent	14	MATCH(thirdparty)
+fontmachine	0x0059228f	TDrawTextException	New	53	MATCH(thirdparty)
+fontmachine	0x005922c4	TDrawTextException	Delete	34	MATCH(thirdparty)
+fontmachine	0x005922e6	TDrawTextException	ToString	51	MATCH(thirdparty)
+fontmachine	0x00592319	TDrawTextException	GetFontObject	18	MATCH(thirdparty)
+fontmachine	0x0059232b	TBitmapFontLoadException	New	34	MATCH(thirdparty)
+fontmachine	0x0059234d	TBitmapFontLoadException	Delete	32	MATCH(thirdparty)
+fontmachine	0x0059236d	TBitmapFontLoadException	ToString	21	MATCH(thirdparty)
+fontmachine	0x00592382	TBitmapFontLoadException	GetFontObject	21	MATCH(thirdparty)
+fontmachine	0x00592397	TPrivateException	New	56	MATCH(thirdparty)
+fontmachine	0x005923cf	TPrivateException	Delete	53	MATCH(thirdparty)
+fontmachine	0x00592404			80	
+fontmachine	0x00592454			34	
+fontmachine	0x00592476			108	
+fontmachine	0x005924e2	iTextRendererFXBase	New	45	MATCH(thirdparty)
+fontmachine	0x0059250f	iTextRendererFXBase	Delete	34	MATCH(thirdparty)
+fontmachine	0x00592531	iTextRendererFXBase	DrawTextBegin	14	MATCH(thirdparty)
+fontmachine	0x0059253f	iTextRendererFXBase	DrawTextEnd	14	MATCH(thirdparty)
+fontmachine	0x0059254d	iTextRendererFXBase	DrawShadowChar	14	MATCH(thirdparty)
+fontmachine	0x0059255b	iTextRendererFXBase	DrawBorderChar	14	MATCH(thirdparty)
+fontmachine	0x00592569	iTextRendererFXBase	DrawFaceChar	14	MATCH(thirdparty)
+fontmachine	0x00592577	TDrawTextAction	New	66	MATCH(thirdparty)
+fontmachine	0x005925b9	TDrawTextAction	Delete	53	MATCH(thirdparty)
+fontmachine	0x005925ee	TDrawCharAction	New	86	MATCH(thirdparty)
+fontmachine	0x00592644	TDrawCharAction	Delete	34	MATCH(thirdparty)
+fontmachine	0x00592666			34	
+fontmachine	0x00592688	eDrawCharStatus	Delete	14	MATCH(thirdparty)
+fontmachine	0x00592696	TFontKerning	New	53	MATCH(thirdparty)
+fontmachine	0x005926cb	TFontKerning	Delete	34	MATCH(thirdparty)
+fontmachine	0x005926ed	TFontKerning	SetHKerning	26	MATCH(thirdparty)
+fontmachine	0x00592707	TFontKerning	SetVKerning	26	MATCH(thirdparty)
+fontmachine	0x00592721	TFontKerning	GetHKerning	18	MATCH(thirdparty)
+fontmachine	0x00592733	TFontKerning	GetVKerning	18	MATCH(thirdparty)
+fontmachine	0x00592745	TPrivateFontKerning	New	44	MATCH(thirdparty)
+fontmachine	0x00592771	TPrivateFontKerning	Delete	14	MATCH(thirdparty)
+fontmachine	0x00592780			135	
+fontmachine	0x00592897	TFontMachineVersion	New	34	MATCH(thirdparty)
+fontmachine	0x005928b9	TFontMachineVersion	Delete	14	MATCH(thirdparty)
+fontmachine	0x005928c7	TFontMachineVersion	Version	14	MATCH(thirdparty)
+fontmachine	0x005928d5	TRectangle	New	54	MATCH(thirdparty)
+fontmachine	0x0059290b	TRectangle	Delete	14	MATCH(thirdparty)
+fontmachine	0x00592919	TRectangle	Create	46	MATCH(thirdparty)
+fontmachine	0x00592947	TRectangle	Clone	32	
+fontmachine	0x00592967			54	
+fontmachine	0x0059299d	TDrawingPoint	New	44	MATCH(thirdparty)
+fontmachine	0x005929c9	TDrawingPoint	Delete	14	MATCH(thirdparty)
+fontmachine	0x005929d7	TDrawingPoint	Create	34	MATCH(thirdparty)
+fontmachine	0x005929f9	TDrawingPoint	Clone	26	
+fontmachine	0x00592a13			36	
+fontmachine	0x00592a37			322	
+fontmachine	0x00592b79		Fn_00592B79	14	MATCH(thirdparty,unattributed)	
+fontmachine	0x00592b87			75	
+fontmachine	0x00592bd4			850	
+fontmachine	0x00592f26	TClass	New	41	MATCH(thirdparty)
+fontmachine	0x00592f4f	TClass	Delete	14	MATCH(thirdparty)
+fontmachine	0x00592f5d	TClass	Compare	39	MATCH(thirdparty)
+fontmachine	0x00592f84	TClass	SetClass	18	MATCH(thirdparty)
+fontmachine	0x00592f96			161	
+fontmachine	0x00593037			355	
+fontmachine	0x0059319a			405	
+fontmachine	0x0059332f			571	
+fontmachine	0x0059356a			241	

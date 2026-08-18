@@ -1,0 +1,13 @@
+' DDCAPS_DX7.New
+' VA 0x005aaeb9   894 bytes   mode=reloc   byte-identical vs NSS5.exe
+' KIND=Method, SIG ()i, class-table slot 0x10
+' ASSUMPTIONS
+'  * The body is EMPTY. Every one of these 894 bytes is compiler-generated: the runtime
+'    ctor helper (FUN_004A8E50), the store of this Type's class-table pointer into +0,
+'    and one `mov dword [ebx+off],0` per declared Int field. DDCAPS_DX7 is a plain
+'    DirectDraw/Direct3D caps record of Int fields, so bcc's implicit New zero-initialises
+'    each of them in offset order and there is no source statement at all.
+'  * No module Globals are touched.
+	Method New()
+
+	End Method

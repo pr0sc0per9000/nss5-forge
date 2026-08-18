@@ -1,0 +1,27 @@
+' TReplayFrame.SaveFrame
+' VA 0x00504cda   276 bytes   vtable slot 0x30   sig (:TStream)i
+' byte-identical vs NSS5.exe (276/276, original length from Ghidra's inventory)
+' 0x005B8307 is the alias set __maxgui_maxgui_TGadget_ItemState|_brl_stream_WriteLine - WriteLine is the one that fits a TStream save.
+	Method SaveFrame:Int(a0:TStream)
+		WriteInt(a0, Self.frametime)
+		WriteLine(a0, Self.obtext)
+		WriteInt(a0, Self.obtype)
+		WriteInt(a0, Self.id)
+		WriteInt(a0, Self.selno)
+		WriteInt(a0, Self.clubid)
+		WriteInt(a0, Self.skincol)
+		WriteInt(a0, Self.haircol)
+		WriteInt(a0, Self.bootcol)
+		WriteInt(a0, Self.glovecol)
+		WriteFloat(a0, Self.x)
+		WriteFloat(a0, Self.y)
+		WriteFloat(a0, Self.z)
+		WriteFloat(a0, Self.xvel)
+		WriteFloat(a0, Self.yvel)
+		WriteFloat(a0, Self.zvel)
+		WriteInt(a0, Self.frame)
+		WriteInt(a0, Self.facing)
+		WriteFloat(a0, Self.rotation)
+		WriteFloat(a0, Self.alph)
+		WriteInt(a0, Self.active)
+	End Method

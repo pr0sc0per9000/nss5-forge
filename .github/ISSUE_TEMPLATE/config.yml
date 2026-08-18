@@ -1,0 +1,8 @@
+# Blank issues are disabled so that every report arrives with the context needed
+# to act on it. OpenTTD's CONTRIBUTING is blunt about why: an issue tracker used
+# for support questions stops being usable as a bug tracker.
+blank_issues_enabled: false
+contact_links:
+  - name: Question about using or building the project
+    url: https://github.com/pr0sc0per9000/nss5-forge/discussions
+    about: Please ask in Discussions rather than opening an issue.

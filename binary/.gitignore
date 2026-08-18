@@ -1,0 +1,9 @@
+# Drop zone for your own copy of New Star Soccer 5.
+#
+# This directory is tracked by git so that it exists in a fresh clone with its
+# instructions intact; its CONTENTS are not. The pattern is the one used by
+# HarbourMasters/Shipwright for roms/ and by zeldaret/oot for baseroms/.
+*
+!.gitignore
+!README.md
+!checksums.json

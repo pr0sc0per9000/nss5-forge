@@ -1,0 +1,67 @@
+name: CI
+
+# What this verifies, and why it is shaped this way.
+#
+# A full build cannot run here: it needs NSS5.exe and the BlitzMax toolchain,
+# and neither can be committed. So CI does not attempt one. Instead it checks
+# everything that is verifiable WITHOUT the copyrighted inputs -- which is the
+# part most likely to break, and the part a reviewer cannot eyeball.
+#
+# The second job is the important one. pret/pokered runs `make compare` against
+# a checksum file and then fails the build if `git diff-index` reports a dirty
+# tree; the point is to catch a generated file that was committed out of sync
+# with its generator. Ours does the equivalent for docs/STATUS.md.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  scripts:
+    name: Python scripts compile and lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Byte-compile every script
+        run: python -m compileall -q scripts
+      # A check that cannot fail is decoration. This one fails on anything
+      # pyflakes reports except two categories that are noise here: an unused
+      # local, and the star-import advisories from the emulator bindings, which
+      # export several hundred constants and are imported that way deliberately.
+      - name: Lint
+        run: |
+          python -m pip install --quiet pyflakes
+          python -m pyflakes scripts/*.py > flakes.txt || true
+          grep -v 'star imports' flakes.txt > a.txt || true
+          grep -v 'unable to detect undefined names' a.txt > b.txt || true
+          grep -v 'local variable .* assigned to but never used' b.txt > real.txt || true
+          if [ -s real.txt ]; then
+            echo "pyflakes found problems:"
+            cat real.txt
+            exit 1
+          fi
+          echo "OK - no undefined names, unused imports or redefinitions."
+
+
+  status:
+    name: docs/STATUS.md is in sync with the source
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Regenerate and diff
+        run: |
+          python scripts/progress.py --write-status
+          if ! git diff --quiet -- docs/STATUS.md docs/progress.json; then
+            echo "Generated progress files are stale. Regenerate them:"
+            echo "  python scripts/progress.py --write-status"
+            git --no-pager diff -- docs/STATUS.md docs/progress.json
+            exit 1
+          fi
+          echo "OK - status and badge match the source."

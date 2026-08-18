@@ -1,0 +1,14 @@
+# Normalise line endings at the Git level. This project is developed on Windows
+# and will attract Linux contributors; without this, every file one of them
+# touches comes back as a whole-file diff.
+* text=auto eol=lf
+
+# Binary formats: never munge, never try to diff.
+*.png  binary
+*.ogg  binary
+*.exe  binary
+*.dll  binary
+
+# Generated. Collapsed in GitHub diffs so a regenerated file does not bury a
+# real change under thousands of lines.
+docs/STATUS.md linguist-generated=true

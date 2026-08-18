@@ -1,0 +1,35 @@
+{
+  "_comment": [
+    "Metadata ABOUT the original game files. The files themselves are never",
+    "committed -- see binary/README.md. This is the convention used by",
+    "isledecomp/isle (reccmp-project.yml), n64decomp/sm64 (assets.json) and",
+    "OpenTTD (media/baseset/*.obg): describe the copyrighted data precisely",
+    "enough to verify and locate it, without redistributing any of it."
+  ],
+  "game": {
+    "title": "New Star Soccer 5",
+    "publisher": "New Star Games Ltd",
+    "steam_appid": 212780,
+    "origin": "Purchase on Steam (appid 212780), then run scripts/setup.py."
+  },
+  "files": {
+    "NSS5.exe": {
+      "size": 9383424,
+      "sha256": "37d566150483da1ecba03b4b2421307fc741a26a63c3092c9a154de21535e8eb",
+      "required": true,
+      "note": "The reconstruction target. Every byte comparison is made against this."
+    },
+    "steamstub.dll": {
+      "size": 498688,
+      "sha256": "3d9519249d4fc218c35a51a93e4aa5b1f5d81120674ec7d29706ad343d6445da",
+      "required": false,
+      "note": "Ships with the retail install. Steam integration is stripped from the reconstruction."
+    },
+    "IRClipboardFunctions.dll": {
+      "size": 45056,
+      "sha256": "64c6dac03c8a8206d95d7bcd44e28e3d2459542b0a40556908a03fd421298032",
+      "required": false,
+      "note": "Ships with the retail install. Not used by the rebuild."
+    }
+  }
+}

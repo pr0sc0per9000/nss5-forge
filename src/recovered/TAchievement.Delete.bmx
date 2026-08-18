@@ -1,0 +1,7 @@
+' TAchievement.Delete
+' VA 0x0058d183   34 bytes   vtable slot 0x14   sig ()i
+' byte-identical vs NSS5.exe (34/34, original length from Ghidra's inventory)
+' empty body -- automatic field release
+
+	Method Delete:Int()
+	End Method
