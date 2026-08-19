@@ -9,17 +9,17 @@
 	Function UpdateOfferButtons:Int()
 		'!Global g_screen_mycontract_arr:TButton[]
 		'!Global g_Object575:TLabel
-		'!Global g_contractoffer_tplayer:TProfile
+		'!Global g_profile:TProfile
 		LogLine("UpdateOfferButtons")
 		For Local i:Int = 0 To 4
 			g_screen_mycontract_arr[i].Hide()
 		Next
-		If g_contractoffer_tplayer.transferlisted = 4
-			Local ds:String = TMyDate.Create(g_contractoffer_tplayer.loanexpires,1,1).GetString("WW")
+		If g_profile.transferlisted = 4
+			Local ds:String = TMyDate.Create(g_profile.loanexpires,1,1).GetString("WW")
 			g_Object575.SetText(GetText("transfer_OnLoanUntil").Replace("$date",ds),"",-1,-1)
 			Return 0
 		EndIf
-		If g_contractoffer_tplayer.transferlisted = 3
+		If g_profile.transferlisted = 3
 			Local n:Int = 0
 			For Local c:TClub = EachIn TContractOffer.GetClubsInterestedInLoan()
 				g_screen_mycontract_arr[n].SetText(c.tla,"",-1,-1)
@@ -35,14 +35,14 @@
 		Else
 			If TContractOffer.TransferWindowOpen()
 				Local slot:Int = 0
-				Select g_contractoffer_tplayer.transferlisted
+				Select g_profile.transferlisted
 				Case 0
 				Case 3
 				Case 4
 				Default
 					For Local i:Int = 0 To 4
-						If g_contractoffer_tplayer.interestedclubs[i] > 0
-							Local c:TClub = TClub.SelectById(g_contractoffer_tplayer.interestedclubs[i])
+						If g_profile.interestedclubs[i] > 0
+							Local c:TClub = TClub.SelectById(g_profile.interestedclubs[i])
 							If c <> Null
 								g_screen_mycontract_arr[slot].SetText(c.tla,"",-1,-1)
 								g_screen_mycontract_arr[slot].SetColour(c.GetPrimaryColour(),"FFFFFF")
@@ -54,18 +54,18 @@
 				End Select
 				Local found:Int = 0
 				For Local j:Int = 0 To 4
-					If g_contractoffer_tplayer.interestedclubs[j] > 0 Then found = 1
+					If g_profile.interestedclubs[j] > 0 Then found = 1
 				Next
 				g_Object575.SetText(GetText("transfer_NoOffers"),"",-1,-1)
 				If found
 					g_Object575.SetText(GetText("transfer_CurrentOffers"),"",-1,-1)
-					If g_contractoffer_tplayer.transferlisted = 0
+					If g_profile.transferlisted = 0
 						g_Object575.SetText(GetText("transfer_OffersNotListed"),"",-1,-1)
 					EndIf
 				EndIf
 			Else
 				Local nw:Int = 26
-				If g_contractoffer_tplayer.date.GetWeek() > 32 Then nw = 1
+				If g_profile.date.GetWeek() > 32 Then nw = 1
 				g_Object575.SetText(GetText("transfer_OffersWindowOpens").Replace("$num",nw),"",-1,-1)
 			EndIf
 		EndIf

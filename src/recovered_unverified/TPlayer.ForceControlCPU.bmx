@@ -77,7 +77,7 @@
 '     TPitch.YardsToPixels(20.0) at 0x004F17CE (`push 0x41A00000`) in the KeeperHolding
 '     block. `g_pitch_int11 - 50` (0x32) in Case 6; `+100` (0x64) on kickbuttonhits;
 '     `+500` (0x1F4) in both debounce checks.
-'!Global g_player_tplayer02:TBall
+'!Global g_ball:TBall
 '!Global g_player_int01:Int
 '!Global g_player_tplayer01:TPlayer
 '!Global g_training_int03:Int
@@ -87,7 +87,7 @@
 '!Global g_ball_float14:Float
 If Self.controller <> 1 Then Return 1
 If Self.matchstats.reds > 0 Or Self.selectionno > 10 Then Return 1
-If TEngine.SetPiece() And g_player_tplayer02 <> Null And g_player_tplayer02.setpiecetaker = Self Then Return 1
+If TEngine.SetPiece() And g_ball <> Null And g_ball.setpiecetaker = Self Then Return 1
 Select g_player_int01
 Case 0
 	Return 1
@@ -96,9 +96,9 @@ Case 2
 	Return 1
 Case 3
 Case 4
-	If g_player_tplayer02 <> Null And g_player_tplayer02.setpiecetaker <> Null And g_player_tplayer02.setpiecetaker.selectionno = 0 Then Return 1
+	If g_ball <> Null And g_ball.setpiecetaker <> Null And g_ball.setpiecetaker.selectionno = 0 Then Return 1
 Case 5
-	If g_player_tplayer02 <> Null And g_player_tplayer02.teaminpossession <> Self.teamid And Dist2D(Self.x, Self.y, g_player_tplayer02.setpiecex, g_player_tplayer02.setpiecey) < TPitch.YardsToPixels(10.0) Then Return 1
+	If g_ball <> Null And g_ball.teaminpossession <> Self.teamid And Dist2D(Self.x, Self.y, g_ball.setpiecex, g_ball.setpiecey) < TPitch.YardsToPixels(10.0) Then Return 1
 Case 6
 	If Abs(Self.y) > g_pitch_int11 - 50
 		g_player_int51 = g_player_int50
@@ -118,8 +118,8 @@ Case 11
 Case 12
 End Select
 If Not Self.PlayerOnFeet() Then Return 0
-If g_player_tplayer02 <> Null
-	If g_player_tplayer02 <> Null And g_player_tplayer02.KeeperHolding() And g_player_tplayer02.controlledby <> Self
+If g_ball <> Null
+	If g_ball <> Null And g_ball.KeeperHolding() And g_ball.controlledby <> Self
 		If g_training_int03 And Self.newstar Then Return 0
 		If Self.distancetoball < TPitch.YardsToPixels(20.0)
 			g_player_int51 = g_player_int50
@@ -127,15 +127,15 @@ If g_player_tplayer02 <> Null
 		End If
 		If g_player_int50 < g_player_int51 + 500 Then Return 1
 	End If
-	If g_player_tplayer02.passtoid = Self.id And Self.GetMyTeam().newstarselno = 0 Then Return 1
-	If Self.joy.kickbuttondown And g_player_tplayer02.controlledby <> Self And g_player_int01 = 1 And g_player_int50 > Self.joy.kickbuttonhits + 100
-		If g_player_tplayer02.jumpx <> 0.0
-			Self.ChaseBall(g_player_tplayer02.jumpx, g_player_tplayer02.jumpy, g_player_tplayer02.controlledby)
+	If g_ball.passtoid = Self.id And Self.GetMyTeam().newstarselno = 0 Then Return 1
+	If Self.joy.kickbuttondown And g_ball.controlledby <> Self And g_player_int01 = 1 And g_player_int50 > Self.joy.kickbuttonhits + 100
+		If g_ball.jumpx <> 0.0
+			Self.ChaseBall(g_ball.jumpx, g_ball.jumpy, g_ball.controlledby)
 		Else
-			Self.ChaseBall(g_player_tplayer02.x, g_player_tplayer02.y, g_player_tplayer02.controlledby)
+			Self.ChaseBall(g_ball.x, g_ball.y, g_ball.controlledby)
 		End If
 		Return 1
 	End If
-	If Self.selectionno = 0 And g_player_tplayer02.passtoid = 0 And g_player_tplayer02.lastkickedby = Self And g_player_int50 < g_player_tplayer02.kicktime + g_ball_float14 Then Return 1
+	If Self.selectionno = 0 And g_ball.passtoid = 0 And g_ball.lastkickedby = Self And g_player_int50 < g_ball.kicktime + g_ball_float14 Then Return 1
 End If
 Return 0

@@ -15,7 +15,7 @@ often. A hang must never cost the user their session.
 
 So this launcher makes two guarantees the bare exe cannot:
 
-  WINDOWED   Settings/Options.ini is rewritten to window=1 / screen=0 BEFORE every launch,
+  WINDOWED   Settings/Options.ini is rewritten to window=1 BEFORE every launch,
              at every path the game might read one from. If none of those exist yet, one is
              created at the path TOptions.LoadOptions actually reads, rather than leaving
              the game to start from its own compiled defaults, which are not documented
@@ -66,7 +66,23 @@ STATUS = os.path.join(ROOT, "status")
 # Display keys forced before every launch. window=1 is the one that matters; screen=0 keeps
 # it off an exclusive mode switch, which is what leaves the desktop unrecoverable when the
 # process dies without restoring it.
-FORCE = {"window": "1", "screen": "0"}
+# `window` is a flag and is the only key that has to be forced: window=1 is what keeps the
+# game out of exclusive fullscreen.
+#
+# `screen` is NOT a flag. It is an INDEX into g_gfxmodes, which TOptions.SetUp builds from
+# GraphicsModes() filtered to height >= 600 and sorts ascending by width, so the list and
+# therefore the meaning of any index is machine-specific. Index 0 is simply the narrowest
+# mode that machine offers. The game's own TOptions.WriteNewOptionsIni writes
+# `screen=` + FindRes800600(), i.e. it looks the index up rather than assuming one, and
+# pinning a literal here overrides whatever resolution the player chose.
+#
+# So `screen` is left alone on an ini that already exists. Only when this script has to
+# create one from scratch does it write SCREEN_RESOLVE, and that value is deliberately out
+# of range: TOptions.LoadOptions bounds-checks with `If g_opt_screen >= g_gfxmodes.Count()`
+# and falls back to FindRes800600(), so an out-of-range value makes the game resolve 800x600
+# against its own mode list on any machine.
+FORCE = {"window": "1"}
+SCREEN_RESOLVE = "99"
 
 
 def ini_paths():
@@ -119,7 +135,7 @@ def force_windowed():
     Every write is read back from disk and checked before this returns, because a write
     that silently failed or landed somewhere the game does not read is exactly the failure
     that already cost two power cycles. If any candidate cannot be confirmed to hold
-    window=1/screen=0 on disk, this raises SystemExit instead of returning a status string
+    window=1 on disk, this raises SystemExit instead of returning a status string
     that main() would print and launch past anyway: the whole point of this function is a
     guarantee, and a guarantee that cannot be kept must stop the launch, not report on it.
     """
@@ -130,7 +146,11 @@ def force_windowed():
                               "Settings", "Options.ini")
         try:
             os.makedirs(os.path.dirname(target), exist_ok=True)
-            open(target, "w", encoding="utf-8").close()
+            # Seed the new file with an out-of-range screen index so
+            # TOptions.LoadOptions resolves it through FindRes800600()
+            # against this machine's own mode list.
+            with open(target, "w", encoding="utf-8") as fh:
+                fh.write("screen=" + SCREEN_RESOLVE + chr(10))
         except OSError as e:
             raise SystemExit(
                 "REFUSING TO LAUNCH: no Options.ini exists anywhere, and one could not\n"
@@ -182,7 +202,7 @@ def force_windowed():
     if failed:
         raise SystemExit(
             "REFUSING TO LAUNCH: could not guarantee windowed mode.\n"
-            "  window=1/screen=0 did not verify on disk for:\n"
+            "  window=1 did not verify on disk for:\n"
             + "\n".join("    %s" % f for f in failed) + "\n"
             "  This launcher's only job is to guarantee the game cannot come up fullscreen,\n"
             "  and it cannot make that guarantee here, so it will not start the exe.")

@@ -16,39 +16,39 @@
 '   `txt.Length` reads the BBString length at +8; the Or is short-circuit.
 '   Literals "Pause", "Skip Time", "F5" read with harness.read_string.
 ' Body-only format: statements only; parameters are a0, a1, ...
-'!Global g_panel_controls_arr01:TButton[]
+'!Global g_panel_controls_lbl:TLabel[]
 '!Global g_options_arr10:Int[]
 '!Global g_options_int01:Int
 Local gap:Int = 34
 For Local i:Int = 0 To 4
-	g_panel_controls_arr01[i].x = a0
-	g_panel_controls_arr01[i].y = a1
-	g_panel_controls_arr01[i].SetText("", "", -1, -1)
-	g_panel_controls_arr01[i].SetImage(Null)
-	g_panel_controls_arr01[i + 5].x = a0 + 52
-	g_panel_controls_arr01[i + 5].y = a1
-	g_panel_controls_arr01[i + 5].SetText("", "", -1, -1)
+	g_panel_controls_lbl[i].x = a0
+	g_panel_controls_lbl[i].y = a1
+	g_panel_controls_lbl[i].SetText("", "", -1, -1)
+	g_panel_controls_lbl[i].SetIcon(Null)
+	g_panel_controls_lbl[i + 5].x = a0 + 52
+	g_panel_controls_lbl[i + 5].y = a1
+	g_panel_controls_lbl[i + 5].SetText("", "", -1, -1)
 	a1 = a1 + gap
 Next
-g_panel_controls_arr01[0].SetText(TOptions.GetButtonLabel(g_options_arr10[0]), "", -1, -1)
-g_panel_controls_arr01[0].SetImage(TOptions.GetButtonIcon(g_options_arr10[1], 0))
-g_panel_controls_arr01[5].SetText(GetText("Pause"), "", -1, -1)
-g_panel_controls_arr01[1].SetText("F5", "", -1, -1)
-g_panel_controls_arr01[6].SetText(GetText("Skip Time"), "", -1, -1)
+g_panel_controls_lbl[0].SetText(TOptions.GetButtonLabel(g_options_arr10[0]), "", -1, -1)
+g_panel_controls_lbl[0].SetIcon(TOptions.GetButtonIcon(g_options_arr10[1], 0))
+g_panel_controls_lbl[5].SetText(GetText("Pause"), "", -1, -1)
+g_panel_controls_lbl[1].SetText("F5", "", -1, -1)
+g_panel_controls_lbl[6].SetText(GetText("Skip Time"), "", -1, -1)
 For Local j:Int = 0 To 4
 	Select g_options_int01
 		Case 0
-			g_panel_controls_arr01[j].icon = Null
+			g_panel_controls_lbl[j].icon = Null
 		Case 1
-			If g_panel_controls_arr01[j].icon <> Null Then
-				g_panel_controls_arr01[j].txt = ""
+			If g_panel_controls_lbl[j].icon <> Null Then
+				g_panel_controls_lbl[j].txt = ""
 			End If
 	End Select
-	If g_panel_controls_arr01[j].icon <> Null Or g_panel_controls_arr01[j].txt.Length Then
-		g_panel_controls_arr01[j].Draw()
+	If g_panel_controls_lbl[j].icon <> Null Or g_panel_controls_lbl[j].txt.Length Then
+		g_panel_controls_lbl[j].Draw()
 	End If
-	If g_panel_controls_arr01[j + 5].txt.Length Then
-		g_panel_controls_arr01[j + 5].Draw()
+	If g_panel_controls_lbl[j + 5].txt.Length Then
+		g_panel_controls_lbl[j + 5].Draw()
 	End If
 Next
 Return 0

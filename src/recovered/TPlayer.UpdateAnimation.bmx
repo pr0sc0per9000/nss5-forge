@@ -24,7 +24,7 @@
 		'!Global g_player_int36:Int
 		'!Global g_player_int50:Int
 		'!Global g_player_float11:Float
-		'!Global g_player_tplayer02:TBall
+		'!Global g_ball:TBall
 		'!Global g_player_arr01:Int[]
 		'!Global g_player_arr02:Int[]
 		'!Global g_player_arr08:Int[]
@@ -49,13 +49,13 @@
 				frame = frame - 1
 			EndIf
 		EndIf
-		If g_player_int01 = 3 And g_player_tplayer02 <> Null And g_player_tplayer02.setpiecetaker <> Null And g_player_tplayer02.setpiecetaker = Self
+		If g_player_int01 = 3 And g_ball <> Null And g_ball.setpiecetaker <> Null And g_ball.setpiecetaker = Self
 			If distancetoball < g_player_float11 And PlayerOnFeet()
 				currentanim = g_player_arr08
 				xvel = 0
 				yvel = 0
-				x = g_player_tplayer02.setpiecex
-				y = g_player_tplayer02.setpiecey
+				x = g_ball.setpiecex
+				y = g_ball.setpiecey
 				If x > 0.0
 					facing = 0
 				Else
@@ -69,7 +69,7 @@
 				facing = 1
 			EndIf
 		EndIf
-		If g_player_int01 = 1 And selectionno = 0 And g_player_tplayer02 <> Null
+		If g_player_int01 = 1 And selectionno = 0 And g_ball <> Null
 			ValidateKeeperAnim()
 		EndIf
 		ValidateAnimDirection()

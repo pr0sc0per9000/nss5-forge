@@ -12,10 +12,10 @@
 '   Shape is ElseIf, not a nested If: one shared exit label at 0x5353CC.
 
 	Function ButtonQuit:Int()
-		'!Global g_edit_selected:TBase_Team
-		If TNation(g_edit_selected) <> Null
-			TScreen_EditNations.SetUpScreen(g_edit_selected.id)
-		ElseIf TClub(g_edit_selected) <> Null
-			TScreen_EditClubs.SetUpScreen(g_edit_selected.id, "")
+		'!Global g_editkits_team:TBase_Team
+		If TNation(g_editkits_team) <> Null
+			TScreen_EditNations.SetUpScreen(g_editkits_team.id)
+		ElseIf TClub(g_editkits_team) <> Null
+			TScreen_EditClubs.SetUpScreen(g_editkits_team.id, "")
 		End If
 	End Function

@@ -112,7 +112,7 @@
 '     not a transcription error).
 '
 '!Global g_dpb_lblTip:TLabel
-'!Global g_contractoffer_tplayer:TProfile
+'!Global g_profile:TProfile
 '!Global g_screen_float01:Float
 '!Global g_screen_float02:Float
 '!Global g_screen_float10:Float
@@ -132,12 +132,12 @@ g_dpb_panTip.SetPosition(Int(g_screen_float01 + 200.0), Int(g_screen_float02 + 2
 Select a3
 	Case -1
 		g_dpb_panTip.Show()
-		g_dpb_lblTip.SetText(g_contractoffer_tplayer.GetCurrentTip(), "", 1, -1)
+		g_dpb_lblTip.SetText(g_profile.GetCurrentTip(), "", 1, -1)
 	Case 0
 		g_dpb_panTip.Hide()
 	Case 1
 		g_dpb_panTip.Show()
-		g_dpb_lblTip.SetText(g_contractoffer_tplayer.GetNewTip(), "", 1, -1)
+		g_dpb_lblTip.SetText(g_profile.GetNewTip(), "", 1, -1)
 End Select
 If g_dpb_lblTip.txt = "" Or g_dpb_lblTip.txt = ""
 	g_dpb_panTip.Hide()

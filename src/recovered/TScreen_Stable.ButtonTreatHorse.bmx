@@ -26,7 +26,7 @@
 
 '!Global g_stable_btn_treat:TButton
 '!Global g_screen_stable_tplayer01:TTable
-'!Global g_contractoffer_tplayer:TProfile
+'!Global g_profile:TProfile
 
 If g_stable_btn_treat.alph < 1.0 Then Return 0
 Local h:THorse = GetSelectedHorse(g_screen_stable_tplayer01.GetSelectedText(0))
@@ -40,7 +40,7 @@ If h.health >= 99.5
 EndIf
 Local c:Int = Int((100.0 - h.health) * 1000.0)
 If TScreen.DoMessage(GetText("CMESSAGE_TREATHORSE").Replace("$cash",FormatMoney(c,1)),1,0)
-	If g_contractoffer_tplayer.UpdateBank(-c)
+	If g_profile.UpdateBank(-c)
 		h.health = 100.0
 		SetUpScreen(1)
 	EndIf

@@ -150,10 +150,10 @@
 '!Global g_engine_int22:Int
 '!Global g_engine_int20:Int
 '!Global g_engine_int17:Int
-'!Global g_Object15:TBitmapFont
+'!Global g_font_match_m:TBitmapFont
 '!Global g_Object29:TImage
 '!Global g_Object30:TImage
-'!Global g_contractoffer_tplayer:TProfile
+'!Global g_profile:TProfile
 
 LogLine("CheckComManagement")
 If g_training_int03 <> 0 Then Return 0
@@ -176,14 +176,14 @@ If target <> Null
 	If heavy
 		TEngine.DoYourSubstitutionOff(0)
 		Return 0
-	Else If g_contractoffer_tplayer.energy < 6.0
+	Else If g_profile.energy < 6.0
 		TEngine.DoYourSubstitutionOff(0)
 		Return 0
 	Else
 		Local thresh:Int = 45
-		If g_contractoffer_tplayer.relationboss < 90 Then thresh = 50
-		If g_contractoffer_tplayer.relationboss < 60 Then thresh = 55
-		If g_contractoffer_tplayer.relationboss < 30 Then thresh = 60
+		If g_profile.relationboss < 90 Then thresh = 50
+		If g_profile.relationboss < 60 Then thresh = 55
+		If g_profile.relationboss < 30 Then thresh = 60
 		If target.matchstats.rating < thresh
 			TEngine.DoYourSubstitutionOff(0)
 			Return 0
@@ -205,9 +205,9 @@ Else
 			Local side:Int = h.GetShootingDirection()
 			Select side
 				Case -1
-					TScreenMessage.Create(0, 0, Lower(GetText("Substitution")), g_engine_int17 Shl 1, g_Object15, g_Object29, 1.0, "FFFFFF")
+					TScreenMessage.Create(0, 0, Lower(GetText("Substitution")), g_engine_int17 Shl 1, g_font_match_m, g_Object29, 1.0, "FFFFFF")
 				Case 1
-					TScreenMessage.Create(0, 0, Lower(GetText("Substitution")), g_engine_int17 Shl 1, g_Object15, g_Object30, 1.0, "FFFFFF")
+					TScreenMessage.Create(0, 0, Lower(GetText("Substitution")), g_engine_int17 Shl 1, g_font_match_m, g_Object30, 1.0, "FFFFFF")
 			End Select
 		EndIf
 	EndIf

@@ -32,8 +32,8 @@
 '  * `If ... And p` uses the object truth test (setne al / movzx eax,al), not `p <> Null`
 '    spelled as a cmp/je.
 	Function SkipTime:Int()
-		'!Global g_trainingon:Int
-		'!Global g_trainingmode:Int
+		'!Global g_intraining:Int
+		'!Global g_training_state:Int
 		'!Global g_matchstate:Int
 		'!Global g_engine_flag28:Int
 		'!Global g_engine_flag20:Int
@@ -49,8 +49,8 @@
 		If p And p.joy
 			p.joy.kickenabled = 0
 		End If
-		If g_trainingon <> 0
-			Select g_trainingmode
+		If g_intraining <> 0
+			Select g_training_state
 				Case 0
 					TTraining.StartChallenge()
 				Case 1

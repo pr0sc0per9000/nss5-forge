@@ -45,10 +45,10 @@
 		'!Global g_time:Int
 		'!Global g_snd_beep2:TSound
 		'!Global g_snd_beep1:TSound
-		'!Global g_chan_sfx:TChannel
+		'!Global g_object859:TChannel
 		'!Global g_train_scrollx:Float
 		'!Global g_train_scrollx2:Float
-		'!Global g_font_scroll:TBitmapFont
+		'!Global g_font_match_m:TBitmapFont
 		'!Global g_train_scrolltext:String
 		'!Global g_screen_w:Int
 		'!Global g_screen_top:Float
@@ -62,9 +62,9 @@
 					g_train_lasttick = g_time
 					g_train_counter :- 1
 					If g_train_counter < 6
-						PlaySound(g_snd_beep2, g_chan_sfx)
+						PlaySound(g_snd_beep2, g_object859)
 					Else
-						PlaySound(g_snd_beep1, g_chan_sfx)
+						PlaySound(g_snd_beep1, g_object859)
 					EndIf
 				EndIf
 				If g_train_counter <= 0
@@ -98,7 +98,7 @@
 		Else
 			g_train_scrollx2 = g_train_scrollx
 			g_train_scrollx = g_train_scrollx - 7.5
-			If g_train_scrollx < 0 - g_font_scroll.GetTxtWidth(g_train_scrolltext)
+			If g_train_scrollx < 0 - g_font_match_m.GetTxtWidth(g_train_scrolltext)
 				g_train_scrollx = g_screen_w
 				g_train_scrollx2 = g_screen_w
 			EndIf

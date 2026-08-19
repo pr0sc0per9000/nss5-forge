@@ -111,7 +111,7 @@
 		'!Global g_player_tplayer01:TPlayer
 		'!Global g_hometeam:TTeam
 		'!Global g_awayteam:TTeam
-		'!Global g_options_int06:Int
+		'!Global g_opt_playercam:Int
 		'!Global g_engine_int14:Int
 		'!Global g_engine_int15:Int
 		'!Global g_engine_int16:Int
@@ -174,13 +174,13 @@
 					campointy = Float(dy * g_engine_float01)
 				EndIf
 			EndIf
-			If (g_hometeam.newstarselno > -1 Or g_awayteam.newstarselno > -1) And g_options_int06 > 0 Then
+			If (g_hometeam.newstarselno > -1 Or g_awayteam.newstarselno > -1) And g_opt_playercam > 0 Then
 				Local human:TPlayer = TPlayer.GetHumanPlayer()
 				If human <> Null And human.selectionno < 11 Then
 					If TEngine.SetPiece() And (human = ball.setpiecetaker) Then
 					Else
 						If g_player_int01 <> 0 And g_player_int01 <> 7 And g_player_int01 <> 9 And g_player_int01 <> 10 Then
-							If g_options_int06 = 1 Then
+							If g_opt_playercam = 1 Then
 								campointx = human.x * g_engine_float01
 								campointy = human.y * g_engine_float01
 							Else
@@ -188,7 +188,7 @@
 								Local by:Float = ball.y
 								If g_training_int03 <> 0 Then TTraining.GetFocus(human, Varptr bx, Varptr by)
 								Local basef:Float = Float(g_engine_int163 - 100) / (TPitch.YardsToPixels(15.0) + Dist2D(bx, by, human.x, human.y))
-								If g_options_int06 = 2 Then
+								If g_opt_playercam = 2 Then
 									g_engine_float01 = g_engine_float01 + (basef - g_engine_float01) * g_campan_ratezoom2
 									ClampFloat(Varptr g_engine_float01, 0.75, 1.75)
 								Else

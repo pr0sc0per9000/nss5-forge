@@ -75,10 +75,10 @@
 '   by their content sitting at two different VAs in the original (0x004FB9F8 and
 '   0x004FBB47) rather than a shared target from one `Case 7,9` -- reproduced duplicated
 '   per law 4 (do not DRY).
-'!Global g_activeball:TBall
+'!Global g_ball:TBall
 '!Global g_player_int01:Int
 	Method CheckJoyAngle:Int()
-		If g_activeball <> Null And g_activeball.setpiecetaker <> Self Then Return 0
+		If g_ball <> Null And g_ball.setpiecetaker <> Self Then Return 0
 		Select g_player_int01
 		Case 3
 			If Self.x > 0.0

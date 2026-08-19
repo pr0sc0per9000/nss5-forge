@@ -79,7 +79,7 @@ EndIf
 If Not SetAudioDriver("OpenAL") Then SetAudioDriver("FreeAudio")
 
 g_Object857 = AllocChannel()
-g_Object858 = AllocChannel()
+g_musicchannel = AllocChannel()
 g_Object859 = AllocChannel()
 g_Object860 = LoadSoundChecked("GameMedia/Sounds/Cash.ogg", 0)
 g_Object861 = LoadSoundChecked("GameMedia/Sounds/Achievement.ogg", 0)

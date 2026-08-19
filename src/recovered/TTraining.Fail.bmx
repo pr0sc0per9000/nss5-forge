@@ -12,12 +12,12 @@
 ' harness mode=reloc, 17 addresses masked.
 	Function Fail:Int()
 		'!Global g_snd_fail:TSound
-		'!Global g_chan_sfx:TChannel
+		'!Global g_object859:TChannel
 		'!Global g_train_int05:Int
 		'!Global g_player_int01:Int
 		'!Global g_train_msg1:String
 		'!Global g_train_msg2:String
-		PlaySound(g_snd_fail, g_chan_sfx)
+		PlaySound(g_snd_fail, g_object859)
 		TScreenMessage.ClearAll(0)
 		g_train_int05 = 2
 		g_player_int01 = 11

@@ -16,7 +16,7 @@
 ' MATCH 651/651, reloc_masked=36. A BUILD_FAIL without them is a harness
 ' limitation (it cannot bind a Global from prose alone), not a body defect.
 	Method ValidateKeeperAnim:Int()
-		'!Global g_player_tplayer02:TBall
+		'!Global g_ball:TBall
 		'!Global g_player_arr01:Int[]
 		'!Global g_player_arr02:Int[]
 		'!Global g_player_arr19:Int[]
@@ -28,7 +28,7 @@
 		'!Global g_player_arr27:Int[]
 		'!Global g_player_arr28:Int[]
 		'!Global g_player_arr29:Int[]
-		If g_player_tplayer02.controlledby = Self And g_player_tplayer02.backpass = 0
+		If g_ball.controlledby = Self And g_ball.backpass = 0
 			If currentanim = g_player_arr01
 				currentanim = g_player_arr20
 			ElseIf currentanim = g_player_arr19
@@ -42,7 +42,7 @@
 			ElseIf currentanim = g_player_arr28
 				currentanim = g_player_arr29
 			EndIf
-		ElseIf g_player_tplayer02.controlledby <> Self
+		ElseIf g_ball.controlledby <> Self
 			If currentanim = g_player_arr20
 				currentanim = g_player_arr01
 			ElseIf currentanim = g_player_arr21

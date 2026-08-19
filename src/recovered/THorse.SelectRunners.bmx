@@ -27,7 +27,7 @@
 		'!Global g_horses:TList
 		'!Global g_runners:TList
 		'!Global g_stable_int26:Int
-		'!Global g_horse_profile:TProfile
+		'!Global g_profile:TProfile
 		LogLine("SelectRunners")
 		For Local h:THorse = EachIn g_horses
 			h.betamount = 0
@@ -42,7 +42,7 @@
 		g_runners.Clear()
 		Local n:Int = 0
 		For Local h:THorse = EachIn g_horses
-			If n < a0 And h.owned = 0 And h.lastran <> g_horse_profile.date.sdate
+			If n < a0 And h.owned = 0 And h.lastran <> g_profile.date.sdate
 				g_runners.AddLast(h)
 				n = n + 1
 				h.racenum = n

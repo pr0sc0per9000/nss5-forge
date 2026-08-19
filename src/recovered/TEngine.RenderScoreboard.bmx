@@ -39,8 +39,8 @@
 		'!Global g_joyactive:Int
 		'!Global g_homebadge:TImage
 		'!Global g_awaybadge:TImage
-		'!Global g_sbbar1:TImage
-		'!Global g_sbbar2:TImage
+		'!Global g_object872:TImage
+		'!Global g_object873:TImage
 		'!Global g_hometeam:TTeam
 		'!Global g_awayteam:TTeam
 		'!Global g_fixture:TFixture
@@ -107,9 +107,9 @@
 				yy = g_screen_h / 2 - 220
 				h = 36
 
-				DrawImageRect(g_sbbar1, 0, yy - 30, g_screen_w, 500, 0)
-				DrawImageRect(g_sbbar2, 0, yy - 32, g_screen_w, 4, 0)
-				DrawImageRect(g_sbbar2, 0, yy + 468, g_screen_w, 4, 0)
+				DrawImageRect(g_object872, 0, yy - 30, g_screen_w, 500, 0)
+				DrawImageRect(g_object873, 0, yy - 32, g_screen_w, 4, 0)
+				DrawImageRect(g_object873, 0, yy + 468, g_screen_w, 4, 0)
 
 				If g_homebadge <> Null And g_awaybadge <> Null
 					DrawImage(g_homebadge, xleft, yy - 58, 0)
@@ -270,9 +270,9 @@
 			Else
 
 				TPanel_Controls.RenderPauseReplay(g_screen_w - 142, 10)
-				DrawImageRect(g_sbbar1, 0, g_screen_h / 2 - 180, g_screen_w, 360, 0)
-				DrawImageRect(g_sbbar2, 0, g_screen_h / 2 - 182, g_screen_w, 4, 0)
-				DrawImageRect(g_sbbar2, 0, g_screen_h / 2 + 178, g_screen_w, 4, 0)
+				DrawImageRect(g_object872, 0, g_screen_h / 2 - 180, g_screen_w, 360, 0)
+				DrawImageRect(g_object873, 0, g_screen_h / 2 - 182, g_screen_w, 4, 0)
+				DrawImageRect(g_object873, 0, g_screen_h / 2 + 178, g_screen_w, 4, 0)
 				DrawMyText(g_hometeam.name, g_screen_w / 2, g_screen_h / 2 - 100, 1, 1, 1.0, g_sbalpha, "FFFFFF", 1)
 				DrawMyText(GetText("tla_Versus"), g_screen_w / 2, g_screen_h / 2, 1, 1, 1.0, g_sbalpha, "FFFFFF", 0)
 				DrawMyText(g_awayteam.name, g_screen_w / 2, g_screen_h / 2 + 100, 1, 1, 1.0, g_sbalpha, "FFFFFF", 1)

@@ -17,7 +17,7 @@
 ' (the current screen -- if none is set yet this one becomes active),
 ' 0x00C6EFDC / 0x00C6EFE0 Int (screen width / height).
 '
-' The help text is looked up as "help_" + Upper(name); GetText returns "@"+key when the key
+' The help text is looked up as "help_" + Lower(name); GetText returns "@"+key when the key
 ' is missing (see TLocale.GetLocaleText), which is exactly what StartsWith("@") tests.
 '!Global g_defaultbg:TImage
 '!Global g_curscreen:TScreen
@@ -36,6 +36,25 @@
 '   44 bytes and is exactly `return bbStringFind(x,y,0)!=-1` -- blitz_string.c:265 --
 '   while bbStringStartsWith/EndsWith are call-free loops and cannot call anything.
 '   With the row right, this body is MISMATCH as .StartsWith and MATCH as .Contains.
+'
+' The case call is .Lower, not .Upper -- the SAME defect class, one call further up the
+' same line. extracted/runtime_helpers.tsv names the call target 0x004A74E0
+' _brl_retro_Upper; decompiling it directly (0x004A7410 and 0x004A74E0 side by side,
+' both 190 bytes, both calling the shared allocator FUN_004a72d0 and otherwise identical
+' in shape) shows the two labels are swapped:
+'   0x004A7410 (labelled _brl_retro_Lower): `if (c-0x61 < 0x1a) c &= 0xFFDF` clears the
+'     0x20 bit on 'a'..'z' -- that RAISES case. This is Upper.
+'   0x004A74E0 (labelled _brl_retro_Upper): `if (c-0x41 < 0x1a) c |= 0x20` sets the
+'     0x20 bit on 'A'..'Z' -- that LOWERS case. This is Lower.
+' Confirmed against data: every one of the 33 `help_*` rows in
+' GameMedia/Languages/Languages.csv (help_newplayer, help_matchprep, help_mycontract,
+' ...) has its screen-name suffix in lowercase, matching every screen-name literal passed
+' to TScreen.CreateScreen (also all lowercase, e.g. "newplayer"). Lower(s.name) is a
+' no-op on those and the built key matches the CSV tag exactly; Upper(s.name) matches
+' none of them, so h.Contains("@") is always true and every screen's help falls back to
+' help_nohelp ("Sorry but there is no help for this screen!"). TMap keys strings via
+' bbStringCompare (blitz_string.c:238), a plain case-sensitive byte compare, so this is
+' not a false alarm from a case-insensitive lookup elsewhere.
 	Function CreateScreen:TScreen(a0:String, a1:TImage, a2:Int(), a3:Int())
 		LogLine("Create Screen:" + a0)
 		Local s:TScreen = New TScreen
@@ -50,7 +69,7 @@
 		If Not g_curscreen
 			TScreen.SetActive(a0, "")
 		EndIf
-		Local h:String = GetText("help_" + Upper(s.name))
+		Local h:String = GetText("help_" + Lower(s.name))
 		If h.Contains("@")
 			h = GetText("help_nohelp")
 		EndIf

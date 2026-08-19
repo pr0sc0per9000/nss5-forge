@@ -17,23 +17,23 @@
 	Function RenderKickToContinue:Int()
 		'!Global g_engine_screenw:Int
 		'!Global g_engine_screenh:Int
-		'!Global g_panel_controls_lbl:TLabel[]
+		'!Global g_panel_controls_kick:TLabel[]
 		'!Global g_options_controlmode:Int
 		'!Global g_options_buttons:Int[]
-		Local x:Int = Int(g_engine_screenw / 2 - (g_panel_controls_lbl[0].w + g_panel_controls_lbl[1].w) / 2.0)
+		Local x:Int = Int(g_engine_screenw / 2 - (g_panel_controls_kick[0].w + g_panel_controls_kick[1].w) / 2.0)
 		Local y:Int = g_engine_screenh - 42
-		g_panel_controls_lbl[0].x = x
-		g_panel_controls_lbl[0].y = y
-		g_panel_controls_lbl[1].x = x + 256
-		g_panel_controls_lbl[1].y = y
+		g_panel_controls_kick[0].x = x
+		g_panel_controls_kick[0].y = y
+		g_panel_controls_kick[1].x = x + 256
+		g_panel_controls_kick[1].y = y
 		Select g_options_controlmode
 			Case 0
-				g_panel_controls_lbl[1].SetText(TOptions.GetButtonLabel(g_options_buttons[0]), "", -1, -1)
-				g_panel_controls_lbl[1].SetIcon(Null)
+				g_panel_controls_kick[1].SetText(TOptions.GetButtonLabel(g_options_buttons[0]), "", -1, -1)
+				g_panel_controls_kick[1].SetIcon(Null)
 			Case 1
-				g_panel_controls_lbl[1].SetText("", "", -1, -1)
-				g_panel_controls_lbl[1].SetIcon(TOptions.GetButtonIcon(g_options_buttons[1], 1))
+				g_panel_controls_kick[1].SetText("", "", -1, -1)
+				g_panel_controls_kick[1].SetIcon(TOptions.GetButtonIcon(g_options_buttons[1], 1))
 		End Select
-		g_panel_controls_lbl[0].Draw()
-		g_panel_controls_lbl[1].Draw()
+		g_panel_controls_kick[0].Draw()
+		g_panel_controls_kick[1].Draw()
 	End Function

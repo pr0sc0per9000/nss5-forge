@@ -42,7 +42,7 @@
 '!Global g_player_int17:Int
 '!Global g_options_int15:Int
 '!Global g_options_int16:Int
-'!Global g_contractoffer_tplayer:TProfile
+'!Global g_profile:TProfile
 '!Global g_engine_int20:Int
 '!Global g_engine_int25:Int
 '!Global g_Object18:TTeam
@@ -103,7 +103,7 @@
 				Next
 				Local hum:TPlayer = TPlayer.GetHumanPlayer()
 				If hum <> Null And hum.teamid = Self.id And hum.selectionno < 11 And a1.setpiecetaker <> hum
-					If g_options_int15 = 1 And (Rand(4, 1) = 1 Or g_contractoffer_tplayer.captain Or g_contractoffer_tplayer.freekicks > g_contractoffer_tplayer.myclub.strength)
+					If g_options_int15 = 1 And (Rand(4, 1) = 1 Or g_profile.captain Or g_profile.freekicks > g_profile.myclub.strength)
 						a1.setpiecetaker = hum
 					ElseIf g_options_int15 = 0 And Rand(5, 1) = 1
 						a1.setpiecetaker = hum
@@ -128,7 +128,7 @@
 			Next
 			Local hum:TPlayer = TPlayer.GetHumanPlayer()
 			If hum <> Null And hum.teamid = Self.id And hum.selectionno < 11 And a1.setpiecetaker <> hum
-				If g_options_int16 = 1 And (Rand(4, 1) = 1 Or g_contractoffer_tplayer.captain Or g_contractoffer_tplayer.corners > g_contractoffer_tplayer.myclub.strength)
+				If g_options_int16 = 1 And (Rand(4, 1) = 1 Or g_profile.captain Or g_profile.corners > g_profile.myclub.strength)
 					a1.setpiecetaker = hum
 				ElseIf g_options_int16 = 0 And Rand(5, 1) = 1
 					a1.setpiecetaker = hum
@@ -156,7 +156,7 @@
 			Next
 			Local hum:TPlayer = TPlayer.GetHumanPlayer()
 			If hum <> Null And hum.teamid = Self.id And hum.selectionno < 11 And a1.setpiecetaker <> hum
-				If g_contractoffer_tplayer.penalties > g_contractoffer_tplayer.myclub.strength
+				If g_profile.penalties > g_profile.myclub.strength
 					a1.setpiecetaker = hum
 				EndIf
 			EndIf

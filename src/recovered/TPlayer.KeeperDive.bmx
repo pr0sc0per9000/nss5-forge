@@ -10,7 +10,7 @@
 
 	Method KeeperDive:Int(a0:TInterceptPoint,a1:Int)
 		'!Global g_player_float08:Float
-		'!Global g_player_tplayer02:TBall
+		'!Global g_ball:TBall
 		'!Global g_player_arr22:Int[]
 		'!Global g_player_arr23:Int[]
 		LogLine("KeeperDive:" + a1)
@@ -40,7 +40,7 @@
 				a0.intercept_AB = -1.0
 			End Select
 		Else
-			Local d:Float = Dist2D(Self.x,Self.y,g_player_tplayer02.lastkickedby.posxwhenkicked,g_player_tplayer02.lastkickedby.posywhenkicked)
+			Local d:Float = Dist2D(Self.x,Self.y,g_ball.lastkickedby.posxwhenkicked,g_ball.lastkickedby.posywhenkicked)
 			If d < TPitch.YardsToPixels(5.0)
 				a0.intercept_AB = Rnd(0.0,1.0)
 			EndIf

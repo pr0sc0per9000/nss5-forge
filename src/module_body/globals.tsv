@@ -6,7 +6,7 @@ g_screen_int20	Int	0x00C6EFD8 -- boot MilliSecs(), also the RNG seed
 g_engine_int167	Int	0x00C6F034 -- fixed-timestep accumulator; starts at one full tick, not 0
 g_timestepMs	Int	0x00C6F02C -- the fixed timestep itself, statically 25 (40 Hz)
 g_Object857	TChannel	0x00C6F088
-g_Object858	TChannel	0x00C6F08C
+g_musicchannel	TChannel	0x00C6F08C -- the MUSIC channel, and it must be allocated here. PlayTrack only reaches its own AllocChannel in the ElseIf; when music volume is 0 it takes the `If a0 = 0 Or g_musicvol = 0` branch, which merely Stops the channel. TEngine.ResumeSounds then does ResumeChannel on this slot unconditionally, and BRL's ResumeChannel is a bare `channel.SetPaused False`. Named g_Object858 here until the split with g_musicchannel was closed; the two were one slot all along, so with music=0 the boot allocation landed on a Global no reader used and the first training crashed.
 g_Object859	TChannel	0x00C6F090
 g_Object860	TSound	0x00C6F0D4 -- GameMedia/Sounds/Cash.ogg
 g_Object861	TSound	0x00C6F124 -- GameMedia/Sounds/Achievement.ogg

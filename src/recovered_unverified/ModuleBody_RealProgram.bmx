@@ -126,7 +126,7 @@ EndIf
 ' logic Update() fires immediately on the first pass through GameMain's catch-up loop,
 ' before the first Render() -- the world gets one tick of head start before anything is
 ' ever drawn. Not asserted in main-loop.md; flagged here for whoever owns that document.
-Global g_contractoffer_tplayer:TProfile = New TProfile     ' 0x00C6F028
+Global g_profile:TProfile = New TProfile     ' 0x00C6F028
 Global g_engine_int167:Int = g_timestepMs                   ' 0x00C6F034 = 0x00C6F02C (=25)
 
 ' Logs the active/default graphics driver's name before driver selection below.
@@ -159,7 +159,7 @@ If Not SetAudioDriver("OpenAL")
 EndIf
 
 Global g_Object857:TChannel = AllocChannel()   ' 0x00C6F088
-Global g_Object858:TChannel = AllocChannel()   ' 0x00C6F08C
+Global g_musicchannel:TChannel = AllocChannel()   ' 0x00C6F08C
 Global g_Object859:TChannel = AllocChannel()   ' 0x00C6F090
 Global g_Object860:TSound = LoadSoundChecked("GameMedia/Sounds/Cash.ogg", 0)          ' 0x00C6F0D4
 Global g_Object861:TSound = LoadSoundChecked("GameMedia/Sounds/Achievement.ogg", 0)   ' 0x00C6F124

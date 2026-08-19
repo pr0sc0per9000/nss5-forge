@@ -25,9 +25,9 @@
 	Function UpdateDesiredCombos:Int()
 		'!Global g_profile:TProfile
 		'!Global g_cmb1:TCombo
-		'!Global g_cmb2:TCombo
+		'!Global g_mc_cmb_nation:TCombo
 		'!Global g_cmb3:TCombo
-		'!Global g_cmb4:TCombo
+		'!Global g_mc_cmb_club:TCombo
 		'!Global g_continents:TList
 		LogLine("UpdateDesiredCombos")
 		If g_cmb1.CountItems() = 0
@@ -51,13 +51,13 @@
 		g_cmb1.SelectItemById(co)
 		ComboContinent()
 		If na > 0
-			g_cmb2.SelectItemById(na)
+			g_mc_cmb_nation.SelectItemById(na)
 			ComboNation()
 			If le > 0
 				g_cmb3.SelectItemById(le)
 				ComboDivision()
 				If cl > 0
-					g_cmb4.SelectItemById(cl)
+					g_mc_cmb_club.SelectItemById(cl)
 					ComboClub()
 				EndIf
 			EndIf

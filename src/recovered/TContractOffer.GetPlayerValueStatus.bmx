@@ -32,36 +32,36 @@
 '   - the final cap-at-90 result is a FRESH Float Local declared after `value`/`clubstrength`
 '     (last-declared Float Local stays x87-resident, never spilled -- codegen-patterns.md
 '     6/10.5) -- reusing `value` for the cap forces a spill/reload the original does not have.
-'!Global g_contractoffer_tplayer:TProfile
-Local year:Int = g_contractoffer_tplayer.date.GetYear()
-Local week:Int = g_contractoffer_tplayer.date.GetWeek()
+'!Global g_profile:TProfile
+Local year:Int = g_profile.date.GetYear()
+Local week:Int = g_profile.date.GetWeek()
 Local value:Float
 If week <= 10
 	If year = 1
 		value = 0.5
 	Else
-		value = g_contractoffer_tplayer.GetStat(18, 3, g_contractoffer_tplayer.clubid, year - 1)
+		value = g_profile.GetStat(18, 3, g_profile.clubid, year - 1)
 	EndIf
 Else
-	value = g_contractoffer_tplayer.GetStat(18, 3, 0, year)
+	value = g_profile.GetStat(18, 3, 0, year)
 EndIf
 
 Local clubstrength:Float
-If g_contractoffer_tplayer.onloanfrom > 0
-	clubstrength = TClub.SelectById(g_contractoffer_tplayer.onloanfrom).strength
+If g_profile.onloanfrom > 0
+	clubstrength = TClub.SelectById(g_profile.onloanfrom).strength
 Else
-	clubstrength = g_contractoffer_tplayer.myclub.strength
+	clubstrength = g_profile.myclub.strength
 EndIf
 
 LogLine(">>> avgrating = " + value)
 
 value = value * 5.0
 
-value = value + g_contractoffer_tplayer.GetSkillRating()
-LogLine(">>> skills = " + g_contractoffer_tplayer.GetSkillRating())
+value = value + g_profile.GetSkillRating()
+LogLine(">>> skills = " + g_profile.GetSkillRating())
 
-value = value + g_contractoffer_tplayer.GetFame()
-LogLine(">>> fame = " + g_contractoffer_tplayer.GetFame())
+value = value + g_profile.GetFame()
+LogLine(">>> fame = " + g_profile.GetFame())
 
 LogLine(">>> clubstrength = " + clubstrength)
 

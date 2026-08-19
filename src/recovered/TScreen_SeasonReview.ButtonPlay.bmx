@@ -16,25 +16,25 @@
 ' The achievements scan is `For n:Int = EachIn <array>` -- the pointer walk over
 ' data(+0x18) .. data+size(+0x10) is the array EachIn form, not an index loop.
 	Function ButtonPlay:Int()
-		'!Global g_contractoffer_tplayer:TProfile
+		'!Global g_profile:TProfile
 		'!Global g_stats_comboclub:TCombo
 		LogLine("TScreen_SeasonReview.ButtonPlay")
-		LogLine("My Age:" + g_contractoffer_tplayer.GetAge())
-		LogLine("Year:" + g_contractoffer_tplayer.date.GetYear())
-		If g_contractoffer_tplayer.transferlisted = 4 Then g_contractoffer_tplayer.CancelLoan()
-		If g_contractoffer_tplayer.date.GetYear() > 20
+		LogLine("My Age:" + g_profile.GetAge())
+		LogLine("Year:" + g_profile.date.GetYear())
+		If g_profile.transferlisted = 4 Then g_profile.CancelLoan()
+		If g_profile.date.GetYear() > 20
 			Local ok:Int = 1
-			For Local n:Int = EachIn g_contractoffer_tplayer.achievements
+			For Local n:Int = EachIn g_profile.achievements
 				If n = 0 Then ok = 0
 			Next
 			If ok
-				TScreen.DoMessage(GetText("CMESSAGE_RETIREMENTLEGEND").Replace("$playername", g_contractoffer_tplayer.GetOriginalName()), 0, 0)
+				TScreen.DoMessage(GetText("CMESSAGE_RETIREMENTLEGEND").Replace("$playername", g_profile.GetOriginalName()), 0, 0)
 			Else
 				TScreen.DoMessage(GetText("CMESSAGE_RETIREMENT"), 0, 0)
 			End If
-			g_contractoffer_tplayer.retired = 1
-			g_contractoffer_tplayer.SaveGame("")
-			g_contractoffer_tplayer.transferlisted = 0
+			g_profile.retired = 1
+			g_profile.SaveGame("")
+			g_profile.transferlisted = 0
 			TScreen_Stats.SetUpScreen()
 			g_stats_comboclub.SelectItemById(0)
 			TScreen_Stats.ComboClub()
@@ -42,31 +42,31 @@
 		End If
 		TCompetition.SetUpCompetitionsAll()
 		TScreen_GameMenu.UpdateNavPanel()
-		g_contractoffer_tplayer.CreateNewClubStats(g_contractoffer_tplayer.myclub.id)
-		g_contractoffer_tplayer.CreateNewInternationalStats()
-		g_contractoffer_tplayer.UpdateEnergy(100.0)
-		g_contractoffer_tplayer.injury = 0
-		g_contractoffer_tplayer.currentyellowsclub = 0
-		g_contractoffer_tplayer.currentyellowscontinent = 0
-		If g_contractoffer_tplayer.date.GetYear() Mod 2 = 1
-			g_contractoffer_tplayer.currentyellowsinternational = 0
+		g_profile.CreateNewClubStats(g_profile.myclub.id)
+		g_profile.CreateNewInternationalStats()
+		g_profile.UpdateEnergy(100.0)
+		g_profile.injury = 0
+		g_profile.currentyellowsclub = 0
+		g_profile.currentyellowscontinent = 0
+		If g_profile.date.GetYear() Mod 2 = 1
+			g_profile.currentyellowsinternational = 0
 		End If
-		If g_contractoffer_tplayer.date.GetYear() = 2
+		If g_profile.date.GetYear() = 2
 			TScreen.DoMessage(GetText("CMESSAGE_HISTORYBUTTON"), 0, 0)
 		End If
-		If g_contractoffer_tplayer.GetAge() >= 30
-			If g_contractoffer_tplayer.GetAge() = 30
+		If g_profile.GetAge() >= 30
+			If g_profile.GetAge() = 30
 				TScreen.DoMessage(GetText("CMESSAGE_GETTINGOLD"), 0, 0)
 			End If
-			Local cap:Int = g_contractoffer_tplayer.GetPaceCap()
-			If g_contractoffer_tplayer.pace > cap
-				g_contractoffer_tplayer.SetAbility(1, cap)
+			Local cap:Int = g_profile.GetPaceCap()
+			If g_profile.pace > cap
+				g_profile.SetAbility(1, cap)
 			End If
-			If g_contractoffer_tplayer.dribbling > cap
-				g_contractoffer_tplayer.SetAbility(2, cap)
+			If g_profile.dribbling > cap
+				g_profile.SetAbility(2, cap)
 			End If
 		End If
-		If g_contractoffer_tplayer.date.GetYear() = 20
+		If g_profile.date.GetYear() = 20
 			TScreen.DoMessage(GetText("CMESSAGE_LASTSEASON"), 0, 0)
 		End If
 		TScreen_Leagues.SetUpScreen(0)

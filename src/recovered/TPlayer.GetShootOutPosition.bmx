@@ -34,7 +34,7 @@
 ' not an If/ElseIf cascade.  The ball test is the bare-truth form `If g_shootout_ball`
 ' (setne al / movzx / cmp 0), not `<> Null`.  The sign flip is `px * -1` (imul ebx,ebx,-1),
 ' not `-px` (which would be `neg`).
-'!Global g_shootout_ball:TBall
+'!Global g_ball:TBall
 '!Global g_shootout_team:TTeam
 '!Global g_shootout_xoff:Float = 180.0
 '!Global g_shootout_yoff:Float = 180.0
@@ -47,9 +47,9 @@
 			Self.UpdateKeeperPosition()
 			Return 0
 		End If
-		If g_shootout_ball And g_shootout_ball.setpiecetaker = Self
-			Self.desx = g_shootout_ball.setpiecex + Cos(Self.joy.direction + g_shootout_xoff) * TPitch.YardsToPixels(0.5)
-			Self.desy = g_shootout_ball.setpiecey + Sin(Self.joy.direction + g_shootout_yoff) * TPitch.YardsToPixels(0.5)
+		If g_ball And g_ball.setpiecetaker = Self
+			Self.desx = g_ball.setpiecex + Cos(Self.joy.direction + g_shootout_xoff) * TPitch.YardsToPixels(0.5)
+			Self.desy = g_ball.setpiecey + Sin(Self.joy.direction + g_shootout_yoff) * TPitch.YardsToPixels(0.5)
 			Return 0
 		End If
 		Local px:Int = Int(TPitch.YardsToPixels(5.0) + TPitch.YardsToPixels(Self.selectionno))

@@ -11,6 +11,6 @@
 
 	Function Lose:Int()
 		'!Global g_snd_lose:TSound
-		'!Global g_chan_sfx:TChannel
-		PlaySound(g_snd_lose, g_chan_sfx)
+		'!Global g_object859:TChannel
+		PlaySound(g_snd_lose, g_object859)
 	End Function

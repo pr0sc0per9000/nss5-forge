@@ -19,7 +19,7 @@
 '!Global g_screen_leagues_table:TTable
 '!Global g_Object467:TCombo
 '!Global g_screen_leagues_comp:TCompetition
-'!Global g_contractoffer_tprofile:TProfile
+'!Global g_profile:TProfile
 g_screen_leagues_table.ClearItems()
 If g_screen_leagues_comp <> Null And g_screen_leagues_comp.teampool Then
 	Select g_screen_leagues_comp.comptype
@@ -36,15 +36,15 @@ If g_screen_leagues_comp <> Null And g_screen_leagues_comp.teampool Then
 		row = row + 1
 	Next
 	g_screen_leagues_comp.PaintPromotionPlaces(g_screen_leagues_table)
-	g_screen_leagues_table.SelectItemByText(g_contractoffer_tprofile.myclub.labelshortname, 1)
+	g_screen_leagues_table.SelectItemByText(g_profile.myclub.labelshortname, 1)
 	If g_screen_leagues_table.selecteditem = -1 Then
-		g_screen_leagues_table.SelectItemByText(g_contractoffer_tprofile.myclub.labelname, 1)
+		g_screen_leagues_table.SelectItemByText(g_profile.myclub.labelname, 1)
 	End If
 	If g_screen_leagues_table.selecteditem = -1 Then
-		g_screen_leagues_table.SelectItemByText(g_contractoffer_tprofile.myclub.tla, 1)
+		g_screen_leagues_table.SelectItemByText(g_profile.myclub.tla, 1)
 	End If
 	Local c:TClub = TClub.SelectById(g_Object467.GetSelectedItemId())
-	If c <> Null And c <> g_contractoffer_tprofile.myclub Then
+	If c <> Null And c <> g_profile.myclub Then
 		g_screen_leagues_table.SelectItemByText(c.labelshortname, 1)
 		If g_screen_leagues_table.selecteditem = -1 Then
 			g_screen_leagues_table.SelectItemByText(c.labelname, 1)

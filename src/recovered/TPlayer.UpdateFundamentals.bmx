@@ -15,31 +15,31 @@
 		'!Global g_player_int01:Int
 		'!Global g_player_int32:Int
 		'!Global g_player_int33:Int
-		'!Global g_player_tplayer02:TBall
+		'!Global g_ball:TBall
 		Self.directiontogoal_own = Int(AngleTo(Self.x, Self.y, 0, Float(g_player_int17 * -Self.GetShootingDirection())))
 		Self.distancetogoal_own = Int(Dist2D(Self.x, Self.y, 0, Float(g_player_int17 * -Self.GetShootingDirection())))
 		Self.directiontogoal_opp = Int(AngleTo(Self.x, Self.y, 0, Float(g_player_int17 * Self.GetShootingDirection())))
 		Self.distancetogoal_opp = Int(Dist2D(Self.x, Self.y, 0, Float(g_player_int17 * Self.GetShootingDirection())))
-		If g_player_tplayer02 <> Null Then
-			Self.distancetoball = Dist2D(Self.x, Self.y, g_player_tplayer02.x, g_player_tplayer02.y)
+		If g_ball <> Null Then
+			Self.distancetoball = Dist2D(Self.x, Self.y, g_ball.x, g_ball.y)
 			If Self.distancetoball > 1.0 Then
-				Self.directiontoball = Int(AngleTo(Self.x, Self.y, g_player_tplayer02.x, g_player_tplayer02.y))
+				Self.directiontoball = Int(AngleTo(Self.x, Self.y, g_ball.x, g_ball.y))
 			EndIf
-			Self.distancetometaball = Dist2D(Self.x, Self.y, g_player_tplayer02.metax, g_player_tplayer02.metay)
-			Self.directiontometaball = Int(AngleTo(Self.x, Self.y, g_player_tplayer02.metax, g_player_tplayer02.metay))
+			Self.distancetometaball = Dist2D(Self.x, Self.y, g_ball.metax, g_ball.metay)
+			Self.directiontometaball = Int(AngleTo(Self.x, Self.y, g_ball.metax, g_ball.metay))
 			Self.goalside = 0
-			If Self.distancetogoal_own < Dist2D(g_player_tplayer02.x, g_player_tplayer02.y, 0, Float(g_player_int17 * -Self.GetShootingDirection())) Then
+			If Self.distancetogoal_own < Dist2D(g_ball.x, g_ball.y, 0, Float(g_player_int17 * -Self.GetShootingDirection())) Then
 				Self.goalside = 1
 			EndIf
 			Self.jumpspotgood = 0
-			If g_player_tplayer02.jumpx <> 0.0 And Self.distancetoball < Float(g_player_int32 Shl 1) And Dist2D(Self.x, Self.y, g_player_tplayer02.jumpx, g_player_tplayer02.jumpy) < g_player_int32 And g_player_tplayer02.z > Float(g_player_int33) Then
+			If g_ball.jumpx <> 0.0 And Self.distancetoball < Float(g_player_int32 Shl 1) And Dist2D(Self.x, Self.y, g_ball.jumpx, g_ball.jumpy) < g_player_int32 And g_ball.z > Float(g_player_int33) Then
 				Self.jumpspotgood = 1
 			Else
-				If g_player_tplayer02.divex <> 0.0 And Self.distancetoball < Float(g_player_int32 Shl 1) And Dist2D(Self.x, Self.y, g_player_tplayer02.divex, g_player_tplayer02.divey) < g_player_int32 And g_player_tplayer02.z > Float(g_player_int33) * 0.5 Then
+				If g_ball.divex <> 0.0 And Self.distancetoball < Float(g_player_int32 Shl 1) And Dist2D(Self.x, Self.y, g_ball.divex, g_ball.divey) < g_player_int32 And g_ball.z > Float(g_player_int33) * 0.5 Then
 					Self.jumpspotgood = 1
 				EndIf
 			EndIf
-			Self.passison = g_player_tplayer02.CanSeePlayer(Self)
+			Self.passison = g_ball.CanSeePlayer(Self)
 		EndIf
 		If g_player_int01 <> 8 Then
 			Self.bonus = 0

@@ -140,7 +140,7 @@
 
 '!Global g_training_int03:Int
 '!Global g_player_int01:Int
-'!Global g_player_tplayer02:TBall
+'!Global g_ball:TBall
 '!Global g_player_int50:Int
 '!Global g_player_int16:Int
 '!Global g_engine_int20:Int
@@ -163,7 +163,7 @@ If g_training_int03 <> 0
 		EndIf
 	EndIf
 Else
-	If TEngine.SetPiece() And g_player_tplayer02.setpiecetaker = Self
+	If TEngine.SetPiece() And g_ball.setpiecetaker = Self
 		Select g_player_int01
 			Case 2
 				Self.PassAI()

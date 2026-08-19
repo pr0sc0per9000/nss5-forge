@@ -8,8 +8,15 @@
 '     a String, i.e. formation:TFormation with TFormation.name at +0x08.
 '   0x00C677D8 :Int, 0x00C677DC :Int (globals_final calls the latter TPlayer -- it is
 '     compared `> 0` and `= 0` with a bare dword, so it is an Int).
-'   0x00C5B22C :TPlayer, field +0x3C = unhappiness (NOT selectionno at +0xBC -- that
-'     spelling is 3 bytes long and was the only divergence in the first draft).
+'   0x00C5B22C :TFixture, field +0x3C = level. An Int compare at +0x3C against 1 compiles
+'     identically regardless of field name, so byte length alone cannot pick between
+'     TPlayer.unhappiness and TFixture.level -- both sit at offset 0x3C (object_model.json).
+'     TEngine.SetUpMatch.bmx settles the type: it constructs this address directly
+'     (`g_fixture = a0:TFixture`) and reads +0xc/+0x10/+0x18/+0x3c/+0x40/+0x50 through it,
+'     all TFixture's own fields; TEngine.MatchOver.bmx independently corroborates +0xc
+'     matchtype, +0x28 resulttype, +0x2c score1, +0x30 score2 and slot 0x78. Aliased to
+'     g_fixture in extracted/global_alias_overrides.tsv; kept as `g_engine_tplayer` at the
+'     source level per that file's evidence trail.
 '   0x00C6E91C is a STRING (a colour), not the Int globals_final claims -- it is pushed
 '     straight into TGadget.SetColour($,$).
 '   TGadget slots 0x54 Hide, 0x58 Show, 0x6C SetColour, 0x70 SetAlph; +0x38 alive.
@@ -22,7 +29,7 @@
 		'!Global g_screen_formation_team:TTeam
 		'!Global g_screen_formation_int05:Int
 		'!Global g_screen_formation_int06:Int
-		'!Global g_engine_tplayer:TPlayer
+		'!Global g_engine_tplayer:TFixture
 		'!Global g_screen_stable_colour:String
 		For Local b:TButton = EachIn g_screen_formation_screen.gadgetlist
 			Select b.name
@@ -76,7 +83,7 @@
 						b.SetColour(g_screen_stable_colour, "FFFFFF")
 					End If
 					b.alive = 1
-					If g_engine_tplayer.unhappiness = 1 Or g_screen_formation_int05 Or g_screen_formation_int06 > 0
+					If g_engine_tplayer.level = 1 Or g_screen_formation_int05 Or g_screen_formation_int06 > 0
 						b.alive = 0
 					End If
 			End Select

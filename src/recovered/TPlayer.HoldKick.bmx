@@ -24,7 +24,7 @@
 '!Global g_player_int01:Int
 '!Global g_player_int14:Int
 '!Global g_player_int15:Int
-'!Global g_player_tplayer02:TBall
+'!Global g_ball:TBall
 
 	Method HoldKick()
 		If Self.newstar And g_player_int14 = 1
@@ -58,15 +58,15 @@
 		If g_player_int01 = 5
 			Select Rand(2)
 				Case 1
-					g_player_tplayer02.Kick(Self, Self.kickdirection, Self.kickpower, 3, 0)
+					g_ball.Kick(Self, Self.kickdirection, Self.kickpower, 3, 0)
 				Case 2
-					g_player_tplayer02.Kick(Self, Self.kickdirection, Self.kickpower, 2, 0)
+					g_ball.Kick(Self, Self.kickdirection, Self.kickpower, 2, 0)
 			End Select
 		Else
 			If Self.distancetogoal_opp > TPitch.YardsToPixels(30.0)
-				g_player_tplayer02.Kick(Self, Self.kickdirection, Self.kickpower, 3, 0)
+				g_ball.Kick(Self, Self.kickdirection, Self.kickpower, 3, 0)
 			Else
-				g_player_tplayer02.Kick(Self, Self.kickdirection, Self.kickpower, 2, 0)
+				g_ball.Kick(Self, Self.kickdirection, Self.kickpower, 2, 0)
 			End If
 		End If
 	End Method

@@ -11,7 +11,7 @@
 ' Fields used (TPlayer): joy:TJoy (+0x158), x/y (+0x4c/+0x50), desx/desy (+0x7c/+0x80,
 ' both Float), selectionno (+0xbc), jumpspotgood (+0xdc), directiontogoal_opp (+0xe0),
 ' teamid (+0x14). TJoy: axis_x/axis_y (+8/+0xc), force (+0x10), direction (+0x14).
-' TBall: active (+0xc), controlledby:TPlayer (+0x70). TPlayer.teamid read off
+' TBall: controlledby:TPlayer (+0x70). TFixture: matchtype (+0xc). TPlayer.teamid read off
 ' g_match_ball.controlledby to compare against Self.teamid.
 '
 ' Globals (construction-site/usage typed):
@@ -23,11 +23,12 @@
 '     name established by TPlayer.UpdateMovement.bmx.
 '   g_match_ball:TBall (0x00C5DEA4) -- "the ball", name established across the TPlayer/TBall
 '     corpus (globals_corrections.tsv).
-'   g_engine_tball:TBall (0x00C5B22C) -- ALSO the ball, a second Global pointing at the same
-'     kind of object; +0xC is read and compared to 1, which is TBall.active (TPlayer+0xC is
-'     imgPlayer:TImage, ruled out the same way TPlayer.UpdateMovement.bmx documents for this
-'     exact address). Kept as a separate Global from g_match_ball because nothing here proves
-'     they are the same instance.
+'   g_engine_tball -> g_fixture:TFixture (0x00C5B22C) -- +0xC is read and compared to 1,
+'     which is TFixture.matchtype (object_model.json), the same field TEngine.SetUpMatch.bmx
+'     and TEngine.MatchOver.bmx establish for this address from the constructing assignment
+'     `g_fixture = a0:TFixture` plus five further corroborating field offsets. Aliased to
+'     g_fixture in extracted/global_alias_overrides.tsv; kept as `g_engine_tball` at the
+'     source level per that file's evidence trail.
 '
 ' Module Functions called: AngleTo(f,f,f,f) [src/recovered_module/AngleTo.bmx],
 ' Dist2D(f,f,f,f) [src/recovered_module/Dist2D.bmx, table in codegen-patterns.md section 7].
@@ -45,7 +46,7 @@
 '     called when PlayerDiving() returned 0.
 '   * The 4-term guard `g_match_ball<>Null And PlayerDiving()=0 And PlayerSliding()=0 And
 '     selectionno<11` and the inner `g_player_int01=8 Or (g_player_int01=11 And
-'     g_engine_tball.active<>1)` are both short-circuit chains built by reusing eax as an
+'     g_engine_tball.matchtype<>1)` are both short-circuit chains built by reusing eax as an
 '     accumulator -- confirmed by walking every cmp/je, not inferred from Ghidra's C.
 '   * axis_x/axis_y MUST be written `Cos(direction) * force` / `Sin(direction) * force`, NOT
 '     `force * Cos(direction)`. bcc evaluates left-to-right and only spills a value across a
@@ -62,8 +63,8 @@
 	Method UpdateJoyAI:Int()
 		'!Global g_player_int01:Int
 		'!Global g_player_int17:Int
-		'!Global g_match_ball:TBall
-		'!Global g_engine_tball:TBall
+		'!Global g_ball:TBall
+		'!Global g_engine_tball:TFixture
 
 		Self.joy.Clear()
 		If TEngine.SetPiece()
@@ -97,13 +98,13 @@
 		EndIf
 		Self.joy.axis_x = Cos(Self.joy.direction) * Self.joy.force
 		Self.joy.axis_y = Sin(Self.joy.direction) * Self.joy.force
-		If g_match_ball <> Null And Self.PlayerDiving() = 0 And Self.PlayerSliding() = 0 And Self.selectionno < 11
-			If g_player_int01 = 8 Or (g_player_int01 = 11 And g_engine_tball.active <> 1)
+		If g_ball <> Null And Self.PlayerDiving() = 0 And Self.PlayerSliding() = 0 And Self.selectionno < 11
+			If g_player_int01 = 8 Or (g_player_int01 = 11 And g_engine_tball.matchtype <> 1)
 				Self.DoCelebrations()
 				Return 0
 			EndIf
 			If Self.selectionno = 0
-				If g_match_ball.controlledby = Self
+				If g_ball.controlledby = Self
 					Self.DoKickingAI()
 					Return 0
 				EndIf
@@ -112,15 +113,15 @@
 					Return 0
 				EndIf
 			EndIf
-			If g_match_ball.controlledby = Null And Self.jumpspotgood
+			If g_ball.controlledby = Null And Self.jumpspotgood
 				Self.DoHeadingAI()
 				Return 0
 			EndIf
-			If g_match_ball.controlledby = Self
+			If g_ball.controlledby = Self
 				Self.DoKickingAI()
 				Return 0
 			EndIf
-			If g_match_ball.controlledby <> Null And g_match_ball.controlledby.teamid <> Self.teamid
+			If g_ball.controlledby <> Null And g_ball.controlledby.teamid <> Self.teamid
 				Self.DoTacklingAI()
 				Return 0
 			EndIf

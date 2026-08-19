@@ -31,7 +31,7 @@
 ' are Ghidra's rendering of BlitzMax's short-circuit And, not real Locals.
 	Method Compare:Int(a0:Object)
 		'!Global g_club_int01:Int
-		'!Global g_contractoffer_tplayer:TProfile
+		'!Global g_profile:TProfile
 		Select g_club_int01
 			Case 1
 				If id > TClub(a0).id Then Return 1
@@ -70,9 +70,9 @@
 			Case 35
 				Local v0:Float = strength
 				Local v1:Float = TClub(a0).strength
-				If strength < 80 And nationid = g_contractoffer_tplayer.myclub.nationid And TClub(a0).nationid <> g_contractoffer_tplayer.myclub.nationid
+				If strength < 80 And nationid = g_profile.myclub.nationid And TClub(a0).nationid <> g_profile.myclub.nationid
 					v0 = v0 + 1.0
-				Else If TClub(a0).strength < 80 And TClub(a0).nationid = g_contractoffer_tplayer.myclub.nationid And nationid <> g_contractoffer_tplayer.myclub.nationid
+				Else If TClub(a0).strength < 80 And TClub(a0).nationid = g_profile.myclub.nationid And nationid <> g_profile.myclub.nationid
 					v1 = v1 + 1.0
 				EndIf
 				If v0 > v1 Then Return 1

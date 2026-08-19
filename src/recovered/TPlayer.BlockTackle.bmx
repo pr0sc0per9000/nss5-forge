@@ -10,17 +10,17 @@
 '   0x00C6AFC0 = TParticle class table + 0x38 = StarShower(i,i,$,$)
 
 	Method BlockTackle:Int()
-		'!Global g_activeball:TBall
+		'!Global g_ball:TBall
 		LogLine("BlockTackle")
-		If g_activeball.controlledby <> Null
-			If g_activeball.controlledby.selectionno = 0 Then Return 0
-			g_activeball.controlledby.DoAnimFall()
+		If g_ball.controlledby <> Null
+			If g_ball.controlledby.selectionno = 0 Then Return 0
+			g_ball.controlledby.DoAnimFall()
 		EndIf
 		Self.AddStat(8,0,0,0,0)
-		g_activeball.NewController(Self)
+		g_ball.NewController(Self)
 		Self.kickpower = 5.0
 		Self.DoAnimKick(Int(Self.kickpower))
-		g_activeball.Kick(Self,Self.directiontoball,Self.kickpower,1,-1)
+		g_ball.Kick(Self,Self.directiontoball,Self.kickpower,1,-1)
 		If Self.newstar <> 0
 			TParticle.StarShower(Int(Self.x),Int(Self.y),Lower(GetText("Tackle")),"FF0099")
 		EndIf

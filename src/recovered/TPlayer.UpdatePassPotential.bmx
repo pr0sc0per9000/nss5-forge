@@ -55,7 +55,7 @@
 		'!Global g_player_int16:Int
 		'!Global g_player_int17:Int
 		'!Global g_engine_int104:Int
-		'!Global g_contractoffer_tplayer:TProfile
+		'!Global g_profile:TProfile
 		If Self.matchstats.reds Or Self.selectionno < 1 Or Self.selectionno > 10
 			Self.passpotential = 0
 			Return 0
@@ -202,10 +202,10 @@
 				Self.passpotential :- 1
 			EndIf
 			If Self.newstar And Self.calling
-				If g_contractoffer_tplayer.relationteam > 60
+				If g_profile.relationteam > 60
 					Self.passpotential :+ 2
 				Else
-					If g_contractoffer_tplayer.relationteam > 30
+					If g_profile.relationteam > 30
 						Self.passpotential :+ 1
 					EndIf
 				EndIf

@@ -133,7 +133,7 @@
 '!Raw Function UploadLeaderboardScore(mode:Int, value:Int, name:Byte Ptr)
 '!Raw End Extern
 '!Global g_profile_int43:Int
-'!Global g_contractoffer_tplayer:TProfile
+'!Global g_profile:TProfile
 	If g_profile_int43 <> 1 Then
 		Print "Steamstate offline!"
 		Return 0
@@ -148,8 +148,8 @@
 		s = String.FromCString(ReadSteam())
 		If s.length > 0 Then Print s
 		If s = "leaderboard:found" Then
-			Local g:TProfile = g_contractoffer_tplayer
-			Local q:Byte Ptr = g_contractoffer_tplayer.name.ToCString()
+			Local g:TProfile = g_profile
+			Local q:Byte Ptr = g_profile.name.ToCString()
 			UploadLeaderboardScore(2, g.GetValue(), q)
 			MemFree q
 		EndIf

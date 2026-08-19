@@ -39,8 +39,8 @@
 '   Every `Case 0 / Case 1` on g_player_int14 is a Select, not If/ElseIf (sec 10.2): the
 '   subject is loaded once and both compares are emitted back to back.
 '
-'!Global g_ctl_panel:TPanel
-'!Global g_ctl_lbl:TLabel[]
+'!Global g_panel_controls_pan:TPanel
+'!Global g_panel_controls_lbl:TLabel[]
 '!Global g_key_a:Int[]
 '!Global g_key_b:Int[]
 '!Global g_key_c:Int[]
@@ -55,18 +55,18 @@
 '!Global g_training_int03:Int
 '!Global g_training_int05:Int
 Local yspace:Int = 34
-g_ctl_panel.SetPosition(Int(a0), Int(a1), 1)
-g_ctl_panel.Draw()
+g_panel_controls_pan.SetPosition(Int(a0), Int(a1), 1)
+g_panel_controls_pan.Draw()
 a0 :+ 6.0
 a1 :+ 34.0
 For Local i:Int = 0 To 4
-	g_ctl_lbl[i].x = a0
-	g_ctl_lbl[i].y = a1
-	g_ctl_lbl[i].SetText("", "", -1, -1)
-	g_ctl_lbl[i].SetIcon(Null)
-	g_ctl_lbl[i + 5].x = a0 + 52.0
-	g_ctl_lbl[i + 5].y = a1
-	g_ctl_lbl[i + 5].SetText("", "", -1, -1)
+	g_panel_controls_lbl[i].x = a0
+	g_panel_controls_lbl[i].y = a1
+	g_panel_controls_lbl[i].SetText("", "", -1, -1)
+	g_panel_controls_lbl[i].SetIcon(Null)
+	g_panel_controls_lbl[i + 5].x = a0 + 52.0
+	g_panel_controls_lbl[i + 5].y = a1
+	g_panel_controls_lbl[i + 5].SetText("", "", -1, -1)
 	a1 :+ yspace
 Next
 Local s:String
@@ -75,129 +75,129 @@ If g_key_c[0] >= 37 And g_key_a[0] <= 40
 Else
 	s = TOptions.GetButtonLabel(g_key_a[0]) + "," + TOptions.GetButtonLabel(g_key_c[0]) + "," + TOptions.GetButtonLabel(g_key_b[0]) + "," + TOptions.GetButtonLabel(g_key_d[0])
 EndIf
-g_ctl_lbl[0].SetText(s, "", -1, -1)
-g_ctl_lbl[0].SetIcon(g_icon_none)
+g_panel_controls_lbl[0].SetText(s, "", -1, -1)
+g_panel_controls_lbl[0].SetIcon(g_icon_none)
 If g_training_int03 = 3 Or g_training_int03 = 6 Or g_training_int03 = 10
-	g_ctl_lbl[5].SetText(GetText("controls_Aim"), "", -1, -1)
+	g_panel_controls_lbl[5].SetText(GetText("controls_Aim"), "", -1, -1)
 Else
-	g_ctl_lbl[5].SetText(GetText("controls_Run"), "", -1, -1)
+	g_panel_controls_lbl[5].SetText(GetText("controls_Run"), "", -1, -1)
 EndIf
 If g_training_int03 = 1 Or g_training_int03 = 2
-	g_ctl_lbl[1].SetText(TOptions.GetButtonLabel(g_key_i[0]), "", -1, -1)
-	g_ctl_lbl[1].SetIcon(TOptions.GetButtonIcon(g_key_i[1], 0))
-	g_ctl_lbl[6].SetText(GetText("controls_Pause"), "", -1, -1)
+	g_panel_controls_lbl[1].SetText(TOptions.GetButtonLabel(g_key_i[0]), "", -1, -1)
+	g_panel_controls_lbl[1].SetIcon(TOptions.GetButtonIcon(g_key_i[1], 0))
+	g_panel_controls_lbl[6].SetText(GetText("controls_Pause"), "", -1, -1)
 	If g_training_int05 = 0
-		g_ctl_lbl[2].SetText(TOptions.GetButtonLabel(g_key_e[0]), "", -1, -1)
-		g_ctl_lbl[2].SetIcon(TOptions.GetButtonIcon(g_key_e[1], 0))
-		g_ctl_lbl[7].SetText(GetText("controls_Kick"), "", -1, -1)
+		g_panel_controls_lbl[2].SetText(TOptions.GetButtonLabel(g_key_e[0]), "", -1, -1)
+		g_panel_controls_lbl[2].SetIcon(TOptions.GetButtonIcon(g_key_e[1], 0))
+		g_panel_controls_lbl[7].SetText(GetText("controls_Kick"), "", -1, -1)
 	EndIf
 ElseIf g_training_int03 = 4 Or g_training_int03 = 5
 	Select g_player_int14
 	Case 0
-		g_ctl_lbl[1].SetText(TOptions.GetButtonLabel(g_key_e[0]), "", -1, -1)
-		g_ctl_lbl[1].SetIcon(TOptions.GetButtonIcon(g_key_e[1], 0))
-		g_ctl_lbl[6].SetText(GetText("controls_Tackle"), "", -1, -1)
+		g_panel_controls_lbl[1].SetText(TOptions.GetButtonLabel(g_key_e[0]), "", -1, -1)
+		g_panel_controls_lbl[1].SetIcon(TOptions.GetButtonIcon(g_key_e[1], 0))
+		g_panel_controls_lbl[6].SetText(GetText("controls_Tackle"), "", -1, -1)
 	Case 1
-		g_ctl_lbl[1].SetText(TOptions.GetButtonLabel(g_key_g[0]), "", -1, -1)
-		g_ctl_lbl[1].SetIcon(TOptions.GetButtonIcon(g_key_g[1], 0))
-		g_ctl_lbl[6].SetText(GetText("controls_Tackle"), "", -1, -1)
+		g_panel_controls_lbl[1].SetText(TOptions.GetButtonLabel(g_key_g[0]), "", -1, -1)
+		g_panel_controls_lbl[1].SetIcon(TOptions.GetButtonIcon(g_key_g[1], 0))
+		g_panel_controls_lbl[6].SetText(GetText("controls_Tackle"), "", -1, -1)
 	End Select
 ElseIf g_training_int03 = 3 Or g_training_int03 = 6 Or g_training_int03 = 10
 	Select g_player_int14
 	Case 0
-		g_ctl_lbl[1].SetText(TOptions.GetButtonLabel(g_key_e[0]), "", -1, -1)
-		g_ctl_lbl[1].SetIcon(TOptions.GetButtonIcon(g_key_e[1], 0))
-		g_ctl_lbl[6].SetText(GetText("controls_Kick"), "", -1, -1)
+		g_panel_controls_lbl[1].SetText(TOptions.GetButtonLabel(g_key_e[0]), "", -1, -1)
+		g_panel_controls_lbl[1].SetIcon(TOptions.GetButtonIcon(g_key_e[1], 0))
+		g_panel_controls_lbl[6].SetText(GetText("controls_Kick"), "", -1, -1)
 	Case 1
-		g_ctl_lbl[1].SetText(TOptions.GetButtonLabel(g_key_f[0]), "", -1, -1)
-		g_ctl_lbl[1].SetIcon(TOptions.GetButtonIcon(g_key_f[1], 0))
-		g_ctl_lbl[6].SetText(GetText("controls_Pass"), "", -1, -1)
-		g_ctl_lbl[2].SetText(TOptions.GetButtonLabel(g_key_g[0]), "", -1, -1)
-		g_ctl_lbl[2].SetIcon(TOptions.GetButtonIcon(g_key_g[1], 0))
-		g_ctl_lbl[7].SetText(GetText("controls_Lob"), "", -1, -1)
-		g_ctl_lbl[3].SetText(TOptions.GetButtonLabel(g_key_e[0]), "", -1, -1)
-		g_ctl_lbl[3].SetIcon(TOptions.GetButtonIcon(g_key_e[1], 0))
-		g_ctl_lbl[8].SetText(GetText("controls_Shoot"), "", -1, -1)
+		g_panel_controls_lbl[1].SetText(TOptions.GetButtonLabel(g_key_f[0]), "", -1, -1)
+		g_panel_controls_lbl[1].SetIcon(TOptions.GetButtonIcon(g_key_f[1], 0))
+		g_panel_controls_lbl[6].SetText(GetText("controls_Pass"), "", -1, -1)
+		g_panel_controls_lbl[2].SetText(TOptions.GetButtonLabel(g_key_g[0]), "", -1, -1)
+		g_panel_controls_lbl[2].SetIcon(TOptions.GetButtonIcon(g_key_g[1], 0))
+		g_panel_controls_lbl[7].SetText(GetText("controls_Lob"), "", -1, -1)
+		g_panel_controls_lbl[3].SetText(TOptions.GetButtonLabel(g_key_e[0]), "", -1, -1)
+		g_panel_controls_lbl[3].SetIcon(TOptions.GetButtonIcon(g_key_e[1], 0))
+		g_panel_controls_lbl[8].SetText(GetText("controls_Shoot"), "", -1, -1)
 	End Select
 ElseIf g_training_int03 = 7 Or g_training_int03 = 8
 	Select g_player_int14
 	Case 0
-		g_ctl_lbl[1].SetText(TOptions.GetButtonLabel(g_key_e[0]), "", -1, -1)
-		g_ctl_lbl[1].SetIcon(TOptions.GetButtonIcon(g_key_e[1], 0))
-		g_ctl_lbl[6].SetText(GetText("controls_Head"), "", -1, -1)
+		g_panel_controls_lbl[1].SetText(TOptions.GetButtonLabel(g_key_e[0]), "", -1, -1)
+		g_panel_controls_lbl[1].SetIcon(TOptions.GetButtonIcon(g_key_e[1], 0))
+		g_panel_controls_lbl[6].SetText(GetText("controls_Head"), "", -1, -1)
 	Case 1
-		g_ctl_lbl[1].SetText(TOptions.GetButtonLabel(g_key_f[0]), "", -1, -1)
-		g_ctl_lbl[1].SetIcon(TOptions.GetButtonIcon(g_key_f[1], 0))
-		g_ctl_lbl[6].SetText(GetText("controls_HeadLow"), "", -1, -1)
-		g_ctl_lbl[2].SetText(TOptions.GetButtonLabel(g_key_g[0]), "", -1, -1)
-		g_ctl_lbl[2].SetIcon(TOptions.GetButtonIcon(g_key_g[1], 0))
-		g_ctl_lbl[7].SetText(GetText("controls_HeadHigh"), "", -1, -1)
-		g_ctl_lbl[3].SetText(TOptions.GetButtonLabel(g_key_e[0]), "", -1, -1)
-		g_ctl_lbl[3].SetIcon(TOptions.GetButtonIcon(g_key_e[1], 0))
-		g_ctl_lbl[8].SetText(GetText("controls_HeadHard"), "", -1, -1)
+		g_panel_controls_lbl[1].SetText(TOptions.GetButtonLabel(g_key_f[0]), "", -1, -1)
+		g_panel_controls_lbl[1].SetIcon(TOptions.GetButtonIcon(g_key_f[1], 0))
+		g_panel_controls_lbl[6].SetText(GetText("controls_HeadLow"), "", -1, -1)
+		g_panel_controls_lbl[2].SetText(TOptions.GetButtonLabel(g_key_g[0]), "", -1, -1)
+		g_panel_controls_lbl[2].SetIcon(TOptions.GetButtonIcon(g_key_g[1], 0))
+		g_panel_controls_lbl[7].SetText(GetText("controls_HeadHigh"), "", -1, -1)
+		g_panel_controls_lbl[3].SetText(TOptions.GetButtonLabel(g_key_e[0]), "", -1, -1)
+		g_panel_controls_lbl[3].SetIcon(TOptions.GetButtonIcon(g_key_e[1], 0))
+		g_panel_controls_lbl[8].SetText(GetText("controls_HeadHard"), "", -1, -1)
 	End Select
 ElseIf g_training_int03 = 9
 	Local b:TBall = TBall.GetActiveBall()
 	If b <> Null And b.controlledby <> Null And b.controlledby.newstar
 		Select g_player_int14
 		Case 0
-			g_ctl_lbl[1].SetText(TOptions.GetButtonLabel(g_key_e[0]), "", -1, -1)
-			g_ctl_lbl[1].SetIcon(TOptions.GetButtonIcon(g_key_e[1], 0))
-			g_ctl_lbl[6].SetText(GetText("controls_Kick"), "", -1, -1)
+			g_panel_controls_lbl[1].SetText(TOptions.GetButtonLabel(g_key_e[0]), "", -1, -1)
+			g_panel_controls_lbl[1].SetIcon(TOptions.GetButtonIcon(g_key_e[1], 0))
+			g_panel_controls_lbl[6].SetText(GetText("controls_Kick"), "", -1, -1)
 		Case 1
-			g_ctl_lbl[1].SetText(TOptions.GetButtonLabel(g_key_f[0]), "", -1, -1)
-			g_ctl_lbl[1].SetIcon(TOptions.GetButtonIcon(g_key_f[1], 0))
-			g_ctl_lbl[6].SetText(GetText("controls_Pass"), "", -1, -1)
-			g_ctl_lbl[2].SetText(TOptions.GetButtonLabel(g_key_g[0]), "", -1, -1)
-			g_ctl_lbl[2].SetIcon(TOptions.GetButtonIcon(g_key_g[1], 0))
-			g_ctl_lbl[7].SetText(GetText("controls_Lob"), "", -1, -1)
-			g_ctl_lbl[3].SetText(TOptions.GetButtonLabel(g_key_e[0]), "", -1, -1)
-			g_ctl_lbl[3].SetIcon(TOptions.GetButtonIcon(g_key_e[1], 0))
-			g_ctl_lbl[8].SetText(GetText("controls_Shoot"), "", -1, -1)
+			g_panel_controls_lbl[1].SetText(TOptions.GetButtonLabel(g_key_f[0]), "", -1, -1)
+			g_panel_controls_lbl[1].SetIcon(TOptions.GetButtonIcon(g_key_f[1], 0))
+			g_panel_controls_lbl[6].SetText(GetText("controls_Pass"), "", -1, -1)
+			g_panel_controls_lbl[2].SetText(TOptions.GetButtonLabel(g_key_g[0]), "", -1, -1)
+			g_panel_controls_lbl[2].SetIcon(TOptions.GetButtonIcon(g_key_g[1], 0))
+			g_panel_controls_lbl[7].SetText(GetText("controls_Lob"), "", -1, -1)
+			g_panel_controls_lbl[3].SetText(TOptions.GetButtonLabel(g_key_e[0]), "", -1, -1)
+			g_panel_controls_lbl[3].SetIcon(TOptions.GetButtonIcon(g_key_e[1], 0))
+			g_panel_controls_lbl[8].SetText(GetText("controls_Shoot"), "", -1, -1)
 		End Select
 	Else
 		Select g_player_int14
 		Case 0
-			g_ctl_lbl[1].SetText(TOptions.GetButtonLabel(g_key_e[0]), "", -1, -1)
-			g_ctl_lbl[1].SetIcon(TOptions.GetButtonIcon(g_key_e[1], 0))
-			g_ctl_lbl[6].SetText(GetText("controls_Call"), "", -1, -1)
+			g_panel_controls_lbl[1].SetText(TOptions.GetButtonLabel(g_key_e[0]), "", -1, -1)
+			g_panel_controls_lbl[1].SetIcon(TOptions.GetButtonIcon(g_key_e[1], 0))
+			g_panel_controls_lbl[6].SetText(GetText("controls_Call"), "", -1, -1)
 		Case 1
-			g_ctl_lbl[1].SetText(TOptions.GetButtonLabel(g_key_f[0]), "", -1, -1)
-			g_ctl_lbl[1].SetIcon(TOptions.GetButtonIcon(g_key_f[1], 0))
-			g_ctl_lbl[6].SetText(GetText("controls_CallLow"), "", -1, -1)
-			g_ctl_lbl[2].SetText(TOptions.GetButtonLabel(g_key_g[0]), "", -1, -1)
-			g_ctl_lbl[2].SetIcon(TOptions.GetButtonIcon(g_key_g[1], 0))
-			g_ctl_lbl[7].SetText(GetText("controls_CallHigh"), "", -1, -1)
-			g_ctl_lbl[3].SetText(TOptions.GetButtonLabel(g_key_e[0]), "", -1, -1)
-			g_ctl_lbl[3].SetIcon(TOptions.GetButtonIcon(g_key_e[1], 0))
-			g_ctl_lbl[8].SetText(GetText("controls_CallHard"), "", -1, -1)
+			g_panel_controls_lbl[1].SetText(TOptions.GetButtonLabel(g_key_f[0]), "", -1, -1)
+			g_panel_controls_lbl[1].SetIcon(TOptions.GetButtonIcon(g_key_f[1], 0))
+			g_panel_controls_lbl[6].SetText(GetText("controls_CallLow"), "", -1, -1)
+			g_panel_controls_lbl[2].SetText(TOptions.GetButtonLabel(g_key_g[0]), "", -1, -1)
+			g_panel_controls_lbl[2].SetIcon(TOptions.GetButtonIcon(g_key_g[1], 0))
+			g_panel_controls_lbl[7].SetText(GetText("controls_CallHigh"), "", -1, -1)
+			g_panel_controls_lbl[3].SetText(TOptions.GetButtonLabel(g_key_e[0]), "", -1, -1)
+			g_panel_controls_lbl[3].SetIcon(TOptions.GetButtonIcon(g_key_e[1], 0))
+			g_panel_controls_lbl[8].SetText(GetText("controls_CallHard"), "", -1, -1)
 		End Select
 	EndIf
 EndIf
 If g_player_int14 = 0
 	If g_training_int03 = 1 Or g_training_int03 = 2
-		g_ctl_lbl[1].SetText(TOptions.GetButtonLabel(g_key_i[0]), "", -1, -1)
-		g_ctl_lbl[1].SetIcon(TOptions.GetButtonIcon(g_key_i[1], 0))
-		g_ctl_lbl[6].SetText(GetText("controls_Pause"), "", -1, -1)
+		g_panel_controls_lbl[1].SetText(TOptions.GetButtonLabel(g_key_i[0]), "", -1, -1)
+		g_panel_controls_lbl[1].SetIcon(TOptions.GetButtonIcon(g_key_i[1], 0))
+		g_panel_controls_lbl[6].SetText(GetText("controls_Pause"), "", -1, -1)
 	Else
-		g_ctl_lbl[2].SetText(TOptions.GetButtonLabel(g_key_i[0]), "", -1, -1)
-		g_ctl_lbl[2].SetIcon(TOptions.GetButtonIcon(g_key_i[1], 0))
-		g_ctl_lbl[7].SetText(GetText("controls_Pause"), "", -1, -1)
+		g_panel_controls_lbl[2].SetText(TOptions.GetButtonLabel(g_key_i[0]), "", -1, -1)
+		g_panel_controls_lbl[2].SetIcon(TOptions.GetButtonIcon(g_key_i[1], 0))
+		g_panel_controls_lbl[7].SetText(GetText("controls_Pause"), "", -1, -1)
 	EndIf
 EndIf
 For Local i:Int = 0 To 4
 	Select g_options_int01
 	Case 0
-		g_ctl_lbl[i].icon = Null
+		g_panel_controls_lbl[i].icon = Null
 	Case 1
-		If g_ctl_lbl[i].icon <> Null
-			g_ctl_lbl[i].txt = ""
+		If g_panel_controls_lbl[i].icon <> Null
+			g_panel_controls_lbl[i].txt = ""
 		EndIf
 	End Select
-	If g_ctl_lbl[i].icon <> Null Or g_ctl_lbl[i].txt.Length
-		g_ctl_lbl[i].Draw()
+	If g_panel_controls_lbl[i].icon <> Null Or g_panel_controls_lbl[i].txt.Length
+		g_panel_controls_lbl[i].Draw()
 	EndIf
-	If g_ctl_lbl[i + 5].txt.Length
-		g_ctl_lbl[i + 5].Draw()
+	If g_panel_controls_lbl[i + 5].txt.Length
+		g_panel_controls_lbl[i + 5].Draw()
 	EndIf
 Next

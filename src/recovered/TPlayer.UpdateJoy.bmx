@@ -24,23 +24,23 @@
 	Method UpdateJoy:Int()
 		'!Global g_player_int02:Int
 		'!Global g_player_int01:Int
-		'!Global g_activeball:TBall
+		'!Global g_ball:TBall
 		'!Global g_player_int50:Int
 		Select Self.controller
 			Case 1
 				If g_player_int02 = 0
 					Local dir:Float = 0.0
-					If g_player_int01 = 3 And g_activeball <> Null And g_activeball.setpiecetaker = Self
+					If g_player_int01 = 3 And g_ball <> Null And g_ball.setpiecetaker = Self
 						dir = -1.0
 					Else
-						If TEngine.SetPiece() And g_activeball <> Null And g_activeball.setpiecetaker = Self
+						If TEngine.SetPiece() And g_ball <> Null And g_ball.setpiecetaker = Self
 							dir = Self.GetShootingDirection()
 							If g_player_int01 = 5 Then dir = -dir
 						EndIf
 					EndIf
 					Self.joy.Update(Self.GetHumanNumber(),Self.GetMouseDirection(),Int(dir))
 					Self.CheckJoyAngle()
-					If g_activeball <> Null And g_activeball.controlledby <> Self And Self.joy.kickbuttonhits And Self.joy.kickbuttondown
+					If g_ball <> Null And g_ball.controlledby <> Self And Self.joy.kickbuttonhits And Self.joy.kickbuttondown
 						If g_player_int50 > Self.joy.kickbuttonhits + 250
 							Self.joy.kickbuttonhits = 0
 						EndIf
