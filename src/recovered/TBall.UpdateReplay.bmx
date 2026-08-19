@@ -1,4 +1,5 @@
 ' TBall.UpdateReplay
+' byte-identical vs NSS5.exe
 ' VA 0x004CC0B6   471 bytes   mode=reloc   MATCH 471/471
 ' KIND=Method on TBall, SIG=(i)i, SLOT=0xB4
 ' Body-only format: statements only, parameters are a0, a1, ...

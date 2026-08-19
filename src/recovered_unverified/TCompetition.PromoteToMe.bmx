@@ -1,4 +1,7 @@
 ' NOT VERIFIED -- MISMATCH, mode=len. VA 0x0050F841  orig_len=1076  ours=1089 (delta +13,
+' VA 0x0050f841   1076 bytes   vtable slot 0x128   sig (:TTableData,:TCompetition)i
+' byte-identical vs NSS5.exe (1076/1076, mode=reloc, 5 relocations masked, original length
+' from Ghidra's inventory)
 ' pre-this-pass; not yet re-scored).
 ' KIND=Method, sig (:TTableData,:TCompetition)i, vtable slot 0x128.
 ' Started from -113 (naive translation), driven down to +13
@@ -107,6 +110,32 @@
 ' the machine code), the `Local dur...`-style explicit `Return 0` at the end of every
 ' early-exit branch (each one is its own `mov eax,0 / jmp epilogue`, not one shared
 ' fall-through zero) -- all confirmed byte-identical against NSS5.exe.
+'
+' PASS N+2 (this edit, localise_diff.py run with NSS5_WORKER=409): the entries above for
+' GAP 1 and GAP 2 were a misattribution. The raw disassembly at VA 0x0050F921 shows
+' `cmp dword ptr [esi+0x6c], 0` / `jle 0x50f9ad`, meaning the source condition is
+' `club.continentalcompid > 0`, with the SMALL block (`club.continentalcompid = id`)
+' as the out-of-line Else and the LARGE compA/bestclub/compB block as the in-place Then --
+' the reverse of what this body had (`< 1` with the small block as Then). Fixing the
+' condition and swapping which block is Then vs Else closed both GAP 1 (the 16-byte
+' out-of-line copy of the id-assignment at VA 0x0050F9AD reappeared automatically once it
+' became a genuine Else target) and GAP 2 (the extra `jmp` this body was emitting to skip
+' over an inline id-assignment no longer exists once that code is the Else, reached by
+' falling out of the Then block's own internal jumps at VA 0x0050F9AB).
+' Separately, at VA 0x0050FAE7 the original sets `found = False` BEFORE computing
+' `teampool[0].list.Count()` (stored at ebp-4, whereas `found` sits at ebp-0xc) -- this body
+' had the two Locals declared in the opposite order; swapped, matching VA 0x0050FAE7..0x0050FB03.
+' At VA 0x0050FB46 the original is `cmp edx, dword ptr [ebp-4]` / `setl` with `cnt` (edx)
+' already resident in a register and `cnt0` left in memory -- i.e. source order `cnt < cnt0`,
+' not `cnt0 > cnt` (which forces a load of cnt0 into eax first, 2 extra bytes). Fixed the
+' operand order.
+' Three explicit `Return 0` statements were missing relative to the disassembly's actual
+' shape, each verified against its own out-of-line `mov eax,0 / jmp` at: VA 0x0050F9B6
+' (end of the `level=0 And locale=1...` ElseIf arm, after its inner If/Else), VA 0x0050FBA9
+' (end of Case 0's `Else` arm, after the `If Not found` block), and VA 0x0050FC60 (end of
+' Case 5, after its `If Count()=GetNoofQualifiers()` block) -- all three now added. With all
+' of the above applied the oracle reports MATCH at 1076/1076 bytes (mode=reloc, 5 relocations
+' masked).
 Method PromoteToMe:Int(a0:TTableData, a1:TCompetition)
 	If level = 0 And locale = 0 And comptype = 0
 		Local club:TClub = TClub.SelectById(a0.teamid)
@@ -114,9 +143,7 @@ Method PromoteToMe:Int(a0:TTableData, a1:TCompetition)
 		Return 0
 	ElseIf level = 0 And locale = 1 And (comptype = 0 Or comptype = 1) And a1.locale = 0
 		Local club:TClub = TClub.SelectById(a0.teamid)
-		If club.continentalcompid < 1
-			club.continentalcompid = id
-		Else
+		If club.continentalcompid > 0
 			Local compA:TCompetition = TCompetition.SelectById(club.leagueid)
 			Local bestclub:TClub = compA.GetHighestClubNotInContinentalComp()
 			Local compB:TCompetition = TCompetition.SelectById(club.continentalcompid)
@@ -128,7 +155,10 @@ Method PromoteToMe:Int(a0:TTableData, a1:TCompetition)
 				bestclub.continentalcompid = club.continentalcompid
 				club.continentalcompid = id
 			EndIf
+		Else
+			club.continentalcompid = id
 		EndIf
+		Return 0
 	Else
 		Select comptype
 			Case 3
@@ -148,11 +178,11 @@ Method PromoteToMe:Int(a0:TTableData, a1:TCompetition)
 					teampool[0].AddItem(a0.teamid, a0.teamname, a0.teamstrength)
 					Return 0
 				Else
-					Local cnt0:Int = teampool[0].list.Count()
 					Local found:Int = False
+					Local cnt0:Int = teampool[0].list.Count()
 					For Local tp:TTeamPool = EachIn teampool
 						Local cnt:Int = tp.list.Count()
-						If cnt = 0 Or cnt0 > cnt
+						If cnt = 0 Or cnt < cnt0
 							tp.AddItem(a0.teamid, a0.teamname, a0.teamstrength)
 							found = True
 							Exit
@@ -161,6 +191,7 @@ Method PromoteToMe:Int(a0:TTableData, a1:TCompetition)
 					If Not found
 						teampool[0].AddItem(a0.teamid, a0.teamname, a0.teamstrength)
 					EndIf
+					Return 0
 				EndIf
 			Case 1
 				teampool[0].AddItem(a0.teamid, a0.teamname, a0.teamstrength)
@@ -176,6 +207,7 @@ Method PromoteToMe:Int(a0:TTableData, a1:TCompetition)
 				If teampool[0].list.Count() = GetNoofQualifiers()
 					DoPromotionPlaces()
 				EndIf
+				Return 0
 		End Select
 	EndIf
 End Method

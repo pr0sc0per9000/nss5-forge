@@ -7,6 +7,7 @@
 '   link layout -- that is whole-program noise, not a defect in this body. Re-verify in
 '   isolation with scripts/localise_diff.py before trusting any raw whole-program number.
 ' VA 0x004E1B6C   838 bytes (Ghidra-authoritative)   vtable slot 0x94   sig ()i   KIND=Method
+' byte-identical vs NSS5.exe
 ' (original candidate, 811/838, 14 unstructured gaps)
 ' (837/838 in isolation, 3 length-changing gaps left, all precisely
 '   localised -- see the fix log below for what worked and what was rejected).

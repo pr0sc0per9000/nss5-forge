@@ -56,11 +56,10 @@
 '       parameters, written unqualified as sibling Functions (already-recovered files).
 '   Module Functions: GetText, LoadImageChecked, FormatMoney, SponsorAmount (all already in
 '     src/recovered_module), and the boot-bonus lookup table at 0x00507DDD, sig (i,i)i,
-'     called GetBootBonus(bootTier, statSelector) here -- ALREADY VERIFIED in the corpus
-'     under two names for the same VA (src/recovered_module/GetBootBonus.bmx and
-'     BootBoost.bmx, both 592/592); this file calls it as `GetBootBonus`. statSelector is
-'     2/4/6 for dribbling/passing/shooting, matching TScreen_MatchPrep.SetUpScreen's own use
-'     of the identical table.
+'     called GetBootBonus(bootTier, statSelector) here -- VERIFIED in the corpus at
+'     src/recovered_module/GetBootBonus.bmx, 592/592. statSelector is 2/4/6 for
+'     dribbling/passing/shooting, matching TScreen_MatchPrep.SetUpScreen's own use of the
+'     identical table.
 '
 ' NOTES ON SHAPE
 '   * ORIGINAL QUIRK, reproduced as found (law 3): the first of the three per-boot stat

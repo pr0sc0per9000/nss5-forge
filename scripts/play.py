@@ -15,10 +15,15 @@ often. A hang must never cost the user their session.
 
 So this launcher makes two guarantees the bare exe cannot:
 
-  WINDOWED   Settings/Options.ini is rewritten to window=1 / screen=0 BEFORE every launch.
-             The game rewrites that file itself via TOptions.SaveOptions, so a fullscreen
-             value can come back at any time -- checking once is not enough, it is reset on
-             every run.
+  WINDOWED   Settings/Options.ini is rewritten to window=1 / screen=0 BEFORE every launch,
+             at every path the game might read one from. If none of those exist yet, one is
+             created at the path TOptions.LoadOptions actually reads, rather than leaving
+             the game to start from its own compiled defaults, which are not documented
+             anywhere as windowed. The game rewrites that file itself via
+             TOptions.SaveOptions, so a fullscreen value can come back at any time --
+             checking once is not enough, it is reset on every run. If the guarantee cannot
+             be confirmed on disk, this refuses to start the exe at all: a safeguard that
+             launches anyway when it fails to apply is not a safeguard.
   BOUNDED    A watchdog kills the process after --minutes no matter what. Even a completely
              frozen game releases the screen on its own within the cap. This is the part
              that makes it safe to run at all.
@@ -81,6 +86,11 @@ def ini_paths():
     So: rewrite every copy that exists. Which one wins depends on how g_userpath resolves
     at runtime, and that has already changed once during this project when the Global was
     merged -- so pinning a single path would be the same mistake again.
+
+    When NONE of these exist, force_windowed() does not return empty-handed. It creates
+    one at the Documents-based path in the loop above, because that is exactly the path
+    this docstring traces g_userpath to. A missing ini is not a reason to skip the
+    guarantee, it is the reason the guarantee has to create the file first.
     """
     out, seen = [], set()
     cands = [INI, os.path.join(RUNDIR, "New Star Soccer 5", "Settings", "Options.ini")]
@@ -99,27 +109,84 @@ def ini_paths():
 
 
 def force_windowed():
-    """Rewrite the display keys in EVERY Options.ini, preserving other settings."""
+    """Rewrite the display keys in EVERY Options.ini, preserving other settings.
+
+    If no Options.ini exists at any candidate path, one is created at the path
+    TOptions.LoadOptions actually reads -- see the note at the end of ini_paths() above --
+    so the forced keys exist before the exe ever starts instead of leaving it to boot from
+    its own compiled defaults.
+
+    Every write is read back from disk and checked before this returns, because a write
+    that silently failed or landed somewhere the game does not read is exactly the failure
+    that already cost two power cycles. If any candidate cannot be confirmed to hold
+    window=1/screen=0 on disk, this raises SystemExit instead of returning a status string
+    that main() would print and launch past anyway: the whole point of this function is a
+    guarantee, and a guarantee that cannot be kept must stop the launch, not report on it.
+    """
     paths = ini_paths()
+    created = None
     if not paths:
-        return "no Options.ini found anywhere -- game will use its own defaults"
+        target = os.path.join(os.path.expanduser("~"), "Documents", "New Star Soccer 5",
+                              "Settings", "Options.ini")
+        try:
+            os.makedirs(os.path.dirname(target), exist_ok=True)
+            open(target, "w", encoding="utf-8").close()
+        except OSError as e:
+            raise SystemExit(
+                "REFUSING TO LAUNCH: no Options.ini exists anywhere, and one could not\n"
+                "be created at %s\n"
+                "  (%s)\n"
+                "This launcher's only job is to guarantee the game cannot come up\n"
+                "fullscreen. With no ini to force window=1 into and no way to create one,\n"
+                "that guarantee cannot be made, so the exe will not start." % (target, e))
+        paths = [target]
+        created = target
+
     notes = []
+    failed = []
     for path in paths:
-        text = open(path, encoding="utf-8", errors="replace").read()
-        changed = []
-        for key, want in FORCE.items():
-            rx = re.compile(r"(?mi)^(%s)\s*=\s*(.*)$" % re.escape(key))
-            m = rx.search(text)
-            if m:
-                if m.group(2).strip() != want:
-                    changed.append("%s %s->%s" % (key, m.group(2).strip(), want))
-                text = rx.sub("%s=%s" % (key, want), text, count=1)
-            else:
-                text = text.rstrip("\n") + "\n%s=%s\n" % (key, want)
-                changed.append("%s added=%s" % (key, want))
-        open(path, "w", encoding="utf-8").write(text)
         short = path.replace(os.path.expanduser("~"), "~")
-        notes.append("%s [%s]" % (short, ", ".join(changed) if changed else "ok"))
+        try:
+            text = open(path, encoding="utf-8", errors="replace").read()
+            changed = []
+            for key, want in FORCE.items():
+                rx = re.compile(r"(?mi)^(%s)\s*=\s*(.*)$" % re.escape(key))
+                m = rx.search(text)
+                if m:
+                    if m.group(2).strip() != want:
+                        changed.append("%s %s->%s" % (key, m.group(2).strip(), want))
+                    text = rx.sub("%s=%s" % (key, want), text, count=1)
+                else:
+                    text = text.rstrip("\n") + "\n%s=%s\n" % (key, want)
+                    changed.append("%s added=%s" % (key, want))
+            open(path, "w", encoding="utf-8").write(text)
+
+            # Confirm what landed on disk rather than trusting the write call. This is the
+            # same class of gap that made the earlier bug invisible: the launcher reported
+            # "already windowed" while the file the game actually loaded said window=0.
+            check = open(path, encoding="utf-8", errors="replace").read()
+            for key, want in FORCE.items():
+                rx = re.compile(r"(?mi)^(%s)\s*=\s*(.*)$" % re.escape(key))
+                m = rx.search(check)
+                if not m or m.group(2).strip() != want:
+                    raise ValueError("%s did not verify on disk (found %r)"
+                                     % (key, m.group(2).strip() if m else None))
+        except (OSError, ValueError) as e:
+            failed.append("%s: %s" % (short, e))
+            notes.append("%s [FAILED: %s]" % (short, e))
+            continue
+
+        tag = "created, " if path == created else ""
+        notes.append("%s [%s%s]" % (short, tag, ", ".join(changed) if changed else "ok"))
+
+    if failed:
+        raise SystemExit(
+            "REFUSING TO LAUNCH: could not guarantee windowed mode.\n"
+            "  window=1/screen=0 did not verify on disk for:\n"
+            + "\n".join("    %s" % f for f in failed) + "\n"
+            "  This launcher's only job is to guarantee the game cannot come up fullscreen,\n"
+            "  and it cannot make that guarantee here, so it will not start the exe.")
+
     return "\n            ".join(notes)
 
 

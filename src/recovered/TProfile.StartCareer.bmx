@@ -1,5 +1,6 @@
 ' TProfile.StartCareer
 ' VA 0x00566107   424 bytes   mode=reloc   MATCH 424/424
+' byte-identical vs NSS5.exe
 ' KIND=Method on TProfile, SIG=()i, SLOT=0x48
 ' Body-only format: statements only, parameters are a0, a1, ...
 '

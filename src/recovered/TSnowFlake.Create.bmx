@@ -6,6 +6,7 @@
 '!Global g_scr_w:Int
 '!Global g_scr_h:Int
 '!Global g_snowcount:Int
+' byte-identical vs NSS5.exe
 Local s:TSnowFlake = New TSnowFlake
 s.x = Rand(0, g_scr_w)
 s.y = Rand(0, -g_scr_h)

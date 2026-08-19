@@ -1,6 +1,7 @@
 ' TPhotographer.SetUpPositions
 ' VA        0x004EA682   2652 bytes   slot 0x38   KIND=Function (static)   SIG=()i
 ' ORACLE    MATCH mode=reloc  2652/2652 bytes  reloc_masked=163
+' byte-identical vs NSS5.exe
 '
 ' GLOBALS DECLARED (names are ours, already established by TPhotographer.SetUp -- the
 ' TYPES are load-bearing)

@@ -1,6 +1,7 @@
 ' TDummy.CheckHit  -- Method, slot 0x50, sig ()i
 ' VA 0x005834FD   269 bytes   (original length from Ghidra's inventory)
 ' ORACLE: MATCH mode=reloc  269/269  reloc_masked=11
+' byte-identical vs NSS5.exe
 '
 ' ASSUMPTIONS / RESOLUTIONS
 '   PTR_FUN_00C5AEDC = TBall classtable (0x00C5AE98) + 0x44  -> TBall.GetActiveBall():TBall

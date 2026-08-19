@@ -1,4 +1,6 @@
 ' TScreen_MatchPrep.ButtonPainKillers
+' VA 0x0055eece   301 bytes   vtable slot 0x40   sig ()i
+' byte-identical vs NSS5.exe (301/301, original length from Ghidra's inventory)
 ' VA        0x0055EECE   slot 0x40   KIND=Function (static)   SIG=()i
 ' ORACLE    MATCH mode=reloc  301/301 bytes  reloc_masked=24
 '

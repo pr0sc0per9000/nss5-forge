@@ -1,4 +1,6 @@
 ' TScreen_Leagues.SetUpScreen
+' VA 0x00545038   446 bytes   vtable slot 0x34   sig (i)i
+' byte-identical vs NSS5.exe (446/446, original length from Ghidra's inventory)
 ' VA        0x00545038   slot 0x34   KIND=Function (static)   SIG=(i)i
 ' ORACLE    MATCH mode=reloc  446/446 bytes  reloc_masked=33
 '

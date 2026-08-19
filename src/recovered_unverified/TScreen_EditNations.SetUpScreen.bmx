@@ -1,5 +1,6 @@
 ' TScreen_EditNations.SetUpScreen
 ' VA 0x0052A8BC   1556 bytes   sig (i)i   class-table slot 0x34   KIND=Function (static)
+' byte-identical vs NSS5.exe
 ' NOT YET BYTE-VERIFIED. Reconstructed from extracted/decomp/
 ' TScreen_EditNations.SetUpScreen@0052a8bc.c, cross-checked against object_model.json field
 ' offsets and against the two closest structural siblings, TScreen_EditClubs.SetUpScreen.bmx

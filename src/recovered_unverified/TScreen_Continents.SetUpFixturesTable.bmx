@@ -1,5 +1,6 @@
 ' TScreen_Continents.SetUpFixturesTable
 ' VA 0x00548244   1255 bytes   sig (i)i   KIND=Function (static)   class-table slot 0x4c
+' byte-identical vs NSS5.exe
 '
 ' a0 is a round id: called as `SetUpFixturesTable(g_contid)` (ButtonGroupsFirst/Left, both
 ' already in src/recovered), `SetUpFixturesTable(g_continents_comp.GetPrevRound())` /

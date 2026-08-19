@@ -1,5 +1,6 @@
 ' TEngine.CheckInput   (KIND=Function -- static, no Self)
 ' VA 0x004D28E4   1565 bytes   class-table slot 0x6C   sig ()i
+' byte-identical vs NSS5.exe
 ' Body-only format: statements only, no parameters.
 '
 ' What it does: the per-frame match-engine input poll. Checks the Pause control first
@@ -173,7 +174,8 @@ Local joynum:Int = 0
 If g_options_int01 = 2 Then joynum = 1
 Local hit:Int = KeyHit(g_options_arr10[0])
 If hit = 0
-	If g_engine_int164 <> 0 Then hit = JoyHit(g_options_arr10[1], joynum)
+	hit = g_engine_int164
+	If hit <> 0 Then hit = JoyHit(g_options_arr10[1], joynum)
 EndIf
 If hit <> 0
 	PauseEngine()
@@ -193,7 +195,8 @@ If KeyHit(121)
 EndIf
 hit = KeyHit(g_options_arr11[0])
 If hit = 0
-	If g_engine_int164 <> 0 Then hit = JoyHit(g_options_arr11[1], joynum)
+	hit = g_engine_int164
+	If hit <> 0 Then hit = JoyHit(g_options_arr11[1], joynum)
 EndIf
 If hit <> 0
 	StartReplay()
@@ -202,19 +205,15 @@ If KeyHit(116)
 	PauseEngine()
 	TScreen_MatchPaused.ButtonSkipTime()
 EndIf
-If g_engine_int161 <> 0
-	If KeyHit(70)
-		If g_profile.name = "Simon Read" Or g_profile.name = "Si Read"
-			SetUpSetPiece(4, Rand(2,1), Int(TBall.GetActiveBall().x), Int(TBall.GetActiveBall().y))
-		EndIf
-	EndIf
+hit = g_engine_int161
+If hit <> 0 Then hit = KeyHit(70)
+If hit And (g_profile.name = "Simon Read" Or g_profile.name = "Si Read")
+	SetUpSetPiece(4, Rand(2,1), Int(TBall.GetActiveBall().x), Int(TBall.GetActiveBall().y))
 EndIf
-If g_engine_int161 <> 0
-	If KeyHit(67)
-		If g_profile.name = "Simon Read" Or g_profile.name = "Si Read"
-			SetUpSetPiece(5, Rand(2,1), Int(TBall.GetActiveBall().x), Int(TBall.GetActiveBall().y))
-		EndIf
-	EndIf
+hit = g_engine_int161
+If hit <> 0 Then hit = KeyHit(67)
+If hit And (g_profile.name = "Simon Read" Or g_profile.name = "Si Read")
+	SetUpSetPiece(5, Rand(2,1), Int(TBall.GetActiveBall().x), Int(TBall.GetActiveBall().y))
 EndIf
 If g_engine_int13 = 3
 	CheckReplayInput()
@@ -224,7 +223,8 @@ Else
 	If TScreenMessage.Count() > 0
 		hit = KeyHit(g_options_arr06[0])
 		If hit = 0
-			If g_engine_int164 <> 0 Then hit = JoyHit(g_options_arr06[1], joynum)
+			hit = g_engine_int164
+			If hit <> 0 Then hit = JoyHit(g_options_arr06[1], joynum)
 		EndIf
 		If hit <> 0
 			TScreenMessage.RemoveFirst()
@@ -235,8 +235,8 @@ Else
 				TScreenMessage.RemoveFirst()
 				Return 0
 			EndIf
-			hit = 0
-			If g_engine_int164 <> 0
+			hit = g_engine_int164
+			If hit <> 0
 				hit = JoyHit(g_options_arr07[1], joynum)
 				If hit = 0 Then hit = JoyHit(g_options_arr08[1], joynum)
 			EndIf
@@ -264,7 +264,8 @@ Else
 	If g_player_int02 <> 0
 		hit = KeyHit(g_options_arr06[0])
 		If hit = 0
-			If g_engine_int164 <> 0 Then hit = JoyHit(g_options_arr06[1], joynum)
+			hit = g_engine_int164
+			If hit <> 0 Then hit = JoyHit(g_options_arr06[1], joynum)
 		EndIf
 		If hit <> 0
 			SkipTime()
@@ -275,8 +276,8 @@ Else
 				SkipTime()
 				Return 0
 			EndIf
-			hit = 0
-			If g_engine_int164 <> 0
+			hit = g_engine_int164
+			If hit <> 0
 				hit = JoyHit(g_options_arr07[1], joynum)
 				If hit = 0 Then hit = JoyHit(g_options_arr08[1], joynum)
 			EndIf

@@ -1,4 +1,5 @@
 ' TRouletteBall.Draw
+' byte-identical vs NSS5.exe
 ' VA 0x00576254   175 bytes   mode=reloc
 ' Verified through the oracle from scratch with helper_map.record stubbed; MATCH over
 ' the full Ghidra-authoritative length, every byte.

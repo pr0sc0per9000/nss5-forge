@@ -1,4 +1,6 @@
 ' TNation.CreateNation
+' VA 0x004bd649   2986 bytes   vtable slot 0x44   sig ($)i
+' byte-identical vs NSS5.exe (2986/2986, original length from Ghidra's inventory)
 ' VA        0x004BD649   classtable slot 0x44   KIND=Function (static)   SIG=($)i
 ' ORACLE    MATCH mode=reloc  2986/2986 bytes  reloc_masked=181
 '           Re-run under NSS5_NO_LEARN=1: MATCH 2986/2986, learned_helpers=none.

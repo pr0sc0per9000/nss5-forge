@@ -1,5 +1,6 @@
 ' TPlayer.PlayerReady
 ' VA 0x004FABE3   356 bytes   mode=reloc
+' byte-identical vs NSS5.exe
 ' Verified through the oracle from scratch with helper_map.record stubbed; MATCH over
 ' the full Ghidra-authoritative length, every byte.
 ' Body-only format: statements only, parameters are a0, a1, ...

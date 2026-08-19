@@ -1,4 +1,5 @@
 ' TScreen.MoveSelection
+' byte-identical vs NSS5.exe
 ' VA 0x00511ea5   1231 bytes   vtable slot 0x84   sig (i)i   KIND=Method
 ' Body-only format: statements only; parameters are a0, a1, ...
 '

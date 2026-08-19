@@ -1,5 +1,6 @@
 ' THistory.CreateFromString
 ' VA 0x0056F4D6   341 bytes   mode=reloc   MATCH 341/341
+' byte-identical vs NSS5.exe
 ' KIND=Function (static method on THistory), SIG ($):THistory, class-table slot 0x34.
 ' Body-only format: statements only, parameters are a0, a1, ...
 '

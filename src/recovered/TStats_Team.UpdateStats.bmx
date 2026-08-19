@@ -3,6 +3,7 @@
 ' Driven through the oracle from scratch with helper_map.record stubbed; MATCH over the
 ' full Ghidra-authoritative length, every byte.
 ' Body-only format: statements only, parameters are a0, a1, ...
+' byte-identical vs NSS5.exe
 Self.appearances :+ 1
 If a0.subbedontime > -1
 	Self.subs :+ 1

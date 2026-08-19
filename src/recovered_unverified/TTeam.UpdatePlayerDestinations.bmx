@@ -1,4 +1,6 @@
 ' =========================== REVISION H -- FULL BYTE MATCH ========================================
+' VA 0x004de516   9170 bytes   vtable slot 0x70   sig ()i
+' byte-identical vs NSS5.exe (9170/9170, original length from Ghidra's inventory)
 ' TTeam.UpdatePlayerDestinations   VA 0x004DE516   original length 9170 bytes
 ' harness.try_method (NSS5_NO_LEARN=1): status=MATCH, mode='reloc',
 ' matched=9170/9170, first_diff=None. Confirmed against the ON-DISK copy of this file, not

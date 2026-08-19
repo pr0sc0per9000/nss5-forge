@@ -480,6 +480,32 @@ def _build_prelude(d):
 # operand masks by name like any other.
 MODULE_FUNC_DIR = os.path.join(ROOT, "src", "recovered_module")
 MODFUNC_SEP = "\n"
+
+# src/recovered_module/ has no tier contest -- unlike src/recovered_unverified/, which
+# skips files via assemble.py's UNVERIFIED_SKIP, every file here is unconditionally wired
+# into every probe and into the whole-program build. That includes its '!Import and
+# '!Raw pragmas (module_imports() below), so a file here that Externs a DLL function
+# makes every build and every probe that pulls in "other" module Functions demand that
+# DLL at process start, whether or not the guarded call inside the body ever runs.
+#
+# Fn_0058D90B.SyncSteamAchievements.bmx Externs SetSteamAchievement out of
+# extern/steamstub/libsteamstub.a, so its mere presence links STEAMSTUB.DLL into the
+# assembled exe's import table. src/assembled/ (the run directory) does not carry
+# STEAMSTUB.DLL -- it exists only under binary/, the read-only original install -- so the
+# loader kills the process before any code runs (STATUS_DLL_NOT_FOUND, 0xC0000135) and no
+# milestone is ever reached, not even settings read. This is exactly the Steam link
+# surface src/recovered_module/SteamInit.bmx exists to keep out of the build entirely
+# (see its header): that file already strips its own '!Import/'!Raw Extern pair and
+# leaves the assembled program with zero Steam link surface, and this file's mere
+# presence undoes that guarantee. Skip it here the same way UNVERIFIED_SKIP does for its
+# siblings Fn_0058D987.SteamPostPlayerValue.bmx and TProfile.CheckAchievement.bmx --
+# the body stays in the tree as byte-verified work, just not linked into anything that
+# runs. TProfile.LoadSavedGame.bmx (src/recovered_unverified/) is the sole caller and
+# carries its own local '!Raw placeholder declaration so the call site still compiles
+# with the real body excluded.
+MODULE_SKIP = {
+    "Fn_0058D90B.SyncSteamAchievements.bmx",
+}
 _MODFUNCS = []
 
 
@@ -513,6 +539,8 @@ def module_functions():
         return _MODFUNCS
     for fn in sorted(os.listdir(MODULE_FUNC_DIR)):
         if not fn.endswith(".bmx"):
+            continue
+        if fn in MODULE_SKIP:
             continue
         text = open(os.path.join(MODULE_FUNC_DIR, fn),
                     encoding="utf-8", errors="replace").read()
@@ -661,8 +689,22 @@ IMPORT_PRAGMA = re.compile(r"^[ \t]*'!\s*Import[ \t]+([^\r\n]*?)[ \t]*$", re.M)
 
 
 def split_imports(body):
-    """-> (body without '!Import lines, [import arguments])"""
-    imps = [m.group(1) for m in IMPORT_PRAGMA.finditer(body)]
+    """-> (body without '!Import lines, [import arguments])
+
+    A tracked '!Import line writes its path as `<repo>/...` rather than a real path,
+    because a real absolute path would be machine-specific (this developer's Windows
+    username, this clone's drive letter) and a real RELATIVE path has nothing to be
+    relative TO: bcc resolves it against the harness's randomly named per-run temp build
+    directory, not the working directory and not the repo, so no relative spelling written
+    in a tracked file can ever reach extern/. <repo> is substituted here, at emission time,
+    with the ROOT this process is actually running from, which keeps the tracked .bmx
+    machine independent while still giving bcc something it can resolve. Forward slashes
+    only: a backslash inside a BlitzMax string is not an escape character, but mixing
+    Windows' own backslash separator into an Import path is untested and forward slashes
+    are known to work, so ROOT is normalised to them here rather than left as-is.
+    """
+    imps = [m.group(1).replace("<repo>", ROOT.replace("\\", "/"))
+            for m in IMPORT_PRAGMA.finditer(body)]
     return IMPORT_PRAGMA.sub("", body), imps
 
 

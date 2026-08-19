@@ -4,38 +4,47 @@
      Do not edit by hand: your changes will be overwritten, and a
      hand-maintained status file goes stale within hours. -->
 
-**88.1%** of the reconstruction is byte-identical to `NSS5.exe`,
-measured as 692083 of 785430 bytes of machine code across 1764 function bodies.
+**94.6%** of the reconstruction is byte-identical to `NSS5.exe`,
+measured as 809362 of 855959 bytes of machine code across 1830 function bodies.
+
+4 bodies (1232 bytes) are permanently excluded from that count as Steam-linked; see STEAM_EXCLUDE in `scripts/progress.py` for which ones and why.
 
 ```
 RECONSTRUCTION PROGRESS  (measured in bytes of matched machine code)
 
   TREE                              BODIES   MATCHED    BYTES    DONE
-  src/recovered                       1643      1581   696183   95.9%
-  src/recovered_module                  62        61    16219   99.0%
-  src/recovered_unverified              59         6    73028   11.9%
+  src/recovered                       1689      1688   712476  100.0%
+  src/recovered_module                  62        62    17588  100.0%
+  src/recovered_unverified              79        57   125895   63.0%
   ------------------------------ --------- --------- -------- -------
-  TOTAL                               1764      1648   785430   88.1%
+  TOTAL                               1830      1807   855959   94.6%
 
-  692083 of 785430 bytes byte-identical against NSS5.exe.
+  809362 of 855959 bytes byte-identical against NSS5.exe.
+
+  EXCLUDED from the corpus above -- 4 bodies, 1232 bytes, permanently
+  Steam-linked (see STEAM_EXCLUDE in scripts/progress.py):
+    TProfile.CheckAchievement                         625 bytes  0x0056cf70  src/recovered_unverified
+    Fn_0058D987.SteamPostPlayerValue                  325 bytes  0x0058d987  src/recovered_unverified
+    SteamInit                                         158 bytes  0x0058d86d  src/recovered_module
+    Fn_0058D90B.SyncSteamAchievements                 124 bytes  0x0058d90b  src/recovered_module
 
   Largest bodies not yet byte-identical:
-    TPhotographer.SetUpPositions                     2652 bytes  0x004ea682
-    TJoy.Update                                      2373 bytes  0x004d9cfa
-    TCompetition.CreateCompetition                   2026 bytes  0x005092e3
-    TEngine.UpdateOffset                             2004 bytes  0x004cfb35
-    TTraining.SetUpTraining                          1764 bytes  0x0057bf1f
-    TScreen_ContinentalComps.CreateScreen            1736 bytes  0x0053357a
-    TKit.GetPaintedPlayer                            1729 bytes  0x004db0dd
+    TPlayer.RecordPlayerStats                       15154 bytes  0x004ff67c
+    TScreen_MatchPrep.CreateScreen                   6249 bytes  0x0055c09b
+    TFormation.GetPlayerXY                           2898 bytes  0x004d8b85
+    TBall.CheckForPlayerRatings                      2867 bytes  0x004cc644
+    TScreen_SeasonReview.SetUpScreen                 2276 bytes  0x0055f8e6
+    TPlayer.CheckKick                                2201 bytes  0x004f6c2b
+    TEngine.SetUpSetPiece                            1788 bytes  0x004d2f01
     TEngine.GoalScored                               1713 bytes  0x004d39d6
-    TScreen_WorldMap.Draw                            1706 bytes  0x0055b1a0
-    TScreen_Formation.Draw                           1704 bytes  0x0054c38b
     TPlayer.UpdateKeeperPosition                     1701 bytes  0x004f2eed
     TContractOffer.CheckTransferWindow               1647 bytes  0x00571e91
-    TTraining.RenderScoreboard                       1626 bytes  0x005811ea
-    TTraining.SetUpTraining_Pace                     1613 bytes  0x0057c6d2
-    TPlayer.CheckPlayerContactAll                    1577 bytes  0x004f458a
-    ... and 101 more
+    TScreen_SeasonReview.UpdateSeasonStats           1279 bytes  0x005601ca
+    TScreen.DoProgressBar                            1178 bytes  0x00512de9
+    TScreenMessage.Draw                              1119 bytes  0x0057004c
+    TProfile.LoadSavedGame                            936 bytes  0x005659f1
+    TProfile.SaveGame                                 850 bytes  0x00565d99
+    ... and 8 more
 ```
 
 Regenerate with:

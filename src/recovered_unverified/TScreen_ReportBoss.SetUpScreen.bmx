@@ -1,5 +1,6 @@
 ' TScreen_ReportBoss.SetUpScreen
 ' VA 0x00561DFF   1492 bytes   KIND=Function (static), SIG ()i, class-table slot 0x34
+' byte-identical vs NSS5.exe
 ' NOT YET BYTE-VERIFIED. Reconstructed from extracted/decomp/TScreen_ReportBoss.SetUpScreen@00561dff.c
 ' and cross-checked against a fresh raw disassembly pulled straight from the read-only Ghidra
 ' project (scripts/ghidra_scripts-style -postScript listing of 0x00561dff for 1492 bytes; see

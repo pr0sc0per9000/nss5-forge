@@ -1,5 +1,6 @@
 ' TTraining.RenderScoreboard
 ' VA 0x005811EA   1626 bytes   KIND=Function (static, no implicit Self)   SIG=(f)i   class-table slot 0x8C
+' byte-identical vs NSS5.exe
 ' Body-only format: statements only; parameter is a0:Float -- the render-interpolation
 ' fraction blended between last-tick and current-tick ticker scroll position (see
 ' g_train_scrollx/g_train_scrollx2 below; TTraining.Update sets the "current" one from the

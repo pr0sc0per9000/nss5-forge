@@ -1,5 +1,6 @@
 ' TKit.GetPaintedFan
 ' VA 0x004db79e   1569 bytes   vtable slot 0x40   sig (i,i):TPixmap   KIND=Method
+' byte-identical vs NSS5.exe
 '
 ' Paints a COPY of Self.pixmap (the crowd/"fan" base mask image): every pixel whose RGB
 ' matches one of the 24 base/mask colours g_kit_arr02[0..23] (built by TKit.SetUp from

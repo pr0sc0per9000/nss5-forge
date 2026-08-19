@@ -1,5 +1,6 @@
 ' TCompetition.SetUpCompetitionsAll  -- KIND=Function (STATIC method on TCompetition), slot 0x58, sig ()i
 ' VA 0x0050A77B   466 bytes   (original length from Ghidra's inventory)
+' byte-identical vs NSS5.exe
 ' ORACLE: MATCH mode=reloc  466/466  reloc_masked=32
 '
 ' ASSUMPTIONS / RESOLUTIONS

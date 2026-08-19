@@ -1,5 +1,6 @@
 ' TTraining.SetUpTraining_Pace
 ' VA 0x0057C6D2   1613 bytes   KIND=Function (static, no implicit Self)   vtable slot 0x38
+' byte-identical vs NSS5.exe
 ' sig ()i   NOT YET BYTE-VERIFIED -- reconstructed statement-by-statement from
 ' scripts/disasm.py 0x0057c6d2 400 (the raw x86, not just Ghidra's C -- see below for why)
 ' plus the five already-verified siblings TTraining.SetUpTraining_Dribbling/_Passing/

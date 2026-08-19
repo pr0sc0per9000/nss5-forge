@@ -1,4 +1,6 @@
 ' TPlayer.pow
+' VA 0x004f9cd1   36 bytes   vtable slot 0x138   sig (i,i)i
+' byte-identical vs NSS5.exe (36/36, original length from Ghidra's inventory)
 ' VA 0x004F9CD1, 36 bytes
 ' byte-identical vs NSS5.exe
 ' The body is verified over the full 36-byte function (length from Ghidra's

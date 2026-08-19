@@ -1,4 +1,5 @@
 ' NOT VERIFIED -- near miss only. Do NOT move to src/recovered without closing the gap.
+' VA 0x00569329   772 bytes   vtable slot 0x88   sig (i,i,i,i)f
 ' TProfile.GetStat  -- KIND=Method, slot 0x88
 ' VA 0x00569329   ORIGINAL 772 bytes   sig (i,i,i,i)f
 ' OURS: 772 bytes -- SAME LENGTH, but 4 gaps that net to zero (localise_diff.py, worker
@@ -79,6 +80,32 @@
 '       source-visible construct) reacting to something upstream of this branch -- not a
 '       missing statement. Confirms the prior worker's conclusion; not re-attempted blind
 '       given the two already-documented attempts both regressed (-8, -5). Left as is.
+'
+' FOLLOW-UP PASS (scripts/workflow/walloc_report.py, worker 433) -- NO CODE CHANGED this
+' pass. Read out bcc's own allocator trace for the whole function to check whether the
+' Case 18 rotation is source-reachable: the four contested registers (arrayptr, loopptr,
+' endptr, loop-body scratch) are internal temporaries the EachIn-over-Int[]-array codegen
+' creates for itself, not named Locals -- they carry no source name in the trace (this is
+' exactly the hidden-enumerator limit the tool's own header documents for TTable.Draw), so
+' only `f` and `total` are addressable levers in this block, and both were already
+' exhausted. Re-ran both existing candidates fresh against this session's oracle to confirm
+' the verdict still holds: declaring `f` ahead of `total` scores 724/772 matched (worse
+' than the 729/772 this file already gets); referencing `s.form` directly in the For..EachIn
+' with no `f` Local collapses the array-walk shape itself, landing at a 767-byte candidate
+' and 533/772 matched -- a real length deficit, not a register swap. The `Local f:Int[] =
+' s.form` statement is REQUIRED to hold total length at 772 (drop it and the array-walk
+' codegen shrinks to a different, shorter shape) and is SIMULTANEOUSLY the reason the
+' rotation exists: its own tmp() call shifts every EachIn-internal temp's sequential id by
+' one slot relative to the original, which evaluates `s.form` directly as the loop's source
+' expression with no separate materializing statement ahead of it. The two levers pull in
+' opposite directions from the same cause. No third placement remains: `total` and `f` are
+' the only two statements in this block with reordering freedom (each must precede its own
+' first use), their only other relative order regresses, the post-loop `s.form.Length` check
+' already matches byte-for-byte, and any statement moved in from outside this block risks
+' the roughly 700 bytes elsewhere that already match. Verdict: the 43-byte gap sits entirely
+' in unnamed compiler-internal register selection for an EachIn array walk, with no
+' remaining statement-placement lever under this toolchain. UNCERTAIN: whether a change to
+' cgallocregs.cpp's own tmp-id/coalescing order (out of scope -- source only) would close it.
 '
 ' Body-only format below (statements only, Self implicit, parameters are a0..a3).
 	'!Global g_profile_float02:Float

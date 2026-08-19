@@ -1,4 +1,6 @@
 ' TCompetition.GetStringTeamPosition  (i)$   slot 0x9c
+' VA 0x0050cb18   213 bytes   vtable slot 0x9c   sig (i)$
+' byte-identical vs NSS5.exe (213/213, original length from Ghidra's inventory)
 ' VA 0x0050CB18   length 213   oracle: MATCH mode=reloc 213/213 reloc_masked=7
 '
 ' Assumptions:

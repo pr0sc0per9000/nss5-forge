@@ -1,4 +1,5 @@
 ' UNVERIFIED -- NOT PROVEN. Do not promote to src/recovered/ without closing the gap below.
+' VA 0x00569a31   211 bytes   vtable slot 0x94   sig (i):TStats_Team
 ' TProfile.GetCurrentStats   VA 0x00569A31
 ' Ghidra-authoritative length: 211 bytes.  Ours: 215 bytes (delta +4).  status=MISMATCH mode=len.
 '

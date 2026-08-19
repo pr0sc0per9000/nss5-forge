@@ -1,5 +1,6 @@
 ' TTrainingLine.Create
 ' VA 0x00583FA3   170 bytes   mode=reloc
+' byte-identical vs NSS5.exe
 ' Driven through the oracle from scratch with helper_map.record stubbed; MATCH over the
 ' full Ghidra-authoritative length, every byte.
 ' Body-only format: statements only, parameters are a0, a1, ...

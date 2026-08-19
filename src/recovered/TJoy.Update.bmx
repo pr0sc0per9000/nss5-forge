@@ -1,6 +1,7 @@
 ' TJoy.Update -- Method, vtable slot 0x34, sig (i,i,i)i
 ' VA 0x004D9CFA   2373 bytes
 ' MATCH, mode=reloc, 2373/2373, reloc_masked=137, NSS5_NO_LEARN=1.
+' byte-identical vs NSS5.exe
 '
 ' Two regions account for the +7 bytes a naive rendering costs; both are closed below.
 '

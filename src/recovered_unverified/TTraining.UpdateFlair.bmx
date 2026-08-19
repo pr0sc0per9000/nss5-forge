@@ -1,5 +1,6 @@
 ' TTraining.UpdateFlair -- NOT VERIFIED. KIND=Function (static), slot 0x68, sig ()i
 ' VA 0x00580761   898 bytes (Ghidra-authoritative)
+' byte-identical vs NSS5.exe
 ' PRIOR RESULT: ours = 896 bytes, delta -2, 10.8% byte agreement
 ' -- length was close but the byte-agreement was low because several comparisons
 ' and one whole control-flow region used the wrong shape. Reworked by disassembling BOTH
@@ -101,7 +102,7 @@
 			Local flag2:Int = False
 			If ball.kicktime > 0 And g_time > ball.kicktime + 1000
 				If ball.controlledby = human Then flag2 = True
-				If ball.kicktime + 4500 < g_time Then flag2 = True
+				If g_time > ball.kicktime + 4500 Then flag2 = True
 			EndIf
 			If ball.y > 0.0 Then flag2 = True
 			Local maxDist:Float = 0.0
@@ -120,7 +121,7 @@
 					lineAlive = l.alive
 				EndIf
 			Next
-			If lineAlive <> 0 And Dist2D(human.x, human.y, ball.x, ball.y) > minDist + 100.0
+			If lineAlive And Dist2D(human.x, human.y, ball.x, ball.y) > minDist + 100.0
 				flag2 = True
 			EndIf
 			If flag2 Then TEngine.SetUpSetPiece(4, 1, g_training_int13, g_training_int14)

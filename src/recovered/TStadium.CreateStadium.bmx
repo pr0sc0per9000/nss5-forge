@@ -1,4 +1,6 @@
 ' TStadium.CreateStadium
+' VA 0x0052771e   377 bytes   vtable slot 0x30   sig ($)i
+' byte-identical vs NSS5.exe (377/377, original length from Ghidra's inventory)
 ' VA        0x0052771E   slot 0x30   KIND=Function (static)   SIG=($)i
 ' ORACLE    MATCH mode=reloc  377/377 bytes  reloc_masked=23
 '

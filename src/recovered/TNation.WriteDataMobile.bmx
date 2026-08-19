@@ -1,4 +1,6 @@
 ' TNation.WriteDataMobile  (KIND=Function -- static, a0 = the TStream)
+' VA 0x004be86d   603 bytes   vtable slot 0x50   sig (:TStream)i
+' byte-identical vs NSS5.exe (603/603, original length from Ghidra's inventory)
 ' VA 0x004BE86D  LEN=603 bytes (full function, Ghidra-authoritative)
 ' ORACLE: mode=reloc  matched=603/603  reloc_masked=54  STATUS=MATCH
 '

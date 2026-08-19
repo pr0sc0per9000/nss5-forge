@@ -1,4 +1,5 @@
 ' Fn_00595EF3 -- NOT VERIFIED (near miss, our_len=235 vs orig_len=210; delta +25)
+' VA 0x00595ef3   210 bytes   sig ()[]$
 ' VA 0x00595EF3   orig 210 bytes (Ghidra inventory).  KIND=Function, module-level (no Self).
 ' Unattributed "code" function, not in vtable_map.tsv -- name is OURS, not a recovered
 ' original name (skill section 8). Verified via harness.try_function.

@@ -1,5 +1,6 @@
 ' TScreen_BlackJack.CreateScreen
 ' VA 0x00576333   1290 bytes   sig ()i   class-table slot 0x30   KIND=Function (static)
+' byte-identical vs NSS5.exe
 ' NOT YET BYTE-VERIFIED. Reconstructed from extracted/decomp/TScreen_BlackJack.CreateScreen@00576333.c,
 '
 ' REFINEMENT PASS (oracle score 4.8%, first-diff at byte 3): the prior version of this body

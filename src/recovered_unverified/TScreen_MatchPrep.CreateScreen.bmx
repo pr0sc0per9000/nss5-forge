@@ -1,4 +1,5 @@
 ' TScreen_MatchPrep.CreateScreen -- CANDIDATE, built on an earlier candidate.
+' VA 0x0055c09b   6249 bytes   vtable slot 0x30   sig ()i
 ' NOT VERIFIED -- NOT A MATCH. VA 0x0055C09B. orig_len 6249.
 ' THIS BODY: our_len 6205, delta -44, 95 length-changing gaps. localise_diff.py reports
 ' "delta accounted for by gaps: -44 of -44 -> COMPLETE" (no tooling noise).
@@ -109,6 +110,40 @@
 ' needs an iterate-and-remeasure loop, not a single blind edit. Per rule 4, a guess that cannot
 ' be verified and might regress a body this well-characterized is worse than leaving it alone.
 ' Body is UNCHANGED this pass.
+' === WALLOC MEASUREMENT PASS === NO BYTE CHANGE. This pass has an actual instrumented-bcc
+' readout tool (walloc_report.py) rather than an ad hoc trace, and uses it to test the
+' iterate-and-remeasure loop the prior pass declined to attempt without tooling. Findings:
+' 1. Tool self-check reproduces this file's own numbers exactly: h regid=76 usage=49 degree=234
+'    block_count=21 (kept, edi); wnum regid=78 usage=25 degree=218 block_count=18 cost=0.00637105
+'    (spilled, [ebp-12], and the global-minimum-cost node -- picked as spill victim first, before
+'    x/w/y/h are even considered). h's own decisive comparison happens later, in pass 2, once
+'    most of the graph has simplified away: usage=49 degree=35 block_count=21 cost=0.0666667.
+' 2. block_count is a real, reachable, measurable lever here, not just a formula on paper.
+'    Reordering the purely-literal reassignments between two calls that neither reads nor
+'    writes wnum (x :+ 10 / h = 40 / w = 100 / y = 130, all sitting inside one call-free zone)
+'    changes nothing -- identical usage/degree/block_count/cost to the eleventh decimal place,
+'    confirmed by direct rebuild. Moving wnum's OWN assignment (wnum = 265) to sit immediately
+'    before its first read instead of three calls earlier (CreatePanel/AddGadget/AddChild, none
+'    of which touch wnum) DOES move the numbers: block_count 18 -> 17, degree 218 -> 205, cost
+'    0.00637105 -> 0.0071736, about +12%. This is the only squeeze available anywhere in the
+'    function: wnum's other two generations already sit zero or one statement from their first
+'    read (the initial Local block's first use is one call later at lbl_Selection1; the Kit Bag
+'    generation's wnum = 160 already sits directly before its first read), and h itself has no
+'    slack to widen in the other direction -- it is a call argument on nearly every one of the
+'    ~21 blocks it survives, i.e. already live almost everywhere between its own first and last
+'    use, with no gap left to stretch.
+' 3. Rebuilding the candidate with that one squeeze applied and reading the trace again shows
+'    the allocator's actual OUTCOME for wnum is unchanged: still spilled to [ebp-12]. The
+'    reachable range shrink is real but roughly an order of magnitude short: wnum's maximum
+'    reachable cost (~0.0072) sits far below h's competing cost (0.0667), and no further legal,
+'    semantics-preserving reordering exists in this body to close that gap without reordering
+'    calls themselves, which would perturb the AddChild/AddGadget sequence already confirmed
+'    byte-matching elsewhere in this function for no compensating gain.
+' CONCLUSION: the h/wnum register-allocation tie is UNREACHABLE via statement placement under
+' this toolchain for this body. Every remaining def-to-first-use and last-use-to-redef gap for
+' both contested Locals is already at its structural minimum, fixed by the row layout's already-
+' verified call order. Body is UNCHANGED this pass -- the one legal edit found does not flip the
+' allocator's decision and is not applied.
 '!Global g_screen_matchprep:TScreen
 '!Global g_pan_abilities:TPanel
 '!Global g_pan_health:TPanel

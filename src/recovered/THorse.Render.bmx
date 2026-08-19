@@ -1,4 +1,6 @@
 ' THorse.Render  (KIND=Method, Self implicit; a0,a1,a2 = the three Floats)
+' VA 0x0058ae38   536 bytes   vtable slot 0x5c   sig (f,f,f)i
+' byte-identical vs NSS5.exe (536/536, original length from Ghidra's inventory)
 ' VA 0x0058AE38  LEN=536 bytes (full function, Ghidra-authoritative)
 ' ORACLE: mode=reloc  matched=536/536  reloc_masked=25  STATUS=MATCH
 '

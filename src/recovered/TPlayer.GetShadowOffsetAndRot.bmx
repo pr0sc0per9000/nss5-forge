@@ -1,4 +1,6 @@
 ' TPlayer.GetShadowOffsetAndRot
+' VA 0x004eefdc   89 bytes   vtable slot 0x54   sig (i,*i,*i)i
+' byte-identical vs NSS5.exe (89/89, original length from Ghidra's inventory)
 ' VA 0x004EEFDC, 89 bytes
 ' byte-identical vs NSS5.exe
 

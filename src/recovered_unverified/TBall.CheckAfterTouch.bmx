@@ -1,5 +1,6 @@
 ' TBall.CheckAfterTouch
 ' VA 0x004C9C35   1175 bytes (Ghidra-authoritative)   vtable slot 0x6c   sig ()i
+' byte-identical vs NSS5.exe
 '
 ' FIXED this pass (was 4.1% byte agreement / delta +14 / wrong from byte 5 onward,
 ' i.e. everything after the prologue was misaligned). Re-verified MATCH, mode=reloc,

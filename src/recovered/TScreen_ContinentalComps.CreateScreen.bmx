@@ -1,5 +1,6 @@
 ' TScreen_ContinentalComps.CreateScreen
 ' VA 0x0053357a   1736 bytes   class-table slot 0x30   sig ()i   KIND=Function (static)
+' byte-identical vs NSS5.exe
 ' Gadget-construction family (see TScreen_Competitions.CreateScreen, the closest already-
 ' banked twin, which supplied the CreateButton/CreateTable/CreateCombo argument orders and
 ' the "assign-to-Global-then-AddGadget" vs "inline-into-AddGadget" convention below).

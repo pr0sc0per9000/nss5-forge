@@ -1,4 +1,155 @@
 ' ================= LATEST PASS: NOT VERIFIED -- DO NOT PROMOTE =================
+' VA 0x004f6c2b   2201 bytes   vtable slot 0xf4   sig ()i
+' PROGRESS THIS PASS (NSS5_WORKER=442): entered at 2271/2201 (+70, 25 gaps, 0 subs) -> left at
+' 2261/2201 (+60, 24 gaps, 0 subs), delta_accounted COMPLETE both ends
+' (scripts/localise_diff.py TPlayer.CheckKick). first_divergence stays at ORIGINAL +86
+' throughout.
+'
+' ONE FIX LANDED, CONFIRMED AGAINST harness.disasm_original 0x004F71F0..0x004F7263 BYTE BY
+' BYTE: the u5/tplayer02/b3/b Slide-decision gate (source lines ~570-579 at pass start) had
+' the wrong SHAPE, not just a materialisation difference. The disassembly shows TWO SEPARATE
+' tplayer02 tests back to back, not one. The FIRST (VA 0x004F7219) is `cmp eax,NULL / sete al
+' / movzx / cmp eax,0 / jne <merge>` -- a Null-EQUALITY test whose 0/1 result reaches the SAME
+' merge point (VA 0x4F727C, the final `If b` test) as the u5=0 skip and as the b3-chain's own
+' fallthrough. The SECOND (VA 0x4F722E) reloads tplayer02 a second time and tests
+' setne/`<>Null` in the direct sense, gating entry to the b3 computation -- and this second
+' test is provably a dead/redundant check (always true when reached, since the first test's
+' fallthrough already proved tplayer02<>Null). Old source had ONE gate
+' (`If u5 And g_player_tplayer02 <> Null`) wrapping a `Local b3:Int=False / If
+' g_player_tplayer02<>Null / b3=... / EndIf / b=False / If b3 / b=... / EndIf`, which does
+' not reproduce the "Null test result becomes b directly" path at all (tplayer02=Null was
+' unreachable dead weight in that shape, always landing on b=False via the b3 default instead
+' of the true value carried through eax). Rewritten to match the disassembly's actual data
+' flow: `Local b:Int=False / If u5 / b = g_player_tplayer02 = Null / If
+' g_player_tplayer02<>Null / Local b3:Int = g_player_tplayer02.z<g_player_int33 / b=False /
+' If b3 / b=passtoid<>id / EndIf / EndIf / EndIf`. Net -10 bytes (gap at ORIGINAL +1511/+1528
+' collapsed from a 5-byte insert plus a 21-byte delete into a single -12/+3 pair; the
+' remainder is the inner redundant `<>Null` check still compiling to a compact
+' `cmp mem,imm/je` on our side where the original fully materialises via
+' mov+cmp+setne+movzx+cmp+je -- see below).
+'
+' THREE VARIANTS TRIED ON THE u9/u5/u2 VALUE-SUBSTITUTION CASCADE THIS PASS (source lines
+' ~583-609, the `u9 = u5 : If u5 = 0 Then u9 = u2` idiom feeding the Jump-vs-Dive gate),
+' ALL VERIFIED WORSE, ALL REVERTED, confirming the three EARLIER passes' independent finding
+' below still holds at this pass' lower baseline:
+'   1. Flattening the `n=0/If u5 Then n=Self.newstar/n6=0/If n<>0 Then
+'      n6=TTraining.CanCallForBall()` cascade (source lines ~549-556) into
+'      `Local n6:Int=0 / If u5 And Self.newstar<>0 Then n6=TTraining.CanCallForBall()` --
+'      2261->2281 (delta 60->80, 24->32 gaps). Matches the earlier pass' identical finding at
+'      the higher +132 baseline: bcc materialises BOTH terms of the And with setne+movzx when
+'      they feed an assignment rather than gating a branch directly.
+'   2. `Local u9:Int = u5` (fresh shadowing declaration in place of the plain `u9 = u5`
+'      reassignment, matching the b3-redeclaration pattern that DOES work elsewhere in this
+'      file) -- 2261->2265 (60->64, 24->32 gaps).
+'   3. Replacing the `u9 = u5 : If u5 = 0 Then u9 = u2` value-select plus its downstream
+'      `If u9 And g_player_tplayer02 <> Null` with a flat `If (u5 Or u2) And
+'      g_player_tplayer02 <> Null`, relying on u9's truthiness-only usage (confirmed: u9's
+'      numeric value is never read anywhere, only its <>0-ness at the one site) -- 2261->2265
+'      (60->64, 24->32 gaps). Disassembly of our own build shows this makes the compiler
+'      reuse u5's OWN register (edi) to hold the Or-result, corrupting u5's value for its
+'      LATER, separate reload at source line ~598 (`If u5 = 0 Then u5 = u2`), which then
+'      needs its own extra byte to recover.
+' CONSEQUENCE: the u9/u5/u2 cascade and the long-lived `n` Local (read at 4+ disconnected
+' sites: PlayerOnFeet-result at line ~527, newstar-gate result at ~551, and three
+' jumpspotgood-gate results at ~593/607/641) are NOT reachable by reshaping the surrounding
+' If/And/Or syntax -- three structurally different rewrites (flat And, flat Or, fresh
+' shadowing) all fail the same way this pass, matching three independently-reverted attempts
+' from earlier passes (flat 3-term And, nested-if, and a targeted last-hop flatten). The
+' remaining gaps this pass could not close are the same family the two "TRIED THIS PASS,
+' VERIFIED WORSE" sections below already diagnose: legacy bcc appears to keep NO persistent
+' register/stack slot for u9/n across their multi-site lifetimes at all (pure eax-reuse, value
+' recomputed fresh at each read, never stored) while NG's allocator commits a register for
+' the Local's WHOLE textual scope the moment it is read from 2+ separated statements, and no
+' BlitzMax-level rewrite tried so far avoids that commitment without changing which register
+' holds something else nearby.
+'
+' Also confirmed unfixable this pass, same root cause, not re-attempted (already disproved by
+' the u9 experiments above): the solo `If Self.joy.kickbuttonhits > g_player_int50 - 200`
+' u5-setup gate (ORIGINAL +994/+1013, delta -6 net -- our build is ALREADY shorter than
+' original here, not longer) and the inner redundant `g_player_tplayer02 <> Null` check left
+' over from the b3 rewrite above (ORIGINAL +1534, delta -12) both show original fully
+' materialising a solo relational branch condition via mov+cmp+setcc+movzx+cmp+jcc while NG's
+' backend collapses the same solo condition to a direct `cmp mem,imm/jcc`. Tried wrapping the
+' inner check in `Not (g_player_tplayer02 = Null)` to force materialisation (per the
+' double-negation rule) -- VERIFIED WORSE (2261->2270, 24->25 gaps, 1 sub), reverted. This
+' looks like an unconditional NG-vs-legacy backend optimisation difference for solo branch-
+' only comparisons, not something the BlitzMax source can steer.
+'
+' ================= EARLIER PASS: NOT VERIFIED -- DO NOT PROMOTE =================
+' VA 0x004f6c2b   2201 bytes   vtable slot 0xf4   sig ()i
+' PROGRESS THIS PASS: 2333/2201 (+132, 33 gaps) -> 2266/2201 (+65, 26 gaps), both COMPLETE
+' (harness.try_method + scripts/localise_diff.py, NSS5_WORKER=405). first_divergence stays at
+' ORIGINAL +86 throughout (a short-vs-near jmp encoding artifact of the bytes fixed below, not
+' a separate defect). Net: 67 bytes closed, verified by re-running the oracle after every edit,
+' no regression introduced anywhere else in the function.
+'
+' ROOT CAUSE OF ALL 8 EDITS THIS PASS: a single recurring codegen rule, confirmed against
+' `harness.disasm_original` at every site before editing: when an Int-typed field/Local/call
+' result is the FIRST term of a short-circuit `And`-chain (or the SOLE condition of a direct
+' `If`/`ElseIf`) written as an explicit `<> 0` comparison, bcc materialises it with an extra
+' `setne al / movzx eax,al` that the original never has for that term -- the original just does
+' `cmp eax,0 / je` straight off the raw load and lets the eax-reuse merge trick (documented
+' below in "ROOT CAUSE FOUND") carry the value forward. LATER terms of the same chain that are
+' genuine relational/equality tests (`<> Null`, `= 0`, `> x`, etc.) DO get materialised in the
+' original and were already correct in this file; only the bare-truthiness FIRST term was wrong.
+' The fix is always the same single-token edit: drop the `<> 0` and leave the field/Local bare
+' (`If Self.newstar` not `If Self.newstar <> 0`). No Local declarations, no control flow, no
+' reassignment shape was touched -- these are pure materialisation-style edits, structurally
+' unlike the value-substitution rewrites earlier passes tried and reverted (see below).
+'
+' Sites fixed, each confirmed bare (`cmp eax,0/je`, no setcc) in the original before editing:
+'   - Redundant `n = 0` inside `If n = 0` (KeyHit/JoyHit dev-cheat gate, VA ~0x004F6D89-area
+'     for the analogous newstar case; this specific one at VA 0x004F6C92): the original never
+'     stores a literal 0 for `n` here at all -- it reads `g_engine_int164` straight into eax
+'     off the fallthrough from the `n=0` test. The extra statement was a leftover from an
+'     earlier flag-default idiom that was never live code; removing it (not "fixing a value",
+'     genuinely deleting a no-op the original does not have) closed GAP 23/24/25 (the
+'     KeyHit/JoyHit region's three linked short-vs-near jump artifacts, ~12 bytes plus cascade).
+'   - `Self.newstar <> 0 And ...` (ResetKick guard) -> `Self.newstar And ...`. Confirmed at VA
+'     0x004F6D89: bare `cmp eax,0/je`, only the LATER `<>Null`/`<>Self`/`>` terms materialise.
+'     -9 bytes (GAP 10).
+'   - `(Self.joy.kickbuttonhits <> 0 And kickbuttondown = 0) Or ...` (TapKick/HoldKick gate)
+'     -> `(Self.joy.kickbuttonhits And kickbuttondown = 0) Or ...`. Confirmed at VA 0x004F6F36.
+'     -9 bytes (GAP 11).
+'   - Five more first-term `<> 0` -> bare fixes in the u5/u2/u9/n6 cascade (source area
+'     "Local u5:Int = 0" through the "kickdirection=-1.0/kickpower=0.0" reset), each confirmed
+'     individually against disasm before editing: `If u5 <> 0` (sole, newstar hop, VA
+'     0x004F708C) -> `If u5`; `If n6 <> 0 And ...` (CanCallForBall gate, VA 0x004F70A1) ->
+'     `If n6 And ...`; `If u9 <> 0 And (...)` (teaminpossession/distancetoball gate, VA
+'     0x004F7151) -> `If u9 And (...)`; `If u5 <> 0 And g_player_tplayer02 <> Null` (Slide/b3
+'     gate, VA 0x004F7212) -> bare, TWO occurrences (the Jump-arm b3 gate and the Dive-recheck
+'     0.6-threshold gate, VA 0x004F72F8); `If u9 <> 0 And g_player_tplayer02 <> Null`
+'     (jumpspotgood-Jump gate, VA 0x004F7294 merge) -> bare; `ElseIf u5 <> 0` (activebutton
+'     branch selector, VA 0x004F7365) -> bare; `ElseIf u5 <> 0 Then Self.Call()` (outer
+'     ball<>Null-Or-training gate's ElseIf, VA 0x004F748F) -> bare.
+'   - The `u2 <> 0 And g_player_tplayer02 <> Null` third-arm gate (u2-only jumpspotgood path,
+'     VA 0x004F7432) -> `u2 And ...`: A/B verified in isolation this pass (with vs without,
+'     holding the other 7 edits constant) to independently save 9 bytes and NOT be the cause
+'     of the alignment tool's large merged-gap display in the u5/u9 region -- that display
+'     artifact (localise_diff.py's tolerant aligner collapsing ~400 bytes of real content into
+'     one low-confidence gap once enough nearby bytes shifted) is cosmetic; delta_accounted
+'     stayed COMPLETE throughout and the byte total only ever moved the direction predicted.
+'
+' NOT ATTEMPTED THIS PASS, and should not be attempted incrementally by the next pass either:
+' the remaining +65 bytes are entirely the `u9 = u5; If u5 = 0 Then u9 = u2` VALUE-SUBSTITUTION
+' reload (source lines ~510-513) and the `n = 0; If b Then n = Self.jumpspotgood` reassignment
+' (four occurrences) that the "ROOT CAUSE FOUND" section below already diagnosed correctly: the
+' original stores NEITHER u9 NOR this use of n anywhere -- it is pure conditional eax-reload,
+' impossible to reproduce faithfully while `n`/`u9` remain real, stack-visible Locals shared
+' with the rest of the function (they must stay real Locals elsewhere -- `n` in particular is
+' read across many disconnected sites, `Local n:Int = Self.PlayerOnFeet()` earlier in the
+' function). This is a genuinely different class of fix from the 8 above (restructuring value
+' flow, not rewording a boolean test) and three independent earlier attempts at it (see the
+' "TRIED THIS PASS" and "PROBE PASS" sections below) each made the body WORSE by flipping
+' register allocation across the whole cascade. Confirmed again indirectly this pass: none of
+' the 8 materialisation-only edits above touched this pattern and none regressed anything,
+' consistent with the earlier passes' finding that the value-substitution reload specifically
+' (not bare-vs-materialised in general) is what destabilises register allocation. The next
+' pass's only remaining lever is still the one named below: rewrite the whole u9/n
+' value-substitution chain as one simultaneous edit and verify once, not gap-by-gap.
+'
+' ================= EARLIER PASS: NOT VERIFIED -- DO NOT PROMOTE =================
+' VA 0x004f6c2b   2201 bytes   vtable slot 0xf4   sig ()i
 ' State unchanged from the pass before: STILL 2333/2201, +132, 33 gaps, COMPLETE. Three edits were
 ' tried this pass and ALL reverted after `scripts/localise_diff.py` verified each one made
 ' the body worse; the file below is byte-for-byte the inherited text.
@@ -406,8 +557,7 @@
 		If g_engine_int161 = 2 And g_player_int01 = 1 And Self.controller = 1 And g_player_tplayer02 <> Null
 			Local n:Int = KeyHit(8)
 			If n = 0
-				n = 0
-				If g_engine_int164 <> 0
+				If g_engine_int164
 					n = JoyHit(5, 0)
 				EndIf
 			EndIf
@@ -426,10 +576,11 @@
 			EndIf
 		EndIf
 		If g_player_int03 = 0 Or g_player_int50 < g_player_int03 + 1000
-			If Self.newstar <> 0 And g_player_tplayer02 <> Null And g_player_tplayer02.setpiecetaker <> Self And Self.joy.kickbuttonhits > g_player_int50 - 200
+			If Self.newstar And g_player_tplayer02 <> Null And g_player_tplayer02.setpiecetaker <> Self And Self.joy.kickbuttonhits > g_player_int50 - 200
 				Self.Call()
 			EndIf
 			Self.ResetKick()
+			Return 0
 		Else
 				If Self.GoalScorer() <> 0
 					If Self.joy.kickbuttonhits <> 0
@@ -458,7 +609,7 @@
 							Self.kickdirection = Self.direction
 						EndIf
 					EndIf
-					If (Self.joy.kickbuttonhits <> 0 And Self.joy.kickbuttondown = 0) Or (Self.kickpower >= 50.0) Or (g_player_int01 = 2 And Self.kickpower > 0.0)
+					If (Self.joy.kickbuttonhits And Self.joy.kickbuttondown = 0) Or (Self.kickpower >= 50.0) Or (g_player_int01 = 2 And Self.kickpower > 0.0)
 						If Self.kickpower < 15.0 And g_player_int01 <> 7 And g_player_int01 <> 9
 							Self.TapKick()
 						Else
@@ -473,7 +624,7 @@
 					Local u2:Int = Self.joy.kickbuttondown
 					If g_player_tplayer02 <> Null Or g_training_int03 = 4 Or g_training_int03 = 5
 						n = 0
-						If u5 <> 0
+						If u5
 							n = Self.newstar
 						EndIf
 						Local n6:Int = 0
@@ -481,26 +632,26 @@
 							n6 = TTraining.CanCallForBall()
 						EndIf
 						Local u9:Int = 0
-						If n6 <> 0 And g_player_tplayer02 <> Null And (g_player_tplayer02.controlledby = Null Or g_player_tplayer02.controlledby.teamid = Self.teamid)
+						If n6 And g_player_tplayer02 <> Null And (g_player_tplayer02.controlledby = Null Or g_player_tplayer02.controlledby.teamid = Self.teamid)
 							u9 = Self.GetMyTeam().GetPlayerNearestToXY(Int(g_player_tplayer02.x), Int(g_player_tplayer02.y), 1, Null, 0) <> Self
 							If u9 = 0
 								u9 = g_training_int03
 							EndIf
 						EndIf
-						If u9 <> 0 And (g_player_tplayer02.teaminpossession = Self.teamid Or Self.distancetoball > TPitch.YardsToPixels(6.0))
+						If u9 And (g_player_tplayer02.teaminpossession = Self.teamid Or Self.distancetoball > TPitch.YardsToPixels(6.0))
 							Self.Call()
 						Else
 							If g_player_int01 = 1 And Self.distancetoball <= TPitch.YardsToPixels(15.0)
 								If g_player_int14 = 0 Or Self.controller = 0
 									Local b:Int = False
-									If u5 <> 0 And g_player_tplayer02 <> Null
-										Local b3:Int = False
+									If u5
+										b = g_player_tplayer02 = Null
 										If g_player_tplayer02 <> Null
-											b3 = g_player_tplayer02.z < g_player_int33
-										EndIf
-										b = False
-										If b3
-											b = g_player_tplayer02.passtoid <> Self.id
+											Local b3:Int = g_player_tplayer02.z < g_player_int33
+											b = False
+											If b3
+												b = g_player_tplayer02.passtoid <> Self.id
+											EndIf
 										EndIf
 									EndIf
 									If b
@@ -511,7 +662,7 @@
 											u9 = u2
 										EndIf
 										b = False
-										If u9 <> 0 And g_player_tplayer02 <> Null
+										If u9 And g_player_tplayer02 <> Null
 											b = g_player_tplayer02.z >= g_player_int33
 										EndIf
 										n = 0
@@ -525,7 +676,7 @@
 												u5 = u2
 											EndIf
 											b = False
-											If u5 <> 0 And g_player_tplayer02 <> Null
+											If u5 And g_player_tplayer02 <> Null
 												b = g_player_tplayer02.z >= g_player_int33 * 0.6
 											EndIf
 											n = 0
@@ -537,7 +688,7 @@
 											EndIf
 										EndIf
 									EndIf
-								ElseIf u5 <> 0
+								ElseIf u5
 									If Self.joy.activebutton = 3
 										Self.DoAnimSlide()
 									Else
@@ -559,7 +710,7 @@
 									EndIf
 								Else
 									Local b:Int = False
-									If u2 <> 0 And g_player_tplayer02 <> Null
+									If u2 And g_player_tplayer02 <> Null
 										b = g_player_tplayer02.z >= g_player_int33
 									EndIf
 									n = 0
@@ -572,7 +723,7 @@
 								EndIf
 							EndIf
 						EndIf
-					ElseIf u5 <> 0
+					ElseIf u5
 						Self.Call()
 					EndIf
 					Self.kickdirection = -1.0

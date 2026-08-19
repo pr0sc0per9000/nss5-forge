@@ -1,4 +1,6 @@
 ' TScreen_Leagues.ComboClub
+' VA 0x00545746   697 bytes   vtable slot 0x48   sig ()i
+' byte-identical vs NSS5.exe (697/697, original length from Ghidra's inventory)
 ' VA 0x00545746   orig length 697 bytes (Ghidra-authoritative)
 ' KIND=Function ()i, slot 0x48.
 '

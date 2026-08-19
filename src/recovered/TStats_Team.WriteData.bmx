@@ -1,4 +1,6 @@
 ' TStats_Team.WriteData -- VA 0x0056ECB7, 735 bytes, vtable slot 0x38, sig (:TStream)i
+' VA 0x0056ecb7   735 bytes   vtable slot 0x38   sig (:TStream)i
+' byte-identical vs NSS5.exe (735/735, original length from Ghidra's inventory)
 ' ORACLE: MATCH mode=reloc  735/735  reloc_masked=74
 '
 ' ASSUMPTIONS / RESOLUTIONS

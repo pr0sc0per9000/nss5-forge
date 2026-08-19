@@ -571,13 +571,12 @@ def _recovered_files():
     # THelpBox.Create dereferences Null and no screen in the game can be built. A body that
     # is three bytes off is not "unfinished"; it is finished and unproven.
     #
-    # Worth knowing when reading behaviour off this build: 43 of these are adjudicated for
-    # functional equivalence as 25 EQUIVALENT, 8 EQUIVALENT_LIKELY, 8 NOT_EQUIVALENT,
-    # 2 UNKNOWN -- so most are functionally right, but a handful are genuinely wrong:
-    # TScreenMessage.Draw's inverted fade guard, TScreen_Leagues.ComboClub's missing
-    # AddItem, TPlayer.InterceptBall's Double/Float Locals, TProfile.CheckAchievement's
-    # extra release. Those are OUR bugs, not the original's, and preserve-by-default does
-    # not protect them.
+    # Worth knowing when reading behaviour off this build: these bodies are adjudicated for
+    # functional equivalence against the byte oracle, with the full per-body record in
+    # docs/archive/analysis/nearmiss-verdict.md. Most match or are judged equivalent. Three
+    # do not yet byte-match under a fresh oracle run and remain open: TGadget.RenderHighlight
+    # (728 of 748 bytes), TProfile.CheckAchievement (623 of 625 bytes), TScreenMessage.Draw
+    # (1115 of 1119 bytes). Preserve-by-default does not protect them until they close.
     #
     # A file here that is 100% comments contributes nothing and stays an empty stub --
     # load_recovered() finds no statements and skips it.

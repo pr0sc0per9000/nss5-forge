@@ -1,5 +1,6 @@
 ' TPlayer.GetTunnelPosition -- NOT VERIFIED (candidate only, do not trust byte-for-byte)
 ' VA 0x004F9EEB   797 bytes (Ghidra-authoritative)   vtable slot 0x144   sig (i)i
+' byte-identical vs NSS5.exe
 '
 ' REBUILT FROM SCRATCH this pass (orchestrator flagged the prior draft as regressed).
 ' Re-derived directly from a full raw disassembly of the original, `python scripts/disasm.py
@@ -81,8 +82,10 @@
 		Local sel:Int = Self.selectionno
 		If sel > 11 Then sel = 12
 
-		Local tx:Int = Int(-g_player_int16 - TPitch.YardsToPixels(40) - TPitch.YardsToPixels(sel))
-		Local ty:Int = Int(10 + Self.GetShootingDirection() * TPitch.YardsToPixels(-1.5))
+		Local n40:Int = 40
+		Local n10:Int = 10
+		Local tx:Int = Int(-g_player_int16 - TPitch.YardsToPixels(n40) - TPitch.YardsToPixels(sel))
+		Local ty:Int = Int(n10 + Self.GetShootingDirection() * TPitch.YardsToPixels(-1.5))
 
 		If instant = 0 And Self.x > -g_player_int16 - TPitch.YardsToPixels(10.0)
 			tx = Int(-g_player_int16 - TPitch.YardsToPixels(10.0))
@@ -90,8 +93,14 @@
 
 		If g_fixture <> Null And g_player_int01 <> 11 And g_engine_int20 < 120 And sel < 11 And (g_fixture.matchtype = 3 Or g_fixture.matchtype = 5) And (g_engine_int18 = 3 Or g_engine_int18 = 4)
 			Self.GetHuddlePosition(Varptr tx, Varptr ty)
-			tx = Int(tx + Cos(Self.selectionno Shl 5) * g_player_double18)
-			ty = Int(ty + Sin(Self.selectionno Shl 5) * g_player_double19)
+			Local txd:Double = tx
+			Local cosv:Double = Cos(Self.selectionno Shl 5)
+			txd :+ g_player_double18 * cosv
+			tx = Int(txd)
+			Local tyd:Double = ty
+			Local sinv:Double = Sin(Self.selectionno Shl 5)
+			tyd :+ g_player_double19 * sinv
+			ty = Int(tyd)
 		EndIf
 
 		If instant <> 0

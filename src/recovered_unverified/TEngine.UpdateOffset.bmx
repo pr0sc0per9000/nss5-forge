@@ -1,5 +1,6 @@
 ' UNVERIFIED -- TEngine.UpdateOffset
 ' VA 0x004CFB35   2004 bytes (Ghidra-authoritative)   slot 0x58   sig (f)i   KIND=Function (no Self)
+' byte-identical vs NSS5.exe
 ' NOTE: this is a static Function on TEngine (declared with the Function keyword inside the
 ' Type body) -- per codegen-patterns.md 11.5 it is verified with harness.try_method, NOT
 ' try_function. This file is WRAPPED format; feed it through localise_diff._body_of() /
@@ -167,10 +168,10 @@
 					End Select
 					Local dx:Double = ball.x
 					dx = dx + Cos(angle) * distance
-					campointx = g_engine_float01 * Float(dx)
+					campointx = Float(dx * g_engine_float01)
 					Local dy:Double = ball.y
 					dy = dy + Sin(angle) * distance
-					campointy = g_engine_float01 * Float(dy)
+					campointy = Float(dy * g_engine_float01)
 				EndIf
 			EndIf
 			If (g_hometeam.newstarselno > -1 Or g_awayteam.newstarselno > -1) And g_options_int06 > 0 Then
@@ -186,11 +187,7 @@
 								Local bx:Float = ball.x
 								Local by:Float = ball.y
 								If g_training_int03 <> 0 Then TTraining.GetFocus(human, Varptr bx, Varptr by)
-								Local basef:Float = Float(g_engine_int163 - 100)
-								Local distf:Float = TPitch.YardsToPixels(15.0)
-								Local d2:Float = Dist2D(bx, by, human.x, human.y)
-								distf = distf + d2
-								basef = basef / distf
+								Local basef:Float = Float(g_engine_int163 - 100) / (TPitch.YardsToPixels(15.0) + Dist2D(bx, by, human.x, human.y))
 								If g_options_int06 = 2 Then
 									g_engine_float01 = g_engine_float01 + (basef - g_engine_float01) * g_campan_ratezoom2
 									ClampFloat(Varptr g_engine_float01, 0.75, 1.75)
@@ -198,8 +195,8 @@
 									g_engine_float01 = g_engine_float01 + (basef - g_engine_float01) * g_campan_ratezoomdefault
 									ClampFloat(Varptr g_engine_float01, 0.5, 1.25)
 								EndIf
-								campointx = (human.x - bx) * g_campan_ratex + bx
-								campointy = (human.y - by) * g_campan_ratey + by
+								campointx = bx + (human.x - bx) * g_campan_ratex
+								campointy = by + (human.y - by) * g_campan_ratey
 								campointx = campointx * g_engine_float01
 								campointy = campointy * g_engine_float01
 							EndIf

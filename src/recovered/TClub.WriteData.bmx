@@ -1,5 +1,6 @@
 ' TClub.WriteData
 ' VA 0x004C0B16   1386 bytes   mode=reloc   MATCH 1386/1386
+' byte-identical vs NSS5.exe
 ' KIND=Function (static method on TClub), SIG=(:TStream)i, SLOT=0x54
 ' Body-only format: statements only, parameters are a0, a1, ...
 '

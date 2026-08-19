@@ -1,4 +1,6 @@
 ' TContinent.CreateContinent
+' VA 0x00508997   486 bytes   vtable slot 0x30   sig ($)i
+' byte-identical vs NSS5.exe (486/486, original length from Ghidra's inventory)
 ' VA        0x00508997   slot 0x30   KIND=Function (static)   SIG=($)i
 ' ORACLE    MATCH mode=reloc  486/486 bytes  reloc_masked=28
 '

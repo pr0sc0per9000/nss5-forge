@@ -1,6 +1,52 @@
 ' TFormation.GetPlayerXY -- VA 0x004D8B85, 2898 bytes, vtable slot 0x58 -- NOT VERIFIED (MISMATCH)
+' VA 0x004d8b85   2898 bytes   vtable slot 0x58   sig (i,f,f,f,f,i,i,*f,*f,f,f)f
 '
-' === LATEST PASS: IMPORTANT CORRECTION TO EVERYTHING BELOW, READ THIS FIRST ===
+' === NEWEST PASS: DIRECT a1 REASSIGNMENT RESTORES THE 13-SLOT FRAME, READ THIS FIRST ===
+' harness.try_method (NSS5_WORKER=402) on the body as it stands: MISMATCH, matched 693/2898,
+' our_len 2898, orig_len 2898 -- length-exact. The xshift/xshiftnoball step writes directly
+' to the `a1` parameter rather than through a separate `Local xAdj:Float`:
+'     a1 = a1 - Float(xOff)
+'     If a6 <> 0
+'         a1 = a1 - (a1 - (a3 / 2.0 - Float(xOff))) / g_form_xshift
+'     Else
+'         a1 = a1 - (a1 - (a3 / 2.0 - Float(xOff))) / g_form_xshiftnoball
+'     EndIf
+' Confirmed by enumerating every distinct `ebp - 0xNN` displacement in NSS5.exe's disassembly
+' of this function: the original frame (`sub esp,0x34`) holds exactly 13 distinct negative-
+' offset slots, contiguous from -4 to -0x34. A build using the direct-reassignment form above
+' matches that frame exactly (`sub esp,0x34`, same 13 slots). A build routed through a
+' `Local xAdj:Float` only reaches 12 slots (`sub esp,0x30`) even though xAdj itself never
+' takes a real memory slot in either build (it stays FPU-resident) -- the missing slot is a
+' downstream allocator effect of the Local's different live-range shape, not "one Local
+' short" in any literal sense. localise_diff.py on this state: 31 length-changing gaps
+' summing to +0 (delta_accounted COMPLETE), 49 same-length subs, of which 3 (ORIGINAL +237,
+' +327, +2802, the setbe/setae sites in "STILL WRONG" below) are real and 46 are cascaded
+' ebp-slot-renumbering noise (the aligner does not blank ebp-relative displacements, see
+' note 6 below) -- both counts independently reproduced this pass, matching the sections
+' below rather than assumed from them.
+'
+' Independent re-derivation of the site-3 mechanism (traced fresh this pass from a full
+' disassembly dump, not taken on faith from the sections below): every `ebp + 0x10` (a1's
+' own parameter slot) reference in the original, function-wide. The last store to that slot
+' is at ORIGINAL +212; every reference after that point is a single read at +710 that seeds
+' the xshift computation. Nothing downstream of that read -- the xshift result, both wScale
+' clamps on a1, the row=0 test, the final `a7[0] = a1 - a3/2.0` -- ever stores back to
+' `[ebp+0x10]`: the whole chain runs on one FPU-resident value across several conditional-
+' reassignment statements with zero spills, despite `a1` being written by `a1 = ...` more
+' than once in the source. `leg`, a Local with the identical clamp / row-0-test / final-
+' consume shape, does not get the same treatment from the allocator -- it spills at the
+' row=0 test (the fxch st(2)/fucom st(2) 3-deep idiom in "SITE 3" below), producing the
+' setbe/setae direction difference at ORIGINAL +2802 and the coupled +237/+327 sites. Two
+' source shapes this similar receiving different spill decisions from BCC's allocator reads
+' as a cost-model distinction between a parameter and a Local (or a degree/cost bookkeeping
+' effect per S18.4), not a source-level defect -- consistent with the four restructuring
+' attempts and the instrumented-allocator dump documented below finding no source-level
+' lever for it. Not re-attempted this pass beyond the trace above; this is a register-
+' allocator tie, not an unread construct, and further grinding on it without a new idea is
+' not a good use of budget.
+'
+' === PRIOR PASS: IMPORTANT CORRECTION TO EVERYTHING BELOW (superseded by the section above
+' on the our_len==2898 point, which it disputed; its setbe/setae and site-3 findings stand) ===
 ' The narrative below claims (repeatedly, in detail) that this body is LENGTH-EXACT
 ' (our_len==orig_len==2898) with only 3 confirmed same-length substitutions remaining (the
 ' setbe/setae sites) and that everything else is harmless stack-slot-renumbering aligner
@@ -727,11 +773,11 @@
 			End Select
 		EndIf
 		If g_player_int01 = 1 Then hScale = hScale * g_form_ymargin
-		Local xAdj:Float = a1 - Float(xOff)
+		a1 = a1 - Float(xOff)
 		If a6 <> 0
-			a1 = xAdj - (xAdj - (a3 / 2.0 - Float(xOff))) / g_form_xshift
+			a1 = a1 - (a1 - (a3 / 2.0 - Float(xOff))) / g_form_xshift
 		Else
-			a1 = xAdj - (xAdj - (a3 / 2.0 - Float(xOff))) / g_form_xshiftnoball
+			a1 = a1 - (a1 - (a3 / 2.0 - Float(xOff))) / g_form_xshiftnoball
 		EndIf
 		Local leg:Float = (a2 + Float(yOff)) - ((a2 + Float(yOff)) - (a4 / 2.0 + Float(yOff))) / g_form_yshift
 		If a1 < wSpacing * wScale * 0.5 Then a1 = wSpacing * wScale * 0.5

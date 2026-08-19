@@ -1,4 +1,5 @@
 ' ================= BUILD_FAIL, oracle-confirmed =================
+' VA 0x0058dda7   28 bytes   vtable slot 0x48   sig ($):SZipFileEntry
 ' harness.try_method('ZipFile','getFileInfoByName', body) -> BUILD_FAIL:
 '   Compile Error: Identifier 'getEntryByName' not found
 ' Same root cause as ZipFile.getFileCount.bmx in this directory: m_zipFileList's type

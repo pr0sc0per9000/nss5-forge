@@ -1,4 +1,6 @@
 ' TTraining.GoalScored
+' VA 0x005823d6   407 bytes   vtable slot 0xac   sig (:TBall)i
+' byte-identical vs NSS5.exe (407/407, original length from Ghidra's inventory)
 ' VA        0x005823D6   slot 0xAC   KIND=Function (static)   SIG=(:TBall)i
 ' ORACLE    MATCH mode=reloc  407/407 bytes  reloc_masked=14
 '

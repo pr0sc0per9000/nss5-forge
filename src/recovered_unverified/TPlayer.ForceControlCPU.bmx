@@ -1,4 +1,5 @@
 ' TPlayer.ForceControlCPU
+' byte-identical vs NSS5.exe
 ' VA 0x004F1491   1305 bytes   KIND=Method, SIG ()i, class-table slot 0x84
 ' Reconstructed directly against harness.disasm_original(0x004F1491,1305) -- the FULL
 ' original disassembly, not just Ghidra's C -- because several branches here only read

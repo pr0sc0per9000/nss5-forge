@@ -1,4 +1,6 @@
 ' TCone.CheckKnockOver  ()i   slot 0x4c
+' VA 0x00582fef   581 bytes   vtable slot 0x4c   sig ()i
+' byte-identical vs NSS5.exe (581/581, original length from Ghidra's inventory)
 ' VA 0x00582FEF   length 581   oracle: MATCH mode=reloc 581/581 reloc_masked=22
 '
 ' TCone Extends TTrainingObject, so img/frame/x/y/alive come from the Super (+0x08..+0x18);

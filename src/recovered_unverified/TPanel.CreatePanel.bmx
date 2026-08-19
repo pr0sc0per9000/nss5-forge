@@ -1,4 +1,6 @@
 ' REVISED this pass -- confirmed via the live compiler probe (harness.try_method):
+' VA 0x00519483   460 bytes   vtable slot 0x88   sig ($,$,i,i,i,i,$,$,i,f,i,i,i):TPanel
+' byte-identical vs NSS5.exe (460/460, original length from Ghidra's inventory)
 ' status=MATCH, matched=460/460, mode=reloc. Was 456/460 (delta -4, 48.9% raw score).
 ' VA 0x00519483   ORIGINAL 460 bytes   sig ($,$,i,i,i,i,$,$,i,f,i,i,i):TPanel
 '

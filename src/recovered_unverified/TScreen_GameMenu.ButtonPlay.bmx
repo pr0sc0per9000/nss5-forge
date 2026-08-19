@@ -1,5 +1,6 @@
 ' TScreen_GameMenu.ButtonPlay
 ' VA 0x0053B3F1   1527 bytes   vtable slot 0x4c   sig ()i   KIND=Function
+' byte-identical vs NSS5.exe
 ' Reconstructed from extracted/decomp_annotated/TScreen_GameMenu.ButtonPlay@0053b3f1.c,
 ' which resolves every SYM/CALL in this body.
 '

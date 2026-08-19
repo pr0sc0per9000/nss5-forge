@@ -1,5 +1,6 @@
 ' TCompetition.CreateCompetition
 ' VA 0x005092E3   2026 bytes   KIND=Function (static)   SIG=($,:TStream)i   slot 0x34
+' byte-identical vs NSS5.exe
 '
 ' MODULE GLOBAL
 '   0x00C6EF74 -> g_club_int07:Int -- the SAME address TClub.CreateClub already declares

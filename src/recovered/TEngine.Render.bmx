@@ -1,4 +1,5 @@
 ' TEngine.Render
+' byte-identical vs NSS5.exe
 ' VA 0x004D0309   282 bytes   mode=reloc
 ' Verified through the oracle from scratch with helper_map.record stubbed; MATCH over
 ' the full Ghidra-authoritative length, every byte.

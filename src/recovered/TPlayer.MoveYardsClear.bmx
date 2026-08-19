@@ -1,4 +1,6 @@
 ' TPlayer.MoveYardsClear -- VA 0x004F9CF5, 391 bytes
+' VA 0x004f9cf5   391 bytes   vtable slot 0x13c   sig (f,i,i)i
+' byte-identical vs NSS5.exe (391/391, original length from Ghidra's inventory)
 ' byte-identical vs NSS5.exe (391/391, original length from Ghidra's inventory, mode=reloc,
 ' reloc_masked=13).
 '

@@ -2,6 +2,7 @@
 ' later pass that read the FULL original disassembly at VA 0x004F9201 instead of only the
 ' Ghidra C, via scripts/bytematch.py's disasm_original(0x004f9201, 696)).
 ' VA 0x004F9201   696 bytes   vtable slot 0x124   sig (:TBall)i
+' byte-identical vs NSS5.exe
 ' Previous score: 307/686 (44.8%), first diff at byte 5 (the `sub esp,N` immediate --
 ' i.e. the whole local-variable/stack-slot layout was off, not a late statement).
 '
@@ -76,20 +77,16 @@
 				Local playerPos:TMyVector = TMyVector.Create(Self.x, Self.y, 0)
 				Local playerVel:TMyVector = TMyVector.Create(Self.xvel, Self.yvel, 0)
 				Local relVel:TMyVector = ballVel.Sub(playerVel)
-				Local dist:Double = ballPos.Sub(playerPos).GetLength()
-				Local t:Double = dist / relVel.GetLength()
-				Local adjT:Double = t
-				adjT :* 0.95
+				Local dist:Double = ballPos.Sub(playerPos).GetLength() / relVel.GetLength()
+				dist :* 0.95
 				ballPos.SetX(a0.x)
 				ballPos.SetY(a0.y)
 				ballVel.SetX(vx)
 				ballVel.SetY(vy)
-				Local landing:TMyVector = ballPos.Add(ballVel.Mul(adjT))
+				Local landing:TMyVector = ballPos.Add(ballVel.Mul(dist))
 				desx = landing.GetX()
 				desy = landing.GetY()
-				Local ang1:Float = AngleTo(Self.x, Self.y, a0.x, a0.y)
-				Local ang2:Float = AngleTo(Self.x, Self.y, desx, desy)
-				If AngleDiff(ang2, ang1, 1) > g_player_double15
+				If AngleDiff(AngleTo(Self.x, Self.y, desx, desy), AngleTo(Self.x, Self.y, a0.x, a0.y), 1) > g_player_double15
 					desx = a0.x
 					desy = a0.y
 					Return 0

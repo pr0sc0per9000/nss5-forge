@@ -65,6 +65,47 @@
 '   bottom: DrawRect ix-b-2, iy+h+2, w+b*2+4, b
 '   left:   DrawRect ix-b-2, iy-b-2, b, h+b*2+2
 '   right:  DrawRect ix+w+2, iy-b-2, b, h+b*2+4
+'
+' MEASURED REGISTER-ALLOCATION COST (scripts/workflow/walloc_report.py, instrumented
+' bcc, worker 435; scripts/localise_diff.py for the byte-level picture). This body
+' builds to 728 bytes against the original's 748. localise_diff.py resolves the whole
+' -20-byte gap into 14 length-changing gaps plus 23 same-length substitutions, and
+' every one of them, gap and substitution alike, is the same instruction:
+' `mov eax, dword ptr [ebp+8]` reloading Self before a field access, or the stack-slot
+' address that reload's absence shifts. The original pays that reload at nine of its
+' ten field accesses (the first is folded into fetching x, same as this build); this
+' build's compiler keeps Self resident in edi for the whole function and never reloads
+' it. No operand order, wrong callee or wrong global address shows up anywhere in the
+' comparison -- the gap is this one register decision and its knock-on slot numbering,
+' completely.
+'
+' The allocator's own trace explains why Self keeps its register. At the decisive
+' spill() call the two live candidates are iy (usage=7, degree=7, block_count=3,
+' cost=0.3333) and Self, unnamed in the trace (usage=11, degree=6, block_count=4,
+' cost=0.4583); lower cost spills first, so iy takes the stack slot and Self keeps edi.
+' Three separate process launches reproduce the same 0.3333/0.4583 split and the same
+' outcome -- this is not the tool's documented near-tie nondeterminism, which only
+' shows up when a rerun flips the winner. ix's own spill (usage=5, degree=24,
+' block_count=4, cost=0.0521) sits an order of magnitude below either and is nowhere
+' near competitive.
+'
+' Neither contested node has slack left. Self's block_count is already at this
+' function's ceiling (4, the same span ix gets): its first and last field access
+' bracket the entire body, so raising it needs a basic block the original does not
+' have. iy's block_count (3) is the minimum its role in the existing branch allows --
+' read in the clamp condition, written again inside the If, read in all four DrawRect
+' calls after the merge -- and the confirmed disassembly shows the ORIGINAL carries iy
+' through those same stages too, so shedding a block here would desync from it, not
+' match it. Flipping the decision needs iy's degree*block_count under 15 (currently 21)
+' or Self's over 34 (currently 24) -- a 6-to-9-point swing in one interference count,
+' not the size of change a legal statement move produces when every statement's
+' position is already pinned by the evaluation order confirmed above. The search log
+' (scripts/workflow/deep_TGadget_RenderHighlight_log.tsv) holds 366 logged variants
+' across operand spelling, multiplication form, declaration order and clamp phrasing;
+' none of those axes touch degree or block_count for either contested node, and every
+' one converges on this same 728-byte result. Treated as closed under this toolchain --
+' the numbers are reported above rather than spending further budget on permutations
+' that do not reach the lever this decision actually turns on.
 
 '!Global g_engine_int163:Int
 '!Global g_screen_float02:Float

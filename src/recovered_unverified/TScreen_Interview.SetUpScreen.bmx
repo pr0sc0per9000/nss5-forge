@@ -1,5 +1,6 @@
 ' TScreen_Interview.SetUpScreen
 ' VA 0x0057B109   1335 bytes   KIND=Function (static, no implicit Self), SIG=()i, class-table slot 0x34
+' byte-identical vs NSS5.exe
 ' Reconstructed from extracted/decomp/TScreen_Interview.SetUpScreen@0057b109.c cross-checked
 ' against a full manual disassembly (scripts/harness.disasm_original) to resolve Ghidra's
 ' merged call-argument lists.

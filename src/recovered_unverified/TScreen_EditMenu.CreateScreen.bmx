@@ -1,5 +1,6 @@
 ' TScreen_EditMenu.CreateScreen
 ' VA 0x00527B84   1446 bytes   sig ()i   class-table slot 0x30   KIND=Function (static)
+' byte-identical vs NSS5.exe
 ' REBUILT this pass from a direct disassembly of NSS5.exe (scripts/disasm.py 0x00527B84),
 ' not from extracted/decomp*/'s Ghidra pseudo-C. That C is actively misleading here: Ghidra
 ' constant-propagates every Local whose value it can trace back to a literal, so w=200,

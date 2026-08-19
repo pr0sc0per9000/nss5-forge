@@ -1,4 +1,6 @@
 ' TClub.CreateClub
+' VA 0x004bfea2   2782 bytes   vtable slot 0x48   sig ($)i
+' byte-identical vs NSS5.exe (2782/2782, original length from Ghidra's inventory)
 ' VA        0x004BFEA2   classtable slot 0x48   KIND=Function (static)   SIG=($)i
 '
 ' MODULE GLOBAL

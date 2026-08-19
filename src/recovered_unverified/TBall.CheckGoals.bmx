@@ -1,4 +1,6 @@
 ' ============ localise_diff.py reports CLEAN, 2008/2008, delta 0 ================
+' VA 0x004ca0cc   2008 bytes   vtable slot 0x70   sig ()i
+' byte-identical vs NSS5.exe (2008/2008, original length from Ghidra's inventory)
 ' TBall.CheckGoals -- VA 0x004CA0CC, 2008 bytes (Ghidra-authoritative), KIND=Method
 ' SIG=()i SLOT=0x70. Self=[ebp+8].
 '

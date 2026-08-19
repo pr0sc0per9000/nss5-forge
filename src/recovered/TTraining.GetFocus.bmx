@@ -1,4 +1,6 @@
 ' TTraining.GetFocus  (:TPlayer,*f,*f)i   slot 0xa8   KIND=Function (static, no Self)
+' VA 0x0058222d   425 bytes   vtable slot 0xa8   sig (:TPlayer,*f,*f)i
+' byte-identical vs NSS5.exe (425/425, original length from Ghidra's inventory)
 ' VA 0x0058222D   length 425   oracle: MATCH mode=reloc 425/425 reloc_masked=15
 '
 ' Assumptions:
