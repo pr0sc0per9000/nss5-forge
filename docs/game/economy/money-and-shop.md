@@ -1,6 +1,6 @@
 # Money, wages and spending
 
-> **Source:** `TProfile.UpdateFinances` @ 0x0056b7e3 (VERIFIED) · `TProfile.UpdateBank` @ 0x0056b669 (VERIFIED) · `TProfile.GetSponsorshipAmount` @ 0x0056ae46 (VERIFIED) · `TProfile.OfferSponsorship` @ 0x0056c158 (VERIFIED) · `TProfile.CheckSponsorExpiry` @ 0x0056bfe2 (VERIFIED) · `TProfile.GetPropertyCosts` @ 0x0056aec2 (VERIFIED) · `TProfile.GetVehicleCosts` @ 0x0056af98 (VERIFIED) · `TProfile.GetRentCosts` @ 0x0056ae99 (VERIFIED) · `TProfile.GetLifestyle` @ 0x0056b5da (VERIFIED) · `TProfile.SellItemByName` @ 0x0056b1de (VERIFIED) · `TProfile.BuyBoots` @ 0x0056c367 (VERIFIED) · `TProfile.WearBoots` @ 0x0056a310 (VERIFIED) · `TProfile.GetStableSize` @ 0x0056b974 (VERIFIED) · `TScreen_Shop.ButtonBuy` @ 0x005424de (VERIFIED) · `TScreen_BootShop.ButtonBuy` @ 0x00543cdc (VERIFIED) · `TScreen_BootShop.SetUpScreen` @ 0x00543978 (VERIFIED) · `TScreen_MatchPrep.SetUpScreen` @ 0x0055d904 (VERIFIED) · `TPlayer.CreatePlayerSimple` @ 0x004ed58d (VERIFIED) · `BootBoost` @ 0x00507ddd (VERIFIED) · `SponsorAmount` @ 0x00507d1a (VERIFIED) · `TierA` @ 0x00507b79 (VERIFIED) · `TierB` @ 0x00507c04 (VERIFIED) · `TierC` @ 0x00507c8f (VERIFIED)
+> **Source:** `TProfile.UpdateFinances` @ 0x0056b7e3 (VERIFIED) · `TProfile.UpdateBank` @ 0x0056b669 (VERIFIED) · `TProfile.GetSponsorshipAmount` @ 0x0056ae46 (VERIFIED) · `TProfile.OfferSponsorship` @ 0x0056c158 (VERIFIED) · `TProfile.CheckSponsorExpiry` @ 0x0056bfe2 (VERIFIED) · `TProfile.GetPropertyCosts` @ 0x0056aec2 (VERIFIED) · `TProfile.GetVehicleCosts` @ 0x0056af98 (VERIFIED) · `TProfile.GetRentCosts` @ 0x0056ae99 (VERIFIED) · `TProfile.GetLifestyle` @ 0x0056b5da (VERIFIED) · `TProfile.SellItemByName` @ 0x0056b1de (VERIFIED) · `TProfile.BuyBoots` @ 0x0056c367 (VERIFIED) · `TProfile.WearBoots` @ 0x0056a310 (VERIFIED) · `TProfile.GetStableSize` @ 0x0056b974 (VERIFIED) · `TScreen_Shop.ButtonBuy` @ 0x005424de (VERIFIED) · `TScreen_BootShop.ButtonBuy` @ 0x00543cdc (VERIFIED) · `TScreen_BootShop.SetUpScreen` @ 0x00543978 (VERIFIED) · `TScreen_MatchPrep.SetUpScreen` @ 0x0055d904 (VERIFIED) · `TPlayer.CreatePlayerSimple` @ 0x004ed58d (VERIFIED) · `GetBootBonus` @ 0x00507ddd (VERIFIED) · `SponsorAmount` @ 0x00507d1a (VERIFIED) · `TierA` @ 0x00507b79 (VERIFIED) · `TierB` @ 0x00507c04 (VERIFIED) · `TierC` @ 0x00507c8f (VERIFIED)
 > **Confidence:** HIGH
 > **Last checked:** 2026-08-15
 
@@ -126,7 +126,7 @@ differently from the cosmetic shop: they are *consumable*, not permanent.
   slot). At 0, the gear is worn out.
 - `TPlayer.CreatePlayerSimple`, which builds the player-controlled player's in-match stats
   from the profile, adds a **real stat bonus** from whichever boots are currently owned, via
-  the `BootBoost(tier, stat)` lookup table (0-2 points, added at ×10 before the 0.2 scaling
+  the `GetBootBonus(tier, stat)` lookup table (0-2 points, added at ×10 before the 0.2 scaling
   every raw stat goes through):
 
 | Boot tier | Dribbling boost | Passing boost | Shooting boost |

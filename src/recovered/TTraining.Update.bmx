@@ -36,6 +36,7 @@
 '    (the `EB 52` before it is the no-match path); the second has an empty `Case 2`.
 '
 ' `g_train_counter :- 1` emits `sub dword [g],1`; the `x = x - 1` spelling does not.
+' byte-identical vs NSS5.exe
 	Function Update:Int()
 		'!Global g_train_mode:Int
 		'!Global g_train_state:Int

@@ -1,4 +1,5 @@
 ' TScreen_EditNations.UpdateNat
+' byte-identical vs NSS5.exe
 ' VA 0x0052AFF4   601 bytes   mode=reloc   MATCH 601/601
 ' KIND=Function (static method on TScreen_EditNations), SIG ()i, class-table slot 0x44.
 ' Body-only format: statements only, parameters are a0, a1, ...

@@ -1,4 +1,6 @@
 ' TDrawOb.RenderAll
+' VA 0x004cd555   744 bytes   vtable slot 0x38   sig (f,f,f)i
+' byte-identical vs NSS5.exe (744/744, original length from Ghidra's inventory)
 ' VA        0x004CD555   slot 0x38   KIND=Function (static)   SIG=(f,f,f)i
 ' ORACLE    MATCH mode=reloc  744/744 bytes  reloc_masked=29
 '

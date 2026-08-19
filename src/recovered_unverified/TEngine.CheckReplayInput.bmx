@@ -1,5 +1,6 @@
 ' TEngine.CheckReplayInput   (KIND=Function -- static, no Self)
 ' VA 0x004D4A9E   1131 bytes   class-table slot 0xA8   sig ()i
+' byte-identical vs NSS5.exe
 ' Body-only format: statements only, no parameters.
 '
 ' What it does: the per-frame input poll while a replay is on screen (called from

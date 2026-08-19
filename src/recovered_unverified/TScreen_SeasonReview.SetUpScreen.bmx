@@ -1,4 +1,5 @@
 ' TScreen_SeasonReview.SetUpScreen -- NOT VERIFIED candidate.
+' VA 0x0055f8e6   2276 bytes   vtable slot 0x34   sig ()i
 ' VA 0x0055F8E6   Ghidra-authoritative length 2276 bytes   slot 0x34   KIND=Function   SIG=()i
 '
 ' CURRENT STATE: ours is 2273 of 2276 bytes -- delta -3, mode=len (does not yet MATCH).

@@ -3,6 +3,25 @@
 ' NOT VERIFIED -- NEAR MISS: ours 327 bytes (delta +2). One single defect remains, fully
 ' characterised below. Verified via harness.try_function under NSS5_NO_LEARN=1.
 '
+' ============================ NOT A DIVERGENCE ============================
+' Steam integration functions get checked for a possible divergence, the way
+' src/recovered_module/SteamInit.bmx diverges from the original OpenSteam call. This one
+' does not qualify. Every Steam call below sits behind a single guard,
+' `If g_profile_int43 <> 1 Then Return 0`, on the same flag SteamInit.bmx writes as
+' g_steamstate at 0x00C6F3B8 (confirmed: both functions read/write DAT_00c6f3b8 in Ghidra's
+' decompilation). SteamInit fixes that flag at 0 (offline) unconditionally, so the guard here
+' is never satisfied and FindLeaderboard / ReadSteam / UploadLeaderboardScore never run.
+' Unlike OpenSteam, nothing in this function calls End or otherwise halts the process on a
+' Steam failure -- the worst case, even if the guard were somehow satisfied, is a bounded
+' 2-second poll loop that falls through and returns 0. Reproducing the original logic
+' verbatim is therefore safe: it changes no observable behaviour versus a stub, needs no
+' neutralisation, and keeps the body faithful to NSS5.exe instead of inventing a divergence
+' nothing requires. The build already proves the link surface itself is harmless: the probe
+' compiles and links clean against extern/steamstub/libsteamstub.a (dlltool-built from the
+' shipped binary/steamstub.dll, the game's own file, not a Valve component) with no
+' BUILD_FAIL. Fn_0058D90B.SyncSteamAchievements.bmx, the sibling Steam Function called from
+' TProfile.LoadSavedGame, reaches the identical conclusion for the identical reason.
+'
 ' ============================ WHAT IT ACTUALLY IS ============================
 ' It posts the player's value to a Steam leaderboard. It is NOT what the caller's notes
 ' predicted. TProfile.SaveGame.bmx's header recorded a working hypothesis that this was a

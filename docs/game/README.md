@@ -81,7 +81,7 @@ The handful of things worth reading even if you read nothing else here.
   [data/csv-schemas.md](data/csv-schemas.md).
 
 * **Boots, shin pads and energy drinks are not cosmetic - they change your stats.** A
-  `BootBoost` lookup table adds real dribbling/passing/shooting points, shin pads add flat
+  `GetBootBonus` lookup table adds real dribbling/passing/shooting points, shin pads add flat
   tackling, and NRG drinks add pace, directly into the live match. Property, vehicles and most
   shop items, by contrast, only ever feed a cosmetic "Lifestyle" score. See
   [economy/money-and-shop.md](economy/money-and-shop.md).

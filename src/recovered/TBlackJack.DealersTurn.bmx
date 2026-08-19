@@ -1,6 +1,7 @@
 ' TBlackJack.DealersTurn  -- KIND=Function (STATIC method on TBlackJack), slot 0x48, sig ()i
 ' VA 0x0057704C   542 bytes   (original length from Ghidra's inventory)
 ' ORACLE: MATCH mode=reloc  542/542  reloc_masked=45
+' byte-identical vs NSS5.exe
 '
 ' ASSUMPTIONS / RESOLUTIONS
 '   FUN_004C5549 = GetText ($)$        FUN_004A7410 = _brl_retro_Lower

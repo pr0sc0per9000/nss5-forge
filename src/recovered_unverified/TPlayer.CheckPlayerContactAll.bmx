@@ -1,5 +1,6 @@
 ' TPlayer.CheckPlayerContactAll
 ' VA 0x004F458A   1577 bytes   KIND=Function, SIG=()i, class-table slot 0xD0
+' byte-identical vs NSS5.exe
 '
 ' ASSUMPTIONS (module Global names are ours; the originals are unrecoverable)
 '   g_player_int01    0x00C5B1FC : Int    -- match state, gate value 1 = live play. This
@@ -193,7 +194,8 @@ For Local side:Int = 1 To 2
 							EndIf
 						Else
 							If ball <> Null And ball.controlledby = q And p.PlayerOnFeet() And ball.controlledby.selectionno > 0 And Dist2D(p.x, p.y, q.x, q.y) < g_player_int34
-								If p.facing <> q.facing And Int(115.0 - p.tackling) < AngleDiff(p.direction, q.direction, 1)
+								Local tackle115:Int = Int(115.0 - p.tackling)
+								If p.facing <> q.facing And AngleDiff(p.direction, q.direction, 1) > tackle115
 									p.BlockTackle()
 								EndIf
 							EndIf
@@ -207,9 +209,11 @@ Next
 
 For Local p:TPlayer = EachIn g_players
 	For Local q:TPlayer = EachIn g_players
-		If p <> q And p.teamid <> q.teamid And Dist2D(p.x, p.y, q.x, q.y) < g_player_int34
-			If p.PlayerOnFeet() And q.PlayerOnFeet()
-				TPlayer.DoCollision(p, q)
+		If p <> q And p.teamid <> q.teamid
+			If Dist2D(p.x, p.y, q.x, q.y) < g_player_int34
+				If p.PlayerOnFeet() And q.PlayerOnFeet()
+					TPlayer.DoCollision(p, q)
+				EndIf
 			EndIf
 		EndIf
 	Next

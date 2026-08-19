@@ -1,5 +1,6 @@
 ' TClub.CheckStadiumSizeAll
 ' VA 0x004C2311   464 bytes   mode=reloc   MATCH 464/464
+' byte-identical vs NSS5.exe
 ' KIND=Function (static method on TClub), SIG ()i, class-table slot 0x90.
 ' Body-only format: statements only, parameters are a0, a1, ...
 '

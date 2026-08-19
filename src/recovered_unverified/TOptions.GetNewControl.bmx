@@ -1,4 +1,5 @@
 ' TOptions.GetNewControl -- NOT VERIFIED (near miss, 703 of 705 bytes, delta -2, COMPLETE)
+' byte-identical vs NSS5.exe
 ' VA 0x004E2C3A   705 bytes (Ghidra-authoritative)   KIND=Function (static, no Self)   SIG=()i
 ' vtable slot 0x3c
 '
@@ -139,7 +140,16 @@ Repeat
 	TScreen.RenderBorder()
 	DrawImageRect(g_Object102, g_screen_float01, g_screen_float02, Float(g_screen_int21), Float(g_screen_int22), 0)
 	Local mode:Int = g_options_int01
-	If mode <> 0
+	Select mode
+	Case 0
+		TEngine.DrawMyText(GetText("CMESSAGE_GETKEY"), g_engine_int162 / 2, g_engine_int163 / 2, 1, 1, 1.0, 1.0, "FFFFFF", 0)
+		For Local i:Int = 0 To 255
+			If KeyDown(i)
+				WaitForJoyRelease()
+				Return i
+			EndIf
+		Next
+	Default
 		TEngine.DrawMyText(GetText("CMESSAGE_GETJOY"), g_engine_int162 / 2, g_engine_int163 / 2, 1, 1, 1.0, 1.0, "FFFFFF", 0)
 		If g_engine_int164 <> 0
 			Local usejoybutton:Int = 0
@@ -171,14 +181,6 @@ Repeat
 				Return -4
 			EndIf
 		EndIf
-	Else
-		TEngine.DrawMyText(GetText("CMESSAGE_GETKEY"), g_engine_int162 / 2, g_engine_int163 / 2, 1, 1, 1.0, 1.0, "FFFFFF", 0)
-		For Local i:Int = 0 To 255
-			If KeyDown(i)
-				WaitForJoyRelease()
-				Return i
-			EndIf
-		Next
-	EndIf
+	End Select
 	Flip(-1)
 Until MilliSecs() > starttime + 3000

@@ -1,5 +1,256 @@
 ' =========================== NOT VERIFIED -- DO NOT COUNT AS MATCHED ===========================
+' VA 0x004ff67c   15154 bytes   vtable slot 0x230   sig ()i
 ' TPlayer.RecordPlayerStats   VA 0x004FF67C   original length 15154 bytes
+'
+' REVISION L -- one disassembly-verified source-spelling fix (NSS5_WORKER=440,
+' harness.try_method + scripts/localise_diff.py max_gaps=200, fresh isolated tree). Starting
+' point was revision K's state exactly as recorded below (our_len 15163, orig_len 15154,
+' delta +9, 38 gaps, 178 same-length subs).
+'
+'   Candidate line 955, "local_8 = local_8 + (iVar14 + iVar13) * 2 - 6" (the CountStat(7)+
+'   CountStat(8)+CountStat(11) rating-delta term, right after "g_profile.coachrep_boss :+
+'   local_8"). Read the original directly at orig_off+6007..6017: it computes the RHS
+'   entirely in eax (load iVar14 from its own stack slot, add edi/iVar13, shl 1, sub 6) and
+'   then applies it to local_8 with a single "add dword ptr [ebp-4], eax" -- a memory
+'   read-modify-write with NO preceding load of local_8's own current value. Our build's
+'   compiled form for the plain "=" reassignment instead loaded local_8 into a register
+'   FIRST ("mov edx,[ebp-4]"), then added the computed term into that register, then stored
+'   it back -- an extra load the original does not have. Every other self-referencing
+'   reassignment in this file was checked individually against its own disassembly before
+'   touching anything (g_profile.thisweeksassistbonus/thisweeksgoalbonus at candidate lines
+'   857-858, g_profile.coachrep_fame at 931, iVar14=iVar14+iVar15 at 944, and all six
+'   local_8=local_8+/-1 single-increment sites at 966-979): every one of those already
+'   matches the original's own bytes exactly (the Global-field sites reload the global
+'   pointer three times on both sides regardless of "=" spelling; the bare +1/-1 sites
+'   compile to the identical memory-immediate add/sub either way, since there is no second
+'   operand to load). Candidate line 955 is the only site in the file where the RHS is a
+'   multi-term expression pulling in other named Locals, and it is the only site where the
+'   "=" vs ":+" spelling changes the emitted bytes. Rewrote as the compound form:
+'       local_8 :+ (iVar14 + iVar13) * 2 - 6
+'   This is the same value, computed the same way, written the way the original spells a
+'   local variable being incremented in place rather than reassigned from itself.
+' Result: our_len 15163 -> 15158 (delta +9 -> +4), closing both the +3@6007 and +2@6014
+' gaps outright (localise_diff drops from 38 to 36 length-changing gaps; the -5 total exactly
+' matches the sum of those two closed gaps, confirmed by a fresh full-body rebuild and
+' oracle call, not a probe). Same-length subs went 178 -> 179; the one new entry is the
+' expected residual at the same statement (mov eax,[ebp-0x28]/add eax,edi in the original
+' vs mov eax,[ebp-0x24]/add eax,ebx in ours) -- an operand-slot/register-name difference of
+' the same already-catalogued frame-size/register-allocation class as every other sub in
+' this file's list, not a new defect class. Re-scanned the full subs list afterward for any
+' setcc/jcc mnemonic mismatch (grepped for je/jne/jle/jge/sete/setne/setl/setg across every
+' SUB entry): none found, matching revision K's own closing note that this class of defect
+' is fully closed.
+'
+' All 36 remaining gaps were individually re-examined against fresh disassembly this pass
+' (not assumed from the header) and every one falls into a family already diagnosed by
+' revisions D through K, or into one newly confirmed and folded into that same family here:
+'   * +173/-173 @ 6625/6733 -- the pre-existing "ARTEFACT, net zero" pair. Read in full this
+'     pass: two near-identical decrement/notify blocks (one per counter field, +0x68 and
+'     +0x6c) that are present, in the same source order, on both sides; the aligner just
+'     cannot line the two up locally because they are structurally identical. Not a
+'     reordering defect -- left untouched, matching every prior revision's conclusion.
+'   * +58/-29/-29 @ 11225/11414/11623 -- the CountStat(6)/(17)/(3) nested-guard cluster
+'     revision H already tested (literal flip, reverted) and revision D/C first diagnosed as
+'     a whole branch-target graph, not independently fixable one comparison at a time. Not
+'     re-attempted; the header's own evidence for this one is still accurate.
+'   * +10/-9/-2 @ 5820/5789/5833 -- the CountStat(11)/(7)/(8) triad revision J already tested
+'     (fusing the three Local declarations into one expression, reverted for making our_len
+'     worse). Re-read the disassembly fresh this pass: original keeps CountStat(11) in edi
+'     and the CountStat(7)+CountStat(8) sum in ebx the whole time; the three-statement
+'     source form already produces exactly that register plan, so the register CHOICE (edi
+'     vs ebx numbering) is the only remaining difference, not the source shape.
+'   * +34/-31 @ 9388/9423 -- NEW this pass, same family: two debug LogLine calls
+'     ("WinningTeam:" + esi_var, then "MyTeam:" + ebx_var, confirmed via harness.read_string
+'     on 0xc7ae6c/0xc7ae90) followed by a comparison of the two values. Both sides call
+'     LogLine in the same order with the same two strings; the byte difference is purely
+'     which of the two values our build keeps live in a register (esi) versus which one it
+'     spills to a stack slot ([ebp-0x1c]) across the two calls, where the original keeps
+'     both in registers (esi/ebx) the whole time. Register-allocation, not source order.
+'   * -5 @ 10320 and +1 x4 @ 10753/10880/11007/11116 -- confirmed, by tracing eax's origin
+'     backward from the -5 site, to be the SAME accident the header already documented for
+'     the four Rand(5,1) push-immediate-vs-push-register sites: "mov eax,5" at +10320 is a
+'     register preload that survives, unused at that point, all the way to the first Rand
+'     call far downstream. One root cause, five gaps, already catalogued.
+'   * -4/-2/-2 @ 775/735/746 -- the iVar4.locale/comptype and CLEFT/CRIGHT bare-field-check
+'     sites revision C/H already traced (original always reloads the field VALUE into a
+'     register before comparing; flattening the If/ElseIf shape was tested and reverted for
+'     no length change). Not re-attempted.
+'   * +3/+2/+2/+1 x9 @ 12146/11827/12126/11856..12096 -- the GOODFREEKICKS..GOODPENALTIES
+'     max-index Select cascade (S18), already documented as the running index staying in a
+'     register the whole cascade in the original versus being spilled and reloaded at each
+'     comparison in ours. The source (iVar8, already a Select per revision B) is unchanged
+'     and correct.
+'   * -2 @ 6364, -1 @ 6036/6391/5674/9362/10518 -- each individually re-disassembled this
+'     pass. All six are single-instruction register-vs-memory-operand or register-numbering
+'     differences (a value the original keeps in one register for a longer span, that our
+'     shorter 19-slot frame either keeps in a different register or spills earlier) with no
+'     corresponding source-text choice available to change them -- confirmed one at a time,
+'     not assumed from the pattern.
+' Every one of the above resolves to the same root cause flagged since revision D: the
+' original's frame uses 21 [ebp-N] depths against our 19, already proven (revisions E, F, I,
+' independently, three times) not to be a missing Local declaration. Not re-opened here, per
+' the standing guidance not to spend further budget on the frame-size prologue itself.
+'
+' REVISION K -- thirteen disassembly-verified source-spelling fixes, all instances of the
+' "match the operand order the original evaluates, not just the meaning" class (a > b and
+' b < a compile to different setcc/jcc bytes even though they mean the same thing), plus one
+' bare-truthiness/Then-Else-swap pair of the same shape as the file's existing GetCurrentStats
+' fix. Starting point was revision J's state exactly as recorded below (our_len 15154,
+' orig_len 15154, delta +0, 41 gaps, 188 same-length subs). NSS5_WORKER=420,
+' harness.try_method + scripts/localise_diff.py (max_gaps=200), fresh isolated tree each call,
+' scripts/disasm.py / harness.disasm_original read directly for every fix before writing it.
+'
+'   1. Candidate line ~668, "If piVar17 = Null Or piVar17.matchstats.rating <
+'      piVar3.matchstats.rating" (the MOTM-loop guard flagged STILL OPEN by revision C/D as
+'      the "488/508/514" triplet). Original spells the Null guard as bare object truthiness
+'      negated ("Not piVar17": cmp edi,Null / setne / movzx / cmp / sete / movzx / cmp / jne,
+'      the double-materialise shape) where the candidate had the direct "piVar17 = Null" short
+'      form (single sete). Rewrote as "Not piVar17". Then, independently, the second Or-term:
+'      original loads piVar3''s rating first (esi, the loop var) and compares with setg
+'      ("piVar3.rating > piVar17.rating") where the candidate evaluated piVar17 first with
+'      setl ("piVar17.rating < piVar3.rating") -- same meaning, wrong evaluation order.
+'      Rewrote as "piVar3.matchstats.rating > piVar17.matchstats.rating". Combined:
+'          If Not piVar17 Or piVar3.matchstats.rating > piVar17.matchstats.rating
+'      The Not-piVar17 half alone closed the 488/508/514 gap trio but grew our_len by +9
+'      (15154 -> 15163, confirmed by localise_diff as the trio collapsing to a clean 0-net
+'      insert/delete pair, not a regression); the rating-order half was a same-length sub fix
+'      (setl -> setg) that also collapsed two adjacent gaps as a side effect (41 -> 38 total
+'      length-changing gaps by the end of this revision, not from this fix alone -- see below).
+'   2. Six sites, one recurring construct: "local_40 < local_48" written with local_40
+'      evaluated first, where the original always evaluates local_48 first (setg, not setl).
+'      Confirmed independently at each site's own disassembly (not generalised from one):
+'      candidate lines ~718 ("piVar5.matchstats.rating > 80 And local_40 < local_48"), ~833
+'      and ~1032 (both "cVar18 = 4 And local_40 < local_48", two separate occurrences of
+'      identical source text at different call sites), ~1023, ~1026, ~1029 (cVar18 = 0/1/2,
+'      same CREPORT_BOSSMOTM/GOOD/OK/POOR cascade as 1032). All six rewritten
+'      "local_48 > local_40". The mirror-image phrasing "local_48 < local_40" (candidate
+'      lines ~887, ~1216) was checked too and already matched as-is -- left untouched, per
+'      the standing rule not to blanket-convert a phrasing without checking each site.
+'   3. Candidate line ~1211/~1217, the RIVALSWEWON/RIVALSWELOST coachrep_fans guard inside
+'      the bVar19 block. Two sub-fixes at each of the two sites: first, "coachrep_fans < 1"
+'      compiled against the literal 1 (cmp field,1/jge) where the original compares against 0
+'      (cmp field,0/jle) -- rewrote as "coachrep_fans <= 0", which fixed the immediate but
+'      left the jcc polarity inverted (jle vs jg, exact opposites). Reading the string
+'      operands at the original's fallthrough vs jump targets (harness.read_string on
+'      0xc7b478/0xc7b4b4/0xc7b4ec) showed the ORIGINAL's fallthrough (bare "> 0") is the GOOD
+'      report and its jump target (<= 0) is the BAD report -- i.e. original''s Then/Else
+'      bodies are the reverse of the candidate's ("BAD" written first, "GOOD" second in the
+'      candidate; original has GOOD first). Rewrote as bare "coachrep_fans > 0" with the GOOD
+'      branch first and BAD second, at both the WON and LOST sites (four report strings, two
+'      guards). All four jcc bytes now match exactly.
+'   4. Candidate lines ~727-733, "If g_profile.GotSponsor() = 0" (no compound, plain If/Else,
+'      COACHYELLOW vs COACHYELLOWSPONSORS). Same shape as fix 3: original''s fallthrough
+'      (GotSponsor() true, eax<>0) is COACHYELLOWSPONSORS and its jump target (GotSponsor()
+'      false, eax=0) is COACHYELLOW -- reversed from the candidate''s "=0 -> COACHYELLOW,
+'      Else -> SPONSORS" order. Confirmed via harness.read_string on 0xc7a93c/0xc7a980.
+'      Rewrote as bare "If g_profile.GotSponsor()" with SPONSORS first, COACHYELLOW second.
+'   5. Candidate line ~882 ("If local_40 < local_48 ... local_8 :+ 1 ... ElseIf local_48 <
+'      local_40 ... local_8 :- 1") and its second occurrence at candidate line ~1209 (inside
+'      "If bVar19"). Both are the same local_40/local_48 evaluation-order defect as fix 2, but
+'      as a bare relational If (no setcc materialised -- a direct cmp+jcc), not an And-term:
+'      original always keeps local_48 as the direct memory cmp operand and loads local_40 into
+'      a register, producing jle/jge on the SAME operands rather than a reversed pair. Both
+'      rewritten "If local_48 > local_40" (the paired "ElseIf local_48 < local_40" at each site
+'      already matched and was left alone).
+'   6. Candidate line ~1034, "If local_40 + 4 < local_48" (the CheckAchievement(22) guard right
+'      after the cVar18 cascade from fix 2). Original evaluates local_40+4 into a register but
+'      keeps local_48 as the LHS memory operand of the cmp (cmp [local_48],eax / jle), i.e. the
+'      original''s comparison is spelled with local_48 first: "local_48 > local_40 + 4".
+'      Rewritten accordingly.
+' Net result of fixes 1-6: our_len 15154 -> 15163 (delta +0 -> +9, all nine bytes are fix 1''s
+' Not-piVar17 half; every other fix in this revision was same-length). localise_diff after all
+' thirteen edits: 38 length-changing gaps (was 41), +9 bytes total, delta_accounted COMPLETE;
+' 178 same-length subs (was 188); zero remaining setcc (setg/setl/sete/setne) or jcc
+' (je/jne/jle/jge) mismatches anywhere in the sub list -- confirmed by grepping the full
+' subs section for every conditional mnemonic after the last edit landed clean. Every
+' remaining sub is a pure "mov/push/cmp [ebp-N]" displacement residual with an IDENTICAL
+' mnemonic on both sides, i.e. the same already-catalogued frame-size/register-allocation
+' finding (orig_len''s frame is 21 stack-slot depths vs our 19, first_diff still lands on the
+' "sub esp,0x54" vs "0x4c" prologue immediate) that revisions D through J spent five separate
+' passes falsifying every source-level hypothesis for (missing Local, name-coalescing,
+' literal-spelling flips on the CountStat(6)/(17) guards, ElseIf-flattening -- see the OPEN
+' (deep) and MAJOR OPEN FINDING sections below, both still accurate and untouched by this
+' revision). The three still-open length gaps this revision did not attempt (+173/-173
+' artefact at 6625/6733, +58/-29/-29 at 11225/11414/11623, +34/-31 at 9388/9423, +10/-9 at
+' 5820/5789) are exactly revision H''s already-tested-and-reverted set; this revision did not
+' re-open them. Stopping here per the register-allocator-tie guidance rather than grinding
+' further on the frame-size root cause -- the next lever, if anyone picks this up, is still
+' revision F''s suggested full per-slot census, not another source-text guess.
+'
+' REVISION J -- three disassembly-verified source fixes, closing the length delta to 0 for
+' the first time (harness.try_method NSS5_WORKER=400, NSS5_NO_LEARN=1, fresh isolated tree).
+' State: our_len 15154 == orig_len 15154 exactly, mode='diff', matched=3035/15154, status
+' still MISMATCH -- first_diff=5, the prologue "sub esp,0x54" vs "0x4c" frame-size gap
+' catalogued since revision D remains OPEN and unresolved by this pass (see below). Still,
+' matched rose from 1215 to 3035 and the whole-body gap list (scripts/localise_diff.py,
+' max_gaps=200) shrank from 46 entries netting +16 to 41 entries netting 0.
+'
+'   1. Candidate line 821, "If piVar5.matchstats.motm <> 0 And local_8 < 1" -- read the
+'      original directly at orig_off+6243..6294: the first (motm) operand of the And is
+'      tested with a bare "cmp eax,0 / je", no setne/movzx pair, where our build compiled
+'      the explicit "<> 0" into a materialised sete/movzx before the branch test (the S-rule
+'      "bare Int truthiness vs an explicit nonzero test differ"). Rewrote the first operand
+'      as bare "piVar5.matchstats.motm" (kept "local_8 < 1", whose own setl/movzx already
+'      matched, untouched). Closed the +9@6265 gap outright, our_len 15170 -> 15161.
+'   2. Candidate line 971, "If TCompetition.SelectById(g_fixture.compid).IsCupFinal() <> 0
+'      And g_fixture.matchtype <> 4" -- same S-rule, confirmed independently at
+'      orig_off+9483..9514 (IsCupFinal's own result tested bare, matchtype's setne/movzx
+'      unaffected). NOTE: an earlier revision (see "FIXED in revision C" section below)
+'      tried dropping this same "<> 0" and reverted it because whole-function our_len got
+'      WORSE at the time -- that measurement predates fix 1 above and was measuring a
+'      different, since-changed baseline; re-tested here in isolation against the CURRENT
+'      source with a full rebuild and confirmed by localise_diff that this specific +9@9492
+'      gap, and only that gap, closes (our_len 15161 -> 15152). Do not re-revert this on the
+'      strength of the old note alone -- it no longer applies to the current file.
+'   3. Candidate lines 978-981, "If iVar4.level = 0 ... ElseIf iVar4.level = 1 ... EndIf" (no
+'      final Else, nested inside "Case 1" of the "Select iVar7" locale cascade) -- a third,
+'      previously unnoticed instance of the same iVar4.level Select-vs-If/ElseIf pattern
+'      revision A already fixed twice elsewhere in this file (S10.2: original loads the
+'      field once and chains cmp/je with no reload; If/ElseIf reloads per arm). Confirmed at
+'      orig_off+9580..9638 directly: original is "mov eax,[iVar4] / mov eax,[eax+0x1c] /
+'      cmp eax,0/je / cmp eax,1/je / jmp" (18 bytes, one load) where our If/ElseIf reloaded
+'      iVar4.level's memory operand directly per arm instead. Rewrote as "Select iVar4.level
+'      / Case 0 / Case 1 / End Select". Closed the -9@9580/+9@9619/-2@9638 trio outright (all
+'      three gone from localise_diff's output, not just netted), our_len 15152 -> 15154,
+'      reaching orig_len exactly. matched jumped from ~1215 to 3035 on this fix alone,
+'      confirming the alignment stage was starved by the leftover length mismatch, not by
+'      this construct's own logic.
+'
+'   ONE HYPOTHESIS TESTED AND REJECTED, recorded so nobody re-tries it: candidate lines
+'   781-783 ("Local iVar14 = CountStat(7)" / "Local iVar15 = CountStat(8)" / "iVar14 = iVar14
+'   + iVar15") were fused into a single "Local iVar14 = CountStat(7) + CountStat(8)" on the
+'   theory that iVar15, used exactly once, is a reconstruction-introduced temporary (the
+'   S22 "extra named Local" class). RESULT: our_len got WORSE (15170 -> 15180, +10), not
+'   better. REVERTED. The three-statement form already in this file is correct; do not
+'   re-try fusing it.
+'
+'   NOT YET RESOLVED -- the remaining ~188 subs and the frame-size gap itself. Traced one
+'   concrete NEW instance of the same register-vs-memory split the frame-size finding (two
+'   sections below) already describes for iVar4 and the -0x54 fild temp: the "GOODFREEKICKS
+'   .. GOODPENALTIES" max-index cascade (candidate lines ~927-955, revision B's own Select
+'   fix) carries its running winning-index value in EAX across all nine comparisons in the
+'   original ("mov eax,N" 5-byte immediate loads, no memory store until the Select header
+'   reads it), where our build spills that same index to [ebp-0x1c]/[ebp-0x14] and reloads it
+'   at each of the nine sites ("mov dword ptr [ebp-N],imm", 7-byte memory stores) -- the
+'   source (iVar8, already a Select per revision B) is unchanged and correct; only the
+'   register-vs-memory placement differs, accounting for the +1 x7 cluster at
+'   11856/11886/11916/11946/11976/12006/12036/12066/12096 and the +3@12146 Select-header
+'   reload already catalogued below as "Pure register-allocation residual (S18)". Same
+'   diagnosis applies, by direct read of the disassembly this pass, to the CountStat(11)/(7)/
+'   (8) triad at candidate lines 780-782 (-9@5789/+10@5820/-2@5833: iVar13 stays in a
+'   register the whole time in the original but is fused into ebx there vs a different
+'   register choice + earlier spill in ours) and to the iVar4.locale/iVar4.comptype nested
+'   test at candidate lines 614-621 (-2@735/-2@746/-4@775: original always reloads the field
+'   VALUE into a register before comparing where ours compares the memory operand directly --
+'   tested flattening to an ElseIf chain, no length change and matched dropped slightly,
+'   reverted). All four are the same class of finding as the pre-existing "MAJOR OPEN
+'   FINDING" below: a single function-wide register-allocation/spill-order difference, not a
+'   source-text defect, and not fixed by any source rewrite tried so far (fusing Locals,
+'   flattening If/ElseIf chains, or reordering statements) -- every attempt this pass either
+'   made no difference or moved the gap without closing it. Flagging for whoever picks this
+'   up next: the lead most likely to pay off is still revision F's suggested full per-slot
+'   census (which variable the original keeps live in a register across the whole cascade,
+'   and why our allocator doesn't), not further one-off source edits in this class.
 '
 ' REVISION I -- NO SOURCE EDIT (assigned to re-chase the "declare the 2 missing Locals"
 ' framing of the frame-size bug; re-tested it from scratch and it still does not hold).
@@ -589,7 +840,7 @@ For Local piVar3:TPlayer = EachIn g_playerlist
 		End Select
 	EndIf
 	piVar3.matchstats.motm = 0
-	If piVar17 = Null Or piVar17.matchstats.rating < piVar3.matchstats.rating
+	If Not piVar17 Or piVar3.matchstats.rating > piVar17.matchstats.rating
 		piVar17 = piVar3
 	ElseIf piVar3.matchstats.rating = piVar17.matchstats.rating
 		Local iVar4:Int = piVar3.matchstats.CountStat(5)
@@ -639,7 +890,7 @@ If piVar5 <> Null
 	If piVar5.GetMyTeam().rating < piVar5.GetOppTeam().rating - 5 And local_48 < local_40
 		piVar5.matchstats.motm = 0
 	EndIf
-	If piVar5.matchstats.rating > 80 And local_40 < local_48
+	If piVar5.matchstats.rating > 80 And local_48 > local_40
 		g_profile.interviewchance = 1
 	EndIf
 	If piVar5.matchstats.distance > 0.0
@@ -651,10 +902,10 @@ If piVar5 <> Null
 	If piVar5.matchstats.reds > 0
 		g_profile.coachreport = GetText("CREPORT_COACHRED")
 	ElseIf piVar5.matchstats.yellows = 1
-		If g_profile.GotSponsor() = 0
-			g_profile.coachreport = GetText("CREPORT_COACHYELLOW")
-		Else
+		If g_profile.GotSponsor()
 			g_profile.coachreport = GetText("CREPORT_COACHYELLOWSPONSORS")
+		Else
+			g_profile.coachreport = GetText("CREPORT_COACHYELLOW")
 		EndIf
 	ElseIf piVar5.matchstats.yellows = 2
 		g_profile.coachreport = GetText("CREPORT_COACHYELLOWS")
@@ -754,7 +1005,7 @@ If piVar5 <> Null
 			EndIf
 		EndIf
 	End Select
-	If cVar18 = 4 And local_40 < local_48
+	If cVar18 = 4 And local_48 > local_40
 		g_profile.UpdateRelationship(6,3)
 		g_profile.coachrep_sponsors :+ 3
 	EndIf
@@ -790,7 +1041,7 @@ If piVar5 <> Null
 	Local local_8:Int = piVar5.matchstats.rating / 10 - 6
 	g_profile.UpdateRelationship(1,local_8)
 	g_profile.coachrep_boss :+ local_8
-	local_8 = local_8 + (iVar14 + iVar13) * 2 - 6
+	local_8 :+ (iVar14 + iVar13) * 2 - 6
 	ClampInt(Varptr local_8,-5,5)
 	If iVar7 < 45
 		ClampInt(Varptr local_8,-3,5)
@@ -803,7 +1054,7 @@ If piVar5 <> Null
 	If bVar20
 		local_8 = local_8 + 1
 	EndIf
-	If local_40 < local_48
+	If local_48 > local_40
 		local_8 = local_8 + 1
 		If bVar19
 			local_8 = local_8 + 1
@@ -817,7 +1068,7 @@ If piVar5 <> Null
 			local_8 = local_8 - 1
 		EndIf
 	EndIf
-	If piVar5.matchstats.motm <> 0 And local_8 < 1
+	If piVar5.matchstats.motm And local_8 < 1
 		local_8 = 1
 	EndIf
 	ClampInt(Varptr local_8,-5,5)
@@ -944,19 +1195,19 @@ If piVar5 <> Null
 	If iVar10 > 29
 		g_profile.CheckAchievement(13)
 	EndIf
-	If cVar18 = 0 And local_40 < local_48
+	If cVar18 = 0 And local_48 > local_40
 		g_profile.CheckAchievement(18)
 	EndIf
-	If cVar18 = 1 And local_40 < local_48
+	If cVar18 = 1 And local_48 > local_40
 		g_profile.CheckAchievement(19)
 	EndIf
-	If cVar18 = 2 And local_40 < local_48
+	If cVar18 = 2 And local_48 > local_40
 		g_profile.CheckAchievement(20)
 	EndIf
-	If cVar18 = 4 And local_40 < local_48
+	If cVar18 = 4 And local_48 > local_40
 		g_profile.CheckAchievement(21)
 	EndIf
-	If local_40 + 4 < local_48
+	If local_48 > local_40 + 4
 		g_profile.CheckAchievement(22)
 	EndIf
 	iVar8 = g_fixture.GetWinningTeamId()
@@ -967,18 +1218,19 @@ If piVar5 <> Null
 	LogLine("WinningTeam:" + iVar8)
 	LogLine("MyTeam:" + iVar7)
 	If iVar8 = iVar7
-		If TCompetition.SelectById(g_fixture.compid).IsCupFinal() <> 0 And g_fixture.matchtype <> 4
+		If TCompetition.SelectById(g_fixture.compid).IsCupFinal() And g_fixture.matchtype <> 4
 			LogLine("CupFinal")
 			iVar7 = iVar4.locale
 			Select iVar7
 				Case 0
 					g_profile.CheckAchievement(23)
 				Case 1
-					If iVar4.level = 0
-						g_profile.CheckAchievement(24)
-					ElseIf iVar4.level = 1
-						g_profile.CheckAchievement(25)
-					EndIf
+					Select iVar4.level
+						Case 0
+							g_profile.CheckAchievement(24)
+						Case 1
+							g_profile.CheckAchievement(25)
+					End Select
 				Case 2
 					g_profile.CheckAchievement(25)
 					g_profile.CheckAchievement(86)
@@ -1130,17 +1382,17 @@ If piVar5 <> Null
 		End Select
 	EndIf
 	If bVar19
-		If local_40 < local_48
-			If g_profile.coachrep_fans < 1
-				g_profile.bossreport :+ " " + GetText("CREPORT_RIVALSWEWONBAD" + Rand(2,1))
-			Else
+		If local_48 > local_40
+			If g_profile.coachrep_fans > 0
 				g_profile.bossreport :+ " " + GetText("CREPORT_RIVALSWEWONGOOD" + Rand(2,1))
+			Else
+				g_profile.bossreport :+ " " + GetText("CREPORT_RIVALSWEWONBAD" + Rand(2,1))
 			EndIf
 		ElseIf local_48 < local_40
-			If g_profile.coachrep_fans < 1
-				g_profile.bossreport :+ " " + GetText("CREPORT_RIVALSWELOSTBAD" + Rand(2,1))
-			Else
+			If g_profile.coachrep_fans > 0
 				g_profile.bossreport :+ " " + GetText("CREPORT_RIVALSWELOSTGOOD" + Rand(2,1))
+			Else
+				g_profile.bossreport :+ " " + GetText("CREPORT_RIVALSWELOSTBAD" + Rand(2,1))
 			EndIf
 		EndIf
 	Else

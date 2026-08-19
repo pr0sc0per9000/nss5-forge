@@ -1,5 +1,6 @@
 ' TFixture.WriteData
 ' VA 0x004C2E72   581 bytes   mode=reloc   MATCH 581/581
+' byte-identical vs NSS5.exe
 ' KIND=Method on TFixture, SIG=(:TStream)i, SLOT=0x38
 ' Body-only format: statements only, parameters are a0, a1, ...
 '

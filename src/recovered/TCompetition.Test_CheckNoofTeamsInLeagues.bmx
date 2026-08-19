@@ -1,5 +1,6 @@
 ' TCompetition.Test_CheckNoofTeamsInLeagues
 ' VA 0x0050FCFF   324 bytes   mode=reloc   reloc_masked=21
+' byte-identical vs NSS5.exe
 ' KIND=Function (static method on the Type), SIG=()i, SLOT=0x130
 ' Body-only format: statements only, parameters are a0, a1, ...
 '

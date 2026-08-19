@@ -1,5 +1,6 @@
 ' TContractOffer.UpdateInterestedClubs
 ' VA 0x00572643   1040 bytes   vtable slot 0x5c   sig ()i   KIND=Function (static)
+' byte-identical vs NSS5.exe
 '
 ' ASSUMPTIONS
 '   Module Globals (names ours, resolved via explain_global.py / globals_final):

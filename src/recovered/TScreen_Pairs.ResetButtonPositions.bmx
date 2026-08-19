@@ -1,5 +1,6 @@
 ' TScreen_Pairs.ResetButtonPositions
 ' VA 0x00579055   153 bytes   mode=reloc   MATCH 153/153
+' byte-identical vs NSS5.exe
 ' KIND=Function (static method on TScreen_Pairs), SIG ()i, class-table slot 0x38.
 ' Body-only format: statements only, parameters are a0, a1, ...
 '

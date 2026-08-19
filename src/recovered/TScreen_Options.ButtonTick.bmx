@@ -3,6 +3,7 @@
 ' Driven through the oracle from scratch with helper_map.record stubbed; MATCH over the
 ' full Ghidra-authoritative length, every byte.
 ' Body-only format: statements only, parameters are a0, a1, ...
+' byte-identical vs NSS5.exe
 '!Global g_opt_a:Int      ' 0x00C5D244
 '!Global g_opt_b:Int      ' 0x00C63CFC
 '!Global g_opt_c:Int      ' 0x00C5D248

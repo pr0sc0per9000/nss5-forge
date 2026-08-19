@@ -20,10 +20,15 @@ title.
 
 ## Status
 
-82.5% of the machine code is byte-identical to the original: 650,716 of 788,482
-bytes across 1,768 function bodies. That figure is derived from the source by
+94.6% of the machine code is byte-identical to the original: 809,362 of 855,959
+bytes across 1,830 function bodies. That figure is derived from the source by
 [`scripts/progress.py`](/scripts/progress.py) and never written by hand; see
 [`docs/STATUS.md`](/docs/STATUS.md) for the breakdown.
+
+A further 4 bodies are excluded from that count. They call into Steam, whose
+2011 backend no longer answers, and linking them makes the Windows loader
+refuse to start the process. `STEAM_EXCLUDE` in
+[`scripts/progress.py`](/scripts/progress.py) names them and says why.
 
 The game builds and boots to the main menu. It is not yet playable end to end.
 

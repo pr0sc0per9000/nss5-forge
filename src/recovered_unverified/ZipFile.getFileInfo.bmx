@@ -1,4 +1,5 @@
 ' ================= RE-CHECK: NO CHANGE, gap confirmed harness-side =====
+' VA 0x0058dd8b   28 bytes   vtable slot 0x44   sig (i):SZipFileEntry
 ' Re-checked against extracted/decomp/ZipFile.getFileInfo@0058dd8b.c: the decompile is a bare,
 ' unguarded delegate --
 '   (**(code**)(**(m_zipFileList) + 0x38))(*(m_zipFileList), param_2);

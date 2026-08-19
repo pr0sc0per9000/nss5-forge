@@ -1,4 +1,6 @@
 ' TKitStrings.ConvertNSS4ColourIndexToHex
+' VA 0x004dc75b   1025 bytes   vtable slot 0x3c   sig (i)$
+' byte-identical vs NSS5.exe (1025/1025, original length from Ghidra's inventory)
 ' VA        0x004DC75B   slot 0x3C   KIND=Function (static)   SIG=(i)$
 ' ORACLE    MATCH mode=reloc  1025/1025 bytes  reloc_masked=32
 '

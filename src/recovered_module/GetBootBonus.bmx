@@ -2,9 +2,10 @@
 ' VA 0x00507ddd   592 bytes   sig (i,i)i
 ' byte-identical vs NSS5.exe (592/592, original length from Ghidra's inventory, mode=exact)
 '
-' NAME IS OURS. Called from TPlayer.CreatePlayerSimple as GetBootBonus(bootIdx, statCategory)
-' where bootIdx is 1..10 (index into TProfile.boots[], -1 = no boot owned) and statCategory is
-' 2/4/6 (dribbling/passing/shooting). Pure lookup table returning a small 0..2 bonus; falls
+' NAME IS OURS. Called from TPlayer.CreatePlayerSimple, TScreen_BootShop.CreateScreen and
+' TScreen_MatchPrep.SetUpScreen as GetBootBonus(bootIdx, statCategory), where bootIdx is
+' 1..10 (index into TProfile.boots[], -1 = no boot owned) and statCategory is 2/4/6
+' (dribbling/passing/shooting). Pure lookup table returning a small 0..2 bonus; falls
 ' through to 0 for any unmatched pair, including bootIdx = -1.
 '
 ' CODEGEN NOTE: this is a NESTED Select, not an outer Select with inner If/ElseIf. The flat

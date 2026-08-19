@@ -1,4 +1,6 @@
 ' TClub.WriteDataMobile
+' VA 0x004c1080   699 bytes   vtable slot 0x58   sig (:TStream)i
+' byte-identical vs NSS5.exe (699/699, original length from Ghidra's inventory)
 ' VA        0x004C1080   slot 0x58   KIND=Function (static)   SIG=(:TStream)i
 ' ORACLE    MATCH mode=reloc  699/699 bytes  reloc_masked=64
 '

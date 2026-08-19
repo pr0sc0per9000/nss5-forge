@@ -1,5 +1,6 @@
 ' TScreen_GameMenu.UpdateNavPanel
 ' VA 0x0053AC42   1361 bytes   vtable slot 0x3c   sig ()i   KIND=Function (static)
+' byte-identical vs NSS5.exe
 ' Source: extracted/decomp/TScreen_GameMenu.UpdateNavPanel@0053ac42.c, cross-checked
 ' statement-by-statement against harness.disasm_original(0x0053ac42, after=1000) (the raw
 ' x86 -- the decompilation merges several call argument lists here, see below). Siblings

@@ -1,6 +1,7 @@
 ' TEngine.SetUpRadarColours  -- KIND=Function (STATIC method on TEngine), slot 0x44, sig ()i
 ' VA 0x004CF11D   417 bytes   (original length from Ghidra's inventory)
 ' ORACLE: MATCH mode=reloc  417/417  reloc_masked=43
+' byte-identical vs NSS5.exe
 '
 ' ASSUMPTIONS / RESOLUTIONS
 '   FUN_004A6A30 = _bbStringCompare (the `=` between two String Globals)

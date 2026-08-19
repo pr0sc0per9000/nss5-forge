@@ -1,4 +1,6 @@
 ' TScreen_Kits.SetUpScreen -- NOT VERIFIED (verify against the shared assembled binary
+' VA 0x0054989d   1260 bytes   vtable slot 0x34   sig (:TFixture,()i,()i)i
+' byte-identical vs NSS5.exe (1260/1260, original length from Ghidra's inventory)
 ' before moving to src/recovered/), but a private-harness probe (scripts/harness.py
 ' try_method, isolated build, not the shared src/assembled tree) now reports
 ' status=MATCH mode=reloc matched=1260/1260 total=1260 (105 relocations masked, which

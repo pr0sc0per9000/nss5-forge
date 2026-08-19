@@ -19,6 +19,7 @@
 '     lplacesthatpromotetome:TList; TPromotionPlace +0x08 parentid; TMyDate +0x08 sdate.
 '   The `puVar3 != Null` / `puVar6 != Null` guards Ghidra prints are the null-skip that
 '   For..EachIn emits itself (guide 10.6) and are NOT written.
+' byte-identical vs NSS5.exe
 '!Global g_competitions:TList
 SortListBy(1,1)
 For Local c:TCompetition = EachIn g_competitions

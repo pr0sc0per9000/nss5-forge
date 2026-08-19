@@ -1,5 +1,6 @@
 ' TProfile.GetStats
 ' VA 0x00569912   287 bytes   mode=reloc
+' byte-identical vs NSS5.exe
 ' MATCH over the full Ghidra-authoritative length (287/287), every byte, reloc_masked=4.
 ' Body-only format: statements only, parameters are a0, a1, ...
 ' SIG (i,i,i):TList  -- a0 = stat level, a1 = team id filter (0 = any), a2 = year filter (0 = any)

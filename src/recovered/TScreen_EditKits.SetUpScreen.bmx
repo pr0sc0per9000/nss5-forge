@@ -1,4 +1,5 @@
 ' TScreen_EditKits.SetUpScreen
+' byte-identical vs NSS5.exe
 ' VA 0x0053524B   289 bytes   mode=reloc
 ' Verified through the oracle from scratch with helper_map.record stubbed; MATCH over
 ' the full Ghidra-authoritative length, every byte.

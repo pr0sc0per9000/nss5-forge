@@ -344,7 +344,14 @@ def orig_functions():
     # never masks and the body is reported bad when it is correct.
     md = os.path.join(ROOT, "src", "recovered_module")
     if os.path.isdir(md):
-        for fn in os.listdir(md):
+        # SORTED, DELIBERATELY. os.listdir() makes no ordering promise, so an unsorted
+        # scan combined with last-write-wins turns a second claim on the same VA into a
+        # coin flip that can land differently between two runs of the identical tree.
+        # claimed_by tracks which file first named each VA so a second, different file
+        # claiming it is a detectable COLLISION rather than a silent overwrite -- see the
+        # raise below for what happens when that collision is not caught.
+        claimed_by = {}
+        for fn in sorted(os.listdir(md)):
             if not fn.endswith(".bmx"):
                 continue
             # READ THE WHOLE FILE. A bounded read (`.read(400)`) silently truncates the
@@ -357,8 +364,27 @@ def orig_functions():
             # once the VA is seen. The regex is anchored on `VA 0x` either way.
             head = open(os.path.join(md, fn), encoding="utf-8", errors="replace").read()
             m = re.search(r"^'\s*VA\s+0x([0-9a-fA-F]+)", head, re.M)
-            if m:
-                _ORIGFN[int(m.group(1), 16)] = fn[:-4]
+            if not m:
+                continue
+            va = int(m.group(1), 16)
+            if va in claimed_by and claimed_by[va] != fn:
+                # Two files reconstructing the SAME original address under two DIFFERENT
+                # names is a corpus defect, not an ordering question -- there is no correct
+                # way to pick a winner here, only an arbitrary one. Left unchecked, whichever
+                # file os.listdir() happens to return last silently becomes the name every
+                # caller's compare() masking sees for this VA, and the loser's callers then
+                # compare their call operand against the WRONG name; compare()'s (a0) name
+                # check treats "both present but unequal" as a genuine difference and breaks
+                # out of the masking search without ever trying the byte-level _same_callee
+                # proof. Measured: exactly this turned a full 5081/5081 match into a reported
+                # MISMATCH 3808/5081. Raising here, at table-build time, stops that before any
+                # body is scored against a table that cannot be trusted.
+                raise RuntimeError(
+                    "orig_functions(): VA 0x%08x is claimed by both %s and %s in "
+                    "src/recovered_module -- duplicate VA is a corpus defect, resolve it "
+                    "there before re-running" % (va, claimed_by[va], fn))
+            claimed_by[va] = fn
+            _ORIGFN[va] = fn[:-4]
 
     vt = os.path.join(ROOT, "extracted", "vtable_map.tsv")
     with open(vt, encoding="utf-8", errors="replace") as f:

@@ -1,4 +1,6 @@
 ' TCompetition.New  ()i   slot 0x10
+' VA 0x00508fb1   414 bytes   vtable slot 0x10   sig ()i
+' byte-identical vs NSS5.exe (414/414, original length from Ghidra's inventory)
 ' VA 0x00508FB1   length 414   oracle: MATCH mode=reloc 414/414 reloc_masked=22
 '
 ' Assumptions:

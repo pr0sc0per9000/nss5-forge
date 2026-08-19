@@ -12,6 +12,7 @@
 '!Global g_slot_panel:TPanel
 '!Global g_slot_btn1:TButton
 '!Global g_slot_btn2:TButton
+' byte-identical vs NSS5.exe
 PlaySound(g_slot_sound, g_slot_chan)
 g_slot_strip1.Spin(1)
 g_slot_strip2.Spin(2)

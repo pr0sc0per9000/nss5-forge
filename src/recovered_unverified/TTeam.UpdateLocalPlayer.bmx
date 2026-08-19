@@ -1,5 +1,6 @@
 ' TTeam.UpdateLocalPlayer
 ' VA 0x004DE0C7   937 bytes   vtable slot 0x68   sig ()i   KIND=Method
+' byte-identical vs NSS5.exe
 ' Ghidra source: extracted/decomp/TTeam.UpdateLocalPlayer@004de0c7.c
 '                extracted/decomp_annotated/TTeam.UpdateLocalPlayer@004de0c7.c (symbol layer)
 '

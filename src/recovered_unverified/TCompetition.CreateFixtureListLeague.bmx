@@ -1,4 +1,5 @@
 ' TCompetition.CreateFixtureListLeague -- NOT VERIFIED (worker boot_FixturesLeague)
+' byte-identical vs NSS5.exe
 ' VA 0x0050B420   1530 bytes   vtable slot 0x68   sig ()i
 ' Ours: 1524 bytes (delta -6, orig 1530). localise_diff.py reports 3 length-changing
 ' gaps (-6 total, COMPLETE), no same-length subs, first real divergence at ORIGINAL
@@ -268,7 +269,8 @@
 							d.AddDays(1)
 							ndays = ndays + 1
 						Wend
-						If d.GetDay() <> primarymatchday And ndays < 7
+						If d.GetDay() = primarymatchday Or ndays > 6
+						Else
 							shortfall = shortfall - 1
 						EndIf
 					Else

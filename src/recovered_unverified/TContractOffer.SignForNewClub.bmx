@@ -1,5 +1,6 @@
 ' TContractOffer.SignForNewClub
 ' VA 0x00572F47   1453 bytes   KIND=Method, SIG=()i, slot 0x6c
+' byte-identical vs NSS5.exe
 ' Body-only format: statements only; Self is implicit (this is a Method, param_1 = Self).
 ' NOT YET byte-verified against NSS5.exe (recovered_pending -- assemble.py not run).
 ' Reconstructed from extracted/decomp/TContractOffer.SignForNewClub@00572f47.c PLUS

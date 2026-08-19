@@ -1,5 +1,6 @@
 ' TPlayer.DoKickingAI
 ' VA 0x004F22D6   1483 bytes   vtable slot 0x98   sig ()i   KIND=Method
+' byte-identical vs NSS5.exe
 '
 ' SOURCE: extracted/decomp/TPlayer.DoKickingAI@004f22d6.c, cross-checked against the
 ' symbol layer at extracted/decomp_annotated/TPlayer.DoKickingAI@004f22d6.c
@@ -154,7 +155,8 @@ If g_training_int03 <> 0
 		EndIf
 	Else
 		If Self.KeeperHoldingBall()
-			If g_player_int50 >= Self.keepercatchtime + 500
+			If g_player_int50 < Self.keepercatchtime + 500
+			Else
 				Self.joy.kickbuttonhits = 1
 				Self.joy.kickbuttondown = 0
 			EndIf
@@ -166,18 +168,20 @@ Else
 			Case 2
 				Self.PassAI()
 			Case 3
-				If Rand(10,1) <> 1
-					Self.PassAI()
-				Else
-					Self.ShootAI()
-				EndIf
+				Select Rand(10,1)
+					Case 1
+						Self.ShootAI()
+					Default
+						Self.PassAI()
+				End Select
 			Case 4
 				If Self.distancetogoal_opp > TPitch.YardsToPixels(35.0) And Self.distancetogoal_opp < TPitch.YardsToPixels(60.0)
-					If Rand(10,1) <> 1
-						Self.PassAI()
-					Else
-						Self.ShootAI()
-					EndIf
+					Select Rand(10,1)
+						Case 1
+							Self.ShootAI()
+						Default
+							Self.PassAI()
+					End Select
 				Else
 					Select Rand(2,1)
 						Case 1

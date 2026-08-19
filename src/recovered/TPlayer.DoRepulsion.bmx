@@ -1,4 +1,5 @@
 ' TPlayer.DoRepulsion
+' byte-identical vs NSS5.exe
 ' VA 0x004F9B88   329 bytes   mode=reloc   MATCH 329/329
 ' KIND=Method, SIG (f,f,*f,*f,d)i, class-table slot 0x134.
 ' Body-only format: statements only, parameters are a0, a1, ...

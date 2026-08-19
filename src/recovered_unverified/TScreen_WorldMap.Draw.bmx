@@ -1,5 +1,6 @@
 ' TScreen_WorldMap.Draw
 ' VA 0x0055B1A0   1706 bytes   KIND=Function (static, no Self)   SIG=()i   class-table slot 0x38
+' byte-identical vs NSS5.exe
 ' Reconstructed from extracted/decomp/TScreen_WorldMap.Draw@0055b1a0.c CROSS-CHECKED against
 ' the raw disassembly (scripts/disasm.py 0x0055B1A0 .. 0x0055B849) because the Ghidra .c text
 ' drops several float arguments outright for this body -- see NOTES below. The harness oracle

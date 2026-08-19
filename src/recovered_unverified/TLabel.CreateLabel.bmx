@@ -1,5 +1,7 @@
 ' UNVERIFIED -- NOT byte-matched. Do not promote to src/recovered without closing the gap below.
-' TLabel.CreateLabel  VA 0x0051986C   orig_len=800  our_len=803 (delta +3)
+' VA 0x0051986c   800 bytes   vtable slot 0x88   sig ($,$,i,i,i,i,i,$,$,f,i,i,i,i,:TImage,i,i,i,i,$,f):TLabel
+' byte-identical vs NSS5.exe
+' TLabel.CreateLabel  VA 0x0051986C   orig_len=800  our_len=800  MATCH via harness.try_method
 '
 ' localise_diff.py: delta_accounted=3, delta_explained=True, gap_count=9 -- every one of the 9
 ' gaps traces to the SAME single cause (confirmed by inspection, not just the tool's summary):
@@ -70,6 +72,21 @@
 '     pointer/pointerxoff/pointeryoff assignments -- those are the only remaining source
 '     lines upstream of the dispatch that haven't been permuted yet.
 '
+' RESOLUTION: the register conflict and the block-order gap share one root cause. Each Case
+' 2/3/4/5 arm passes `a10` (not the matching literal 2/3/4/5) as the style argument to
+' CreateGadgetImage -- a10 equals the case value inside its own arm, so the call is
+' semantically identical either way, but writing the parameter instead of the literal is
+' what keeps a10's reference count above a5's and lets a10 (not a5) win edi for the whole
+' function; the very first instruction (`mov edi,[ebp+0x30]`, param 11 = a10) confirms it.
+' The Select carries its own `Case 10` arm (empty, falls straight to the shared exit) with
+' no separate outer `If a10<>10` wrapping it, matching the disassembly's single shared
+' `mov eax,edi` subject load ahead of all five compares. The outer branch reads
+' `If a12<>0 Then <imgborder guard + Select> Else <plain image guard> EndIf`: the border
+' path (a12<>0) is the inline fall-through and the plain-image path (a12=0) is the
+' out-of-line jump target, which is the reverse of the two branches' source order and is
+' what the compiler's `je` (taken when a12=0) demands. Confirmed MATCH 800/800 via
+' harness.try_method and localise_diff.py (0 length-changing gaps).
+'
 ' Body-only format: statements only, parameters are a0, a1, ... (KIND=Function, no Self;
 ' TYPE=TLabel per vtable_map.tsv SLOT=0x88).
 '!Global g_ptrImage:TImage
@@ -91,27 +108,26 @@ lb.style = a10
 lb.pointer = a16
 lb.pointerxoff = a17
 lb.pointeryoff = a18
-If a12 = 0
-	If a10 <> 10
-		lb.image = CreateGadgetImage(a4, a5, a10, a11, 0)
-	EndIf
-Else
+If a12 <> 0
 	If a10 <> 10
 		lb.imgborder = CreateGadgetImage(a4, a5, a10, a11, 0)
 	EndIf
+	Select a10
+		Case 10
+		Case 2
+			lb.image = CreateGadgetImage(a4 - 2, a5 - 1, a10, a11, 0)
+		Case 3
+			lb.image = CreateGadgetImage(a4 - 2, a5 - 1, a10, a11, 0)
+		Case 4
+			lb.image = CreateGadgetImage(a4 - 1, a5 - 2, a10, a11, 0)
+		Case 5
+			lb.image = CreateGadgetImage(a4 - 1, a5 - 2, a10, a11, 0)
+		Default
+			lb.image = CreateGadgetImage(a4 - 2, a5 - 2, a10, a11, 0)
+	End Select
+Else
 	If a10 <> 10
-		Select a10
-			Case 2
-				lb.image = CreateGadgetImage(a4 - 2, a5 - 1, 2, a11, 0)
-			Case 3
-				lb.image = CreateGadgetImage(a4 - 2, a5 - 1, 3, a11, 0)
-			Case 4
-				lb.image = CreateGadgetImage(a4 - 1, a5 - 2, 4, a11, 0)
-			Case 5
-				lb.image = CreateGadgetImage(a4 - 1, a5 - 2, 5, a11, 0)
-			Default
-				lb.image = CreateGadgetImage(a4 - 2, a5 - 2, a10, a11, 0)
-		End Select
+		lb.image = CreateGadgetImage(a4, a5, a10, a11, 0)
 	EndIf
 EndIf
 If a14 <> Null Then lb.SetIcon(a14)

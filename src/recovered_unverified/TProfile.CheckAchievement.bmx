@@ -86,6 +86,56 @@
 '   established sibling shape, not from Ghidra's printed arg list.
 ' Fields: TProfile.achievements = Int[] @ offset 444 (0x1bc); TProfile.date:TMyDate @ offset 16
 '   (0x10); TMyDate.sdate:Int @ offset 8 -- all confirmed against extracted/object_model.json.
+'
+' ORACLE STATE -- NEAR MISS, 2 GAPS. harness.try_method reports ours 623 bytes against the
+' original's 625 (delta -2). scripts/localise_diff.py aligns the two streams and localises
+' the entire deficit to two spots inside the "Bugged Achievement" block; nothing outside it
+' is in question (the positional `matched` count desyncs once a length gap opens and must
+' not be read as a percentage -- see reverify.py's own header).
+'
+' Y'S EVALUATION ORDER (this is what the mousey/width line encodes, and it is load-bearing).
+' At VA 0x0056D0D5 the original computes y with `fld [g_screen_mousey]` FIRST, then loads
+' g_screen_width into eax, stores it to a spilled temp, `fild`s that temp onto the x87
+' stack SECOND, and combines the two with `faddp st(1)` before the `fsub [118.0]`. That
+' two-step fld+faddp pair only appears when the Float operand is evaluated before the Int
+' operand in source; writing the Int operand first collapses it to a single `fadd
+' [g_screen_mousey]` after the `fild`, which is 6 bytes shorter at that point and 4 bytes
+' longer three instructions later (the surrounding code re-aligns once the operand order is
+' wrong), for a net -2 there alone. `g_screen_mousey + g_screen_width - 118.0` is therefore
+' the order the original evaluates in, not `g_screen_width + g_screen_mousey - 118.0`; `x`'s
+' own line (`g_screen_mousex + 10.0`) already had its one Float operand first and needed no
+' change.
+'
+' THE REMAINING TWO GAPS (both real, both unexplained) sit at VA 0x0056D01F and 0x0056D068,
+' inside the `g_profile_int43 = 1` guard that gates GetSteamAchievement. The original tests
+' this flag by materialising it into a byte (`cmp eax,1; sete al; movzx eax,al; cmp eax,0;
+' je`) -- 19 bytes -- where a bare `If g_profile_int43 = 1` here compiles to the short `cmp
+' [mem],1; jne` form -- 14 bytes -- despite the IDENTICAL construct at VA 0x0056D196 (guarding
+' SetSteamAchievement near the end of the function) compiling to the short form on BOTH
+' sides. The original's `je` at the end of the long form lands exactly on the `cmp eax,0`
+' that later re-tests `steamResult` (VA 0x0056D06A), which only works because eax already
+' holds 0 there on the untaken path -- a genuine register-value-reuse across the whole
+' `steamResult`/`gotIt` chain that ties the guard's byte-length to what happens dozens of
+' bytes later, not to how the guard itself is spelled. Tried and measured, all under
+' NSS5_NO_LEARN=1, all leaving `matched`/`our_len` unchanged from the state above: dropping
+' the `= 0`/`= False` initialisers on `steamResult`/`gotIt` (BlitzMax zero-defaults an
+' uninitialised Int either way, and bcc emits the same explicit store regardless of which
+' spelling is used); reordering the `steamResult`/`gotIt` declarations; hoisting
+' `steamResult` above the outer achievement-number check; collapsing `steamResult`/`gotIt`
+' into one reused variable (620, worse); a single combined `If steamResult <> 0 And
+' achievements[a0-1] > 0 Then Return 0` in place of the separate `gotIt` (627, worse); the
+' compact one-line `If ... Then` form for both inner Ifs (no change). UNCERTAIN: whether any
+' BlitzMax source spelling reaches this specific jump-threaded form, or whether it is a
+' peephole pass over the `steamResult`/`gotIt` pair as a whole that this project's bcc build
+' does not take. Left as the closest state that still builds and does not regress.
+'
+' TWO SUBS ARE PROBE ARTEFACTS, NOT DEFECTS. `and eax,2`/`or [...],2` in the original
+' against `and eax,1`/`or [...],1` here is g_Object878's bcc-synthesised once-only guard bit
+' (see above); its position depends on how many other guarded Globals exist in the same
+' compiled unit, which for an isolated single-function probe is never the same count as the
+' full game, exactly as documented for that guard already. A `p`/`steamResult` register-role
+' swap (esi/ebx here against ebx/esi in the original) is a live one; UNCERTAIN whether it is
+' reachable from source at all, since it did not move under any variant tried above.
 
 '!Import "<repo>/extern/steamstub/libsteamstub.a"
 '!Raw Extern
@@ -94,6 +144,9 @@
 '!Raw End Extern
 '!Global g_iconpath:String
 '!Global g_profile_int43:Int
+'!Global g_screen_mousex:Float
+'!Global g_screen_width:Int
+'!Global g_screen_mousey:Float
 '!Global g_player_int01:Int
 '!Global g_engine_int163:Int
 '!Global g_Object861:TSound
@@ -119,7 +172,7 @@
 	End If
 	achievements[a0-1] = date.sdate
 	Local x:Int = g_screen_mousex + 10.0
-	Local y:Int = g_screen_width + g_screen_mousey - 118.0
+	Local y:Int = g_screen_mousey + g_screen_width - 118.0
 	If g_player_int01 <> 0
 		x = 10
 		y = g_engine_int163 - 60

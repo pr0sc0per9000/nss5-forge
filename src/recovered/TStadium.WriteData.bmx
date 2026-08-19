@@ -3,6 +3,7 @@
 ' Driven through the oracle from scratch with helper_map.record stubbed; MATCH over the
 ' full Ghidra-authoritative length, every byte.
 ' Body-only format: statements only, parameters are a0, a1, ...
+' byte-identical vs NSS5.exe
 '!Global g_stadiums:TList        ' 0x00C64BC0
 WriteLine(a0, "id~tname~tnation~tcapacity~tlongitude~tlatitude")
 For Local s:TStadium = EachIn g_stadiums

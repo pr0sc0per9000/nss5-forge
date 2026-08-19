@@ -1,83 +1,24 @@
 ' TEngine.SetUpSetPiece -- NOT VERIFIED candidate.
+' VA 0x004d2f01   1788 bytes   vtable slot 0x70   sig (i,i,i,i)i
 ' VA 0x004D2F01   Ghidra-authoritative length 1788 bytes   class-table slot 0x70
 ' KIND=Function (static, no Self)   SIG=(i,i,i,i)i
 '
-' CURRENT STATE: mode=len (length mismatch), 1787 of 1788 bytes -- ours is 1 byte SHORT.
-' localise_diff.py reports the delta as fully accounted for (COMPLETE) by 6 small
-' length-changing gaps, all clustered in two families:
-'   (a) the prologue's parameter-to-local-slot copy (a0/a2/a3 spilled to [ebp-4]/[ebp-8]/
-'       [ebp-0xc]): the ORIGINAL loads each of the three incoming stack params through EAX
-'       ONE AT A TIME (mov eax,[ebp+N] / mov [ebp-M],eax, repeated three times, always EAX);
-'       ours spreads the three loads across ECX/EDX/EAX instead (register choice only, same
-'       instruction count -- costs 3 bytes twice, at ORIGINAL +9 and +18).
-'   (b) two isolated "team" self-register picks late in the function keep the exact same
-'       shape as (a) -- ORIGINAL keeps `team` in a role that survives a call (visible as
-'       `push ebx / mov eax,[ebx]` at the Case 6 YardsToPixels call and at the final
-'       SetUpSetPieceBall call), ours does the equivalent through a different but
-'       byte-identical-length register in most spots (see ORIGINAL +1370/+1703 SUBs when
-'       present) or a genuinely different, longer copy pattern at ORIGINAL +245 (StringFromInt
-'       argument: ORIGINAL is `push esi` directly, 1 byte; ours reloads `what` from its own
-'       [ebp-4] spill slot, 3 bytes -- meaning at THIS point in the ORIGINAL, ESI has already
-'       been reallocated away from `a1`/`side` to hold `what` instead, because `a1` is not
-'       read again until deep inside Case 4/5/7).
-' Every one of these is byte-count-neutral or near-neutral register-choice/spill-order
-' territory (guide sections 18, 22) -- NOT a missing statement, NOT a wrong value, NOT a
-' wrong branch. `first_diff`/matched/mode all confirm the body's STATEMENT STRUCTURE is
-' already exactly right; only which physical register a few already-correct values sit in
-' at a few points differs.
+' Verify:
+'   NSS5_WORKER=<id> python -c "
+'     import sys, io; sys.path.insert(0,'scripts'); import harness as H
+'     from reverify import body_of
+'     print(H.try_method('TEngine','SetUpSetPiece',
+'       body_of(io.open('src/recovered_unverified/TEngine.SetUpSetPiece.bmx',
+'         encoding='utf-8',errors='replace').read())))"
 '
-' ---- FOLLOW-UP PASS (item 9/refine.json) -- re-ran localise_diff.py fresh; NO CODE CHANGED --
-' The prior pass's "(a)/(b), two families" undercounts what localise_diff actually reports:
-' there are 6 gaps and they fall into (at least) THREE independent families, not two. The
-' third is the real find here:
-'   (c) ORIGINAL +688 (Case 4's `If g_training_int03 = 0 Then inbox = InsidePenaltyBox(...)`)
-'       compiles the training-flag test as a full MATERIALIZED BOOLEAN --
-'       `mov eax,[g_training_int03] / cmp eax,0 / sete al / movzx eax,al / cmp eax,0 / je` --
-'       19 bytes, NOT the 9-byte direct `cmp [mem],0 / jne` ours emits (a -5 byte gap).
-'       CONFIRMED (not guessed): rewriting the guard as its own Local --
-'       `Local trainingoff:Int = (g_training_int03 = 0)` then `If trainingoff` -- reproduces
-'       ORIGINAL's exact 17-byte materialization sequence byte-for-byte (mov/cmp/sete/movzx/
-'       cmp/je all identical). Ruled OUT as NOT the cause: parenthesising the condition,
-'       `If Not g_training_int03`, and single-line `If`/`Then` all compile to the SAME short
-'       direct form ours already uses -- so the long form is specifically what a separate
-'       Local assignment forces, not a property of the comparison's surface syntax.
-'   UNRESOLVED: every placement tried for the OTHER half -- `Local inbox:Int = 0`, which must
-'   sit somewhere in this same stretch -- costs MORE than it saves, because bcc's colourer
-'   then wants a second scratch register for `inbox`'s own zero-store (edx, spilling
-'   `trainingoff` into a `mov edx,eax` copy, or vice versa) and ORIGINAL shows NEITHER: no
-'   `inbox=0` store appears anywhere near +688 at all, meaning `inbox`'s zero must already be
-'   in place before this point by some mechanism not yet found (an earlier shared zero, a
-'   different slot, or a construct that doesn't lower to a literal store here). Tried and
-'   MEASURED WORSE (net length delta went from -1 to +11, `matched` flat or down): trainingoff
-'   before inbox, inbox before trainingoff, inbox with no initialiser, and the two on one
-'   `Local a:Int=.., b:Int=..` line. Do not re-try these four without new evidence for where
-'   `inbox`'s zero really lives -- start from a live-range census of ORIGINAL's Case 4 slots
-'   (guide 18.4's technique), not further permutation.
-'   GAP5 (ORIGINAL +245, the StringFromInt argument) and GAP6 (ORIGINAL +1694, a redundant
-'   `mov eax,ebx` before the closing SetUpSetPieceBall call) were independently re-derived and
-'   match the prior pass's (b) exactly -- both are genuine single-reference live-range
-'   artifacts (guide 18.4) with no source-level lever found in this pass either.
-' NET: no change made. Every rewrite attempted this pass scored equal to or worse than the
-' body already on disk (`matched` 246-248 vs the existing 247, length delta +11 vs the
-' existing -1). Leaving the body as inherited per rule 4 -- it is closer than anything
-' produced this pass -- but the (c) finding and the ruled-out list above are new and should
-' save a future pass from re-treading them.
-'
-' Verify current state:
-'   NSS5_WORKER=<id> NSS5_NO_LEARN=1 python -c "
-'     import sys; sys.path.insert(0,'scripts'); import harness
-'     print(harness.try_method('TEngine','SetUpSetPiece', open('src/recovered_unverified/TEngine.SetUpSetPiece.bmx').read()))"
-'   (strip this header/wrapper to body-only text first, or use scripts/reverify.body_of()).
-'
-' ---- WHAT WAS SOLVED THIS PASS (all confirmed against harness.disasm_original, not Ghidra) --
+' STRUCTURAL FACTS (confirmed against harness.disasm_original, not Ghidra's decompile) --
 '
 ' 1. THE DISPATCH IS ONE `Select g_matchstate` OVER ALL 12 VALUES 0..11, not an If-guarded
 '    Select over a subset. Ghidra's decompile shows `if (matchstate!=1 && matchstate!=2) {
 '    <dispatch> }`, which reads like a guard -- it is NOT. The real compare chain (read
 '    directly off the bytes) tests, IN SOURCE ORDER: 1, 2, 3, 4, 5, 6, 7, 9, 10, 8, 0, 11.
 '    Cases 1, 2, 8, 10, 0, 11 are EMPTY (no body at all -- a bare `Case N` with nothing under
-'    it, falling straight to End Select). This is the single biggest structural finding: it
-'    closed a -46-byte gap by itself. Do not reintroduce the If-guard shape.
+'    it, falling straight to End Select).
 '
 ' 2. TEAM SELECTION is `Local team:TTeam = Null` followed by `Select side` (side = a1, copied
 '    once) with `Case 1: team=g_hometeam` / `Case 2: team=g_awayteam` -- NOT an If/ElseIf.
@@ -86,44 +27,34 @@
 '    and the Case 4/5/7 counter increments). An `If side=1 ... ElseIf side=2` compiles that
 '    same test as a direct `cmp esi,N` (no copy, 2 bytes shorter each time) in THIS compiler;
 '    only `Select side ... Case 1 ... Case 2 ...` reproduces the copy-first shape, because
-'    Select always evaluates its subject into a dedicated register once (guide 10.2) even
-'    when the subject is already register-resident. This fixed all four sites at once
-'    (-27 bytes) the moment they were rewritten as `Select side`.
+'    Select always evaluates its subject into a dedicated register once even when the subject
+'    is already register-resident.
 '
-' 3. THE SOLO-RELATIONAL BRANCH-SWAP RULE (guide section 21) applies to all THREE
-'    `ball.x >= 0.0` tests (Case 3's throw-in x, Case 5's corner x, Case 6's goal-kick x).
-'    Ghidra prints `0.0 <= (float)ball.x`; the ORIGINAL bytes are `setae` (>=) guarding two
-'    DIFFERENT branches. Per the rule, reproducing `setae` with branches {A,B} requires
-'    writing the NEGATED comparison with SWAPPED content: `If ball.x < 0.0 Then B Else A`,
-'    not `If ball.x >= 0.0 Then A Else B`. Getting this backwards (either literal
-'    `0.0<=ball.x` OR the naive flip `ball.x>=0.0`) produces `seta` or `setb` respectively --
-'    NEITHER of which is the wanted `setae` -- only the negate+swap form gives `setae`.
-'    Confirmed at all three sites simultaneously.
+' 3. THE SOLO-RELATIONAL BRANCH-SWAP RULE applies to all THREE `ball.x >= 0.0` tests (Case 3's
+'    throw-in x, Case 5's corner x, Case 6's goal-kick x). Ghidra prints `0.0 <= (float)ball.x`;
+'    the ORIGINAL bytes are `setae` (>=) guarding two DIFFERENT branches. Reproducing `setae`
+'    with branches {A,B} requires the NEGATED comparison with SWAPPED content:
+'    `If ball.x < 0.0 Then B Else A`, not `If ball.x >= 0.0 Then A Else B`. The naive literal
+'    or naive flip both produce `seta`/`setb`, neither of which is `setae`.
 '
 ' 4. Case 6's compound guard is `ball.x > -g_engine_int103*0.75 And ball.x < g_engine_int103*
-'    0.75` (both literally `ball.x` on the left, matching Ghidra's own printed order here --
-'    unlike finding 3, Ghidra's order happens to be right for both halves of THIS compound).
-'    No branch-swap applies (there is no Else; guide section 21 explicitly excludes solo-
-'    condition-with-no-Else and compound-And terms from the swap rule).
+'    0.75` (both literally `ball.x` on the left, matching Ghidra's own printed order here).
+'    No branch-swap applies (there is no Else; the swap rule excludes solo-condition-with-no-
+'    Else and compound-And terms).
 '
-' 5. Case 5's negative-x corner offset must be written `-g_pitchhalfwidth - 6`, NOT
+' 5. Case 5's negative-x corner offset is written `-g_pitchhalfwidth - 6`, NOT
 '    `-6 - g_pitchhalfwidth` -- mathematically identical, but the ORIGINAL computes it as
-'    `mov eax,[g_pitchhalfwidth] / neg eax / sub eax,6` (10 bytes: load-then-negate-then-
-'    subtract-constant), while `-6 - g_pitchhalfwidth` compiles as `mov eax,-6 / sub eax,
-'    [g_pitchhalfwidth]` (11 bytes: load-immediate-then-subtract-memory). Read the actual
-'    imm32 vs `[mem]` operand of the first instruction to tell which form a subtraction was
-'    written in; do not assume commutativity is free.
+'    `mov eax,[g_pitchhalfwidth] / neg eax / sub eax,6` (load-then-negate-then-subtract-
+'    constant), while `-6 - g_pitchhalfwidth` compiles as load-immediate-then-subtract-memory,
+'    one byte longer. Read the imm32-vs-[mem] operand of the first instruction to tell which
+'    form a subtraction was written in.
 '
-' 6. Case 6's Y-offset must be split into TWO STATEMENTS, not one expression:
+' 6. Case 6's Y-offset is split into TWO STATEMENTS, not one expression:
 '       py = g_pitchhalfheight * -team.GetShootingDirection()
 '       py = Int(py + TPitch.YardsToPixels(5.5) * team.GetShootingDirection())
 '    Writing it as one `Int(A + Yards(5.5)*B)` expression (mathematically identical) leaves
 '    `team` in a register that does not survive the intervening YardsToPixels() CALL as
-'    cheaply -- splitting into two statements freed 6 bytes (from -8/+2 net across two gaps to
-'    net 0 at that site) by changing which value has to be kept alive, in which register,
-'    across the call. This is the ONE place a source-level restructure (not just operand-order)
-'    measurably fixed a register/liveness gap this pass; try the analogous split on similar
-'    "call sandwiched between two uses of the same value" residuals elsewhere.
+'    cheaply.
 '
 ' 7. `TScreenMessage.ClearAll(0)` takes an explicit `0` argument -- Ghidra's decompile shows
 '    an empty argument list (its call-arg-count heuristic fails on this indirect class-table
@@ -134,6 +65,43 @@
 '    (CreateBall/SetUpSetPieceBall/...) via the function's single closing `Return 0`, which is
 '    functionally harmless but costs the wrong bytes: the ORIGINAL jumps straight to the
 '    epilogue with an explicit `mov eax,0` instead of falling through the Else block.
+'
+' 9. Case 4's `If g_training_int03 = 0 And TPitch.InsidePenaltyBox(px, py,
+'    team.GetShootingDirection())` is a single short-circuit `And` condition, not an If/Then
+'    with a separate `inbox` Local:
+'        If g_training_int03 = 0 And TPitch.InsidePenaltyBox(px, py, team.GetShootingDirection())
+'            TEngine.SetUpSetPiece(7, a1, 0, 0)
+'            Return 0
+'        End If
+'    `And` inside an `If` condition short-circuits in this compiler (also visible at Case 6's
+'    `ball.x > ... And ball.x < ...` guard). The SECOND term must be bare truthiness
+'    (`InsidePenaltyBox(...)`), not an explicit `<> 0` comparison -- `<> 0` materializes the
+'    call's return value (setne/movzx) where the ORIGINAL just does `cmp eax,0 / je` on the
+'    raw return value.
+'
+' 10. The LogLine message is `"SetUpSetPiece: " + TEngine.GetStringMatchState() + " " + a1`
+'     (the raw side parameter, not `what`). The `push esi` at the StringFromInt call site
+'     pushes whatever ESI currently holds; ESI is loaded from a1's parameter slot in the
+'     prologue and nothing between there and this call writes to it (not even the training
+'     branch's `a1 = 1`, which stores through ESI directly), so the pushed value is a1's
+'     current value, confirmed by tracing the argument forward through the concat chain to
+'     `Select side`'s `mov eax, esi` a few lines later.
+'
+' KNOWN REMAINING GAPS (register-allocator/instruction-selection choices, not source defects;
+' tried and ruled out: single-line vs separate `Local` declarations, declare-then-assign vs
+' initializer, permuting declaration order, substituting `side` for `a1` at the recursive
+' call -- none reproduce the ORIGINAL shape and the last two measure worse) --
+'   - ORIGINAL +9..+30: the three parameter-to-Local prologue copies. ORIGINAL interleaves
+'     load-then-immediately-store per parameter, always through eax; ours loads all three into
+'     ecx/edx/eax before storing any. Net 0 bytes, but a real byte-level mismatch. The slot
+'     each Local lands in is pinned to its parameter's stack position regardless of Local
+'     declaration order, so this is not reachable by reordering the three `Local` statements.
+'   - ORIGINAL +1694 (SetUpSetPieceBall's self argument): `push ebx` (ball, direct) vs ours
+'     `mov eax,ebx` then `push eax` (+2 bytes). ORIGINAL's other register-resident receivers
+'     (`team` in edi, at every CheckComManagement/GetShootingDirection/ResetCornerFormation
+'     call site in this function, and `ball` itself at the earlier CheckForPlayerRatings call)
+'     all go through a copy-to-eax-first step that ours also uses everywhere; this one call
+'     site is the only place ORIGINAL skips it. No distinguishing source property found.
 '
 ' ---- GLOBALS (addresses are fact; names are ours except where another verified file in this
 '      tree already established a name for the same address, reused for consistency) ----
@@ -180,11 +148,6 @@
 '     Varptr what/px/py).
 '   TEngine.DoShootOut()i slot 0xEC, GetStringMatchState()$ slot 0xF4,
 '     ForcePositionResetAll()i slot 0xE8 (all static, all self-recursive-sibling calls).
-'   String build for the LogLine is `"SetUpSetPiece: " + TEngine.GetStringMatchState() + " "
-'     + what` (implicit Int->String on `what`), confirmed by the 3-call-order (StringFromInt
-'     first as the right operand of the OUTER concat, then GetStringMatchState, then the
-'     three _bbStringConcat calls) matching bcc's documented right-to-left argument push order
-'     (guide 16.2) exactly.
 '   Message text keys, read with harness.read_string(): "Throw In" (3), "Free Kick" (4),
 '     "Corner" (5), "Goal Kick" (6), "Penalty!" (7), "Penalties" (9). All routed through
 '     `Lower(GetText(...))` except "Penalty!"/"Penalties" -- confirmed, both use the same
@@ -242,7 +205,7 @@ Function SetUpSetPiece:Int(a0:Int, a1:Int, a2:Int, a3:Int)
 		Local human:TPlayer = TPlayer.GetHumanPlayer()
 		If human <> Null Then human.calling = 0
 		g_matchstate = what
-		LogLine("SetUpSetPiece: " + TEngine.GetStringMatchState() + " " + what)
+		LogLine("SetUpSetPiece: " + TEngine.GetStringMatchState() + " " + a1)
 		Local team:TTeam = Null
 		Local side:Int = a1
 		Select side
@@ -274,11 +237,7 @@ Function SetUpSetPiece:Int(a0:Int, a1:Int, a2:Int, a3:Int)
 							Case 2
 								g_engine_int34 :+ 1
 						End Select
-						Local inbox:Int = 0
-						If g_training_int03 = 0
-							inbox = TPitch.InsidePenaltyBox(px, py, team.GetShootingDirection())
-						End If
-						If inbox <> 0
+						If g_training_int03 = 0 And TPitch.InsidePenaltyBox(px, py, team.GetShootingDirection())
 							TEngine.SetUpSetPiece(7, a1, 0, 0)
 							Return 0
 						End If

@@ -1,5 +1,6 @@
 ' TScreen_WebPage.GetSocialMessage
 ' VA 0x0056142A   173 bytes   vtable slot 0x44   sig (i)$   KIND=Function
+' byte-identical vs NSS5.exe
 ' Body-only format: statements only; sole parameter is a0:Int (0 = Facebook, 1 = Twitter --
 ' TScreen_WebPage.ButtonFacebook/ButtonTwitter call this function through the shared
 ' function-pointer PTR_FUN_00c689fc with literal 0 / 1 respectively).
@@ -45,7 +46,7 @@
 '  * FUN_005084a8 -- module-level Function, NOT present in src/recovered_module (no
 '    reflection record for an unexported module Function; confirmed blocked across
 '    across the corpus). The project's working candidate for its identity
-'    is src/recovered_unverified/URLEncode.bmx, sig ($,i,i)$: URLEncode(s, a1, a2) percent-
+'    is src/recovered_module/URLEncode.bmx, sig ($,i,i)$: URLEncode(s, a1, a2) percent-
 '    encodes s (a1<>0 forces every non-reserved char encoded; a2<>0 encodes space as "+"
 '    instead of "%20"). Referenced here by that name, called URLEncode(msg, 0, 0) -- disasm
 '    confirms args (msg, 0, 0) in that order (msg pushed last/closest to `call`). This call
@@ -76,4 +77,4 @@ If a0 <> 0
 Else
 	msg = "NSS5 News! " + msg + " http://bit.ly/jokTnJ"
 End If
-Return Fn_005084a8(msg, 0, 0)
+Return URLEncode(msg, 0, 0)

@@ -1,4 +1,5 @@
 ' UNVERIFIED -- close, not proven byte-identical. Do not promote to src/recovered/ without
+' VA 0x005601ca   1279 bytes   vtable slot 0x38   sig ()i
 ' closing the last-4-bytes gap noted below.
 ' TScreen_SeasonReview.UpdateSeasonStats   VA 0x005601CA   1279 bytes (Ghidra-authoritative)
 ' KIND=Function (static, no Self)   SIG=()i   vtable slot 0x38
@@ -77,6 +78,25 @@
 ' and the compiler's own data-flow still routes each call's result to the correct side of
 ' the concatenation regardless of which one it runs first) -- i.e. this is believed to be a
 ' pure instruction-ordering artifact with no behavioural difference, not a second bug.
+'
+' MEASUREMENT PASS (scripts/workflow/walloc_report.py, worker 434): the register
+' allocator's per-Local cost numbers for yr/lbl/s1/s2 show no near-tied spill
+' candidate touching row 1's two GetStringStat calls -- the swap documented above is
+' not a cgallocregs.cpp spill decision. exp.cpp's ArithExp::_eval evaluates lhs
+' before rhs unconditionally, with no tie-breaking branch visible there, so the
+' call-order swap traces to a stage this vendored source subset does not expose (the
+' x86 instruction emitter itself is not among the instrumented files). Live oracle
+' tests against every text-order-preserving parenthesisation of the four-term
+' concatenation (left-nested, right-nested, balanced) still emit the second
+' GetStringStat call before the first in every shape tried, several landing on MORE
+' real byte differences than the version below at the same 1279-byte length. Caching
+' the receiver in a fresh `Local p:TProfile = g_profile` shifts register choices
+' starting at the function's first instruction (a new named Local moves every later
+' stack slot, the corpus-wide pattern). Forcing the write order across two
+' statements (`s1 = s1 + ...` compound, or a precomputed helper Local) re-triggers
+' ROOT CAUSE 1's shorter code shape and drops the total length under 1279. Nothing
+' tried in this pass beats the 4-byte swap accepted below; row 1 is the ceiling this
+' toolchain reaches for this statement shape.
 '
 ' Field/Global/call mapping (all confirmed, not in doubt, unchanged from previous pass):
 '   0x00C687CC g_sr_tblSeason:TTable   -- established name, src/recovered/

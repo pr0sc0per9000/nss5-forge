@@ -22,6 +22,7 @@
 '                                           call site pushes no Self -- matches the original)
 '   String literals read out of the exe with harness.read_string:
 '     0x00C90C2C = "blackjack"   0x00C5D284 = ""   0x00C81674 = "btn_play"
+' byte-identical vs NSS5.exe
 '!Global g_bj_panel:TPanel
 '!Global g_bj_btn1:TButton
 '!Global g_bj_btn2:TButton

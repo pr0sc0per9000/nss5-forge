@@ -30,7 +30,7 @@
 '   TProfile.helppages is Int[] and the decompilation's [helppages+0x38] is BBArray data
 '     (+0x18) + 8*4, i.e. helppages[8].
 '   0x004C5549 GetText, 0x0050720B FormatMoney, 0x00505F90 ClampFloat (Var, hence Varptr
-'     at the call site) and 0x00507DDD BootBoost are recovered module Functions.
+'     at the call site) and 0x00507DDD GetBootBonus are recovered module Functions.
 '   Both 20.0 constants really are two separate literal slots (0x00C8C8D4 / 0x00C8C8D8),
 '     and both GetStat thresholds are 2.0 (0x00C8C9F4 / 0x00C8C9F8) -- reproduced as
 '     written rather than folded.
@@ -171,9 +171,9 @@
 				s = g_profile.boots[bootslot - 1] + " " + GetText("Match")
 			End If
 			g_matchprep_barboots.SetText(s, "", -1, -1)
-			paceboost = BootBoost(bootslot, 2)
-			passboost = BootBoost(bootslot, 4)
-			shootboost = BootBoost(bootslot, 6)
+			paceboost = GetBootBonus(bootslot, 2)
+			passboost = GetBootBonus(bootslot, 4)
+			shootboost = GetBootBonus(bootslot, 6)
 		Else
 			g_matchprep_barboots.SetText(GetText("No Boots"), "", -1, -1)
 			g_matchprep_barboots.SetPercent(0, 1)

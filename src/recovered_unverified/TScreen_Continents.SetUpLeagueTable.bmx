@@ -1,5 +1,6 @@
 ' TScreen_Continents.SetUpLeagueTable
 ' VA 0x00548970   1433 bytes   sig ()i   KIND=Function (static)   class-table slot 0x64
+' byte-identical vs NSS5.exe
 '
 ' Own-Type callback: called bare as `SetUpLeagueTable()` from TScreen_Continents.ButtonGroup
 ' (src/recovered/TScreen_Continents.ButtonGroup.bmx). Near-twin of the already-recovered

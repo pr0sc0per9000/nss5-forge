@@ -1,4 +1,5 @@
 ' TCompetition.SetUpCompetition
+' byte-identical vs NSS5.exe
 ' VA 0x0050A94D   403 bytes   mode=reloc
 ' Verified through the oracle from scratch with helper_map.record stubbed; MATCH over
 ' the full Ghidra-authoritative length, every byte.

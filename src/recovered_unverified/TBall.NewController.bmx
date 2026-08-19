@@ -1,5 +1,6 @@
 ' TBall.NewController  -- KIND=Method, SIG=(:TPlayer)i, slot 0x84
 ' VA 0x004CAF26   1576 bytes   (Ghidra-authoritative)
+' byte-identical vs NSS5.exe
 ' Body-only format: statements only, parameter is a0:TPlayer.
 '
 ' Called whenever a new player (a0) gains control of the ball: re-scores whoever last

@@ -1,5 +1,6 @@
 ' TScreen_Stable.Draw
 ' VA 0x005890C9   934 bytes original.   KIND=Function, SIG ()i, slot 0x68
+' byte-identical vs NSS5.exe
 '
 ' STATUS: MATCH, 934/934 bytes, mode=reloc (reloc_masked=59), verified locally against
 ' NSS5.exe via harness.try_method('TScreen_Stable','Draw', body) in a private per-pass

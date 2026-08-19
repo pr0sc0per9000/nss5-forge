@@ -1,4 +1,6 @@
 ' TEngine.UpdateOffsetReplay -- verified MATCH (1088/1088, mode=reloc, reloc_masked=65) via
+' VA 0x004d4f09   1088 bytes   vtable slot 0xac   sig (f)i
+' byte-identical vs NSS5.exe (1088/1088, original length from Ghidra's inventory)
 ' harness.try_method against a private probe build. Ready to move to
 ' src/recovered/ once this pass's other in-flight bodies are reconciled (left in
 ' recovered_unverified/ per this task's file-ownership rule -- only this file was touched).

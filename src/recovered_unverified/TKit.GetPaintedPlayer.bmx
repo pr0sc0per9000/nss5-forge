@@ -1,5 +1,6 @@
 ' TKit.GetPaintedPlayer
 ' VA 0x004db0dd   1729 bytes   vtable slot 0x3c   sig ($,i,i,$):TPixmap   KIND=Method
+' byte-identical vs NSS5.exe
 ' MATCH 1729/1729 (mode=reloc, reloc_masked=75) verified via harness.try_method under
 ' NSS5_WORKER=refine2_gpp. Still filed in recovered_unverified pending promotion by the
 ' pipeline; nothing else in this header block needs re-checking.

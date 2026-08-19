@@ -1,4 +1,5 @@
 ' TInputBox.CreateInputImage
+' byte-identical vs NSS5.exe
 ' VA 0x00515750   391 bytes   mode=reloc   MATCH 391/391
 ' KIND=Method, SIG ()i, class-table slot 0x8c.
 ' Body-only format: statements only, parameters are a0, a1, ...

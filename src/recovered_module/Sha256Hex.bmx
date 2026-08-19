@@ -1,4 +1,6 @@
 ' Sha256Hex (name OURS -- module-level Function, no reflection record)
+' VA 0x0058c960   1776 bytes   sig ($)$
+' byte-identical vs NSS5.exe (1776/1776, original length from Ghidra's inventory)
 ' VA 0x0058C960   1,776 bytes   KIND=Function, no Self.   sig ($)$
 ' byte-identical vs NSS5.exe (1776/1776, mode=reloc -- every remaining difference is an
 ' in-image relocation or a named runtime-call operand, masked by the oracle)

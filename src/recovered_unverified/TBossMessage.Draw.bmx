@@ -1,4 +1,5 @@
 ' TBossMessage.Draw
+' byte-identical vs NSS5.exe
 ' VA 0x00570B40   872 bytes original.
 ', re-verified this pass against a live probe (harness.try_method).
 '

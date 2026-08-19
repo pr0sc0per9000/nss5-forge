@@ -1,4 +1,5 @@
 ' ================= REFINE PASS (item 51, refine.json): body left UNCHANGED =====
+' VA 0x0058dd25   40 bytes   vtable slot 0x38   sig ()i
 ' status/score/ZipFile.getFileCount.txt reports 3/14 (21.4%), first diff at byte 3,
 ' our_len=14 vs orig_len=40. That 14-byte "ours" is NOT this file's body -- it is the
 ' push ebp/mov ebp,esp/mov eax,0/jmp/epilogue shape of a bare `Return 0`, i.e. the
@@ -58,7 +59,8 @@
 ' placeholder logic needs its own dedicated pass, not a drive-by inside a health sweep.
 ' ==================================================================================
 ' ZipFile.getFileCount -- VA 0x0058DD25, 40 bytes
-' byte-identical vs NSS5.exe
+' The oracle cannot verify this body: the synthetic stub for TZipFileList carries no
+' getCount() method, because TZipFileList has zero rows in the reflection data.
 ' (1 absolute-address slot(s) relocation-masked; emitted code identical)
 ' Parameter names are not recoverable from the binary and do not affect codegen.
 Method getFileCount:Int()

@@ -1,4 +1,6 @@
 ' TBall.KeeperImageHolding -- VA 0x004CB58D, 95 bytes
+' VA 0x004cb58d   95 bytes   vtable slot 0x8c   sig ()i
+' byte-identical vs NSS5.exe (95/95, original length from Ghidra's inventory)
 ' byte-identical vs NSS5.exe
 ' (1 absolute-address slot(s) relocation-masked; emitted code identical)
 ' Parameter names are not recoverable from the binary and do not affect codegen.

@@ -1,4 +1,5 @@
 ' TTarget.Create
+' byte-identical vs NSS5.exe
 ' VA 0x005844B7   217 bytes   mode=reloc
 ' Driven through the oracle from scratch with helper_map.record stubbed; MATCH over the
 ' full Ghidra-authoritative length, every byte.

@@ -1,4 +1,5 @@
 ' TInputBox.Update  VA 0x005158D7   orig_len=699   vtable slot 0x34   sig ()i
+' VA 0x005158d7   699 bytes   vtable slot 0x34   sig ()i
 ' An earlier draft wrote the semantics but declined to emit code at all,
 ' blocked on FUN_0058D81A (see below); the file was 100% comments, scoring ~21% by pure
 ' prologue/epilogue coincidence (our_len was 14 bytes -- an empty "Return 0" stub).

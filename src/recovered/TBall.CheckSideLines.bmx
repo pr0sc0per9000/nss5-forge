@@ -1,4 +1,6 @@
 ' TBall.CheckSideLines -- VA 0x004CA8A4, 491 bytes
+' VA 0x004ca8a4   491 bytes   vtable slot 0x74   sig ()i
+' byte-identical vs NSS5.exe (491/491, original length from Ghidra's inventory)
 ' byte-identical vs NSS5.exe (491/491, original length from Ghidra's inventory, mode=reloc,
 ' reloc_masked=19).
 '

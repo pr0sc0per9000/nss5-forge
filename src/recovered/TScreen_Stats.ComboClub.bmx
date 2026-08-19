@@ -1,4 +1,6 @@
 ' TScreen_Stats.ComboClub  ()i   slot 0x38   KIND=Function (static, no Self)
+' VA 0x0054df94   470 bytes   vtable slot 0x38   sig ()i
+' byte-identical vs NSS5.exe (470/470, original length from Ghidra's inventory)
 ' VA 0x0054DF94   length 470   oracle: MATCH mode=reloc 470/470 reloc_masked=29
 '
 ' Assumptions:

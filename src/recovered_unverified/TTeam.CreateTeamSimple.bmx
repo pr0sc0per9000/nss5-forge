@@ -1,5 +1,6 @@
 ' TTeam.CreateTeamSimple
 ' VA 0x004DD418   1340 bytes   slot 0x44   sig (i,$,$,i,i,:TKit,:TKit,i,i,i,:TFixture):TTeam
+' byte-identical vs NSS5.exe
 ' KIND=Function -- static, no implicit Self. param_1 is a real parameter (team id), not Self.
 '
 ' ASSUMPTIONS

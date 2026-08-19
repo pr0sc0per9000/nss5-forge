@@ -1,5 +1,6 @@
 ' TScreen_Continents.ComboTeam
 ' VA 0x00547EBD   903 bytes   KIND=Function, SIG ()i, slot 0x48
+' byte-identical vs NSS5.exe
 '
 ' FIX (byte-oracle: 341/903, first diff at byte 11 -- `mov dword ptr [ebp-4],Null` in the
 ' original vs `mov dword ptr [ebp-8],Null` here, i.e. `t` and the SECOND For-loop's hidden
@@ -149,20 +150,20 @@ Function ComboTeam:Int()
 		g_table_02.Hide()
 		g_table_03.Show()
 		g_table_03.ClearItems()
-		Local rowidx:Int = 0
 		Local firstopenrow:Int = -1
+		Local rowidx:Int = 0
 		For Local arr:String[] = EachIn t.GetStringArrayFixtureList(g_continents_competition.locale)
 			g_table_03.AddItem(arr, "", "")
-			Local restext:String = arr[5]
-			If restext = GetText("sla_Won")
-				g_table_03.SetRowColour(g_table_03.CountItems(), "99FF99")
-			ElseIf restext = GetText("sla_Lost")
-				g_table_03.SetRowColour(g_table_03.CountItems(), "FF9999")
-			ElseIf restext = GetText("sla_Drawn")
-				g_table_03.SetRowColour(g_table_03.CountItems(), "9999FF")
-			ElseIf firstopenrow = -1
-				firstopenrow = rowidx
-			EndIf
+			Select arr[5]
+				Case GetText("sla_Won")
+					g_table_03.SetRowColour(g_table_03.CountItems(), "99FF99")
+				Case GetText("sla_Lost")
+					g_table_03.SetRowColour(g_table_03.CountItems(), "FF9999")
+				Case GetText("sla_Drawn")
+					g_table_03.SetRowColour(g_table_03.CountItems(), "9999FF")
+				Default
+					If firstopenrow = -1 Then firstopenrow = rowidx
+			End Select
 		Next
 		g_table_03.SelectItemByRow(0)
 		If firstopenrow > -1

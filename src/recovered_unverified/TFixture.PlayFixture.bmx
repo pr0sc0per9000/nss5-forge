@@ -1,5 +1,6 @@
 ' TFixture.PlayFixture -- VERIFIED 100% BYTE MATCH (1066/1066) against NSS5.exe
 ' VA 0x004C47E1   1066 bytes   vtable slot 0x54   sig ()i
+' byte-identical vs NSS5.exe
 '
 ' Fixed from an earlier attempt that scored 13.8% (147/1066, +138 length delta).
 ' That attempt's problem was never the field/slot resolution (all correct) but the

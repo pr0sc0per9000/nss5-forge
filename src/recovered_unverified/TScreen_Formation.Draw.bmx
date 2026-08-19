@@ -1,5 +1,6 @@
 ' TScreen_Formation.Draw
 ' VA 0x0054C38B   1704 bytes   mode=reloc   KIND=Function, SIG ()i, class-table slot 0x40
+' byte-identical vs NSS5.exe
 '
 ' Reconstructed from extracted/decomp/TScreen_Formation.Draw@0054c38b.c PLUS a manual
 ' re-disassembly of the original bytes (harness.disasm_original) -- Ghidra's pseudocode drops

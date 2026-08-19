@@ -35,6 +35,7 @@
 '     form that matches -- Upper(a0) is evaluated and pushed first.
 '!Global g_curscreen:TScreen
 '!Global g_activegadget:TGadget
+' byte-identical vs NSS5.exe
 For Local g:TGadget = EachIn g_curscreen.gadgetlist
 	If Upper(g.name) = Upper(a0)
 		g_activegadget = g

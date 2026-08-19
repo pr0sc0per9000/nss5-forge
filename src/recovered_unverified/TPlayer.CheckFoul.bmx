@@ -1,4 +1,5 @@
 ' TPlayer.CheckFoul
+' byte-identical vs NSS5.exe
 ' VA 0x004F4D5F   1492 bytes   vtable slot 0xD8   sig (:TPlayer)i   KIND=Method
 ' Body-only format: statements only; parameter is a0:TPlayer, the "victim"/ball carrier
 ' being challenged -- Self is the tackler, per CheckFoul(tackler, victim) semantics
@@ -124,16 +125,16 @@ If a0.KeeperHoldingBall() <> 0
 	If Self.currentanim = g_player_arr05 And TPitch.InsidePenaltyBox(Int(Self.x), Int(Self.y), Self.GetShootingDirection()) And g_ball.lasttouchedby <> Self
 		LogLine("Foul: Slide on keeper!")
 		Self.YellowCard()
-		a0.DoAnimFall()
-		If g_training_int03 = 0 Then PlaySound(g_object52, g_Object46)
-		Local n:Int = 2
-		If g_awayteam.id = Self.teamid Then n = 1
-		TEngine.SetUpSetPiece(4, n, a0.x, a0.y)
-		Return 1
 	Else
 		LogLine("Don't block tackle keeper.")
 		Return 0
 	End If
+	a0.DoAnimFall()
+	If g_training_int03 = 0 Then PlaySound(g_object52, g_Object46)
+	Local n:Int = 2
+	If g_awayteam.id = Self.teamid Then n = 1
+	TEngine.SetUpSetPiece(4, n, a0.x, a0.y)
+	Return 1
 End If
 a0.DoAnimFall()
 If g_ball <> Null And g_ball.controlledby <> Null And g_ball.controlledby <> a0 Then Return 0
@@ -155,25 +156,25 @@ If Self.selectionno = 0
 		Return 0
 	End If
 Else
-	If a0.CleanThrough() = 0
-		If 60.0 <= ang
+	If a0.CleanThrough() <> 0
+		If ang < 60.0
+			LogLine("Red card: Clean through and from behind")
+			Self.RedCard()
+		Else
+			LogLine("Yellow card: Clean through but not from behind")
+			Self.YellowCard()
+		End If
+	Else
+		If ang < 60.0
+			LogLine("Yellow card: From behind")
+			Self.YellowCard()
+		Else
 			If Self.matchstats.CountStat(11) = Self.matchstats.yellows + 5
 				LogLine("Yellow card: Too many fouls")
 				Self.YellowCard()
 			Else
 				Self.AddStat(11, 0, 0, 0, 0)
 			End If
-		Else
-			LogLine("Yellow card: From behind")
-			Self.YellowCard()
-		End If
-	Else
-		If 60.0 <= ang
-			LogLine("Yellow card: Clean through but not from behind")
-			Self.YellowCard()
-		Else
-			LogLine("Red card: Clean through and from behind")
-			Self.RedCard()
 		End If
 	End If
 End If
@@ -181,26 +182,28 @@ If g_training_int03 = 0 Then PlaySound(g_object52, g_Object46)
 Local n:Int = 2
 If g_awayteam.id = Self.teamid Then n = 1
 TEngine.SetUpSetPiece(4, n, a0.x, a0.y)
+If g_contractoffer_tplayer.shinpads = 0
+End If
 If g_contractoffer_tplayer.energy < 30.0 Or g_contractoffer_tplayer.takenpainkillers
 	g_player_float16 = g_player_float16 * 0.5
 Else
-	If 40.0 <= g_contractoffer_tplayer.energy
-		If 50.0 <= g_contractoffer_tplayer.energy
-			If 60.0 <= g_contractoffer_tplayer.energy
+	If g_contractoffer_tplayer.energy < 40.0
+		g_player_float16 = g_player_float16 * 0.6
+	Else
+		If g_contractoffer_tplayer.energy < 50.0
+			g_player_float16 = g_player_float16 * 0.7
+		Else
+			If g_contractoffer_tplayer.energy < 60.0
+				g_player_float16 = g_player_float16 * 0.8
+			Else
 				If g_contractoffer_tplayer.energy < 70.0
 					g_player_float16 = g_player_float16 * 0.9
 				End If
-			Else
-				g_player_float16 = g_player_float16 * 0.8
 			End If
-		Else
-			g_player_float16 = g_player_float16 * 0.7
 		End If
-	Else
-		g_player_float16 = g_player_float16 * 0.6
 	End If
 End If
-If a0.newstar And Rand(1, Int(g_player_float16)) = 1
+If a0.newstar And Rand(Int(g_player_float16), 1) = 1
 	TEngine.DoYourSubstitutionOff(1)
 	g_contractoffer_tplayer.DoInjury()
 End If

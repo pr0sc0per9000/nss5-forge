@@ -1,4 +1,5 @@
 ' TScreen_Interview.Update -- NOT VERIFIED (LENGTH-EXACT 904/904; 661/904 = 73.1% per current
+' byte-identical vs NSS5.exe
 ' status/score, first diff is a Global-address operand at byte 7, see the re-check note below)
 ' VA 0x0057B9D9   904 bytes (Ghidra-authoritative)   KIND=Function (static, no Self)   SIG=()i
 ' vtable slot 0x44
@@ -170,7 +171,7 @@ If g_screen_interview_int04 = 0
 				g_Object796.SetText("", "", -1, -1)
 			EndIf
 		EndIf
-	Else If g_screen_interview_int05 + 1250 < g_player_int50
+	Else If g_player_int50 > g_screen_interview_int05 + 1250
 		g_screen_interview_int15 = 0
 		Local btn:TButton = TButton(g_iv_screen.GetGadgetByName("btn_" + String(Abs(g_screen_interview_arr[g_screen_interview_int07 - 1]))))
 		btn.SetColour("FFFFFF", "FFFFFF")
@@ -182,7 +183,7 @@ If g_screen_interview_int04 = 0
 		Else
 			g_screen_interview_int07 :+ 1
 		EndIf
-		If g_screen_interview_int02 < g_screen_interview_int07
+		If g_screen_interview_int07 > g_screen_interview_int02
 			g_Object796.SetText(GetText("Go!"), "", -1, -1)
 			g_screen_interview_int07 = 1
 			g_screen_interview_int04 = 1

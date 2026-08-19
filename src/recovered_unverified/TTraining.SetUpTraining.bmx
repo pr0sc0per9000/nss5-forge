@@ -1,5 +1,6 @@
 ' TTraining.SetUpTraining
 ' VA 0x0057BF1F   1764 bytes   KIND=Function (static, no implicit Self)   slot 0x30   sig (i)i
+' byte-identical vs NSS5.exe
 ' Reconstructed from extracted/decomp/TTraining.SetUpTraining@0057bf1f.c and its
 ' extracted/decomp_annotated/ pass (CTSLOT/STR/FN resolution -- CONFIDENCE=NONE on the
 ' GLOBAL substitutions specifically, everything else high-confidence/multi-site-agreed).
