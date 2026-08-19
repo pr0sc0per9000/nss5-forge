@@ -154,8 +154,8 @@
 '!Global g_traininglabel3:TLabel
 '!Global g_traininglabel4:TLabel
 '!Global g_screen_w:Int
-'!Global g_kits_img1:TImage
-'!Global g_kits_img2:TImage
+'!Global g_object872:TImage
+'!Global g_object873:TImage
 '!Global g_training_int08:String
 '!Global g_training_int09:String
 '!Global g_training_int10:String
@@ -188,9 +188,9 @@ Select g_training_int05
 			EndIf
 		Else
 			Local cy:Int = g_screen_h / 2 - 170
-			DrawImageRect(g_kits_img1, 0, cy - 30, g_screen_w, 300.0, 0)
-			DrawImageRect(g_kits_img2, 0, cy - 32, g_screen_w, 4.0, 0)
-			DrawImageRect(g_kits_img2, 0, cy + 268, g_screen_w, 4.0, 0)
+			DrawImageRect(g_object872, 0, cy - 30, g_screen_w, 300.0, 0)
+			DrawImageRect(g_object873, 0, cy - 32, g_screen_w, 4.0, 0)
+			DrawImageRect(g_object873, 0, cy + 268, g_screen_w, 4.0, 0)
 			cy :+ 50
 			TEngine.DrawMyText(g_training_int08, g_screen_w / 2, cy, 1, 1, 1.0, 1.0, "FFFFFF", 1)
 			cy :+ 100
@@ -201,9 +201,9 @@ Select g_training_int05
 	Case 1
 	Case 2
 		Local cy:Int = g_screen_h / 2 - 150
-		DrawImageRect(g_kits_img1, 0, cy - 30, g_screen_w, 300.0, 0)
-		DrawImageRect(g_kits_img2, 0, cy - 32, g_screen_w, 4.0, 0)
-		DrawImageRect(g_kits_img2, 0, cy + 268, g_screen_w, 4.0, 0)
+		DrawImageRect(g_object872, 0, cy - 30, g_screen_w, 300.0, 0)
+		DrawImageRect(g_object873, 0, cy - 32, g_screen_w, 4.0, 0)
+		DrawImageRect(g_object873, 0, cy + 268, g_screen_w, 4.0, 0)
 		cy :+ 50
 		TEngine.DrawMyText(g_training_int08, g_screen_w / 2, cy, 1, 1, 1.0, 1.0, "FFFFFF", 1)
 		cy :+ 100

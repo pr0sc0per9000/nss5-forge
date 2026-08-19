@@ -16,55 +16,55 @@
 ' as a default argument, which bcc materialises at the call site.
 	Method AddPlayerRating:Int(a0:Int, a1:Int, a2:String)
 		'!Global g_training_int03:Int
-		'!Global g_player_tplayer02:TBall
-		'!Global g_contractoffer_tplayer:TProfile
+		'!Global g_ball:TBall
+		'!Global g_profile:TProfile
 		'!Global g_Object17:TTeam
 		If Self.newstar = 0 Then Return 0
 		If g_training_int03 <> 0 Then Return 0
-		If g_player_tplayer02 <> Null And g_player_tplayer02.lastkickmatchstate = 3 Then Return 0
+		If g_ball <> Null And g_ball.lastkickmatchstate = 3 Then Return 0
 		Local s:String = ""
 		Select a0
 			Case 1
-				g_contractoffer_tplayer.temp_freekicks = g_contractoffer_tplayer.temp_freekicks + a1
+				g_profile.temp_freekicks = g_profile.temp_freekicks + a1
 				s = "Free Kicks"
 			Case 2
-				g_contractoffer_tplayer.temp_corners = g_contractoffer_tplayer.temp_corners + a1
+				g_profile.temp_corners = g_profile.temp_corners + a1
 				s = "Corners"
 			Case 3
-				g_contractoffer_tplayer.temp_crossing = g_contractoffer_tplayer.temp_crossing + a1
+				g_profile.temp_crossing = g_profile.temp_crossing + a1
 				s = "Crossing"
 			Case 4
-				g_contractoffer_tplayer.temp_positioning = g_contractoffer_tplayer.temp_positioning + a1
+				g_profile.temp_positioning = g_profile.temp_positioning + a1
 				s = "Positioning"
 			Case 5
-				g_contractoffer_tplayer.temp_shortpassing = g_contractoffer_tplayer.temp_shortpassing + a1
+				g_profile.temp_shortpassing = g_profile.temp_shortpassing + a1
 				s = "Short Passing"
 			Case 6
-				g_contractoffer_tplayer.temp_longpassing = g_contractoffer_tplayer.temp_longpassing + a1
+				g_profile.temp_longpassing = g_profile.temp_longpassing + a1
 				s = "Long Passing"
 			Case 7
-				g_contractoffer_tplayer.temp_aggression = g_contractoffer_tplayer.temp_aggression + a1
+				g_profile.temp_aggression = g_profile.temp_aggression + a1
 				s = "Aggression"
 			Case 8
-				g_contractoffer_tplayer.temp_longshots = g_contractoffer_tplayer.temp_longshots + a1
+				g_profile.temp_longshots = g_profile.temp_longshots + a1
 				s = "Long Shots"
 			Case 9
-				g_contractoffer_tplayer.temp_finishing = g_contractoffer_tplayer.temp_finishing + a1
+				g_profile.temp_finishing = g_profile.temp_finishing + a1
 				s = "Finishing"
 			Case 10
-				g_contractoffer_tplayer.temp_penalties = g_contractoffer_tplayer.temp_penalties + a1
+				g_profile.temp_penalties = g_profile.temp_penalties + a1
 				s = "Penalties"
 		End Select
-		ClampInt(Varptr g_contractoffer_tplayer.temp_freekicks, -10, 10)
-		ClampInt(Varptr g_contractoffer_tplayer.temp_corners, -10, 10)
-		ClampInt(Varptr g_contractoffer_tplayer.temp_crossing, -10, 10)
-		ClampInt(Varptr g_contractoffer_tplayer.temp_positioning, -10, 10)
-		ClampInt(Varptr g_contractoffer_tplayer.temp_shortpassing, -10, 10)
-		ClampInt(Varptr g_contractoffer_tplayer.temp_longpassing, -10, 10)
-		ClampInt(Varptr g_contractoffer_tplayer.temp_aggression, -10, 10)
-		ClampInt(Varptr g_contractoffer_tplayer.temp_longshots, -10, 10)
-		ClampInt(Varptr g_contractoffer_tplayer.temp_finishing, -10, 10)
-		ClampInt(Varptr g_contractoffer_tplayer.temp_penalties, -10, 10)
+		ClampInt(Varptr g_profile.temp_freekicks, -10, 10)
+		ClampInt(Varptr g_profile.temp_corners, -10, 10)
+		ClampInt(Varptr g_profile.temp_crossing, -10, 10)
+		ClampInt(Varptr g_profile.temp_positioning, -10, 10)
+		ClampInt(Varptr g_profile.temp_shortpassing, -10, 10)
+		ClampInt(Varptr g_profile.temp_longpassing, -10, 10)
+		ClampInt(Varptr g_profile.temp_aggression, -10, 10)
+		ClampInt(Varptr g_profile.temp_longshots, -10, 10)
+		ClampInt(Varptr g_profile.temp_finishing, -10, 10)
+		ClampInt(Varptr g_profile.temp_penalties, -10, 10)
 		If a1 < 0
 			s = s + " " + a1
 		Else

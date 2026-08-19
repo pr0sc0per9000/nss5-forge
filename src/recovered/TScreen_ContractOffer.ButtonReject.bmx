@@ -14,8 +14,8 @@
 '   Global fReject:Int()
 	Function ButtonReject:Int()
 		'!Global fReject:Int()
-		'!Global g_offer_profile:TProfile
-		If Not g_offer_profile.myclub Then
+		'!Global g_profile:TProfile
+		If Not g_profile.myclub Then
 			If TScreen.DoMessage(GetText("CMESSAGE_FIRSTCONTRACTREJECT"), 1, 0) Then
 				fReject()
 			End If

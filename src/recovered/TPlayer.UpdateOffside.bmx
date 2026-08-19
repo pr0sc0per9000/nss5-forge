@@ -58,7 +58,7 @@
 	Method UpdateOffside:Int()
 		'!Global g_training_int03:Int
 		'!Global g_player_int01:Int
-		'!Global g_player_tplayer02:TBall
+		'!Global g_ball:TBall
 		'!Global g_players:TList
 		'!Global g_player_int50:Int
 		'!Global g_hometeam:TTeam
@@ -73,10 +73,10 @@
 			Default
 				Return 0
 		End Select
-		If Not g_player_tplayer02 Then Return 0
-		If g_player_tplayer02.controlledby <> Null
-			If g_player_tplayer02.controlledby = Self Then Return 0
-			If g_player_tplayer02.controlledby.teamid <> Self.teamid Then Return 0
+		If Not g_ball Then Return 0
+		If g_ball.controlledby <> Null
+			If g_ball.controlledby = Self Then Return 0
+			If g_ball.controlledby.teamid <> Self.teamid Then Return 0
 		End If
 		If Self.selectionno = 0 Or Self.selectionno > 10 Then Return 0
 		If Self.goalside <> 0 Then Return 0

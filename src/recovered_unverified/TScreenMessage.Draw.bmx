@@ -59,8 +59,8 @@
 '!Global g_screenmessages:TList
 '!Global g_matchtime:Int
 '!Global g_engine_int162:Int
-'!Global g_kits_img1:TImage
-'!Global g_kits_img2:TImage
+'!Global g_object872:TImage
+'!Global g_object873:TImage
 
 If g_matchtime < starttime Then Return 0
 If g_matchtime > finishtime
@@ -94,9 +94,9 @@ Else
 			SetAlpha(alfa * 0.75)
 			Local th2:Int = bmfnt.GetFontHeight()
 			Local hbar:Float = Float(th2 + 2) * alfa
-			DrawImageRect(g_kits_img1, 0, Float(y - 5) - hbar * 0.5, Float(g_engine_int162), hbar, 0)
-			DrawImageRect(g_kits_img2, 0, (Float(y - 5) - hbar * 0.5) - 2.0, Float(g_engine_int162), 4.0, 0)
-			DrawImageRect(g_kits_img2, 0, (Float(y - 5) + hbar * 0.5) - 2.0, Float(g_engine_int162), 4.0, 0)
+			DrawImageRect(g_object872, 0, Float(y - 5) - hbar * 0.5, Float(g_engine_int162), hbar, 0)
+			DrawImageRect(g_object873, 0, (Float(y - 5) - hbar * 0.5) - 2.0, Float(g_engine_int162), 4.0, 0)
+			DrawImageRect(g_object873, 0, (Float(y - 5) + hbar * 0.5) - 2.0, Float(g_engine_int162), 4.0, 0)
 			SetColourHex(colour)
 			SetAlpha(alfa)
 			bmfnt.DrawText(message, Float(tx), Float(ty), 1)

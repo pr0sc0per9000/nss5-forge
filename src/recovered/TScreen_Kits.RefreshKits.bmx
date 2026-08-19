@@ -36,23 +36,23 @@
 '!Global g_kits_kit2:TKit
 '!Global g_kits_int06:Int
 '!Global g_kits_int07:Int
-'!Global g_kits_img1:TImage
-'!Global g_kits_img2:TImage
+'!Global g_object872:TImage
+'!Global g_object873:TImage
 '!Global g_kits_int08:Int
 '!Global g_kits_int09:Int
 '!Global g_kits_lbl1:TLabel
 '!Global g_kits_lbl2:TLabel
-'!Global g_contractoffer_tplayer:TProfile
+'!Global g_profile:TProfile
 CreateKits(g_media_path + "GameMedia/Images/Interface/Player.png")
 Local p1:TPixmap = g_kits_kit1.GetPaintedPlayer("444444", g_kits_int06, -1, "444444")
 Local p2:TPixmap = g_kits_kit2.GetPaintedPlayer("444444", g_kits_int07, -1, "444444")
-g_kits_img1 = LoadImage(p1, -1)
-g_kits_img2 = LoadImage(p2, -1)
-TButton(g_kits_screen.GetGadgetByName("kits_kit1")).SetImage(g_kits_img1)
-TButton(g_kits_screen.GetGadgetByName("kits_kit2")).SetImage(g_kits_img2)
+g_object872 = LoadImage(p1, -1)
+g_object873 = LoadImage(p2, -1)
+TButton(g_kits_screen.GetGadgetByName("kits_kit1")).SetImage(g_object872)
+TButton(g_kits_screen.GetGadgetByName("kits_kit2")).SetImage(g_object873)
 Select g_kits_int08
 	Case 1
-		g_kits_lbl1.SetText(g_contractoffer_tplayer.GetOriginalName(), "", -1, -1)
+		g_kits_lbl1.SetText(g_profile.GetOriginalName(), "", -1, -1)
 		g_kits_lbl1.SetColour("00FF00", "FFFFFF")
 	Case 0
 		g_kits_lbl1.SetText(GetText("CPU"), "", -1, -1)
@@ -64,7 +64,7 @@ Select g_kits_int09
 			g_kits_lbl2.SetText(GetText("Player 2"), "", -1, -1)
 			g_kits_lbl2.SetColour("00FF00", "FFFFFF")
 		Else
-			g_kits_lbl2.SetText(g_contractoffer_tplayer.GetOriginalName(), "", -1, -1)
+			g_kits_lbl2.SetText(g_profile.GetOriginalName(), "", -1, -1)
 			g_kits_lbl2.SetColour("00FF00", "FFFFFF")
 		EndIf
 	Case 0

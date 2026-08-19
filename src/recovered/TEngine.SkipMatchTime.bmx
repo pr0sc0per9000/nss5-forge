@@ -89,7 +89,7 @@
 		'!Global g_screen_newplayer_flag:Int
 		'!Global g_player_int16:Int
 		'!Global g_engine_int17:Int = 1750
-		'!Global g_Object15:TBitmapFont
+		'!Global g_font_match_m:TBitmapFont
 		'!Global g_Object29:TImage
 		'!Global g_Object30:TImage
 		'!Global g_engine_float07:Float
@@ -145,9 +145,9 @@
 						If hp2 <> Null
 							Select hp2.GetShootingDirection()
 								Case -1
-									TScreenMessage.Create(0, 0, Lower(GetText("Substitution")), g_engine_int17 Shl 1, g_Object15, g_Object29, 1.0, "FFFFFF")
+									TScreenMessage.Create(0, 0, Lower(GetText("Substitution")), g_engine_int17 Shl 1, g_font_match_m, g_Object29, 1.0, "FFFFFF")
 								Case 1
-									TScreenMessage.Create(0, 0, Lower(GetText("Substitution")), g_engine_int17 Shl 1, g_Object15, g_Object30, 1.0, "FFFFFF")
+									TScreenMessage.Create(0, 0, Lower(GetText("Substitution")), g_engine_int17 Shl 1, g_font_match_m, g_Object30, 1.0, "FFFFFF")
 							End Select
 						EndIf
 						Return 0

@@ -11,7 +11,7 @@
 
 	Function SetActive:Int(a0:TBall)
 		'!Global g_balls:TList
-		'!Global g_activeball:TBall
+		'!Global g_ball:TBall
 		If Not g_balls Then Return 0
 		For Local b:TBall = EachIn g_balls
 			If b <> a0
@@ -20,5 +20,5 @@
 			EndIf
 		Next
 		a0.active = 1
-		g_activeball = a0
+		g_ball = a0
 	End Function

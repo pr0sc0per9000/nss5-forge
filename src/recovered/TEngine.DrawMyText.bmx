@@ -4,11 +4,11 @@
 ' Verified through the oracle from scratch with helper_map.record stubbed; MATCH over
 ' the full Ghidra-authoritative length, every byte.
 ' Body-only format: statements only, parameters are a0, a1, ...
-'!Global g_font1:TBitmapFont
+'!Global g_font_match_m:TBitmapFont
 '!Global g_font2:TBitmapFont
 '!Global g_screenW:Int
 '!Global g_screenH:Int
-Local f:TBitmapFont = g_font1
+Local f:TBitmapFont = g_font_match_m
 If a8 = 1 Then f = g_font2
 If a1 = 0.0 And a2 = 0.0
 	a1 = g_screenW / 2

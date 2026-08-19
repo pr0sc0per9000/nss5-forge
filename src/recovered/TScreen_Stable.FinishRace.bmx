@@ -33,7 +33,7 @@
 '!Global g_stable_stake:Int
 '!Global g_stable_racenum:Int
 '!Global g_stable_state:Int
-'!Global g_contractoffer_tplayer:TProfile
+'!Global g_profile:TProfile
 '!Global g_snd_win:TSound
 '!Global g_chan_bet:TChannel
 '!Global g_chan_race:TChannel
@@ -46,8 +46,8 @@
 For Local h:THorse = EachIn g_horses
 	If h.raceposition = 1 And g_stable_racenum = h.racenum
 		Local w:Int = g_stable_stake * h.betprice
-		g_contractoffer_tplayer.UpdateBank(w)
-		g_contractoffer_tplayer.CheckAchievement(72)
+		g_profile.UpdateBank(w)
+		g_profile.CheckAchievement(72)
 	EndIf
 	Select h.raceposition
 		Case 1
@@ -62,16 +62,16 @@ For Local h:THorse = EachIn g_horses
 			Case 1
 				PlaySound(g_snd_win, g_chan_bet)
 				TScreen.DoMessage(GetText("CMESSAGE_HORSEPRIZE").Replace("$cash", FormatMoney(50000, 1)), 0, 0)
-				g_contractoffer_tplayer.UpdateBank(50000)
-				g_contractoffer_tplayer.CheckAchievement(83)
+				g_profile.UpdateBank(50000)
+				g_profile.CheckAchievement(83)
 			Case 2
 				PlaySound(g_snd_win, g_chan_bet)
 				TScreen.DoMessage(GetText("CMESSAGE_HORSEPRIZE").Replace("$cash", FormatMoney(25000, 1)), 0, 0)
-				g_contractoffer_tplayer.UpdateBank(25000)
+				g_profile.UpdateBank(25000)
 			Case 3
 				PlaySound(g_snd_win, g_chan_bet)
 				TScreen.DoMessage(GetText("CMESSAGE_HORSEPRIZE").Replace("$cash", FormatMoney(10000, 1)), 0, 0)
-				g_contractoffer_tplayer.UpdateBank(10000)
+				g_profile.UpdateBank(10000)
 		End Select
 	EndIf
 Next

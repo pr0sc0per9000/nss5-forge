@@ -6,13 +6,13 @@
 '!Global g_sound_success:TSound
 '!Global g_channel:TChannel
 '!Global g_font:TBitmapFont
-'!Global g_screenw:Int
-'!Global g_screenh:Int
+'!Global g_screen_w:Int
+'!Global g_screen_h:Int
 '!Global g_button_interview:TButton
 '!Global g_icon_tick:TImage
 '!Global g_profile:TProfile
 PlaySound(g_sound_success, g_channel)
-TScreenMessage.Create(g_screenw / 2, g_screenh / 2, GetText("Success!"), 1000, g_font, Null, 1.0, "FFFFFF")
+TScreenMessage.Create(g_screen_w / 2, g_screen_h / 2, GetText("Success!"), 1000, g_font, Null, 1.0, "FFFFFF")
 g_button_interview.SetIcon(g_icon_tick)
 g_button_interview.Show()
 g_profile.UpdateRelationship(7, 5)

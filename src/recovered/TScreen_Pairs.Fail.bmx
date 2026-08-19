@@ -26,9 +26,9 @@
 		'!Global g_sound_fail:TSound
 		'!Global g_channel_sfx:TChannel
 		'!Global g_font_main:TBitmapFont
-		'!Global g_screenw:Int
-		'!Global g_screenh:Int
+		'!Global g_screen_w:Int
+		'!Global g_screen_h:Int
 		PlaySound(g_sound_fail, g_channel_sfx)
-		TScreenMessage.Create(g_screenw / 2, g_screenh / 2, GetText("Fail!"), 1000, g_font_main, Null, 1.0, "FFFFFF")
+		TScreenMessage.Create(g_screen_w / 2, g_screen_h / 2, GetText("Fail!"), 1000, g_font_main, Null, 1.0, "FFFFFF")
 		TScreen_Relationships.SetUpScreen(1)
 	End Function

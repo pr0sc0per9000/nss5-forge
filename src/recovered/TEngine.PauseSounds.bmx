@@ -8,12 +8,12 @@
 		'!Global g_snd_chan3:TChannel
 		'!Global g_snd_chan4:TChannel
 		'!Global g_snd_chan5:TChannel
-		'!Global g_snd_chan6:TChannel
+		'!Global g_musicchannel:TChannel
 		LogLine("PauseSounds")
 		PauseChannel(g_snd_chan1)
 		PauseChannel(g_snd_chan2)
 		PauseChannel(g_snd_chan3)
 		PauseChannel(g_snd_chan4)
 		PauseChannel(g_snd_chan5)
-		ResumeChannel(g_snd_chan6)
+		ResumeChannel(g_musicchannel)
 	End Function

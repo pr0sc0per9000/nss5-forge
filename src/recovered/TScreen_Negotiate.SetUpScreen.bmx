@@ -14,7 +14,11 @@
 '                              :TContractOffer and the store is a plain retain/release
 '                              assignment of a0, so the type follows from the signature)
 '    0x00C5B1C8 g_font       : TBitmapFont     (table: construction, medium)
-'    0x00C6EFE4 g_screenw    : Int   0x00C6EFE8 g_screenh : Int  (bare movs, no refcounts)
+'    0x00C6EFE4 g_screen_w   : Int   0x00C6EFE8 g_screen_h : Int  (bare movs, no refcounts;
+'      named with the underscore to match the address family TScreen_Negotiate.Fail.bmx and
+'      TScreen_Negotiate.Success.bmx already use for the same TScreenMessage.Create pattern --
+'      "g_screenw"/"g_screenh" without the underscore is a different pair, 0x00C6EFDC/E0, the
+'      800x600 design-resolution constant TScreen.Draw@00510dfc reads for its own viewport)
 '    0x00C6CC40 g_selected   : Int
 '    0x00C6CC50 g_nums       : Int[]   (table says Object[]; every element is used as an
 '                              array subscript and assigned from Rand -> Int[], cf. 11.2)
@@ -49,8 +53,8 @@
 
 	Function SetUpScreen:Int(a0:TContractOffer)
 		'!Global g_offer:TContractOffer
-		'!Global g_screenw:Int
-		'!Global g_screenh:Int
+		'!Global g_screen_w:Int
+		'!Global g_screen_h:Int
 		'!Global g_font:TBitmapFont
 		'!Global g_selected:Int
 		'!Global g_nums:Int[]
@@ -64,7 +68,7 @@
 		'!Global g_profile:TProfile
 		g_offer = a0
 		TScreen.SetActive("negotiate", "")
-		TScreenMessage.Create(g_screenw / 2, g_screenh / 2, GetText("Negotiate!"), ..
+		TScreenMessage.Create(g_screen_w / 2, g_screen_h / 2, GetText("Negotiate!"), ..
 			1500, g_font, Null, 1.0, "FFFFFF")
 		g_selected = 1
 		For Local i:Int = 1 To 5

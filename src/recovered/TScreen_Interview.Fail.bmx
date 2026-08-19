@@ -23,10 +23,10 @@
 		'!Global g_engine_font:TBitmapFont
 		'!Global g_interview_button:TButton
 		'!Global g_negotiate_icon:TImage
-		'!Global g_contractoffer_profile:TProfile
+		'!Global g_profile:TProfile
 		PlaySound(g_interview_failsound, g_interview_channel)
 		TScreenMessage.Create(g_engine_gfxw/2, g_engine_gfxh/2, GetText("Fail!"), 1000, g_engine_font, Null, 1.0, "FFFFFF")
 		g_interview_button.SetIcon(g_negotiate_icon)
 		g_interview_button.Show()
-		g_contractoffer_profile.UpdateRelationship(7, -5)
+		g_profile.UpdateRelationship(7, -5)
 	End Function

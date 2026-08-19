@@ -44,7 +44,7 @@
 '  * `TOptions.LoadOptions()` is a `ct` (class-table) call, not a Self dispatch --
 '    `SetUp` is itself a Function (static), so there is no Self.
 	'!Global g_gfxmodes:TList
-	'!Global g_dataDir:String
+	'!Global g_userpath:String
 	'!Global g_options_arr12:TImage[]
 	'!Global g_options_arr13:TImage[]
 	'!Global g_Object55:TImage
@@ -61,13 +61,13 @@
 		EndIf
 	Next
 	g_gfxmodes.Sort(1)
-	CreateDir(g_dataDir)
-	CreateDir(g_dataDir + "Settings/")
-	If FileType(g_dataDir + "Settings/Options.ini") <> 1
+	CreateDir(g_userpath)
+	CreateDir(g_userpath + "Settings/")
+	If FileType(g_userpath + "Settings/Options.ini") <> 1
 		LogLine("Options.ini doesn't exist. Writing new one...")
 		TOptions.WriteNewOptionsIni()
-		If FileType(g_dataDir + "Settings/Options.ini") <> 1
-			Notify("Error OPTIONS: Unable to create an options file:" + g_dataDir + "Settings/Options.ini", 1)
+		If FileType(g_userpath + "Settings/Options.ini") <> 1
+			Notify("Error OPTIONS: Unable to create an options file:" + g_userpath + "Settings/Options.ini", 1)
 			End
 		EndIf
 	EndIf

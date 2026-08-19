@@ -9,7 +9,7 @@
 ' `If p.newstar And ...` is load-bearing: `<> 0` adds setne/movzx/cmp (9 bytes) per site
 ' and made the body 645. The three `Then Continue` guards each emit 74 02 / EB xx.
 	Method SelectRandomPlayer:TPlayer(a0:Int, a1:Int, a2:Int, a3:Int)
-		'!Global g_contractoffer_tplayer:TProfile
+		'!Global g_profile:TProfile
 		Local ok:Int
 		Local r:Int
 		Repeat
@@ -22,7 +22,7 @@
 		Until ok
 		For Local p:TPlayer = EachIn Self.squad
 			If p.selectionno = r And p.matchstats <> Null
-				If p.newstar And g_contractoffer_tplayer.injury > 0 Then Continue
+				If p.newstar And g_profile.injury > 0 Then Continue
 				If p.matchstats.subbedofftime > 0 Then Continue
 				If p.matchstats.reds > 0 Then Continue
 				Return p
@@ -32,7 +32,7 @@
 			r = Rand(10)
 			For Local p:TPlayer = EachIn Self.squad
 				If p.selectionno = r And p.matchstats <> Null
-					If p.newstar And g_contractoffer_tplayer.injury > 0 Then Continue
+					If p.newstar And g_profile.injury > 0 Then Continue
 					If p.matchstats.subbedofftime > 0 Then Continue
 					If p.matchstats.reds > 0 Then Continue
 					Return p

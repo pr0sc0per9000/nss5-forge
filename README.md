@@ -30,7 +30,18 @@ A further 4 bodies are excluded from that count. They call into Steam, whose
 refuse to start the process. `STEAM_EXCLUDE` in
 [`scripts/progress.py`](/scripts/progress.py) names them and says why.
 
-The game builds and boots to the main menu. It is not yet playable end to end.
+The game builds, boots, and a new career now runs through character creation into
+the club trial and draws its first training. It is not yet playable end to end.
+
+Getting that far was not a matter of recovering more machine code -- the byte figure
+above did not move. It was a naming defect. One memory address routinely collected
+several recovered names, and because a Global's name never reaches compiled output,
+every body involved byte-matched perfectly while the writer updated one variable and
+the reader saw another that nothing ever assigned. Twenty slots have now been
+collapsed onto one name each, including the player profile, the match ball and the
+engine state. [`docs/specs/21-module-globals.md`](/docs/specs/21-module-globals.md)
+§8 records what was fixed, the three shapes this defect takes, why neither the byte
+oracle nor the name-based tooling can see it, and the 62 addresses still outstanding.
 
 Beyond the rebuild, [`docs/game`](/docs/game/README.md) documents how the game
 actually behaves: the match engine, AI decisions, injuries, cards, transfers and

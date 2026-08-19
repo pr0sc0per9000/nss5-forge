@@ -10,7 +10,7 @@
 		'!Global g_fixture:TFixture
 		'!Global g_Object17:TTeam
 		'!Global g_training_int03:Int
-		'!Global g_contractoffer_tplayer:TProfile
+		'!Global g_profile:TProfile
 		LogLine("SetUpWeatherConditions")
 		Local wind:Int = 0
 		Local chance:Int = 0
@@ -26,7 +26,7 @@
 		EndIf
 		Local nat:TNation
 		If g_training_int03 <> 0
-			nat = TNation.SelectById(g_contractoffer_tplayer.myclub.nationid)
+			nat = TNation.SelectById(g_profile.myclub.nationid)
 		Else
 			Local comp:TCompetition = TCompetition.SelectById(g_fixture.compid)
 			Select g_fixture.level

@@ -12,7 +12,7 @@
 ' all, so neither name can have come from the call sites it now masks.
 '
 ' ASSUMPTIONS (module Global types are load-bearing -- they pick the dispatch slot):
-'   g_match_ball:TBall (0x00C5DEA4)      g_engine_tball:TBall (0x00C5B22C, +0xC=active)
+'   g_match_ball:TBall (0x00C5DEA4)      g_engine_tball -> g_fixture:TFixture (0x00C5B22C, +0xC=matchtype)
 '   g_profile:TProfile (0x00C6F028)      g_player_tplayer01:TPlayer (0x00C5B248)
 '   g_player_arr13:Int[] (0x00C5DEDC)    g_img_drunk/g_img_stomach:TImage (0x00C5B320/31C)
 '   g_snd_alert:TSound (0x00C5DF3C)      g_chan_alert:TChannel (0x00C6F090)
@@ -21,8 +21,12 @@
 '         g_player_int50 C6EFD4, g_engine_int20 C5B210, g_engine_int163 C6EFE8,
 '         g_training_int03 C6CF90
 '   Floats: g_player_float03/05/06/09/10/17 C5DE48/50/54/60/64/90, g_ball_float03 C5A4D4
-' 0x00C5B22C is TBall, not the TPlayer globals_final.tsv claims: it is read as [eax+0xC]
-' and compared with 1, and TPlayer+0xC is imgPlayer:TImage while TBall+0xC is active:Int.
+' 0x00C5B22C is TFixture, not TBall: it is read as [eax+0xC] and compared with 1, and
+' +0xC on TFixture is matchtype (object_model.json), the same field TEngine.SetUpMatch.bmx
+' and TEngine.MatchOver.bmx establish for this address from the constructing assignment
+' (`g_fixture = a0:TFixture`) plus five further corroborating field offsets. Aliased to
+' g_fixture in extracted/global_alias_overrides.tsv; kept as `g_engine_tball` at the
+' source level per that file's evidence trail.
 ' 0x00C5DEDC is Int[], not Object[]: it is compared with TPlayer.currentanim, whose
 ' reflected type is []i.
 ' All string literals read out of NSS5.exe with harness.read_string(): "matchmsg_Drunk",
@@ -43,9 +47,9 @@
 ' 0x00C5D294 -- codegen-patterns 21.1/21.3).
 '!Global g_options_int19:Int = 1
 '!Global g_player_int01:Int
-'!Global g_engine_tball:TBall
+'!Global g_engine_tball:TFixture
 '!Global g_player_int50:Int
-'!Global g_match_ball:TBall
+'!Global g_ball:TBall
 '!Global g_training_int03:Int
 '!Global g_player_int15:Int
 '!Global g_player_float10:Float
@@ -92,14 +96,14 @@ If Self.ForceControlCPU()
 		dir = 0
 		force = 1.0
 	EndIf
-	If g_player_int01 = 8 Or (g_player_int01 = 11 And g_engine_tball.active <> 1)
+	If g_player_int01 = 8 Or (g_player_int01 = 11 And g_engine_tball.matchtype <> 1)
 		Self.DoCelebrations()
 	EndIf
 EndIf
 Local timerunning:Float = g_player_int50 - Self.runtime
 Local pace:Float = Self.pace
 Local turnlimit:Int = 35
-If g_match_ball <> Null And g_match_ball.controlledby = Self
+If g_ball <> Null And g_ball.controlledby = Self
 	pace = Self.dribbling
 	turnlimit = 20
 EndIf
@@ -176,7 +180,7 @@ If Self.newstar And g_player_int01 = 1 And Self.selectionno < 11
 	If g_profile.energy < 0.0
 		g_profile.energy = 0.0
 	EndIf
-	If Self.PlayerOnFeet() And g_match_ball <> Null And g_training_int03 = 0
+	If Self.PlayerOnFeet() And g_ball <> Null And g_training_int03 = 0
 		If Rand(7500, 1) = 1 And ((g_profile.booze > 0 And Self.boozecount = 0) Or (g_profile.booze > 50 And Self.boozecount = 1))
 			Self.boozedup = g_player_int50
 			Self.boozecount :+ 1
@@ -198,7 +202,7 @@ If Self.selectionno = 0
 		ClampFloat(Varptr Self.y, -g_player_int17 + 5, g_player_int17 - 5)
 	EndIf
 	If Self.KeeperHoldingBall() And TPitch.InsidePenaltyBox(Int(Self.x), Int(Self.y), -Self.GetShootingDirection()) = 0
-		g_match_ball.backpass = 1
+		g_ball.backpass = 1
 	EndIf
 EndIf
 Self.zvel = Self.zvel - g_ball_float03
@@ -211,7 +215,7 @@ Self.metay = Self.y + Self.yvel * Self.speed * 10.5
 If Self.speed > 0.0
 	Self.direction = ATan2(Self.yvel, Self.xvel)
 EndIf
-If TEngine.SetPiece() And g_match_ball <> Null And g_match_ball.controlledby = Self
+If TEngine.SetPiece() And g_ball <> Null And g_ball.controlledby = Self
 	Self.direction = Self.joy.direction
 EndIf
 If TTraining.TrainingSetPiece(Self) And Self.KeeperHoldingBall() = 0
@@ -273,7 +277,7 @@ If Self.matchstats.reds = 0 And Self.selectionno < 11
 	EndIf
 EndIf
 If Self.newstar And g_player_int01 = 8 And Self.bonus = 0 And g_player_tplayer01 <> Null And g_player_tplayer01 = Self
-	If g_match_ball.controlledby = Self And Dist2D(Self.x, Self.y, 0, 0) < TPitch.YardsToPixels(10.0)
+	If g_ball.controlledby = Self And Dist2D(Self.x, Self.y, 0, 0) < TPitch.YardsToPixels(10.0)
 		Self.bonus = 1
 		TParticle.StarShower(Int(Self.x), Int(Self.y), "+" + Lower(GetText("Team")), "FF00FF")
 		g_profile.CheckAchievement(39)

@@ -159,3 +159,88 @@ Only 46 of 954 currently have a `stored_from` edge because writes are frequently
 `mov [G],eax` several instructions after the call, past my 1-instruction window, or via a
 register saved across a block. Widening that window with a small dataflow pass over the
 writing function should convert several hundred `Object` rows into concrete Types.
+
+## 8. One slot, several names - the defect class that costs playability
+
+Section 3 says naming "costs nothing in byte-match terms". That is true and it is also the
+trap. Because the name is free, two passes can name one address differently and **both
+bodies still byte-match**. `assemble.py` then emits one `Global` per distinct name, so the
+writer updates one variable and the reader sees another that nothing ever assigns.
+
+This is the single largest source of *runtime* defects in the reconstruction. It does not
+show up as a lower percentage; it shows up as the game not working.
+
+### 8.1 Why nothing catches it automatically
+
+- **The byte oracle cannot.** `harness.compare` masks relocations, and a Global reference
+  *is* a relocation. `mov eax,[A]` and `mov eax,[B]` compare equal. A body can be 100%
+  byte-identical and still read the wrong slot. `TEngine.SkipTime` was byte-identical while
+  reading two wrong Globals.
+- **`find_dead_globals.py` cannot, on its own.** It asks "read but never written". That
+  finds the easy half. It is blind whenever *both* survivors have a writer - which is the
+  common case, because the second name usually belongs to a real writer somewhere else.
+- **Name-based tools cannot see the mirror image.** One *name* can mean two *addresses*.
+  `g_options_int06` meant `0x00C5B1CC` in one body and `0x00C5D24C` in another; merging on
+  the name corrupted both.
+
+### 8.2 The three shapes
+
+| shape | what it looks like | how to find it |
+|---|---|---|
+| One address, several names | `assemble.py` emits 2+ `Global`s for one slot | group every recorded name by address, resolve each through `global_alias_map()`, flag any address with **2+ distinct surviving names** - do *not* filter to "one is unwritten" |
+| One name, several addresses | one identifier, different slot per body | disassemble the body and read the absolute displacement at each site; compare against the file's own header |
+| Array allocated, elements never filled | `Global g:TLabel[10]` looks written - the ten elements are Null | test element writes (`g[i] = ...`) separately from the array itself |
+
+The array shape is easy to miss because a sized declaration allocates a real array, so every
+"is this Global assigned" check passes. `g_ctl_lbl` had 114 element dereferences and no
+element writer at all.
+
+### 8.3 What a body's own header is worth
+
+Repeatedly, the recovered body **already recorded the right address** and the alias tables
+overrode it. `TEngine.SkipTime.bmx:9` reads `0x00C6CF90 -> g_trainingon  0x00C6CF98 ->
+g_trainingmode`, which is exactly what the original does - and the tables bound both names
+to `0x00C6CF90` because *other* files use the name `g_trainingmode` for that slot.
+
+**When a header and the alias tables disagree, disassemble before believing either.**
+`scripts/disasm.py <VA> <len>` and read the displacement. That is ground truth and it takes
+one command.
+
+### 8.4 Slots corrected
+
+Each row was confirmed against the binary or against a byte-identical writer's own header.
+Every merge below is name-only: no machine code changed, and the 94.6% figure is unmoved.
+
+| address | names collapsed onto | symptom while split |
+|---|---|---|
+| `0x00C6F028` | `g_profile` (8 names) | the player profile was Null for 168 dereferences; new career crashed before the first training |
+| `0x00C5DEA4` | `g_ball` (6 names) | the match ball was Null for 29 files; only assignment reachable was `= Null` |
+| `0x00C5B1C4` | `g_font_match_m` (4 names) | training scroll text measured against a Null font |
+| `0x00C6F08C` | `g_musicchannel` | boot allocated the music channel under another name, so with `music=0` in Options.ini `ResumeChannel(Null)` threw |
+| `0x00C6F090` | `g_object859` | shared SFX channel Null in training and blackjack |
+| `0x00C6F34C` / `0x00C6F3B0` | `g_object872` / `g_object873` | message-panel images Null unless the Kits screen had been opened; killed the first frame of any training |
+| `0x00C5B32C` | `g_engine_labels` | scoreboard team-name labels Null in `SetUpMatch` |
+| `0x00C6DD50` / `54` / `60` / `6C` | `g_panel_controls_pan` / `panreplay` / `lbl` / `kick` | the in-match controls panel; one *name* covered two panels, and `RenderKickToContinue` read the wrong array |
+| `0x00C67DA4` / `0x00C67DAC` | `g_mc_cmb_nation` / `g_mc_cmb_club` | My Contract nation/club combos |
+| `0x00C65C70` | `g_editkits_team` | Edit Kits quit handler |
+| `0x00C5B1CC` vs `0x00C5D24C` | split per body in `TEngine.SetUpMatch` | one name for the engine state *and* the player-cam option; the engine state was never set, so `MatchLoop` exited on its first pass and every trial auto-failed |
+| `0x00C6CF90` vs `0x00C6CF98` | split per body in `TEngine.SkipTime` | training-active flag vs challenge state; `StartChallenge` was unreachable, so KICK did nothing |
+| `0x00C6E9A8` | `g_userpath` in `TOptions.SetUp` | `SetUp` tested the install dir while `WriteNewOptionsIni`/`LoadOptions` used the save dir, so no options file was ever written and every setting - key bindings included - loaded as 0 |
+
+### 8.5 Still outstanding
+
+The sweep in 8.2 reports **62 addresses** still carrying 2+ surviving names. They are not all
+real: `0x00000000` collects seven names, and `g_camerax1`/`g_cameray1` appear at *both*
+`0x00C5DCB0` and `0x00C5DCB4`, which is an unresolved pairing rather than an identity. Each
+needs adjudicating against the disassembly before it is merged - **a wrong merge fuses two
+live variables, which is worse than the split it replaces.**
+
+The ones that look real and matter most are the engine's own audio channels
+(`0x00C5B33C/40/44/48`, e.g. `g_chan_a`/`g_chn2`), which sit in `TEngine.UpdateSounds`'
+non-training branch and would affect a real match the way the training faults above did.
+
+Hand-verified merges live in `extracted/global_alias_overrides.tsv`, each row cited. **That
+file is inside the gitignored `extracted/` tree**, so it does not survive a fresh clone; the
+merges above are therefore also applied at source, by renaming in `src/`, which is what
+actually makes them durable. Prefer the source rename. Use the override row for the evidence
+trail and to stop a regenerated `globals_final.tsv` re-splitting the slot.

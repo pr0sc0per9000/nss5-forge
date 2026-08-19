@@ -12,18 +12,18 @@
 '     proves only two of the five pushed dwords belong to it.
 	Function ButtonGame:Int()
 		'!Global g_screen_worldmap_int01:Int
-		'!Global g_contractoffer_tplayer:TProfile
+		'!Global g_profile:TProfile
 		'!Global g_worldmap_lblcash:TLabel
 		If g_screen_worldmap_int01 <= 0
 			TScreen.DoMessage(GetText("CMESSAGE_NOTTIRED"), 0, 0)
-		ElseIf g_contractoffer_tplayer.items[1] = 0
+		ElseIf g_profile.items[1] = 0
 			TScreen.DoMessage(GetText("CMESSAGE_CANNOTBUYGAME"), 0, 0)
-		ElseIf g_contractoffer_tplayer.bank < 100
+		ElseIf g_profile.bank < 100
 			TScreen.DoMessage(GetText("CMESSAGE_NOTENOUGHCASH"), 0, 0)
 		Else
-			g_contractoffer_tplayer.UpdateBank(-100)
-			g_worldmap_lblcash.SetText(FormatMoney(g_contractoffer_tplayer.bank, 0), "", -1, -1)
-			g_contractoffer_tplayer.boughtgame = 1
+			g_profile.UpdateBank(-100)
+			g_worldmap_lblcash.SetText(FormatMoney(g_profile.bank, 0), "", -1, -1)
+			g_profile.boughtgame = 1
 			TScreen_WorldMap.UpdateTravelTime()
 		End If
 	End Function

@@ -549,12 +549,12 @@
 '!Global g_player_int33:Int
 '!Global g_player_int50:Int
 '!Global g_player_float13:Float
-'!Global g_player_tplayer02:TBall
+'!Global g_ball:TBall
 '!Global g_training_int03:Int
 '!Global g_engine_int164:Int
-'!Global g_contractoffer_tplayer:TProfile
+'!Global g_profile:TProfile
 
-		If g_engine_int161 = 2 And g_player_int01 = 1 And Self.controller = 1 And g_player_tplayer02 <> Null
+		If g_engine_int161 = 2 And g_player_int01 = 1 And Self.controller = 1 And g_ball <> Null
 			Local n:Int = KeyHit(8)
 			If n = 0
 				If g_engine_int164
@@ -562,21 +562,21 @@
 				EndIf
 			EndIf
 			If n <> 0
-				If g_contractoffer_tplayer.name = "Simon Read" Or g_contractoffer_tplayer.name = "Si Read"
-					g_player_tplayer02.NewController(Self)
-					g_player_tplayer02.x = Self.x
-					g_player_tplayer02.y = Self.y
-					g_player_tplayer02.z = 0.0
-					g_player_tplayer02.oldx = Self.x
-					g_player_tplayer02.oldy = Self.y
-					g_player_tplayer02.oldz = 0.0
-					g_player_tplayer02.velocity = 0.0
-					g_player_tplayer02.zvelocity = 0.0
+				If g_profile.name = "Simon Read" Or g_profile.name = "Si Read"
+					g_ball.NewController(Self)
+					g_ball.x = Self.x
+					g_ball.y = Self.y
+					g_ball.z = 0.0
+					g_ball.oldx = Self.x
+					g_ball.oldy = Self.y
+					g_ball.oldz = 0.0
+					g_ball.velocity = 0.0
+					g_ball.zvelocity = 0.0
 				EndIf
 			EndIf
 		EndIf
 		If g_player_int03 = 0 Or g_player_int50 < g_player_int03 + 1000
-			If Self.newstar And g_player_tplayer02 <> Null And g_player_tplayer02.setpiecetaker <> Self And Self.joy.kickbuttonhits > g_player_int50 - 200
+			If Self.newstar And g_ball <> Null And g_ball.setpiecetaker <> Self And Self.joy.kickbuttonhits > g_player_int50 - 200
 				Self.Call()
 			EndIf
 			Self.ResetKick()
@@ -586,8 +586,8 @@
 					If Self.joy.kickbuttonhits <> 0
 						If Self.joy.kickbuttondown = 0
 							If Self.PlayerOnFeet() <> 0
-								If g_player_tplayer02.controlledby <> Null
-									g_player_tplayer02.z = 0.0
+								If g_ball.controlledby <> Null
+									g_ball.z = 0.0
 									Self.HoldKick()
 								Else
 									If g_player_int04 = Self.teamid
@@ -602,7 +602,7 @@
 				EndIf
 			Local n:Int = Self.PlayerOnFeet()
 			If n <> 0
-				If g_player_tplayer02 <> Null And g_player_tplayer02.controlledby = Self
+				If g_ball <> Null And g_ball.controlledby = Self
 					If Self.joy.kickbuttondown = 1
 						Self.kickpower = Self.kickpower + g_player_float13
 						If Self.kickdirection = -1.0
@@ -622,7 +622,7 @@
 						u5 = Self.joy.kickbuttondown = 0
 					EndIf
 					Local u2:Int = Self.joy.kickbuttondown
-					If g_player_tplayer02 <> Null Or g_training_int03 = 4 Or g_training_int03 = 5
+					If g_ball <> Null Or g_training_int03 = 4 Or g_training_int03 = 5
 						n = 0
 						If u5
 							n = Self.newstar
@@ -632,25 +632,25 @@
 							n6 = TTraining.CanCallForBall()
 						EndIf
 						Local u9:Int = 0
-						If n6 And g_player_tplayer02 <> Null And (g_player_tplayer02.controlledby = Null Or g_player_tplayer02.controlledby.teamid = Self.teamid)
-							u9 = Self.GetMyTeam().GetPlayerNearestToXY(Int(g_player_tplayer02.x), Int(g_player_tplayer02.y), 1, Null, 0) <> Self
+						If n6 And g_ball <> Null And (g_ball.controlledby = Null Or g_ball.controlledby.teamid = Self.teamid)
+							u9 = Self.GetMyTeam().GetPlayerNearestToXY(Int(g_ball.x), Int(g_ball.y), 1, Null, 0) <> Self
 							If u9 = 0
 								u9 = g_training_int03
 							EndIf
 						EndIf
-						If u9 And (g_player_tplayer02.teaminpossession = Self.teamid Or Self.distancetoball > TPitch.YardsToPixels(6.0))
+						If u9 And (g_ball.teaminpossession = Self.teamid Or Self.distancetoball > TPitch.YardsToPixels(6.0))
 							Self.Call()
 						Else
 							If g_player_int01 = 1 And Self.distancetoball <= TPitch.YardsToPixels(15.0)
 								If g_player_int14 = 0 Or Self.controller = 0
 									Local b:Int = False
 									If u5
-										b = g_player_tplayer02 = Null
-										If g_player_tplayer02 <> Null
-											Local b3:Int = g_player_tplayer02.z < g_player_int33
+										b = g_ball = Null
+										If g_ball <> Null
+											Local b3:Int = g_ball.z < g_player_int33
 											b = False
 											If b3
-												b = g_player_tplayer02.passtoid <> Self.id
+												b = g_ball.passtoid <> Self.id
 											EndIf
 										EndIf
 									EndIf
@@ -662,8 +662,8 @@
 											u9 = u2
 										EndIf
 										b = False
-										If u9 And g_player_tplayer02 <> Null
-											b = g_player_tplayer02.z >= g_player_int33
+										If u9 And g_ball <> Null
+											b = g_ball.z >= g_player_int33
 										EndIf
 										n = 0
 										If b
@@ -676,8 +676,8 @@
 												u5 = u2
 											EndIf
 											b = False
-											If u5 And g_player_tplayer02 <> Null
-												b = g_player_tplayer02.z >= g_player_int33 * 0.6
+											If u5 And g_ball <> Null
+												b = g_ball.z >= g_player_int33 * 0.6
 											EndIf
 											n = 0
 											If b
@@ -693,12 +693,12 @@
 										Self.DoAnimSlide()
 									Else
 										Local b:Int = False
-										If g_player_tplayer02 <> Null
-											b = g_player_tplayer02.z > g_player_int33 * 0.6
+										If g_ball <> Null
+											b = g_ball.z > g_player_int33 * 0.6
 										EndIf
 										Local b3:Int = False
 										If b
-											b3 = g_player_tplayer02.z < g_player_int33 * 1.5
+											b3 = g_ball.z < g_player_int33 * 1.5
 										EndIf
 										b = False
 										If b3
@@ -710,8 +710,8 @@
 									EndIf
 								Else
 									Local b:Int = False
-									If u2 And g_player_tplayer02 <> Null
-										b = g_player_tplayer02.z >= g_player_int33
+									If u2 And g_ball <> Null
+										b = g_ball.z >= g_player_int33
 									EndIf
 									n = 0
 									If b

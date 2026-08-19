@@ -54,8 +54,8 @@
 '   short-circuit Or/truthy Draw guards are copied verbatim from RenderTraining.bmx's
 '   already-verified (4218/4218) shape for the identical idiom on the same array.
 	Function RenderReplay:Int(a0:Int, a1:Int)
-		'!Global g_ctl_panel:TPanel
-		'!Global g_ctl_lbl:TLabel[]
+		'!Global g_panel_controls_panreplay:TPanel
+		'!Global g_panel_controls_lbl:TLabel[]
 		'!Global g_key_a:Int[]
 		'!Global g_key_c:Int[]
 		'!Global g_key_d:Int[]
@@ -65,18 +65,18 @@
 		'!Global g_options_int05:Int
 		'!Global g_engine_int53:Int
 		Local yspace:Int = 34
-		g_ctl_panel.SetPosition(a0, a1, 1)
-		g_ctl_panel.Draw()
+		g_panel_controls_panreplay.SetPosition(a0, a1, 1)
+		g_panel_controls_panreplay.Draw()
 		a0 = a0 + 6
 		a1 = a1 + 34
 		For Local i:Int = 0 To 4
-			g_ctl_lbl[i].x = a0
-			g_ctl_lbl[i].y = a1
-			g_ctl_lbl[i].SetText("", "", -1, -1)
-			g_ctl_lbl[i].SetIcon(Null)
-			g_ctl_lbl[i + 5].x = a0 + 52
-			g_ctl_lbl[i + 5].y = a1
-			g_ctl_lbl[i + 5].SetText("", "", -1, -1)
+			g_panel_controls_lbl[i].x = a0
+			g_panel_controls_lbl[i].y = a1
+			g_panel_controls_lbl[i].SetText("", "", -1, -1)
+			g_panel_controls_lbl[i].SetIcon(Null)
+			g_panel_controls_lbl[i + 5].x = a0 + 52
+			g_panel_controls_lbl[i + 5].y = a1
+			g_panel_controls_lbl[i + 5].SetText("", "", -1, -1)
 			a1 = a1 + yspace
 		Next
 		Local s:String
@@ -85,39 +85,39 @@
 		Else
 			s = TOptions.GetButtonLabel(g_key_c[0]) + "," + TOptions.GetButtonLabel(g_key_d[0])
 		EndIf
-		g_ctl_lbl[0].SetText(s, "", -1, -1)
-		g_ctl_lbl[0].SetIcon(g_icon_none)
-		g_ctl_lbl[5].SetText(GetText("replay_RwdFwd"), "", -1, -1)
+		g_panel_controls_lbl[0].SetText(s, "", -1, -1)
+		g_panel_controls_lbl[0].SetIcon(g_icon_none)
+		g_panel_controls_lbl[5].SetText(GetText("replay_RwdFwd"), "", -1, -1)
 		If g_engine_int53
-			g_ctl_lbl[5].SetText(GetText("replay_SlowMo"), "", -1, -1)
+			g_panel_controls_lbl[5].SetText(GetText("replay_SlowMo"), "", -1, -1)
 		EndIf
-		g_ctl_lbl[1].SetText(TOptions.GetButtonLabel(g_key_e[0]), "", -1, -1)
-		g_ctl_lbl[1].SetIcon(TOptions.GetButtonIcon(g_key_e[1], 0))
-		g_ctl_lbl[6].SetText(GetText("replay_Pause"), "", -1, -1)
-		g_ctl_lbl[2].SetText(GetText("key_F2"), "", -1, -1)
+		g_panel_controls_lbl[1].SetText(TOptions.GetButtonLabel(g_key_e[0]), "", -1, -1)
+		g_panel_controls_lbl[1].SetIcon(TOptions.GetButtonIcon(g_key_e[1], 0))
+		g_panel_controls_lbl[6].SetText(GetText("replay_Pause"), "", -1, -1)
+		g_panel_controls_lbl[2].SetText(GetText("key_F2"), "", -1, -1)
 		If g_options_int05 <> 0
-			g_ctl_lbl[7].SetText(GetText("replay_HideNames"), "", -1, -1)
+			g_panel_controls_lbl[7].SetText(GetText("replay_HideNames"), "", -1, -1)
 		Else
-			g_ctl_lbl[7].SetText(GetText("replay_ShowNames"), "", -1, -1)
+			g_panel_controls_lbl[7].SetText(GetText("replay_ShowNames"), "", -1, -1)
 		EndIf
-		g_ctl_lbl[3].SetText(GetText("key_F3"), "", -1, -1)
-		g_ctl_lbl[8].SetText(GetText("replay_Save"), "", -1, -1)
-		g_ctl_lbl[4].SetText(GetText("key_F9") + " - " + GetText("key_F10"), "", -1, -1)
-		g_ctl_lbl[9].SetText(GetText("replay_Zoom"), "", -1, -1)
+		g_panel_controls_lbl[3].SetText(GetText("key_F3"), "", -1, -1)
+		g_panel_controls_lbl[8].SetText(GetText("replay_Save"), "", -1, -1)
+		g_panel_controls_lbl[4].SetText(GetText("key_F9") + " - " + GetText("key_F10"), "", -1, -1)
+		g_panel_controls_lbl[9].SetText(GetText("replay_Zoom"), "", -1, -1)
 		For Local i:Int = 0 To 4
 			Select g_options_int01
 			Case 0
-				g_ctl_lbl[i].icon = Null
+				g_panel_controls_lbl[i].icon = Null
 			Case 1
-				If g_ctl_lbl[i].icon <> Null
-					g_ctl_lbl[i].txt = ""
+				If g_panel_controls_lbl[i].icon <> Null
+					g_panel_controls_lbl[i].txt = ""
 				EndIf
 			End Select
-			If g_ctl_lbl[i].icon <> Null Or g_ctl_lbl[i].txt.Length
-				g_ctl_lbl[i].Draw()
+			If g_panel_controls_lbl[i].icon <> Null Or g_panel_controls_lbl[i].txt.Length
+				g_panel_controls_lbl[i].Draw()
 			EndIf
-			If g_ctl_lbl[i + 5].txt.Length
-				g_ctl_lbl[i + 5].Draw()
+			If g_panel_controls_lbl[i + 5].txt.Length
+				g_panel_controls_lbl[i + 5].Draw()
 			EndIf
 		Next
 	End Function

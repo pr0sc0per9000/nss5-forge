@@ -8,7 +8,7 @@
 ' TGadget+0x6c = SetColour($,$), TProgressBar+0x8c = SetPercent(f,i),
 ' TCompetition+0x9c = GetStringTeamPosition(i)$, TProfile+0x84 = GetStringContractExpires.
 ' 0x00C67B34 is the TProgressBar; the other nine 0x00C67Bxx globals are TLabels.
-'!Global g_contractoffer_tplayer:TProfile
+'!Global g_profile:TProfile
 '!Global g_Object539:TLabel
 '!Global g_Object540:TLabel
 '!Global g_Object541:TLabel
@@ -18,23 +18,23 @@
 '!Global g_Object545:TLabel
 '!Global g_Object546:TLabel
 '!Global g_Object547:TLabel
-If Not g_contractoffer_tplayer.myclub Then Return 0
-Local c:TClub = g_contractoffer_tplayer.myclub
-If g_contractoffer_tplayer.onloanfrom <> 0 Then c = TClub.SelectById(g_contractoffer_tplayer.onloanfrom)
+If Not g_profile.myclub Then Return 0
+Local c:TClub = g_profile.myclub
+If g_profile.onloanfrom <> 0 Then c = TClub.SelectById(g_profile.onloanfrom)
 Local n:TNation = TNation.SelectById(c.nationid)
 Local cp:TCompetition = TCompetition.SelectById(c.leagueid)
 g_Object539.SetColour(c.GetPrimaryColour(), "FFFFFF")
 g_Object539.SetText(c.labelname, "", -1, -1)
 g_Object540.SetText(n.labelname, "", -1, -1)
 g_Object541.SetText(cp.GetStringTeamPosition(c.id) + " " + cp.name, "", -1, -1)
-g_Object542.SetPercent(Float(g_contractoffer_tplayer.relationboss), 1)
-g_Object542.SetColour("", ColourGreen(g_contractoffer_tplayer.relationboss))
-If g_contractoffer_tplayer.onloanfrom <> 0 Then
-	g_Object542.SetPercent(Float(g_contractoffer_tplayer.oldbossrel), 1)
-	g_Object542.SetColour("", ColourGreen(g_contractoffer_tplayer.oldbossrel))
+g_Object542.SetPercent(Float(g_profile.relationboss), 1)
+g_Object542.SetColour("", ColourGreen(g_profile.relationboss))
+If g_profile.onloanfrom <> 0 Then
+	g_Object542.SetPercent(Float(g_profile.oldbossrel), 1)
+	g_Object542.SetColour("", ColourGreen(g_profile.oldbossrel))
 EndIf
-g_Object543.SetText(FormatMoney(g_contractoffer_tplayer.contractwage, 0), "", -1, -1)
-g_Object545.SetText(FormatMoney(g_contractoffer_tplayer.contractgoalbonus, 0), "", -1, -1)
-g_Object546.SetText(FormatMoney(g_contractoffer_tplayer.contractassistbonus, 0), "", -1, -1)
-g_Object547.SetText(FormatMoney(g_contractoffer_tplayer.contractcleanbonus, 0), "", -1, -1)
-g_Object544.SetText(g_contractoffer_tplayer.GetStringContractExpires(), "", -1, -1)
+g_Object543.SetText(FormatMoney(g_profile.contractwage, 0), "", -1, -1)
+g_Object545.SetText(FormatMoney(g_profile.contractgoalbonus, 0), "", -1, -1)
+g_Object546.SetText(FormatMoney(g_profile.contractassistbonus, 0), "", -1, -1)
+g_Object547.SetText(FormatMoney(g_profile.contractcleanbonus, 0), "", -1, -1)
+g_Object544.SetText(g_profile.GetStringContractExpires(), "", -1, -1)

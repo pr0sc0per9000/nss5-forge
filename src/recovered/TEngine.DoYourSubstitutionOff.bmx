@@ -39,7 +39,7 @@
 
 '!Global g_engine_ico_suboff:TImage
 '!Global g_engine_ico_injury:TImage
-'!Global g_engine_fntmatch:TBitmapFont
+'!Global g_font_match_m:TBitmapFont
 '!Global g_engine_int17:Int = 1750
 '!Global g_engine_clock:Int
 '!Global g_hometeam:TTeam
@@ -55,7 +55,7 @@ If a0 <> 0
 	msg = Lower(GetText("Injury!"))
 	ico = g_engine_ico_injury
 EndIf
-TScreenMessage.Create(0, 0, msg, g_engine_int17 * 2, g_engine_fntmatch, ico, 1.0, "FFFFFF")
+TScreenMessage.Create(0, 0, msg, g_engine_int17 * 2, g_font_match_m, ico, 1.0, "FFFFFF")
 Local p:TPlayer = TPlayer.GetHumanPlayer()
 p.matchstats.subbedofftime = g_engine_clock
 Local t:TTeam = g_hometeam

@@ -60,6 +60,21 @@ Print "[boot] module body entered"
 ' GetLocaleText.bmx says as much.)
 g_locale_lang = "en"
 
+' ---- window caption and version -----------------------------------------------
+' Both are string literals in the exe, found as BlitzMax string objects (UTF-16 with
+' the immortal-literal refcount 0x7fffffff): "1.15" at file offset 0x86c6f8, length 4,
+' and "New Star Soccer 5" at 0x856e68 among others.
+'
+' AppTitle is brl.blitz's own Global and must be set before Graphics() runs, which
+' happens later, inside SetUpGraphics() as called from GameMain(). Left unset, the
+' window carries brl.appstub's default caption.
+'
+' g_version feeds two readers: the main menu label, which renders "v" + g_version, and
+' the save writer, which stamps "#VERSION:" + g_version into each save file. An empty
+' value writes a save header the loader's own "#VERSION:" check cannot match.
+AppTitle = "New Star Soccer 5"
+g_version = "1.15"
+
 ' ---- install directory --------------------------------------------------------
 ' g_dataDir is 0x00C6E950: the base every relative asset path is resolved against
 ' by LoadImageChecked / LoadSoundChecked / ReadSettingString / ReadSettingFloat
@@ -174,6 +189,32 @@ g_timestepMs = 25
 ' TProfile's class table, and the corpus majority (plus GameMain's own '!Global pragma)
 ' spells it g_profile. Assigning the retired name would have created the TProfile into a
 ' Global nothing reads, leaving the one GameMain uses Null.
+'
+' THAT IS EXACTLY WHAT WAS HAPPENING EVERYWHERE ELSE, until the whole corpus was renamed
+' onto this one name. Eight names had been recovered for 0x00C6F028 -- g_profile,
+' g_contractoffer_tplayer, g_contractoffer_tprofile, g_contractoffer_profile,
+' g_trainingprofile, g_offer_profile, g_mycontract_profile, g_horse_profile -- and
+' assemble.py's alias tables collapsed seven of them onto g_contractoffer_tplayer while
+' this line kept writing g_profile. Two Globals, one address, and 168 dereferences of the
+' half nothing ever assigns: TScreen.DoProgressBar, TTeam.CreateTeamSimple,
+' TTraining.SetUpTraining, TProfile.StartNewGame, TPlayer.CheckKick and TPlayer.CheckFoul
+' among them. In a release build that is silent (a null deref returns 0), right up until
+' something calls a METHOD through it, which faults for real.
+'
+' Reported symptom: New Career -> set up character -> Play died with a Windows access
+' violation before the first (Pace) training drew. GDB on a symbol-preserving debug build
+' put the fault at TScreen.DoProgressBar+606, `call *0x7c(%eax)` with eax = 0, under
+' TTeam.PaintSquad <- TTeam.CreateTeamSimple <- TTraining.SetUpTraining <-
+' TScreen_NewPlayer.DoClubTrial. Slot 0x7c on TProfile is GetCurrentTip, i.e.
+' DoProgressBar's `g_dpb_lblTip.SetText(<profile>.GetCurrentTip(), ...)` -- reached because
+' TTeam.PaintSquad passes a3 = -1.
+'
+' Fixed at the source, the same way the g_screenw/g_screen_w split was: every body now
+' spells the slot g_profile, so there is one Global again. The narrative in those files'
+' headers still records whichever name that pass recovered, which is the honest history --
+' only the code and the '!Global pragmas were renamed. The merge is also stated in
+' extracted/global_alias_overrides.tsv, with the full evidence, so the alias tables cannot
+' re-split it if globals_final.tsv is regenerated.
 g_profile = New TProfile
 g_engine_int167 = g_timestepMs
 
@@ -211,7 +252,7 @@ EndIf
 
 Print "[boot] alloc channels"
 g_Object857 = AllocChannel()
-g_Object858 = AllocChannel()
+g_musicchannel = AllocChannel()
 g_Object859 = AllocChannel()
 Print "[boot] loading sounds"
 g_Object860 = LoadSoundChecked("GameMedia/Sounds/Cash.ogg", 0)

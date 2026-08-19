@@ -73,7 +73,8 @@
 '     "FixtureType:", "666666", "FFFFFF", "tla_CupMatch", "tla_Leg", " 1", "tla_Aggregate",
 '     " ", g_engine_float09's assigned constant = 2.0 (0x00C73B34, raw dword 0x40000000).
 '!Global g_engine_int55:Int
-'!Global g_options_int06:Int
+'!Global g_enginestate:Int
+'!Global g_opt_playercam:Int
 '!Global g_replayframes:TList
 '!Global g_engine_int12:Int()
 '!Global g_fixture:TFixture
@@ -91,7 +92,7 @@
 '!Global g_engine_int49:Int
 '!Global g_Object21:TImage
 '!Global g_Object22:TImage
-'!Global g_engine_arr02:TGadget[]
+'!Global g_engine_labels:TLabel[]
 '!Global g_Object41:TLabel
 '!Global g_Object42:TLabel
 '!Global g_training_int03:Int
@@ -102,7 +103,7 @@ GCCollect()
 g_engine_int55 = GCMemAlloced()
 DebugLog(">>> MemAlloced = " + String(g_engine_int55))
 TEngine.SetUpChannels()
-g_options_int06 = 2
+g_enginestate = 2
 If Not g_replayframes Then
 	g_replayframes = CreateList()
 Else
@@ -114,7 +115,7 @@ a0.GetFirstLegScore(Varptr g_engine_int23, Varptr g_engine_int24)
 DebugLog("FixtureType:" + String(g_fixture.matchtype))
 g_Object17 = a1
 g_Object18 = a2
-If g_options_int06 > 1 Then g_engine_float09 = 2.0
+If g_opt_playercam > 1 Then g_engine_float09 = 2.0
 g_engine_float01 = g_engine_float09
 g_engine_int25 = 0
 For Local i:Int = 0 To 98
@@ -143,8 +144,8 @@ Select g_fixture.level
 		If p1 <> Null Then
 			g_Object22 = p1.imgFlag
 		End If
-		g_engine_arr02[0].SetColour("666666", "FFFFFF")
-		g_engine_arr02[2].SetColour("666666", "FFFFFF")
+		g_engine_labels[0].SetColour("666666", "FFFFFF")
+		g_engine_labels[2].SetColour("666666", "FFFFFF")
 		g_Object41.SetColour("666666", "FFFFFF")
 		g_Object42.SetColour("666666", "FFFFFF")
 	Case 1
@@ -156,8 +157,8 @@ Select g_fixture.level
 		If p1 <> Null Then
 			g_Object22 = p1.imgFlag
 		End If
-		g_engine_arr02[0].SetColour("FFFFFF", "FFFFFF")
-		g_engine_arr02[2].SetColour("FFFFFF", "FFFFFF")
+		g_engine_labels[0].SetColour("FFFFFF", "FFFFFF")
+		g_engine_labels[2].SetColour("FFFFFF", "FFFFFF")
 		g_Object41.SetColour("FFFFFF", "FFFFFF")
 		g_Object42.SetColour("FFFFFF", "FFFFFF")
 End Select
@@ -177,10 +178,10 @@ End If
 If g_training_int03 = 0 Then
 	TPitch.SetUpFans(a1, a2, g_fixture.level)
 End If
-g_engine_arr02[1].SetText(Left(g_Object17.tla, 8), "", -1, -1)
-g_engine_arr02[1].SetColour(g_Object17.kitplayer.newcol[1], "FFFFFF")
-g_engine_arr02[3].SetText(Left(g_Object18.tla, 8), "", -1, -1)
-g_engine_arr02[3].SetColour(g_Object18.kitplayer.newcol[1], "FFFFFF")
+g_engine_labels[1].SetText(Left(g_Object17.tla, 8), "", -1, -1)
+g_engine_labels[1].SetColour(g_Object17.kitplayer.newcol[1], "FFFFFF")
+g_engine_labels[3].SetText(Left(g_Object18.tla, 8), "", -1, -1)
+g_engine_labels[3].SetColour(g_Object18.kitplayer.newcol[1], "FFFFFF")
 g_engine_int22 = -1
 If g_profile.selectedformatch > 1 Then
 	Select Rand(5, 1)

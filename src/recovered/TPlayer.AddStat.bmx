@@ -23,7 +23,7 @@
 
 '!Global g_engine_int20:Int
 '!Global g_bossmessages:TList
-'!Global g_player_tplayer02:TBall
+'!Global g_ball:TBall
 
 	Method AddStat(a0:Int, a1:Float, a2:Float, a3:Float, a4:Float)
 		Local xx:Float = Self.x
@@ -53,11 +53,11 @@
 					Self.AddPlayerRating(7, 4, "CBOSSSHOUT_EXPLETIVE" + Rand(4))
 				Case 5
 					If TPitch.InsidePenaltyBox(Int(xx), Int(yy), 0)
-						If g_player_tplayer02.lastkickmatchstate = 7
+						If g_ball.lastkickmatchstate = 7
 							Self.AddPlayerRating(10, 7, "CBOSSSHOUT_GOODFINISH" + Rand(4))
-						ElseIf g_player_tplayer02.lastkickmatchstate = 4
+						ElseIf g_ball.lastkickmatchstate = 4
 							Self.AddPlayerRating(1, 7, "CBOSSSHOUT_GOODFREEKICK" + Rand(4))
-						ElseIf g_player_tplayer02.lastkickmatchstate = 5
+						ElseIf g_ball.lastkickmatchstate = 5
 							Self.AddPlayerRating(2, 5, "CBOSSSHOUT_GOODCORNER" + Rand(4))
 						Else
 							Self.AddPlayerRating(9, 5, "CBOSSSHOUT_GOODFINISH" + Rand(4))

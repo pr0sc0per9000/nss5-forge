@@ -22,7 +22,7 @@
 ' Body-only format: statements only, parameters are a0, a1, ...
 '!Global g_Object839:TButton
 '!Global g_screen_stable_tplayer01:TTable
-'!Global g_contractoffer_tplayer:TProfile
+'!Global g_profile:TProfile
 If g_Object839.alph < 1.0 Then Return 0
 Local h:THorse = GetSelectedHorse(g_screen_stable_tplayer01.GetSelectedText(0))
 If Not h
@@ -31,7 +31,7 @@ If Not h
 EndIf
 Local v:Int = h.GetValue()
 If TScreen.DoMessage(GetText("CMESSAGE_SELLHORSE").Replace("$cash",FormatMoney(v,1)),1,0)
-	g_contractoffer_tplayer.UpdateBank(v)
+	g_profile.UpdateBank(v)
 	h.owned = 0
 	SetUpScreen(1)
 EndIf

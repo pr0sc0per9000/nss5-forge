@@ -18,12 +18,12 @@
 	Function ButtonPlay:Int()
 		'!Global g_profile:TProfile
 		'!Global g_cmb1:TCombo
-		'!Global g_cmb2:TCombo
+		'!Global g_mc_cmb_nation:TCombo
 		'!Global g_cmb3:TCombo
-		'!Global g_cmb4:TCombo
+		'!Global g_mc_cmb_club:TCombo
 		g_profile.desiredcontinentid = g_cmb1.GetSelectedItemId()
-		g_profile.desirednationid = g_cmb2.GetSelectedItemId()
+		g_profile.desirednationid = g_mc_cmb_nation.GetSelectedItemId()
 		g_profile.desiredleagueid = g_cmb3.GetSelectedItemId()
-		g_profile.desiredclubid = g_cmb4.GetSelectedItemId()
+		g_profile.desiredclubid = g_mc_cmb_club.GetSelectedItemId()
 		TScreen_Home.SetUpScreen()
 	End Function

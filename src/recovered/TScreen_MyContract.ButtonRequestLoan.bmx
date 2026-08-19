@@ -19,31 +19,31 @@
 ' Body-only format: statements only; parameters are a0, a1, ...
 '!Global g_Object568:TButton
 '!Global g_Object542:TProgressBar
-'!Global g_contractoffer_tprofile:TProfile
+'!Global g_profile:TProfile
 If g_Object568.alph < 1.0 Then Return 0
-Select g_contractoffer_tprofile.transferlisted
+Select g_profile.transferlisted
 	Case 0
-		Local yr:Int = g_contractoffer_tprofile.date.GetYear()
-		If g_contractoffer_tprofile.relationboss > 60 And g_contractoffer_tprofile.GetStat(12, 3, g_contractoffer_tprofile.clubid, yr) > 5.0 And g_contractoffer_tprofile.GetAverageForm(3, g_contractoffer_tprofile.clubid, yr) > 7.0 Then
+		Local yr:Int = g_profile.date.GetYear()
+		If g_profile.relationboss > 60 And g_profile.GetStat(12, 3, g_profile.clubid, yr) > 5.0 And g_profile.GetAverageForm(3, g_profile.clubid, yr) > 7.0 Then
 			TScreen.DoMessage(GetText("CMESSAGE_LOANREQUESTREJECTED"), 0, 0)
-		ElseIf g_contractoffer_tprofile.contractexpires - g_contractoffer_tprofile.date.sdate < 84 Then
+		ElseIf g_profile.contractexpires - g_profile.date.sdate < 84 Then
 			TScreen.DoMessage(GetText("CMESSAGE_LOANREQUESTREJECTEDDATE"), 0, 0)
 		Else
-			g_contractoffer_tprofile.transferlisted = 3
+			g_profile.transferlisted = 3
 		End If
 	Case 1
 	Case 2
 	Case 3
-		g_contractoffer_tprofile.transferlisted = 0
+		g_profile.transferlisted = 0
 	Case 4
-		If TScreen.DoMessage(GetText("CMESSAGE_CANCELLOANEARLY").Replace("$clubname", TClub.SelectById(g_contractoffer_tprofile.onloanfrom).labelname), 1, 0) Then
-			g_contractoffer_tprofile.CancelLoan()
+		If TScreen.DoMessage(GetText("CMESSAGE_CANCELLOANEARLY").Replace("$clubname", TClub.SelectById(g_profile.onloanfrom).labelname), 1, 0) Then
+			g_profile.CancelLoan()
 			TScreen_MyContract.SetUpScreen()
 			Return 0
 		End If
 End Select
 TScreen_MyContract.UpdateTransferStatus()
 TScreen_MyContract.UpdateOfferButtons()
-g_Object542.SetPercent(g_contractoffer_tprofile.relationboss, 0)
-g_Object542.SetColour("", ColourGreen(g_contractoffer_tprofile.relationboss))
+g_Object542.SetPercent(g_profile.relationboss, 0)
+g_Object542.SetColour("", ColourGreen(g_profile.relationboss))
 Return 0

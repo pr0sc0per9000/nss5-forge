@@ -13,10 +13,10 @@
 '     0x00C6E284 = +0x7c, 0x00C6E23C = +0x34) so they are written unprefixed.
 '   `If Not h` is the 21-byte setne/movzx/cmp/jne form (pattern 10.3), not `If h = Null`.
 '   All four string literals read out of NSS5.exe with harness.read_string.
-'!Global g_contractoffer_tplayer:TProfile
+'!Global g_profile:TProfile
 '!Global g_screen_stable_tplayer01:TTable
 '!Global g_screen_stable_tplayer02:TTable
-If THorse.CountHorsesOwned() >= g_contractoffer_tplayer.GetStableSize()
+If THorse.CountHorsesOwned() >= g_profile.GetStableSize()
 	TScreen.DoMessage(GetText("CMESSAGE_STABLE_NOROOM"),0,0)
 	Return 0
 EndIf
@@ -27,10 +27,10 @@ If Not h
 EndIf
 Local v:Int = h.GetValue()
 If TScreen.DoMessage(GetText("CMESSAGE_BUYHORSE").Replace("$cash",FormatMoney(v,1)),1,0)
-	If g_contractoffer_tplayer.UpdateBank(-v)
+	If g_profile.UpdateBank(-v)
 		h.owned = 1
 		SetUpScreen(1)
 		g_screen_stable_tplayer01.SelectItemByRow(1)
-		g_contractoffer_tplayer.CheckAchievement(82)
+		g_profile.CheckAchievement(82)
 	EndIf
 EndIf

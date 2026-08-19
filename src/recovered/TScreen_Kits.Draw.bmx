@@ -12,10 +12,10 @@
 '   Global g_kits_img2:TImage    ' 0x00c6f3b0
 '   Global g_screen_int21:Int    ' 0x00c6efdc
 	Function Draw:Int()
-		'!Global g_kits_img1:TImage
+		'!Global g_object872:TImage
 		'!Global g_screen_int21:Int
-		'!Global g_kits_img2:TImage
-		DrawImageRect(g_kits_img1, 0, 180.0, g_screen_int21, 280.0, 0)
-		DrawImageRect(g_kits_img2, 0, 178.0, g_screen_int21, 4.0, 0)
-		DrawImageRect(g_kits_img2, 0, 458.0, g_screen_int21, 4.0, 0)
+		'!Global g_object873:TImage
+		DrawImageRect(g_object872, 0, 180.0, g_screen_int21, 280.0, 0)
+		DrawImageRect(g_object873, 0, 178.0, g_screen_int21, 4.0, 0)
+		DrawImageRect(g_object873, 0, 458.0, g_screen_int21, 4.0, 0)
 	End Function

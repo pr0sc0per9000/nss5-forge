@@ -6,7 +6,7 @@
 ' 0x00C5DE70 Int.  The eight Case compares are emitted back to back with every target past
 ' the last one -- a Select, not an If/ElseIf chain (patterns 10.2).
 '!Global g_training_mode:Int
-'!Global g_matchball:TBall
+'!Global g_ball:TBall
 '!Global g_ballheightscale:Int
 	Function CanCallForBall:Int()
 		Select g_training_mode
@@ -28,7 +28,7 @@
 				Return 0
 			Default
 				Local p:TPlayer = TPlayer.GetHumanPlayer()
-				If p And g_matchball And g_matchball.z > g_ballheightscale * 0.5 And p.distancetoball < TPitch.YardsToPixels(10.0) Then Return 0
+				If p And g_ball And g_ball.z > g_ballheightscale * 0.5 And p.distancetoball < TPitch.YardsToPixels(10.0) Then Return 0
 		End Select
 		Return 1
 	End Function

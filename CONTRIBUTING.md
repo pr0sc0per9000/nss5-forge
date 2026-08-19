@@ -75,6 +75,31 @@ or a comparison that can never be true, reproduce it and annotate it:
 ' BUG (original): index runs to 26 on a 25-element table. Preserved.
 ```
 
+### A byte match does not prove your Globals are right
+
+This is the one trap worth knowing before you start. A Global's *name* never reaches
+compiled output, so it cannot affect a byte match -- and a Global reference is a
+relocation, which the oracle masks. `mov eax,[A]` and `mov eax,[B]` compare equal.
+
+So a body can be 100% byte-identical and still read the wrong memory. If your body
+and someone else's pick different names for one address, `assemble.py` emits two
+`Global`s, the writer updates one and you read the other, which is Null forever.
+Both bodies still MATCH. In a release build a Null read silently returns 0, so the
+feature just quietly does nothing until something calls a method through it.
+
+Two rules follow:
+
+* **Put the address in your header, next to the name**, exactly as the recovered
+  bodies already do. It is the only record of what you meant.
+* **When your header and the alias tables disagree, disassemble before believing
+  either.** `python scripts/disasm.py <VA> <length>` and read the absolute
+  displacement. That is ground truth and it takes one command. Several bodies had
+  the right address in their own header and were overridden by a table built from a
+  name tally.
+
+[`docs/specs/21-module-globals.md`](/docs/specs/21-module-globals.md) §8 has the
+three shapes this takes, worked examples, and the addresses still outstanding.
+
 ## Overview
 
 * [`binary`](/binary): Metadata about the original game files. The files

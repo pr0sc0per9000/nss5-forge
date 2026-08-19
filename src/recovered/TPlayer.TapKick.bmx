@@ -70,7 +70,7 @@
 		'!Global g_player_float19:Float
 		'!Global g_player_float20:Float
 		'!Global g_player_float21:Float
-		'!Global g_player_tplayer02:TBall
+		'!Global g_ball:TBall
 
 		If Self.newstar And g_player_int14 = 1
 			Self.TapKickAdvanced()
@@ -118,7 +118,7 @@
 					Self.kickdirection = Self.joy.direction
 					Self.kickpower = 30.0
 					kicktype = 1
-					Local nearBall:Int = g_player_tplayer02 <> Null And g_player_tplayer02.setpiecetaker = Self
+					Local nearBall:Int = g_ball <> Null And g_ball.setpiecetaker = Self
 					If nearBall
 						kicktype = 3
 						Self.kickpower = Self.distancetogoal_opp * 0.1
@@ -184,6 +184,6 @@
 		If g_player_int01 = 2 Then kicktype = 1
 		If g_training_int03 = 4 Then kicktype = 1
 		Self.DoAnimKick(Int(Self.kickpower))
-		g_player_tplayer02.Kick(Self, Self.kickdirection, Self.kickpower, kicktype, Self.teammateid)
+		g_ball.Kick(Self, Self.kickdirection, Self.kickpower, kicktype, Self.teammateid)
 		Return 0
 	End Method

@@ -10,7 +10,7 @@
 		'!Global g_traininglabel3:TLabel
 		'!Global g_traininglabel4:TLabel
 		'!Global g_trainingstate:Int
-		'!Global g_trainingprofile:TProfile
+		'!Global g_profile:TProfile
 		LogLine("ClearUpTraining")
 		TTrainingObject.ClearAll()
 		g_trainingstate = 0
@@ -18,6 +18,6 @@
 		g_traininglabel2.SetText("", "", -1, -1)
 		g_traininglabel3.SetText("", "", -1, -1)
 		g_traininglabel4.SetText("", "", -1, -1)
-		g_trainingprofile.UpdateEnergy(-20.0)
+		g_profile.UpdateEnergy(-20.0)
 		FlushAllInput()
 	End Function

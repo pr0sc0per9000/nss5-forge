@@ -42,9 +42,9 @@
 	'!Global g_player_int17:Int
 	'!Global g_player_int18:Int
 	'!Global g_player_int33:Int
-	'!Global g_player_tplayer02:TBall
-	If g_player_tplayer02.z < g_player_int33 * 0.6
-		g_player_tplayer02.Deflect(Self)
+	'!Global g_ball:TBall
+	If g_ball.z < g_player_int33 * 0.6
+		g_ball.Deflect(Self)
 		Return 0
 	Else
 		If Self.newstar And g_player_int14 = 1
@@ -52,7 +52,7 @@
 			Return 0
 		EndIf
 		LogLine("HeadBall")
-		g_player_tplayer02.NewController(Self)
+		g_ball.NewController(Self)
 		Self.kickdirection = Self.directiontoteammate
 		Self.kickpower = Self.distancetoteammate * 0.06
 		Local uVar5:Int = 4
@@ -84,6 +84,6 @@
 		EndIf
 		Self.kickpower = Self.kickpower - Rand(Int(Self.heading * 1.5), 1)
 		Self.kickdirection = Self.kickdirection + Rand(Int(-Self.heading * 1.5), Int(Self.heading * 1.5))
-		g_player_tplayer02.Kick(Self, Self.kickdirection, Self.kickpower, uVar5, Self.teammateid)
+		g_ball.Kick(Self, Self.kickdirection, Self.kickpower, uVar5, Self.teammateid)
 		Self.AddStat(6, 0, 0, 0, 0)
 	EndIf

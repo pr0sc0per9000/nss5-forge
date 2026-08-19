@@ -119,6 +119,7 @@ UNVERIFIED_SKIP = {
                                               # does not, so it needs rewriting rather than
                                               # including.
 }
+BEHAVIOUR = os.path.join(ROOT, "src", "behaviour")
 PLACEHOLDER = os.path.join(ROOT, "src", "placeholder")
 MODBODY_DIR = os.path.join(ROOT, "src", "module_body")
 MODBODY_TAIL = os.path.join(MODBODY_DIR, "tail.bmx")
@@ -600,6 +601,16 @@ def _recovered_files():
     # reverify.py would correctly report them as broken) and must never be mistaken for
     # recovered work: every file here states in its header what it fakes and what the real
     # body is supposed to do. Deleting the file restores the empty-stub behaviour exactly.
+    # src/behaviour/ -- bodies written from OBSERVED GAME BEHAVIOUR rather than from the
+    # binary. They are meant to be functionally right and are NOT claimed to be byte-exact,
+    # so they carry no `VA ... N bytes` header and no `byte-identical vs NSS5.exe` marker,
+    # and progress.py does not scan this tree. Ranked above placeholder, because a body that
+    # implements the real behaviour beats one that only keeps the boot alive, and below every
+    # recovered tree, because a body derived from the binary always wins.
+    if os.path.isdir(BEHAVIOUR):
+        for fn in sorted(os.listdir(BEHAVIOUR)):
+            out.append((BEHAVIOUR, fn))
+
     if os.path.isdir(PLACEHOLDER):
         for fn in sorted(os.listdir(PLACEHOLDER)):
             out.append((PLACEHOLDER, fn))
@@ -654,7 +665,7 @@ def load_recovered():
         # placeholder. Without this guard a lower tier would silently displace a higher one,
         # which is the worst available failure mode: the build looks fine and quietly runs
         # unverified or fake code in place of a byte-exact body.
-        if _dir in (UNVERIFIED, PLACEHOLDER) and (tname, mname) in out:
+        if _dir in (UNVERIFIED, BEHAVIOUR, PLACEHOLDER) and (tname, mname) in out:
             continue
         out[(tname, mname)] = (body.rstrip(), gdecls, comments, fn)
     return out, dupes
@@ -1167,9 +1178,10 @@ def selfcontained_defects(recovered):
     and the per-FILE association -- the only thing this check is about -- is gone by the
     time the assembler sees it.
 
-    src/recovered_unverified, src/recovered_thirdparty and src/placeholder are deliberately
-    NOT gated. They are near-miss, borrowed and admittedly-fake bodies; holding them to the
-    durable-artefact standard would fail the gate on files nobody claims are finished.
+    src/recovered_unverified, src/recovered_thirdparty, src/behaviour and src/placeholder
+    are deliberately NOT gated. They are near-miss, borrowed, behaviour-derived and
+    admittedly-fake bodies; holding them to the durable-artefact standard would fail the
+    gate on files nobody claims are finished.
     """
     mine = {fn for _d, fn in _recovered_files() if _d == RECOVERED}
     bad = []

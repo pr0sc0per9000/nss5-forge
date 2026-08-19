@@ -31,6 +31,14 @@
 '     src/recovered/TTable.UpdateActivated.bmx already declares for its own identical
 '     "repeat interval" Local (AMBIGUOUS tier in the address solver -- only 1-2
 '     declaring bodies -- but no other name has ever been proposed for this slot).
+'     g_table_int02's original data-section value is 80 (read directly from NSS5.exe
+'     at 0x00C61CFC: raw bytes 50 00 00 00). Never stored to anywhere in the corpus --
+'     same "uncaptured Global initialiser" defect as g_pole_maxz/g_ball_snowthreshold
+'     (codegen-patterns 21.1), just on an Int slot instead of a Float one. A bare
+'     `'!Global g_table_int02:Int` defaults the assembled build to 0, which collapses
+'     the hover repeat-scroll gate below (`g_player_int50 > g_combo_int03 + rep`) to
+'     "any elapsed time at all", so it re-fires every 25ms logic tick instead of every
+'     80ms -- the dropdown scroll-too-fast symptom.
 '   0x00C6EFD4 g_player_int50:Int -- the frame clock; annotator SYM block marks this
 '     one "(verified)". Compared/updated against a per-TCombo-instance-independent
 '     repeat timestamp (see next).
@@ -105,7 +113,7 @@
 '
 '!Global g_screen_int03:Int
 '!Global g_curscreen:TScreen
-'!Global g_table_int02:Int
+'!Global g_table_int02:Int = 80
 '!Global g_player_int50:Int
 '!Global g_combo_int03:Int
 '!Global g_activegadget:TGadget

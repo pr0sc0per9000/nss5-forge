@@ -26,7 +26,7 @@
 ' The `If s = ""`/`If s <> ""` tests are bbStringCompare + `cmp eax,0` branched directly.
 ' The EachIn null-skip (cmp esi,bbNullObject / je) is emitted by the loop itself.
 	Function UpdateClubsInterestedLabelForLoan:Int()
-		'!Global g_mycontract_profile:TProfile
+		'!Global g_profile:TProfile
 		'!Global g_mycontract_label:TGadget
 		Local s:String = ""
 		For Local c:TClub = EachIn TContractOffer.GetClubsInterestedInLoan()
@@ -35,7 +35,7 @@
 			EndIf
 			Local nat:TNation = TNation.SelectById(c.nationid)
 			Local comp:TCompetition = TCompetition.SelectById(c.leagueid)
-			If nat.id = g_mycontract_profile.myclub.nationid
+			If nat.id = g_profile.myclub.nationid
 				s = s + (c.labelshortname + " (" + comp.tla + ")")
 			Else
 				s = s + (c.labelshortname + " (" + nat.tla + ")")

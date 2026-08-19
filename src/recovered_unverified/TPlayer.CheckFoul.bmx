@@ -115,7 +115,7 @@
 '!Global g_ball:TBall
 '!Global g_player_arr05:Int[]
 '!Global g_awayteam:TTeam
-'!Global g_contractoffer_tplayer:TProfile
+'!Global g_profile:TProfile
 '!Global g_player_float16:Float
 '!Global g_Object46:TChannel
 '!Global g_object52:TSound
@@ -182,21 +182,21 @@ If g_training_int03 = 0 Then PlaySound(g_object52, g_Object46)
 Local n:Int = 2
 If g_awayteam.id = Self.teamid Then n = 1
 TEngine.SetUpSetPiece(4, n, a0.x, a0.y)
-If g_contractoffer_tplayer.shinpads = 0
+If g_profile.shinpads = 0
 End If
-If g_contractoffer_tplayer.energy < 30.0 Or g_contractoffer_tplayer.takenpainkillers
+If g_profile.energy < 30.0 Or g_profile.takenpainkillers
 	g_player_float16 = g_player_float16 * 0.5
 Else
-	If g_contractoffer_tplayer.energy < 40.0
+	If g_profile.energy < 40.0
 		g_player_float16 = g_player_float16 * 0.6
 	Else
-		If g_contractoffer_tplayer.energy < 50.0
+		If g_profile.energy < 50.0
 			g_player_float16 = g_player_float16 * 0.7
 		Else
-			If g_contractoffer_tplayer.energy < 60.0
+			If g_profile.energy < 60.0
 				g_player_float16 = g_player_float16 * 0.8
 			Else
-				If g_contractoffer_tplayer.energy < 70.0
+				If g_profile.energy < 70.0
 					g_player_float16 = g_player_float16 * 0.9
 				End If
 			End If
@@ -205,6 +205,6 @@ Else
 End If
 If a0.newstar And Rand(Int(g_player_float16), 1) = 1
 	TEngine.DoYourSubstitutionOff(1)
-	g_contractoffer_tplayer.DoInjury()
+	g_profile.DoInjury()
 End If
 Return 1
