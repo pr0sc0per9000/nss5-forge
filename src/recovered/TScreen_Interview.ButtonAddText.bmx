@@ -47,6 +47,15 @@
 '!Global g_Object770:TSound
 '!Global g_Object796:TLabel
 '!Global g_Object859:TChannel
+' CASE DIRECTION CORRECTED 2026-08-22: 2 call sites -> .ToLower().
+' extracted/runtime_helpers.tsv named 0x004A7410 `_brl_retro_Lower` and 0x004A74E0
+' `_brl_retro_Upper`. Both were wrong and neither address is a brl.retro wrapper:
+' 0x004A7410 is `_bbStringToUpper` and 0x004A74E0 is `_bbStringToLower`. NSS5.exe's
+' own 21-byte retro wrappers at 0x0059C8FD (Lower) and 0x0059C912 (Upper) CALL those
+' two addresses, and a wrapper cannot be the function it calls. The wrong row masked
+' by name, so this body certified with the case conversion running backwards. Full
+' derivation and the discriminating 3x4 matrix: docs/reference/codegen-patterns.md
+' 15.6. Re-verified under NSS5_NO_LEARN=1 on worker trees 380 and 380b.
 If g_screen_interview_int04 = 0 Then Return 0
 If g_screen_interview_int07 > 5 Or g_Object108.alph < 1.0 Then Return 0
 g_Object108.SetAlph(0.5)
@@ -56,11 +65,11 @@ If TGadget.GetActiveGadgetName().Replace("btn_","").Compare(String(Abs(g_screen_
 	If g_screen_interview_int07 = 1
 		g_screen_interview_int06 = g_screen_interview_int06 + g_Object108.txt
 	Else If g_screen_interview_int07 = g_screen_interview_int02
-		g_screen_interview_int06 = g_screen_interview_int06 + (", " + Upper(g_Object108.txt) + ".")
+		g_screen_interview_int06 = g_screen_interview_int06 + (", " + g_Object108.txt.ToLower() + ".")
 		DisableAllButtons()
 		Success()
 	Else
-		g_screen_interview_int06 = g_screen_interview_int06 + (", " + Upper(g_Object108.txt))
+		g_screen_interview_int06 = g_screen_interview_int06 + (", " + g_Object108.txt.ToLower())
 	End If
 	g_Object796.SetText(g_screen_interview_int06,"",-1,-1)
 	g_screen_interview_int07 = g_screen_interview_int07 + 1

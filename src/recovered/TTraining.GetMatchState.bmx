@@ -7,8 +7,8 @@
 '!Global g_tr_active:Int   ' 0x00C6CF98
 '!Global g_tr_mode:Int     ' 0x00C6CF90
 '!Global g_tr_count:Int    ' 0x00C6CFFC
-'!Global g_tr_x1:Int       ' 0x00C6CFD0
-'!Global g_tr_y1:Int       ' 0x00C6CFD4
+'!Global g_training_int11:Int       ' 0x00C6CFD0
+'!Global g_training_int12:Int       ' 0x00C6CFD4
 '!Global g_tr_x2:Int       ' 0x00C6CFD8
 '!Global g_tr_y2:Int       ' 0x00C6CFDC
 If g_tr_active = 0
@@ -23,8 +23,8 @@ Select g_tr_mode
 	Case 3
 		a0[0] = 4
 		g_tr_count :- 1
-		a1[0] = g_tr_x1
-		a2[0] = g_tr_y1
+		a1[0] = g_training_int11
+		a2[0] = g_training_int12
 		ResetTraining()
 	Case 4
 		a0[0] = 1
@@ -33,8 +33,8 @@ Select g_tr_mode
 	Case 6
 		a0[0] = 4
 		g_tr_count :- 1
-		a1[0] = g_tr_x1
-		a2[0] = g_tr_y1
+		a1[0] = g_training_int11
+		a2[0] = g_training_int12
 		ResetTraining()
 	Case 7
 		a0[0] = 1

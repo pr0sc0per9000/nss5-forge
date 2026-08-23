@@ -57,6 +57,15 @@
 '!Global g_col_key:String
 '!Global g_img_back:TImage
 '!Global g_img_tick:TImage
+' CASE DIRECTION CORRECTED 2026-08-22: 9 call sites -> .ToUpper().
+' extracted/runtime_helpers.tsv named 0x004A7410 `_brl_retro_Lower` and 0x004A74E0
+' `_brl_retro_Upper`. Both were wrong and neither address is a brl.retro wrapper:
+' 0x004A7410 is `_bbStringToUpper` and 0x004A74E0 is `_bbStringToLower`. NSS5.exe's
+' own 21-byte retro wrappers at 0x0059C8FD (Lower) and 0x0059C912 (Upper) CALL those
+' two addresses, and a wrapper cannot be the function it calls. The wrong row masked
+' by name, so this body certified with the case conversion running backwards. Full
+' derivation and the discriminating 3x4 matrix: docs/reference/codegen-patterns.md
+' 15.6. Re-verified under NSS5_NO_LEARN=1 on worker trees 380 and 380b.
 	Function CreateScreen()
 		If Not g_img_joy1
 			g_img_joy1 = LoadImageChecked("GameMedia/Images/Interface/Joystick.png", -1)
@@ -117,20 +126,20 @@
 		w = w * 2 - 20
 		g_pan_simple.AddChild(TLabel.CreateLabel("simple1", GetText("simple_Description"), x1, y, w, h, 2, "AAAAAA", "FFFFFF", 1.0, 1, 0, 1, 1, Null, 1, 0, 0, 0, "", 0))
 		y :+ h + 10
-		g_pan_simple.AddChild(TLabel.CreateLabel("simple2", Lower(GetText("controls_Shoot")), x1, y, 100, h, 2, g_col_key, "FFFFFF", 1.0, 6, 0, 1, 1, Null, 1, 0, 0, 0, "", 0))
+		g_pan_simple.AddChild(TLabel.CreateLabel("simple2", GetText("controls_Shoot").ToUpper(), x1, y, 100, h, 2, g_col_key, "FFFFFF", 1.0, 6, 0, 1, 1, Null, 1, 0, 0, 0, "", 0))
 		g_pan_simple.AddChild(TLabel.CreateLabel("simple3", GetText("simple_ShootDesc"), x1 + 100, y, w - 100, h, 2, "EEEEEE", "FFFFFF", 1.0, 7, 0, 1, 1, Null, 1, 0, 0, 0, "", 0))
 		y :+ h
 		g_pan_simple.AddChild(TLabel.CreateLabel("simple4", GetText("simple_ShootTip"), x1, y, w, h, 2, "AAAAAA", "FFFFFF", 1.0, 3, 0, 1, 1, Null, 1, 0, 0, 0, "", 0))
 		y :+ h + 10
-		g_pan_simple.AddChild(TLabel.CreateLabel("simple5", Lower(GetText("controls_Pass")), x1, y, 100, h, 2, g_col_key, "FFFFFF", 1.0, 6, 0, 1, 1, Null, 1, 0, 0, 0, "", 0))
+		g_pan_simple.AddChild(TLabel.CreateLabel("simple5", GetText("controls_Pass").ToUpper(), x1, y, 100, h, 2, g_col_key, "FFFFFF", 1.0, 6, 0, 1, 1, Null, 1, 0, 0, 0, "", 0))
 		g_pan_simple.AddChild(TLabel.CreateLabel("simple6", GetText("simple_PassDesc"), x1 + 100, y, w - 100, h, 2, "EEEEEE", "FFFFFF", 1.0, 7, 0, 1, 1, Null, 1, 0, 0, 0, "", 0))
 		y :+ h
 		g_pan_simple.AddChild(TLabel.CreateLabel("simple7", GetText("simple_PassTip"), x1, y, w, h, 2, "AAAAAA", "FFFFFF", 1.0, 3, 0, 1, 1, Null, 1, 0, 0, 0, "", 0))
 		y :+ h + 10
-		g_pan_simple.AddChild(TLabel.CreateLabel("simple8", Lower(GetText("controls_SlideTackle")), x1, y, 100, h, 2, g_col_key, "FFFFFF", 1.0, 4, 0, 1, 1, Null, 1, 0, 0, 0, "", 0))
+		g_pan_simple.AddChild(TLabel.CreateLabel("simple8", GetText("controls_SlideTackle").ToUpper(), x1, y, 100, h, 2, g_col_key, "FFFFFF", 1.0, 4, 0, 1, 1, Null, 1, 0, 0, 0, "", 0))
 		g_pan_simple.AddChild(TLabel.CreateLabel("simple9", GetText("simple_SlideDesc"), x1 + 100, y, w - 100, h, 2, "EEEEEE", "FFFFFF", 1.0, 5, 0, 1, 1, Null, 1, 0, 0, 0, "", 0))
 		y :+ h + 10
-		g_pan_simple.AddChild(TLabel.CreateLabel("simple10", Lower(GetText("controls_Call")), x1, y, 100, h, 2, g_col_key, "FFFFFF", 1.0, 6, 0, 1, 1, Null, 1, 0, 0, 0, "", 0))
+		g_pan_simple.AddChild(TLabel.CreateLabel("simple10", GetText("controls_Call").ToUpper(), x1, y, 100, h, 2, g_col_key, "FFFFFF", 1.0, 6, 0, 1, 1, Null, 1, 0, 0, 0, "", 0))
 		g_pan_simple.AddChild(TLabel.CreateLabel("simple11", GetText("simple_CallDesc"), x1 + 100, y, w - 100, h, 2, "EEEEEE", "FFFFFF", 1.0, 7, 0, 1, 1, Null, 1, 0, 0, 0, "", 0))
 		y :+ h
 		g_pan_simple.AddChild(TLabel.CreateLabel("simple12", GetText("simple_CallTip"), x1, y, w, h, 2, "AAAAAA", "FFFFFF", 1.0, 3, 0, 1, 1, Null, 1, 0, 0, 0, "", 0))
@@ -145,19 +154,19 @@
 		w = w * 2 - 20
 		g_pan_advanced.AddChild(TLabel.CreateLabel("advanced1", GetText("advanced_Description"), x1, y, w, h, 2, "AAAAAA", "FFFFFF", 1.0, 1, 0, 1, 1, Null, 1, 0, 0, 0, "", 0))
 		y :+ h + 10
-		g_pan_advanced.AddChild(TLabel.CreateLabel("advanced2", Lower(GetText("controls_Shoot")), x1, y, 100, h, 2, g_col_key, "FFFFFF", 1.0, 4, 0, 1, 1, Null, 1, 0, 0, 0, "", 0))
+		g_pan_advanced.AddChild(TLabel.CreateLabel("advanced2", GetText("controls_Shoot").ToUpper(), x1, y, 100, h, 2, g_col_key, "FFFFFF", 1.0, 4, 0, 1, 1, Null, 1, 0, 0, 0, "", 0))
 		g_pan_advanced.AddChild(TLabel.CreateLabel("advanced3", GetText("advanced_ShootDesc"), x1 + 100, y, w - 100, h, 2, "EEEEEE", "FFFFFF", 1.0, 5, 0, 1, 1, Null, 1, 0, 0, 0, "", 0))
 		y :+ h + 10
-		g_pan_advanced.AddChild(TLabel.CreateLabel("advanced4", Lower(GetText("controls_Pass")), x1, y, 100, h, 2, g_col_key, "FFFFFF", 1.0, 4, 0, 1, 1, Null, 1, 0, 0, 0, "", 0))
+		g_pan_advanced.AddChild(TLabel.CreateLabel("advanced4", GetText("controls_Pass").ToUpper(), x1, y, 100, h, 2, g_col_key, "FFFFFF", 1.0, 4, 0, 1, 1, Null, 1, 0, 0, 0, "", 0))
 		g_pan_advanced.AddChild(TLabel.CreateLabel("advanced5", GetText("advanced_PassDesc"), x1 + 100, y, w - 100, h, 2, "EEEEEE", "FFFFFF", 1.0, 5, 0, 1, 1, Null, 1, 0, 0, 0, "", 0))
 		y :+ h + 10
-		g_pan_advanced.AddChild(TLabel.CreateLabel("advanced6", Lower(GetText("controls_Lob")), x1, y, 100, h, 2, g_col_key, "FFFFFF", 1.0, 4, 0, 1, 1, Null, 1, 0, 0, 0, "", 0))
+		g_pan_advanced.AddChild(TLabel.CreateLabel("advanced6", GetText("controls_Lob").ToUpper(), x1, y, 100, h, 2, g_col_key, "FFFFFF", 1.0, 4, 0, 1, 1, Null, 1, 0, 0, 0, "", 0))
 		g_pan_advanced.AddChild(TLabel.CreateLabel("advanced7", GetText("advanced_LobDesc"), x1 + 100, y, w - 100, h, 2, "EEEEEE", "FFFFFF", 1.0, 5, 0, 1, 1, Null, 1, 0, 0, 0, "", 0))
 		y :+ h + 10
-		g_pan_advanced.AddChild(TLabel.CreateLabel("advanced8", Lower(GetText("controls_SlideTackle")), x1, y, 100, h, 2, g_col_key, "FFFFFF", 1.0, 4, 0, 1, 1, Null, 1, 0, 0, 0, "", 0))
+		g_pan_advanced.AddChild(TLabel.CreateLabel("advanced8", GetText("controls_SlideTackle").ToUpper(), x1, y, 100, h, 2, g_col_key, "FFFFFF", 1.0, 4, 0, 1, 1, Null, 1, 0, 0, 0, "", 0))
 		g_pan_advanced.AddChild(TLabel.CreateLabel("advanced9", GetText("advanced_SlideDesc"), x1 + 100, y, w - 100, h, 2, "EEEEEE", "FFFFFF", 1.0, 5, 0, 1, 1, Null, 1, 0, 0, 0, "", 0))
 		y :+ h + 10
-		g_pan_advanced.AddChild(TLabel.CreateLabel("advanced10", Lower(GetText("controls_Call")), x1, y, 100, h, 2, g_col_key, "FFFFFF", 1.0, 4, 0, 1, 1, Null, 1, 0, 0, 0, "", 0))
+		g_pan_advanced.AddChild(TLabel.CreateLabel("advanced10", GetText("controls_Call").ToUpper(), x1, y, 100, h, 2, g_col_key, "FFFFFF", 1.0, 4, 0, 1, 1, Null, 1, 0, 0, 0, "", 0))
 		g_pan_advanced.AddChild(TLabel.CreateLabel("advanced11", GetText("advanced_CallDesc"), x1 + 100, y, w - 100, h, 2, "EEEEEE", "FFFFFF", 1.0, 5, 0, 1, 1, Null, 1, 0, 0, 0, "", 0))
 		y :+ h + 10
 		g_pan_advanced.AddChild(TLabel.CreateLabel("advanced12", GetText("advanced_Tip"), x1, y, w, 56, 2, "AAAAAA", "FFFFFF", 1.0, 1, 0, 1, 1, Null, 1, 0, 0, 0, "", 0))

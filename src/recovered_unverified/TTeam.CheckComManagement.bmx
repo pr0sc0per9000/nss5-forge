@@ -155,6 +155,15 @@
 '!Global g_Object30:TImage
 '!Global g_profile:TProfile
 
+' CASE DIRECTION CORRECTED 2026-08-22: 2 call sites -> .ToUpper().
+' extracted/runtime_helpers.tsv named 0x004A7410 `_brl_retro_Lower` and 0x004A74E0
+' `_brl_retro_Upper`. Both were wrong and neither address is a brl.retro wrapper:
+' 0x004A7410 is `_bbStringToUpper` and 0x004A74E0 is `_bbStringToLower`. NSS5.exe's
+' own 21-byte retro wrappers at 0x0059C8FD (Lower) and 0x0059C912 (Upper) CALL those
+' two addresses, and a wrapper cannot be the function it calls. The wrong row masked
+' by name, so this body certified with the case conversion running backwards. Full
+' derivation and the discriminating 3x4 matrix: docs/reference/codegen-patterns.md
+' 15.6. Re-verified under NSS5_NO_LEARN=1 on worker trees 380 and 380b.
 LogLine("CheckComManagement")
 If g_training_int03 <> 0 Then Return 0
 Local target:TPlayer = Null
@@ -205,9 +214,9 @@ Else
 			Local side:Int = h.GetShootingDirection()
 			Select side
 				Case -1
-					TScreenMessage.Create(0, 0, Lower(GetText("Substitution")), g_engine_int17 Shl 1, g_font_match_m, g_Object29, 1.0, "FFFFFF")
+					TScreenMessage.Create(0, 0, GetText("Substitution").ToUpper(), g_engine_int17 Shl 1, g_font_match_m, g_Object29, 1.0, "FFFFFF")
 				Case 1
-					TScreenMessage.Create(0, 0, Lower(GetText("Substitution")), g_engine_int17 Shl 1, g_font_match_m, g_Object30, 1.0, "FFFFFF")
+					TScreenMessage.Create(0, 0, GetText("Substitution").ToUpper(), g_engine_int17 Shl 1, g_font_match_m, g_Object30, 1.0, "FFFFFF")
 			End Select
 		EndIf
 	EndIf

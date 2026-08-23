@@ -147,6 +147,15 @@
 '!Global g_ball_int06:Int
 '!Global g_ball_soundfanlow:TSound
 '!Global g_ball_soundfanhigh:TSound
+' CASE DIRECTION CORRECTED 2026-08-22: 3 call sites -> .ToUpper().
+' extracted/runtime_helpers.tsv named 0x004A7410 `_brl_retro_Lower` and 0x004A74E0
+' `_brl_retro_Upper`. Both were wrong and neither address is a brl.retro wrapper:
+' 0x004A7410 is `_bbStringToUpper` and 0x004A74E0 is `_bbStringToLower`. NSS5.exe's
+' own 21-byte retro wrappers at 0x0059C8FD (Lower) and 0x0059C912 (Upper) CALL those
+' two addresses, and a wrapper cannot be the function it calls. The wrong row masked
+' by name, so this body certified with the case conversion running backwards. Full
+' derivation and the discriminating 3x4 matrix: docs/reference/codegen-patterns.md
+' 15.6. Re-verified under NSS5_NO_LEARN=1 on worker trees 380 and 380b.
 	LogLine("NewController:" + a0.initials)
 	Self.CheckForPlayerRatings(a0)
 	Local hp:TPlayer = TPlayer.GetHumanPlayer()
@@ -179,12 +188,12 @@
 					Self.lastkickedby.AddStat(3, ang, dist, kx, ky)
 					If Self.lastkickedby.newstar
 						If wasCrossing And dist > TPitch.YardsToPixels(20.0) And Self.lastkickedby.distancetogoal_opp < Self.lastkickedby.distancetogoal_own
-							TParticle.StarShower(Int(Self.lastkickedby.x), Int(Self.lastkickedby.y), Lower(GetText("Cross")), "0000FF")
+							TParticle.StarShower(Int(Self.lastkickedby.x), Int(Self.lastkickedby.y), GetText("Cross").ToUpper(), "0000FF")
 						Else
 							If dist > TPitch.YardsToPixels(25.0)
-								TParticle.StarShower(Int(Self.lastkickedby.x), Int(Self.lastkickedby.y), Lower(GetText("Long Pass")), "0000FF")
+								TParticle.StarShower(Int(Self.lastkickedby.x), Int(Self.lastkickedby.y), GetText("Long Pass").ToUpper(), "0000FF")
 							Else
-								TParticle.StarShower(Int(Self.lastkickedby.x), Int(Self.lastkickedby.y), Lower(GetText("Pass")), "0000FF")
+								TParticle.StarShower(Int(Self.lastkickedby.x), Int(Self.lastkickedby.y), GetText("Pass").ToUpper(), "0000FF")
 							EndIf
 						EndIf
 					EndIf

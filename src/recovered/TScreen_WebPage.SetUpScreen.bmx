@@ -36,6 +36,15 @@
 '!Global g_webpage_lbl_comp:TLabel
 '!Global g_webpage_table:TTable
 '!Global g_profile:TProfile
+' CASE DIRECTION CORRECTED 2026-08-22: 1 call site -> .ToUpper().
+' extracted/runtime_helpers.tsv named 0x004A7410 `_brl_retro_Lower` and 0x004A74E0
+' `_brl_retro_Upper`. Both were wrong and neither address is a brl.retro wrapper:
+' 0x004A7410 is `_bbStringToUpper` and 0x004A74E0 is `_bbStringToLower`. NSS5.exe's
+' own 21-byte retro wrappers at 0x0059C8FD (Lower) and 0x0059C912 (Upper) CALL those
+' two addresses, and a wrapper cannot be the function it calls. The wrong row masked
+' by name, so this body certified with the case conversion running backwards. Full
+' derivation and the discriminating 3x4 matrix: docs/reference/codegen-patterns.md
+' 15.6. Re-verified under NSS5_NO_LEARN=1 on worker trees 380 and 380b.
 g_webpage_name = a0
 LogLine("Temp headline: " + a1)
 LogLine("Player webheadline: " + g_profile.webheadline)
@@ -45,7 +54,7 @@ If a1.Length <> 0
 Else
 	g_webpage_headline = g_profile.webheadline
 EndIf
-g_webpage_lbl_headline.SetText(Lower(g_webpage_headline), "", -1, -1)
+g_webpage_lbl_headline.SetText(g_webpage_headline.ToUpper(), "", -1, -1)
 Local cid:Int = g_profile.clubid
 Local comp:TCompetition = TCompetition.SelectById(TClub.SelectById(cid).GetActualLeagueId())
 If comp <> Null And comp.teampool

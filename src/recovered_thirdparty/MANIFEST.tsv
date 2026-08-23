@@ -83,34 +83,34 @@ fontmachine	0x0059005f	TBitmapFont	GetDrawShadow	18	MATCH(thirdparty)
 fontmachine	0x00590071	TBitmapFont	SetDrawBorder	26	MATCH(thirdparty)
 fontmachine	0x0059008b	TBitmapFont	GetDrawBorder	18	MATCH(thirdparty)
 fontmachine	0x0059009d	TBitmapFont	SetProgressFunction	26	MATCH(thirdparty)
-fontmachine	0x005900b7	TBitmapFont	Load	1855	
+fontmachine	0x005900b7	TBitmapFont	Load	1855	MATCH(thirdparty)
 fontmachine	0x005907f6	TBitmapFont	FontLoaded	18	MATCH(thirdparty)
 fontmachine	0x00590808	TBitmapFont	DrawText	58	MATCH(thirdparty)
 fontmachine	0x00590842	TBitmapFont	DrawTextMaxWidth	755	
-fontmachine	0x00590b35	TBitmapFont	GetTxtWidth	278	
+fontmachine	0x00590b35	TBitmapFont	GetTxtWidth	278	MATCH(thirdparty)
 fontmachine	0x00590c4b	TBitmapFont	GetFontHeight	52	MATCH(thirdparty)
-fontmachine	0x00590c7f			72	
-fontmachine	0x00590cc7			72	
-fontmachine	0x00590d0f			72	
-fontmachine	0x00590d57			132	
-fontmachine	0x00590ddb			132	
-fontmachine	0x00590e5f			132	
-fontmachine	0x00590ee3			72	
-fontmachine	0x00590f2b			114	
-fontmachine	0x00590f9d			142	
-fontmachine	0x0059102b	TBitmapFont	Fn_0059102B	26	MATCH(thirdparty,unreflected,try_function)
-fontmachine	0x00591045	TBitmapFont	Fn_00591045	18	MATCH(thirdparty,unreflected,try_function)
-fontmachine	0x00591057	TBitmapFont	Fn_00591057	26	MATCH(thirdparty,unreflected,try_function)
-fontmachine	0x00591071	TBitmapFont	Fn_00591071	18	MATCH(thirdparty,unreflected,try_function)
-fontmachine	0x00591083	TBitmapFont	Fn_00591083	26	MATCH(thirdparty,unreflected,try_function)
-fontmachine	0x0059109d	TBitmapFont	Fn_0059109D	18	MATCH(thirdparty,unreflected,try_function)
+fontmachine	0x00590c7f	TBitmapFont	GetFaceImage	72	
+fontmachine	0x00590cc7	TBitmapFont	GetBorderImage	72	
+fontmachine	0x00590d0f	TBitmapFont	GetShadowImage	72	
+fontmachine	0x00590d57	TBitmapFont	GetFaceInfo	132	
+fontmachine	0x00590ddb	TBitmapFont	GetBorderInfo	132	
+fontmachine	0x00590e5f	TBitmapFont	GetShadowInfo	132	
+fontmachine	0x00590ee3	TBitmapFont	GetCharOffset	72	
+fontmachine	0x00590f2b	TBitmapFont	GetCharBorderOffset	114	
+fontmachine	0x00590f9d	TBitmapFont	GetCharShadowOffset	142	
+fontmachine	0x0059102b	TBitmapFont	SetFaceBlend	26	MATCH(thirdparty)
+fontmachine	0x00591045	TBitmapFont	GetFaceBlend	18	MATCH(thirdparty)
+fontmachine	0x00591057	TBitmapFont	SetBorderBlend	26	MATCH(thirdparty)
+fontmachine	0x00591071	TBitmapFont	GetBorderBlend	18	MATCH(thirdparty)
+fontmachine	0x00591083	TBitmapFont	SetShadowBlend	26	MATCH(thirdparty)
+fontmachine	0x0059109d	TBitmapFont	GetShadowBlend	18	MATCH(thirdparty)
 fontmachine	0x005910af			87	
 fontmachine	0x00591106			376	
 fontmachine	0x0059127e	TPrivateBitmapFont	New	174	MATCH(thirdparty)
 fontmachine	0x0059132c	TPrivateBitmapFont	Delete	87	MATCH(thirdparty)
-fontmachine	0x00591383	TPrivateBitmapFont	DrawFaceText	1428	
-fontmachine	0x00591917	TPrivateBitmapFont	DrawBorderText	1195	
-fontmachine	0x00591dc2	TPrivateBitmapFont	DrawShadowText	666	
+fontmachine	0x00591383	TPrivateBitmapFont	DrawFaceText	1428	NEARMISS(1422/1428, src/recovered_unverified)
+fontmachine	0x00591917	TPrivateBitmapFont	DrawBorderText	1195	NEARMISS(1191/1195, src/recovered_unverified)
+fontmachine	0x00591dc2	TPrivateBitmapFont	DrawShadowText	666	NEARMISS(662/666, src/recovered_unverified)
 fontmachine	0x0059205c	TPrivateBitmapFont	DrawTextLine	431	MATCH(thirdparty)
 fontmachine	0x0059220b	TRenderStatus	New	56	MATCH(thirdparty)
 fontmachine	0x00592243	TRenderStatus	Delete	14	MATCH(thirdparty)
@@ -127,9 +127,9 @@ fontmachine	0x0059236d	TBitmapFontLoadException	ToString	21	MATCH(thirdparty)
 fontmachine	0x00592382	TBitmapFontLoadException	GetFontObject	21	MATCH(thirdparty)
 fontmachine	0x00592397	TPrivateException	New	56	MATCH(thirdparty)
 fontmachine	0x005923cf	TPrivateException	Delete	53	MATCH(thirdparty)
-fontmachine	0x00592404			80	
-fontmachine	0x00592454			34	
-fontmachine	0x00592476			108	
+fontmachine	0x00592404	TBitMapChar	New	80	MATCH(thirdparty)
+fontmachine	0x00592454	TBitMapChar	Delete	34	MATCH(thirdparty)
+fontmachine	0x00592476	TBitMapChar	LoadDrawRenderingData	108	MATCH(thirdparty)
 fontmachine	0x005924e2	iTextRendererFXBase	New	45	MATCH(thirdparty)
 fontmachine	0x0059250f	iTextRendererFXBase	Delete	34	MATCH(thirdparty)
 fontmachine	0x00592531	iTextRendererFXBase	DrawTextBegin	14	MATCH(thirdparty)
@@ -164,10 +164,10 @@ fontmachine	0x0059299d	TDrawingPoint	New	44	MATCH(thirdparty)
 fontmachine	0x005929c9	TDrawingPoint	Delete	14	MATCH(thirdparty)
 fontmachine	0x005929d7	TDrawingPoint	Create	34	MATCH(thirdparty)
 fontmachine	0x005929f9	TDrawingPoint	Clone	26	
-fontmachine	0x00592a13			36	
-fontmachine	0x00592a37			322	
+fontmachine	0x00592a13		Fn_00592A13	36	MATCH(thirdparty,unreflected,try_function)
+fontmachine	0x00592a37		Fn_00592A37	322	MATCH(thirdparty,unreflected,try_function)
 fontmachine	0x00592b79		Fn_00592B79	14	MATCH(thirdparty,unattributed)	
-fontmachine	0x00592b87			75	
+fontmachine	0x00592b87		Fn_00592B87	75	MATCH(thirdparty,unreflected,try_function)
 fontmachine	0x00592bd4			850	
 fontmachine	0x00592f26	TClass	New	41	MATCH(thirdparty)
 fontmachine	0x00592f4f	TClass	Delete	14	MATCH(thirdparty)

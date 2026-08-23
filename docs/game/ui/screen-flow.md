@@ -51,7 +51,7 @@ panels and a progress bar - so it is not repeated every time you visit the scree
 1. Registers the screen's name and background image.
 2. **If this is the very first screen ever created, makes it active** (`TScreen.SetActive`).
    This is why the game always opens on whichever screen's `CreateScreen` runs first at boot.
-3. Looks up a **help entry** for the screen from the tag `"help_" + Upper(name)` (see §3) and
+3. Looks up a **help entry** for the screen from the tag `"help_" + name.ToLower()` (see §3) and
    builds a `THelpBox` for it, queued for the in-game Help button. If no translation exists
    for that tag, it silently falls back to the tag `help_nohelp`.
 

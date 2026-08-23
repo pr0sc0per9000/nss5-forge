@@ -28,13 +28,22 @@
 
 '!Global g_ball:TBall
 
+' CASE DIRECTION CORRECTED 2026-08-22: 1 call site -> .ToUpper().
+' extracted/runtime_helpers.tsv named 0x004A7410 `_brl_retro_Lower` and 0x004A74E0
+' `_brl_retro_Upper`. Both were wrong and neither address is a brl.retro wrapper:
+' 0x004A7410 is `_bbStringToUpper` and 0x004A74E0 is `_bbStringToLower`. NSS5.exe's
+' own 21-byte retro wrappers at 0x0059C8FD (Lower) and 0x0059C912 (Upper) CALL those
+' two addresses, and a wrapper cannot be the function it calls. The wrong row masked
+' by name, so this body certified with the case conversion running backwards. Full
+' derivation and the discriminating 3x4 matrix: docs/reference/codegen-patterns.md
+' 15.6. Re-verified under NSS5_NO_LEARN=1 on worker trees 380 and 380b.
 LogLine("SlideBall")
 If g_ball.KeeperHolding() And Self.CheckFoul(g_ball.controlledby) Then Return 0
 If Not g_ball.controlledby Or (g_ball.controlledby And g_ball.controlledby.teamid <> Self.teamid)
 	If g_ball.lastkickedby <> Self And Self.distancetoopponent < TPitch.YardsToPixels(3.0)
 		Self.AddStat(7,0,0,0,0)
 		If Self.newstar
-			TParticle.StarShower(Int(Self.x), Int(Self.y), Lower(GetText("Tackle")), "FF0099")
+			TParticle.StarShower(Int(Self.x), Int(Self.y), GetText("Tackle").ToUpper(), "FF0099")
 		EndIf
 	EndIf
 EndIf

@@ -4,47 +4,42 @@
      Do not edit by hand: your changes will be overwritten, and a
      hand-maintained status file goes stale within hours. -->
 
-**94.6%** of the reconstruction is byte-identical to `NSS5.exe`,
-measured as 809362 of 855959 bytes of machine code across 1830 function bodies.
+**99.3%** of the reconstruction is byte-identical to `NSS5.exe`,
+measured as 867506 of 873829 bytes of machine code across 1973 function bodies.
 
-4 bodies (1232 bytes) are permanently excluded from that count as Steam-linked; see STEAM_EXCLUDE in `scripts/progress.py` for which ones and why.
+Nothing is excluded from that count. 4 bodies (1232 bytes, of which 1074 are byte-identical) are counted above but are deliberately absent from the shipped `src/assembled/` build, because their Steam import would stop the exe loading; see VERIFIED_NOT_SHIPPED in `scripts/progress.py` for which ones and why.
 
 ```
 RECONSTRUCTION PROGRESS  (measured in bytes of matched machine code)
 
   TREE                              BODIES   MATCHED    BYTES    DONE
-  src/recovered                       1689      1688   712476  100.0%
-  src/recovered_module                  62        62    17588  100.0%
-  src/recovered_unverified              79        57   125895   63.0%
+  src/recovered                       1709      1709   757980  100.0%
+  src/recovered_module                  89        88    20833   99.2%
+  src/recovered_thirdparty             112       112     8073  100.0%
+  src/recovered_unverified              63        58    86943   92.9%
   ------------------------------ --------- --------- -------- -------
-  TOTAL                               1830      1807   855959   94.6%
+  TOTAL                               1973      1967   873829   99.3%
 
-  809362 of 855959 bytes byte-identical against NSS5.exe.
+  867506 of 873829 bytes byte-identical against NSS5.exe.
 
-  EXCLUDED from the corpus above -- 4 bodies, 1232 bytes, permanently
-  Steam-linked (see STEAM_EXCLUDE in scripts/progress.py):
-    TProfile.CheckAchievement                         625 bytes  0x0056cf70  src/recovered_unverified
-    Fn_0058D987.SteamPostPlayerValue                  325 bytes  0x0058d987  src/recovered_unverified
-    SteamInit                                         158 bytes  0x0058d86d  src/recovered_module
-    Fn_0058D90B.SyncSteamAchievements                 124 bytes  0x0058d90b  src/recovered_module
+  NOT IN THE SHIPPED BUILD -- 4 bodies, 1232 bytes (1074 of them matched)
+  COUNTED in the totals above, like every other body. They are left out
+  of src/assembled/ because their Steam import would stop the exe loading;
+  that is a fact about the build, not about whether they can be matched.
+  (see VERIFIED_NOT_SHIPPED in scripts/progress.py for the evidence)
+    BODY                                         BYTES VA          MATCHED  ABSENCE
+    TProfile.CheckAchievement                      625 0x0056cf70  yes      OMITTED  (assemble.py UNVERIFIED_SKIP)
+    Fn_0058D987.SteamPostPlayerValue               325 0x0058d987  yes      OMITTED  (harness.py MODULE_SKIP)
+    SteamInit                                      158 0x0058d86d  no       SUBSTITUTED  (compiled as a neutralised 4-line stub; original kept as a comment)
+    Fn_0058D90B.SyncSteamAchievements              124 0x0058d90b  yes      OMITTED  (harness.py MODULE_SKIP)
 
   Largest bodies not yet byte-identical:
-    TPlayer.RecordPlayerStats                       15154 bytes  0x004ff67c
-    TScreen_MatchPrep.CreateScreen                   6249 bytes  0x0055c09b
-    TFormation.GetPlayerXY                           2898 bytes  0x004d8b85
-    TBall.CheckForPlayerRatings                      2867 bytes  0x004cc644
-    TScreen_SeasonReview.SetUpScreen                 2276 bytes  0x0055f8e6
-    TPlayer.CheckKick                                2201 bytes  0x004f6c2b
-    TEngine.SetUpSetPiece                            1788 bytes  0x004d2f01
-    TEngine.GoalScored                               1713 bytes  0x004d39d6
-    TPlayer.UpdateKeeperPosition                     1701 bytes  0x004f2eed
-    TContractOffer.CheckTransferWindow               1647 bytes  0x00571e91
-    TScreen_SeasonReview.UpdateSeasonStats           1279 bytes  0x005601ca
-    TScreen.DoProgressBar                            1178 bytes  0x00512de9
-    TScreenMessage.Draw                              1119 bytes  0x0057004c
-    TProfile.LoadSavedGame                            936 bytes  0x005659f1
-    TProfile.SaveGame                                 850 bytes  0x00565d99
-    ... and 8 more
+    Fn_0058BC02.Md5                                  2848 bytes  0x0058bc02
+    TPrivateBitmapFont.DrawFaceText                  1428 bytes  0x00591383
+    TPrivateBitmapFont.DrawBorderText                1195 bytes  0x00591917
+    TPrivateBitmapFont.DrawShadowText                 666 bytes  0x00591dc2
+    SteamInit                                         158 bytes  0x0058d86d
+    ZipFile.getFileInfoByName                          28 bytes  0x0058dda7
 ```
 
 Regenerate with:

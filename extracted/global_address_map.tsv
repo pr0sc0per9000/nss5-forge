@@ -1,0 +1,2780 @@
+name	address	tier	type	bodies	evidence
+freject	-	UNGROUNDED	Int	0	in no body pairable with an original
+g_ach_imgstar	0x00C68318	STRONG	TImage	1	forced in 1 body
+g_ach_imgstargrey	0x00C6831C	STRONG	TImage	1	forced in 1 body
+g_ach_int	0x00C6E80C	STRONG	Int	1	forced in 1 body
+g_ach_panachievements	0x00C68320	STRONG	TPanel	1	forced in 1 body
+g_ach_prgachievements	0x00C68328	STRONG	TProgressBar	1	forced in 1 body
+g_ach_progress	0x00C68328	STRONG	TProgressBar	1	forced in 1 body
+g_ach_screen	0x00C68314	STRONG	TScreen	1	forced in 1 body
+g_ach_table	0x00C68324	STRONG	TTable	1	forced in 1 body
+g_ach_tblachievements	0x00C68324	STRONG	TTable	1	forced in 1 body
+g_achievement_int	0x00C6E80C	STRONG	Int	1	forced in 1 body
+g_achievements	0x00C6E808	CERTAIN	TList	4	forced in 4 bodies, unanimous
+g_activecombo	0x00C61CF8	STRONG	TCombo	1	forced in 1 body
+g_activegadget	0x00C61CF8	CERTAIN	TGadget	23	forced in 14 bodies, unanimous
+g_activescreen	0x00C61700	CERTAIN	TScreen	6	forced in 5 bodies, unanimous
+g_adboardimg	0x00C5D5E0	STRONG	TImage[]	2	forced in 1 body
+g_allcompetitions	-	AMBIGUOUS	TList	1	no alignment forced it (1 bodies)
+g_allgadgets	0x00C61CF0	CERTAIN	TList	4	forced in 4 bodies, unanimous
+g_allhorses	0x00C6E294	CERTAIN	TList	2	forced in 2 bodies, unanimous
+g_allplayers	0x00C5DE10	CERTAIN	TList	2	forced in 2 bodies, unanimous
+g_anim_comm_a	0x00C5DEE4	STRONG	Int[]	1	forced in 1 body
+g_anim_comm_b	0x00C5DEE8	STRONG	Int[]	1	forced in 1 body
+g_anim_comm_c	0x00C5DEEC	STRONG	Int[]	1	forced in 1 body
+g_anim_comm_d	0x00C5DEF0	STRONG	Int[]	1	forced in 1 body
+g_anim_default	-	AMBIGUOUS	Int[]	1	no alignment forced it (1 bodies)
+g_anim_dive	0x00C5DF18	STRONG	Int[]	1	forced in 1 body
+g_anim_jump	0x00C5DEB8	STRONG	Int[]	1	forced in 1 body
+g_anim_keepercatchhigh	0x00C5DF10	STRONG	Int[]	1	forced in 1 body
+g_anim_kick1	0x00C5DEB4	STRONG	Int[]	1	forced in 1 body
+g_anim_kick2	0x00C5DECC	STRONG	Int[]	1	forced in 1 body
+g_anim_run	-	AMBIGUOUS	Int[]	1	no alignment forced it (1 bodies)
+g_animfall	0x00C5DEC4	STRONG	Int[]	1	forced in 1 body
+g_appcount_a	0x00C68BCC	STRONG	Int	1	forced in 1 body
+g_appcount_b	0x00C68BD0	STRONG	Int	1	forced in 1 body
+g_arrowalpha	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_audio_channel	-	AMBIGUOUS	TChannel	1	no alignment forced it (1 bodies)
+g_awaybadge	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_awayteam	0x00C5B21C	CERTAIN	TTeam	18	forced in 8 bodies, unanimous
+g_awayyellows	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_ball	0x00C5DEA4	CERTAIN	TBall	49	forced in 40 bodies, unanimous
+g_ball_bouncesound	0x00C5A514	STRONG	TSound	1	forced in 1 body
+g_ball_channel	0x00C5A510	CERTAIN	TChannel	4	forced in 3 bodies, unanimous
+g_ball_double01	-	AMBIGUOUS	Double	1	no alignment forced it (1 bodies)
+g_ball_float01	0x00C5A4CC	CERTAIN	Float	3	forced in 3 bodies, unanimous
+g_ball_float02	0x00C5A4D0	CERTAIN	Float	4	forced in 3 bodies, unanimous
+g_ball_float03	0x00C5A4D4	CERTAIN	Float	4	forced in 3 bodies, unanimous
+g_ball_float04	0x00C5A4D8	CERTAIN	Float	5	forced in 4 bodies, unanimous
+g_ball_float05	0x00C5A4DC	CERTAIN	Float	2	forced in 2 bodies, unanimous
+g_ball_float06	0x00C5A4E0	STRONG	Float	2	forced in 1 body
+g_ball_float07	0x00C5A4E4	STRONG	Float	2	forced in 1 body
+g_ball_float08	0x00C5A4E8	STRONG	Float	2	forced in 1 body
+g_ball_float09	0x00C5A4EC	STRONG	Float	2	forced in 1 body
+g_ball_float10	0x00C5A4F0	STRONG	Float	2	forced in 1 body
+g_ball_float11	0x00C5A4F4	STRONG	Float	2	forced in 1 body
+g_ball_float12	0x00C5A4F8	STRONG	Float	2	forced in 1 body
+g_ball_float13	0x00C5A4FC	STRONG	Float	2	forced in 1 body
+g_ball_float14	0x00C5A500	CERTAIN	Float	4	forced in 2 bodies, unanimous
+g_ball_float15	0x00C5A504	STRONG	Float	2	forced in 1 body
+g_ball_float16	0x00C5A508	STRONG	Float	2	forced in 1 body
+g_ball_float17	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_ball_float18	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_ball_float19	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_ball_float20	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_ball_friction	0x00C5A4D0	STRONG	Float	1	forced in 1 body
+g_ball_gravity	0x00C5A4D4	STRONG	Float	1	forced in 1 body
+g_ball_int02	0x00C5A4C8	CERTAIN	Int	2	forced in 2 bodies, unanimous
+g_ball_int05	0x00C5B244	STRONG	Int	2	forced in 1 body
+g_ball_int06	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_ball_minspeed	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_ball_nextid	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_ball_parrysound	0x00C5A518	STRONG	TSound	1	forced in 1 body
+g_ball_postchannel	0x00C5A510	STRONG	TChannel	2	forced in 1 body
+g_ball_postsound	-	AMBIGUOUS	TSound	1	no alignment forced it (1 bodies)
+g_ball_snowthreshold	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_ball_sortmode	0x00C5A4C4	CERTAIN	Int	2	forced in 2 bodies, unanimous
+g_ball_sound	0x00C5A51C	CERTAIN	TSound	2	forced in 2 bodies, unanimous
+g_ball_soundbounce	0x00C5A514	STRONG	TSound	1	forced in 1 body
+g_ball_soundfanhigh	-	AMBIGUOUS	TSound	1	no alignment forced it (1 bodies)
+g_ball_soundfanlow	-	AMBIGUOUS	TSound	1	no alignment forced it (1 bodies)
+g_ball_soundkick	0x00C5A518	STRONG	TSound	1	forced in 1 body
+g_ballheightscale	0x00C5DE70	STRONG	Int	1	forced in 1 body
+g_ballimg	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_balls	0x00C5A4C0	CERTAIN	TList	14	forced in 11 bodies, unanimous
+g_ballspeedlimit	0x00C5DE70	STRONG	Int	1	forced in 1 body
+g_bar_booze	0x00C685FC	CERTAIN	TProgressBar	1	forced, agrees with verified pair
+g_bar_energy	0x00C66790	CERTAIN	TProgressBar	2	forced, agrees with verified pair
+g_bar_injury	0x00C685F4	CERTAIN	TProgressBar	1	forced, agrees with verified pair
+g_bar_nrg	0x00C68608	CERTAIN	TProgressBar	1	forced, agrees with verified pair
+g_bet	0x00C6B85C	STRONG	Int	1	forced in 1 body
+g_bgimage	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_bigfont	-	AMBIGUOUS	TBitmapFont	2	no alignment forced it (2 bodies)
+g_bj1	0x00C6C174	STRONG	Int	1	forced in 1 body
+g_bj2	0x00C6C178	CERTAIN	Int	1	forced, agrees with verified pair
+g_bj3	0x00C6C17C	CERTAIN	Int	2	forced in 2 bodies, unanimous
+g_bj_bet	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_bj_btn1	-	AMBIGUOUS	TButton	2	bodies disagree: 00c6c020:1 00c6c01c:1
+g_bj_btn2	-	AMBIGUOUS	TButton	2	bodies disagree: 00c6c024:1 00c6c028:1
+g_bj_btn3	-	AMBIGUOUS	TButton	2	bodies disagree: 00c6c01c:1 00c6c020:1
+g_bj_btn4	0x00C6C024	CERTAIN	TButton	1	forced, agrees with verified pair
+g_bj_cardflip	0x00C6C168	STRONG	TSound	1	forced in 1 body
+g_bj_cardlist	-	AMBIGUOUS	TList	1	no alignment forced it (1 bodies)
+g_bj_chan	0x00C6F090	STRONG	TChannel	1	forced in 1 body
+g_bj_dealercards	0x00C6C170	CERTAIN	TList	2	forced, agrees with verified pair
+g_bj_dealerhand	0x00C6C170	CERTAIN	TList	2	forced, agrees with verified pair
+g_bj_dealerturn	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_bj_dealing	0x00C6C17C	STRONG	Int	1	forced in 1 body
+g_bj_deck	0x00C6C16C	STRONG	TList	1	forced in 1 body
+g_bj_fntsize	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_bj_font	-	AMBIGUOUS	TBitmapFont	1	no alignment forced it (1 bodies)
+g_bj_gadget1	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_bj_gadget2	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_bj_hand	0x00C6C170	STRONG	TList	1	forced in 1 body
+g_bj_imgbg	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_bj_msgstyle	-	AMBIGUOUS	Int	2	no alignment forced it (2 bodies)
+g_bj_panel	0x00C6B858	STRONG	TPanel	1	forced in 1 body
+g_bj_playerhand	0x00C6C16C	CERTAIN	TList	2	forced, agrees with verified pair
+g_bj_result	-	AMBIGUOUS	Int	3	no alignment forced it (3 bodies)
+g_bj_screen	0x00C6C018	STRONG	TScreen	2	forced in 1 body
+g_bj_snd	0x00C6C168	STRONG	TSound	1	forced in 1 body
+g_bj_state	0x00C6C174	STRONG	Int	3	forced in 1 body
+g_bjdealerlabel	0x00C6C02C	STRONG	TLabel	2	forced in 1 body
+g_bjplayerhand	0x00C6C16C	STRONG	TList	1	forced in 1 body
+g_bjplayerlabel	0x00C6C030	STRONG	TLabel	2	forced in 1 body
+g_bjstate	0x00C6C174	STRONG	Int	1	forced in 1 body
+g_blackjack_int01	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_blackjack_state	0x00C6C174	CERTAIN	Int	2	forced in 2 bodies, unanimous
+g_bootshop_img_boots	-	AMBIGUOUS	TImage[]	1	no alignment forced it (1 bodies)
+g_bootshop_pan_boots	-	AMBIGUOUS	TPanel	1	no alignment forced it (1 bodies)
+g_bootshop_pan_nav	-	AMBIGUOUS	TPanel	1	no alignment forced it (1 bodies)
+g_bootshop_pan_title	-	AMBIGUOUS	TPanel	1	no alignment forced it (1 bodies)
+g_boss_img	0x00C6B288	CERTAIN	TImage	2	forced in 2 bodies, unanimous
+g_boss_list	0x00C6B284	STRONG	TList	1	forced in 1 body
+g_bossmessages	0x00C6B284	CERTAIN	TList	4	forced in 4 bodies, unanimous
+g_bossmsg_list	0x00C6B284	CERTAIN	TList	2	forced in 2 bodies, unanimous
+g_bossmsgs	0x00C6B284	CERTAIN	TList	1	forced, agrees with verified pair
+g_btn_accept	0x00C67B80	STRONG	TButton	1	forced in 1 body
+g_btn_achievements	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_btn_back	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_btn_boots	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_btn_booze	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_btn_competitions	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_btn_contract	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_btn_drugs	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_btn_finances	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_btn_group	0x00C66420	STRONG	TButton	2	forced in 1 body
+g_btn_happiness	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_btn_help	-	AMBIGUOUS	TButton	2	no alignment forced it (2 bodies)
+g_btn_home	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_btn_injury	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_btn_lifestyle	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_btn_main	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_btn_nrg	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_btn_options	-	AMBIGUOUS	TButton	2	no alignment forced it (2 bodies)
+g_btn_physioplay	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_btn_play	-	AMBIGUOUS	TButton	3	no alignment forced it (3 bodies)
+g_btn_quit	-	AMBIGUOUS	TButton	2	no alignment forced it (2 bodies)
+g_btn_relationships	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_btn_savemobile	0x00C64D20	STRONG	TButton	1	forced in 1 body
+g_btn_shinpads	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_btn_shop	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_btn_skills	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_btn_stats	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_btn_test	0x00C64D1C	CERTAIN	TButton	2	forced in 2 bodies, unanimous
+g_btn_training	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_btnaccept	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_btnkick4	0x00C5D1EC	CERTAIN	Int[]	1	forced, agrees with verified pair
+g_btnmore	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_btnreject	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_btns	-	AMBIGUOUS	TButton[]	2	no alignment forced it (2 bodies)
+g_btnwait	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_button_interview	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_calendar_prevname	-	AMBIGUOUS	String	1	no alignment forced it (1 bodies)
+g_calendar_screen	0x00C6E950	STRONG	TScreen	1	forced in 1 body
+g_calendar_table	0x00C65E34	STRONG	TTable	2	forced in 1 body
+g_calltime	0x00C6EFD4	STRONG	Int	1	forced in 1 body
+g_cam_offx	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_cam_offy	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_cam_targetx	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_cam_targety	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_cameraman_images	0x00C5DCAC	STRONG	TImage[]	1	forced in 1 body
+g_cameraman_imgs	0x00C5DCAC	STRONG	TImage[]	1	forced in 1 body
+g_cameraman_int01	0x00C5DCB4	STRONG	Int	1	forced in 1 body
+g_cameraman_int02	0x00C5DCB0	STRONG	Int	1	forced in 1 body
+g_cameraman_int03	0x00C5DCBC	STRONG	Int	1	forced in 1 body
+g_cameraman_int04	0x00C5DCB8	STRONG	Int	1	forced in 1 body
+g_cameraman_list	0x00C5DCA0	STRONG	TList	1	forced in 1 body
+g_cameramen	0x00C5DCA0	CERTAIN	TList	5	forced in 4 bodies, unanimous
+g_camerax1	0x00C5DCB0	STRONG	Int	1	forced in 1 body
+g_camerax2	0x00C5DCB8	STRONG	Int	1	forced in 1 body
+g_cameray1	0x00C5DCB4	STRONG	Int	1	forced in 1 body
+g_cameray2	0x00C5DCBC	STRONG	Int	1	forced in 1 body
+g_campan_ratex	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_campan_ratey	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_campan_ratezoom2	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_campan_ratezoomdefault	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_camsubmode	0x00C5B1FC	STRONG	Int	1	forced in 1 body
+g_camtype	0x00C5D24C	STRONG	Int	1	forced in 1 body
+g_camx	0x00C5B1D8	STRONG	Float	2	forced in 1 body
+g_camy	0x00C5B1DC	STRONG	Float	2	forced in 1 body
+g_camz	0x00C5B1D4	STRONG	Float	2	forced in 1 body
+g_captaincy_level	0x00C5D228	STRONG	Int	1	forced in 1 body
+g_card_img	0x00C6C34C	STRONG	TImage	1	forced in 1 body
+g_card_int01	0x00C6C354	CERTAIN	Int	2	forced in 2 bodies, unanimous
+g_card_list	0x00C6C350	STRONG	TList	1	forced in 1 body
+g_card_num	0x00C6C354	STRONG	Int	1	forced in 1 body
+g_cardback	0x00C6C34C	STRONG	TImage	1	forced in 1 body
+g_cards	-	AMBIGUOUS	TList	2	bodies disagree: 00c6c16c:1 00c6c350:1
+g_casino_chipimages	0x00C6B840	CERTAIN	TImage[]	2	forced in 2 bodies, unanimous
+g_casino_imgblackjack	0x00C6B844	STRONG	TImage	1	forced in 1 body
+g_casino_imgroulette	0x00C6B848	STRONG	TImage	1	forced in 1 body
+g_casino_imgslots	0x00C6B84C	STRONG	TImage	1	forced in 1 body
+g_casino_panel	0x00C6B858	CERTAIN	TPanel	3	forced in 2 bodies, unanimous
+g_casino_pantitle	0x00C6B854	STRONG	TPanel	1	forced in 1 body
+g_casino_screen	0x00C6B830	STRONG	TScreen	1	forced in 1 body
+g_casino_snderror	0x00C6B850	STRONG	TSound	1	forced in 1 body
+g_casino_stake100	0x00C6B864	CERTAIN	TButton	2	forced in 2 bodies, unanimous
+g_casino_stake1000	0x00C6B870	CERTAIN	TButton	2	forced in 2 bodies, unanimous
+g_casino_stake250	0x00C6B868	CERTAIN	TButton	2	forced in 2 bodies, unanimous
+g_casino_stake2500	0x00C6B874	CERTAIN	TButton	2	forced in 2 bodies, unanimous
+g_casino_stake50	-	AMBIGUOUS	TButton	2	bodies disagree: 00c6e91c:1 00c6b860:1
+g_casino_stake500	0x00C6B86C	CERTAIN	TButton	2	forced in 2 bodies, unanimous
+g_casino_stake5000	0x00C6B878	CERTAIN	TButton	2	forced in 2 bodies, unanimous
+g_cc_btn_editclub	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_cc_btn_editcomp	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_cc_btn_editplace	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_cc_btn_gotoclubs	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_cc_btn_removeclub	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_cc_combo	0x00C65A40	CERTAIN	TCombo	3	forced in 2 bodies, unanimous
+g_cc_combocomp	0x00C65A2C	STRONG	TCombo	2	forced in 1 body
+g_cc_combocontinent	-	AMBIGUOUS	TCombo	3	bodies disagree: 00c65a20:1 00c65a28:1
+g_cc_comp	0x00C65A24	CERTAIN	TCompetition	3	forced in 3 bodies, unanimous
+g_cc_continent	-	AMBIGUOUS	TContinent	2	bodies disagree: 00c65a28:1 00c65a20:1
+g_cc_table	-	AMBIGUOUS	TTable	4	bodies disagree: 00c65a4c:2 00c65a48:1
+g_cc_tableclubs	0x00C65A4C	STRONG	TTable	1	forced in 1 body
+g_cc_tableplaces	0x00C65A48	STRONG	TTable	2	forced in 1 body
+g_cccombo	-	AMBIGUOUS	TCombo	1	no alignment forced it (1 bodies)
+g_cccomboa	-	AMBIGUOUS	TCombo	1	no alignment forced it (1 bodies)
+g_cccomp	-	AMBIGUOUS	TCompetition	1	no alignment forced it (1 bodies)
+g_ccomps_table	0x00C65A48	STRONG	TTable	1	forced in 1 body
+g_ch1	-	AMBIGUOUS	TChannel	1	no alignment forced it (1 bodies)
+g_ch2	-	AMBIGUOUS	TChannel	1	no alignment forced it (1 bodies)
+g_ch3	-	AMBIGUOUS	TChannel	1	no alignment forced it (1 bodies)
+g_chan	0x00C6F090	CERTAIN	TChannel	3	forced in 2 bodies, unanimous
+g_chan_a	0x00C5B340	STRONG	TChannel	1	forced in 1 body
+g_chan_alert	-	AMBIGUOUS	TChannel	1	no alignment forced it (1 bodies)
+g_chan_alert2	-	AMBIGUOUS	TChannel	1	no alignment forced it (1 bodies)
+g_chan_b	0x00C5B344	STRONG	TChannel	1	forced in 1 body
+g_chan_bet	-	AMBIGUOUS	TChannel	3	bodies disagree: 00c6bbcc:1 00c6f090:1
+g_chan_c	0x00C5B348	STRONG	TChannel	1	forced in 1 body
+g_chan_crowd	-	AMBIGUOUS	TChannel	2	no alignment forced it (2 bodies)
+g_chan_d	0x00C5B33C	STRONG	TChannel	1	forced in 1 body
+g_chan_e	0x00C600D4	STRONG	TChannel	1	forced in 1 body
+g_chan_kick	-	AMBIGUOUS	TChannel	1	no alignment forced it (1 bodies)
+g_chan_negotiate	-	AMBIGUOUS	TChannel	2	no alignment forced it (2 bodies)
+g_chan_news	0x00C6F090	STRONG	TChannel	1	forced in 1 body
+g_chan_race	0x00C6DF1C	STRONG	TChannel	1	forced in 1 body
+g_chan_slide	0x00C5DF2C	STRONG	TChannel	1	forced in 1 body
+g_chan_star	0x00C6F090	STRONG	TChannel	1	forced in 1 body
+g_chan_training	0x00C6F090	STRONG	TChannel	1	forced in 1 body
+g_chan_ui	-	AMBIGUOUS	TChannel	1	no alignment forced it (1 bodies)
+g_chan_whistle	-	AMBIGUOUS	TChannel	4	no alignment forced it (4 bodies)
+g_chanclick	0x00C6F088	CERTAIN	TChannel	4	forced in 2 bodies, unanimous
+g_chanfall	0x00C5DF30	STRONG	TChannel	1	forced in 1 body
+g_channel	0x00C6F090	CERTAIN	TChannel	6	forced in 5 bodies, unanimous
+g_channel_sfx	0x00C5B344	STRONG	TChannel	2	forced in 1 body
+g_chn1	0x00C5B33C	STRONG	TChannel	2	forced in 1 body
+g_chn2	0x00C5B340	STRONG	TChannel	2	forced in 1 body
+g_chn3	0x00C5B344	STRONG	TChannel	2	forced in 1 body
+g_chn4	0x00C5B348	STRONG	TChannel	2	forced in 1 body
+g_chn5	0x00C600D4	STRONG	TChannel	1	forced in 1 body
+g_chn_extra	-	AMBIGUOUS	brl.audio.TChannel	1	no alignment forced it (1 bodies)
+g_chncone	0x00C5B344	STRONG	TChannel	1	forced in 1 body
+g_clearradius	0x00C5DE74	STRONG	Int	1	forced in 1 body
+g_club_int01	0x00C59A48	STRONG	Int	1	forced in 1 body
+g_club_int07	0x00C6EF74	CERTAIN	Int	2	forced in 2 bodies, unanimous
+g_club_sortby	0x00C59A48	CERTAIN	Int	3	forced in 2 bodies, unanimous
+g_club_sortmode	0x00C59A48	CERTAIN	Int	3	forced in 3 bodies, unanimous
+g_clublist	0x00C59A44	CERTAIN	TList	3	forced in 3 bodies, unanimous
+g_clubs	0x00C59A44	STRONG	TList	29	27/28 bodies agree
+g_clubs_btnnames	0x00C65248	STRONG	TButton	2	forced in 1 body
+g_clubs_comboa	0x00C65234	STRONG	TCombo	1	forced in 1 body
+g_clubs_combob	0x00C65238	STRONG	TCombo	1	forced in 1 body
+g_clubs_combobased	-	AMBIGUOUS	TCombo	4	bodies disagree: 00c65238:2 00c59a44:1
+g_clubs_combocomp	-	AMBIGUOUS	TCombo	3	bodies disagree: 00c6523c:1 00c65238:1
+g_clubs_combolocale	0x00C65234	CERTAIN	TCombo	4	forced in 3 bodies, unanimous
+g_clubs_screen	-	AMBIGUOUS	TScreen	1	no alignment forced it (1 bodies)
+g_clubs_shownames	0x00C6524C	STRONG	Int	1	forced in 1 body
+g_clubs_table	0x00C65240	CERTAIN	TTable	3	forced in 2 bodies, unanimous
+g_clubs_title	0x00C65244	STRONG	TButton	2	forced in 1 body
+g_clubtable	0x00C65240	STRONG	TTable	1	forced in 1 body
+g_cmb1	0x00C67DA0	CERTAIN	TCombo	2	forced, agrees with verified pair
+g_cmb3	0x00C67DA8	STRONG	TCombo	2	forced in 1 body
+g_cmbgroups	0x00C671E4	CERTAIN	TCombo	2	forced in 2 bodies, unanimous
+g_cmbnation	0x00C6503C	CERTAIN	TCombo	3	forced in 2 bodies, unanimous
+g_co_btn537	-	AMBIGUOUS	TButton	2	no alignment forced it (2 bodies)
+g_co_btn548	0x00C67B4C	STRONG	TButton	3	forced in 1 body
+g_co_btn549	-	AMBIGUOUS	TButton	2	no alignment forced it (2 bodies)
+g_co_btn561	-	AMBIGUOUS	TButton	2	no alignment forced it (2 bodies)
+g_co_fn1	-	AMBIGUOUS	Int	2	no alignment forced it (2 bodies)
+g_co_fn2	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_co_g1	0x00C67B24	STRONG	TGadget	1	forced in 1 body
+g_co_g2	0x00C67B54	STRONG	TGadget	1	forced in 1 body
+g_co_lbl539	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_co_lbl540	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_co_lbl541	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_co_lbl543	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_co_lbl544	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_co_lbl545	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_co_lbl546	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_co_lbl547	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_co_lbl551	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_co_lbl552	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_co_lbl553	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_co_lbl555	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_co_lbl556	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_co_lbl557	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_co_lbl558	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_co_lbl559	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_co_lbl560	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_co_offer	-	AMBIGUOUS	TContractOffer	1	no alignment forced it (1 bodies)
+g_co_pan536	-	AMBIGUOUS	TPanel	1	no alignment forced it (1 bodies)
+g_co_pan538	0x00C67B24	STRONG	TPanel	2	forced in 1 body
+g_co_pan550	-	AMBIGUOUS	TPanel	1	no alignment forced it (1 bodies)
+g_co_panela	0x00C67B24	CERTAIN	TPanel	2	forced in 2 bodies, unanimous
+g_co_panelb	0x00C67B54	CERTAIN	TPanel	2	forced in 2 bodies, unanimous
+g_co_prg542	-	AMBIGUOUS	TProgressBar	1	no alignment forced it (1 bodies)
+g_co_prg554	-	AMBIGUOUS	TProgressBar	1	no alignment forced it (1 bodies)
+g_co_screen	-	AMBIGUOUS	TScreen	2	no alignment forced it (2 bodies)
+g_co_snd	-	AMBIGUOUS	TSound	2	no alignment forced it (2 bodies)
+g_col_highlight	0x00C6E91C	CERTAIN	String	4	forced in 3 bodies, unanimous
+g_col_key	0x00C6E91C	CERTAIN	String	2	forced in 2 bodies, unanimous
+g_colour_disabled	0x00C6E91C	STRONG	String	1	forced in 1 body
+g_colour_sel	-	AMBIGUOUS	String	2	bodies disagree: 00c6b860:1 00c6e91c:1
+g_colourselected	-	AMBIGUOUS	String	1	no alignment forced it (1 bodies)
+g_combo1	0x00C671E0	STRONG	TCombo	1	forced in 1 body
+g_combo2	0x00C671E4	STRONG	TCombo	1	forced in 1 body
+g_combo3	0x00C671E8	STRONG	TCombo	1	forced in 1 body
+g_combo_arrow	0x00C62D9C	CERTAIN	TImage	1	forced, agrees with verified pair
+g_combo_based	0x00C6644C	STRONG	TCombo	2	forced in 1 body
+g_combo_club	-	AMBIGUOUS	TCombo	5	bodies disagree: 00c66f3c:2 00c67da8:1 00c679c8:1
+g_combo_competition	0x00C671E8	CERTAIN	TCombo	3	forced in 2 bodies, unanimous
+g_combo_continent	-	AMBIGUOUS	TCombo	4	bodies disagree: 00c671e0:1 00c66f30:1 00c67da0:1
+g_combo_div	0x00C67DAC	STRONG	TCombo	1	forced in 1 body
+g_combo_group	0x00C671E4	CERTAIN	TCombo	2	forced in 2 bodies, unanimous
+g_combo_hair	0x00C64240	CERTAIN	TCombo	1	forced, agrees with verified pair
+g_combo_img1	0x00C61D00	STRONG	TImage	1	forced in 1 body
+g_combo_img2	0x00C61D04	STRONG	TImage	1	forced in 1 body
+g_combo_int03	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_combo_league	-	AMBIGUOUS	TCombo	3	bodies disagree: 00c66f5c:1 00c66f38:1
+g_combo_level	-	AMBIGUOUS	TCombo	3	bodies disagree: 00c679d8:1 00c66444:1
+g_combo_locale	0x00C66448	STRONG	TCombo	2	forced in 1 body
+g_combo_nation	-	AMBIGUOUS	TCombo	3	bodies disagree: 00c66f34:1 00c67da4:1
+g_combo_year	0x00C679CC	STRONG	TCombo	1	forced in 1 body
+g_comboa	0x00C66444	STRONG	TCombo	1	forced in 1 body
+g_combob	0x00C66448	STRONG	TCombo	1	forced in 1 body
+g_comboimg	0x00C62D9C	CERTAIN	TImage	1	forced, agrees with verified pair
+g_combolocale	0x00C6644C	STRONG	TCombo	1	forced in 1 body
+g_comboskin	0x00C6423C	CERTAIN	TCombo	1	forced, agrees with verified pair
+g_comp	0x00C67220	CERTAIN	TCompetition	4	forced in 3 bodies, unanimous
+g_comp_combo1	0x00C65578	CERTAIN	TCombo	4	forced in 4 bodies, unanimous
+g_comp_combo2	0x00C6557C	CERTAIN	TCombo	4	forced in 4 bodies, unanimous
+g_comp_combo3	0x00C65580	CERTAIN	TCombo	3	forced in 3 bodies, unanimous
+g_comp_combo4	0x00C65584	CERTAIN	TCombo	2	forced in 2 bodies, unanimous
+g_competition_int10	0x00C609A0	STRONG	Int	1	forced in 1 body
+g_competitions	0x00C6099C	CERTAIN	TList	29	forced in 28 bodies, unanimous
+g_complist	0x00C6099C	CERTAIN	TList	7	forced in 7 bodies, unanimous
+g_comps	0x00C6099C	CERTAIN	TList	7	forced in 7 bodies, unanimous
+g_compsortby	0x00C609A0	STRONG	Int	1	forced in 1 body
+g_comptable	0x00C65588	CERTAIN	TTable	3	forced in 3 bodies, unanimous
+g_coneimg	0x00C6D6C0	STRONG	TImage	1	forced in 1 body
+g_cones	0x00C6D568	CERTAIN	TList	1	forced, agrees with verified pair
+g_conesnd	0x00C6D6C4	STRONG	TSound	1	forced in 1 body
+g_conesplitsound	0x00C6DAF8	STRONG	TSound	1	forced in 1 body
+g_cont_combo	0x00C671E4	CERTAIN	TCombo	2	forced in 2 bodies, unanimous
+g_cont_comp	0x00C67220	CERTAIN	TCompetition	3	forced in 3 bodies, unanimous
+g_cont_fixid	0x00C67208	STRONG	Int	1	forced in 1 body
+g_cont_grp	0x00C671EC	STRONG	Int	1	forced in 1 body
+g_cont_selected	0x00C671EC	STRONG	Int	1	forced in 1 body
+g_cont_selfix	0x00C67208	STRONG	Int	1	forced in 1 body
+g_contid	0x00C67208	CERTAIN	Int	3	forced in 2 bodies, unanimous
+g_continents	0x00C6080C	STRONG	TList	14	12/13 bodies agree
+g_continents_btnfixturesfirst	0x00C6720C	STRONG	TButton	3	forced in 1 body
+g_continents_btnfixtureslast	0x00C6721C	STRONG	TButton	3	forced in 1 body
+g_continents_btnfixturesleft	0x00C67210	STRONG	TButton	3	forced in 1 body
+g_continents_btnfixturesright	0x00C67218	STRONG	TButton	3	forced in 1 body
+g_continents_btngroup	0x00C671F8	STRONG	TButton	2	forced in 1 body
+g_continents_btngroupsfirst	0x00C671F0	STRONG	TButton	2	forced in 1 body
+g_continents_btngroupslast	0x00C67200	STRONG	TButton	2	forced in 1 body
+g_continents_btngroupsleft	0x00C671F4	STRONG	TButton	2	forced in 1 body
+g_continents_btngroupsright	0x00C671FC	STRONG	TButton	2	forced in 1 body
+g_continents_btnlevel	0x00C671DC	STRONG	TButton	2	forced in 1 body
+g_continents_btnround	0x00C67214	STRONG	TButton	3	forced in 1 body
+g_continents_cmbcompetition	0x00C671E4	STRONG	TCombo	2	forced in 1 body
+g_continents_cmbcontinent	0x00C671E0	STRONG	TCombo	2	forced in 1 body
+g_continents_cmbteam	0x00C671E8	CERTAIN	TCombo	3	forced in 2 bodies, unanimous
+g_continents_combo	0x00C671E8	CERTAIN	TCombo	2	forced, agrees with verified pair
+g_continents_comp	0x00C67220	CERTAIN	TCompetition	5	forced in 4 bodies, unanimous
+g_continents_competition	0x00C67220	CERTAIN	TCompetition	2	forced in 2 bodies, unanimous
+g_continents_compid	0x00C67204	STRONG	Int	1	forced in 1 body
+g_continents_fixmode	0x00C67204	STRONG	Int	1	forced in 1 body
+g_continents_int03	0x00C671EC	CERTAIN	Int	2	forced in 2 bodies, unanimous
+g_continents_int04	0x00C67204	STRONG	Int	1	forced in 1 body
+g_continents_int05	0x00C67208	CERTAIN	Int	2	forced in 2 bodies, unanimous
+g_continents_level	0x00C67224	STRONG	Int	2	forced in 1 body
+g_continents_mode	0x00C67224	CERTAIN	Int	4	forced in 4 bodies, unanimous
+g_continents_panfixtures	0x00C671D0	CERTAIN	TPanel	4	forced in 2 bodies, unanimous
+g_continents_pantable	0x00C671C8	STRONG	TPanel	2	forced in 1 body
+g_continents_screen	-	AMBIGUOUS	TScreen	1	no alignment forced it (1 bodies)
+g_continents_selrow	0x00C671EC	STRONG	Int	1	forced in 1 body
+g_continents_sortmode	0x00C59310	STRONG	Int	1	forced in 1 body
+g_continents_table1	-	AMBIGUOUS	TTable	1	no alignment forced it (1 bodies)
+g_continents_table2	-	AMBIGUOUS	TTable	1	no alignment forced it (1 bodies)
+g_continents_table3	-	AMBIGUOUS	TTable	1	no alignment forced it (1 bodies)
+g_continents_tblfixturesclub	-	AMBIGUOUS	TTable	2	no alignment forced it (2 bodies)
+g_continents_tblfixturesleague	-	AMBIGUOUS	TTable	2	no alignment forced it (2 bodies)
+g_continents_tbltable	-	AMBIGUOUS	TTable	1	no alignment forced it (1 bodies)
+g_contractoffer	0x00C6CC3C	STRONG	TContractOffer	3	forced in 1 body
+g_contractoffers	0x00C6B428	CERTAIN	TList	6	forced in 6 bodies, unanimous
+g_credits	0x00C63990	STRONG	String[]	1	forced in 1 body
+g_crossbar	0x00C5D644	STRONG	Int	1	forced in 1 body
+g_crosszone_x	0x00C5D64C	STRONG	Int	1	forced in 1 body
+g_crosszone_y	0x00C5D650	STRONG	Int	1	forced in 1 body
+g_crowd_oohchannel	0x00C5B348	STRONG	TChannel	2	forced in 1 body
+g_crowd_oohsound	-	AMBIGUOUS	TSound	1	no alignment forced it (1 bodies)
+g_ctl	0x00C5D1E4	STRONG	Int[]	1	forced in 1 body
+g_ctrl_down	0x00C5D1BC	STRONG	Int[]	1	forced in 1 body
+g_ctrl_pause	0x00C5D1F4	STRONG	Int[]	1	forced in 1 body
+g_ctrl_player	0x00C5D1A8	CERTAIN	Int	3	forced in 3 bodies, unanimous
+g_ctrl_right	0x00C5D1CC	STRONG	Int[]	1	forced in 1 body
+g_ctrlleft	-	AMBIGUOUS	Int[]	2	no alignment forced it (2 bodies)
+g_ctrlright	-	AMBIGUOUS	Int[]	2	no alignment forced it (2 bodies)
+g_ctrlset	0x00C5D1A8	STRONG	Int	1	forced in 1 body
+g_ctrlstate	0x00C5D1A8	STRONG	Int	1	forced in 1 body
+g_curcomp	-	AMBIGUOUS	TCompetition	5	bodies disagree: 00c65720:3 00c67220:2
+g_curnat	0x00C65034	CERTAIN	TNation	2	forced in 2 bodies, unanimous
+g_curnation	0x00C65034	STRONG	TNation	1	forced in 1 body
+g_currency	0x00C5D274	CERTAIN	Int	1	forced, agrees with verified pair
+g_currenttrack	-	UNGROUNDED	Int	0	in no body pairable with an original
+g_curscreen	0x00C61700	CERTAIN	TScreen	19	forced in 9 bodies, unanimous
+g_curscreenname	0x00C63CEC	CERTAIN	String	1	forced, agrees with verified pair
+g_datadir	-	UNGROUNDED	String	0	in no body pairable with an original
+g_datapath	0x00C6E950	STRONG	String	23	16/18 bodies agree
+g_deck	0x00C6C350	STRONG	TList	1	forced in 1 body
+g_defaultanim	0x00C5DEAC	CERTAIN	Int[]	1	forced, agrees with verified pair
+g_defaultbg	0x00C61714	STRONG	TImage	2	forced in 1 body
+g_difficulty	0x00C5D228	CERTAIN	Int	5	forced in 5 bodies, unanimous
+g_diffname	0x00C64504	STRONG	String	1	forced in 1 body
+g_dil_btn1	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_dil_btn2	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_dil_choice1	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_dil_choice2	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_dil_img1	0x00C68064	STRONG	TImage	2	forced in 1 body
+g_dil_img2	0x00C68068	STRONG	TImage	2	forced in 1 body
+g_dil_prg1	-	AMBIGUOUS	TProgressBar	1	no alignment forced it (1 bodies)
+g_dil_prg2	-	AMBIGUOUS	TProgressBar	1	no alignment forced it (1 bodies)
+g_dilemma_a	0x00C6805C	STRONG	Int	1	forced in 1 body
+g_dilemma_b	0x00C68060	STRONG	Int	1	forced in 1 body
+g_dilemma_btn1	0x00C68054	STRONG	TButton	1	forced in 1 body
+g_dilemma_btn2	0x00C68058	STRONG	TButton	1	forced in 1 body
+g_dilemma_img_boss	0x00C6806C	STRONG	TImage	1	forced in 1 body
+g_dilemma_img_bowling	0x00C68078	STRONG	TImage	1	forced in 1 body
+g_dilemma_img_cinema	0x00C68080	STRONG	TImage	1	forced in 1 body
+g_dilemma_img_fans	0x00C68074	STRONG	TImage	1	forced in 1 body
+g_dilemma_img_golf	0x00C6807C	STRONG	TImage	1	forced in 1 body
+g_dilemma_img_pub	0x00C68084	STRONG	TImage	1	forced in 1 body
+g_dilemma_img_restaurant	0x00C68088	STRONG	TImage	1	forced in 1 body
+g_dilemma_img_shopping	0x00C6808C	STRONG	TImage	1	forced in 1 body
+g_dilemma_img_sponsors	0x00C68090	STRONG	TImage	1	forced in 1 body
+g_dilemma_img_training	0x00C68070	STRONG	TImage	1	forced in 1 body
+g_dilemma_o1	0x00C68064	STRONG	Object	1	forced in 1 body
+g_dilemma_o2	0x00C68068	STRONG	Object	1	forced in 1 body
+g_dilemma_prg1	0x00C6804C	STRONG	TProgressBar	1	forced in 1 body
+g_dilemma_prg2	0x00C68050	STRONG	TProgressBar	1	forced in 1 body
+g_dpb_lbltip	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_drawobs	0x00C5AF6C	CERTAIN	TList	4	forced in 4 bodies, unanimous
+g_drawscale	0x00C5DE44	STRONG	Float	2	forced in 1 body
+g_dugoutimg	0x00C5D5E4	STRONG	TImage	2	forced in 1 body
+g_dugouty	0x00C5D674	STRONG	Int	1	forced in 1 body
+g_dummies	0x00C6D568	CERTAIN	TList	3	forced in 3 bodies, unanimous
+g_dummy_img	0x00C6D7C0	STRONG	TImage	1	forced in 1 body
+g_dummy_snd	0x00C6D7C4	STRONG	TSound	1	forced in 1 body
+g_ec_btn_go	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_ec_btn_id	0x00C64ED0	STRONG	TButton	2	forced in 1 body
+g_ec_btn_nations	0x00C64EF0	STRONG	TButton	2	forced in 1 body
+g_ec_btn_next	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_ec_btn_prev	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_ec_club	-	AMBIGUOUS	TClub	1	no alignment forced it (1 bodies)
+g_ec_cmb_bteam	-	AMBIGUOUS	TCombo	1	no alignment forced it (1 bodies)
+g_ec_cmb_contcomp	-	AMBIGUOUS	TCombo	1	no alignment forced it (1 bodies)
+g_ec_cmb_league	-	AMBIGUOUS	TCombo	1	no alignment forced it (1 bodies)
+g_ec_cmb_nation	-	AMBIGUOUS	TCombo	1	no alignment forced it (1 bodies)
+g_ec_cmb_rival1	-	AMBIGUOUS	TCombo	1	no alignment forced it (1 bodies)
+g_ec_cmb_rival2	-	AMBIGUOUS	TCombo	1	no alignment forced it (1 bodies)
+g_ec_cmb_rival3	-	AMBIGUOUS	TCombo	1	no alignment forced it (1 bodies)
+g_ec_comp	0x00C65720	STRONG	TCompetition	1	forced in 1 body
+g_ec_compbox	0x00C65788	STRONG	TInputBox	1	forced in 1 body
+g_ec_continent	0x00C64EC4	STRONG	TContinent	1	forced in 1 body
+g_ec_details	-	AMBIGUOUS	TTable	1	no alignment forced it (1 bodies)
+g_ec_ib_capacity	-	AMBIGUOUS	TInputBox	1	no alignment forced it (1 bodies)
+g_ec_ib_continentality	0x00C64EE0	STRONG	TInputBox	2	forced in 1 body
+g_ec_ib_fedname	0x00C64EE4	STRONG	TInputBox	2	forced in 1 body
+g_ec_ib_fedshort	0x00C64EE8	STRONG	TInputBox	2	forced in 1 body
+g_ec_ib_lat	-	AMBIGUOUS	TInputBox	1	no alignment forced it (1 bodies)
+g_ec_ib_long	-	AMBIGUOUS	TInputBox	1	no alignment forced it (1 bodies)
+g_ec_ib_name	0x00C64ED8	STRONG	TInputBox	3	forced in 1 body
+g_ec_ib_nick	-	AMBIGUOUS	TInputBox	1	no alignment forced it (1 bodies)
+g_ec_ib_short	-	AMBIGUOUS	TInputBox	1	no alignment forced it (1 bodies)
+g_ec_ib_stadium	-	AMBIGUOUS	TInputBox	1	no alignment forced it (1 bodies)
+g_ec_ib_strength	0x00C64EEC	STRONG	TInputBox	3	forced in 1 body
+g_ec_ib_tla	0x00C64EDC	STRONG	TInputBox	3	forced in 1 body
+g_ec_placebox	0x00C65784	STRONG	TInputBox	1	forced in 1 body
+g_ec_screen	-	AMBIGUOUS	TScreen	1	no alignment forced it (1 bodies)
+g_ec_table	0x00C64EF4	CERTAIN	TTable	3	forced in 2 bodies, unanimous
+g_editclub	0x00C653C4	CERTAIN	TClub	2	forced in 2 bodies, unanimous
+g_editclubs_btn1	0x00C6541C	STRONG	TButton	2	forced in 1 body
+g_editclubs_btn2	0x00C65420	STRONG	TButton	2	forced in 1 body
+g_editclubs_btn3	0x00C65424	STRONG	TButton	2	forced in 1 body
+g_editclubs_btn4	0x00C65428	STRONG	TButton	2	forced in 1 body
+g_editclubs_btnid	0x00C653D0	STRONG	TButton	2	forced in 1 body
+g_editclubs_btnnext	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_editclubs_btnprev	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_editclubs_caller	0x00C653C0	CERTAIN	String	2	forced in 2 bodies, unanimous
+g_editclubs_club	-	AMBIGUOUS	TClub	3	bodies disagree: 00c653c4:2 00c6542c:1
+g_editclubs_cmbbteamof	0x00C65404	STRONG	TCombo	2	forced in 1 body
+g_editclubs_cmbcontinentalcomp	0x00C65400	STRONG	TCombo	2	forced in 1 body
+g_editclubs_cmbleague	0x00C653FC	STRONG	TCombo	2	forced in 1 body
+g_editclubs_cmbnation	0x00C653EC	STRONG	TCombo	2	forced in 1 body
+g_editclubs_cmbrival1	0x00C653F0	STRONG	TCombo	2	forced in 1 body
+g_editclubs_cmbrival2	0x00C653F4	STRONG	TCombo	2	forced in 1 body
+g_editclubs_cmbrival3	0x00C653F8	STRONG	TCombo	2	forced in 1 body
+g_editclubs_ibname	0x00C653D8	STRONG	TInputBox	2	forced in 1 body
+g_editclubs_ibnickname	0x00C653E4	STRONG	TInputBox	2	forced in 1 body
+g_editclubs_ibshortname	0x00C653DC	STRONG	TInputBox	2	forced in 1 body
+g_editclubs_ibstadiumcapacity	0x00C6540C	STRONG	TInputBox	2	forced in 1 body
+g_editclubs_ibstadiumlat	0x00C65414	STRONG	TInputBox	2	forced in 1 body
+g_editclubs_ibstadiumlong	0x00C65410	STRONG	TInputBox	2	forced in 1 body
+g_editclubs_ibstadiumname	0x00C65408	STRONG	TInputBox	2	forced in 1 body
+g_editclubs_ibstrength	0x00C653E8	STRONG	TInputBox	2	forced in 1 body
+g_editclubs_ibtla	0x00C653E0	STRONG	TInputBox	2	forced in 1 body
+g_editclubs_kit1	0x00C653C4	STRONG	TKit	1	forced in 1 body
+g_editclubs_kit2	0x00C65430	STRONG	TKit	1	forced in 1 body
+g_editclubs_kit3	0x00C65434	STRONG	TKit	1	forced in 1 body
+g_editclubs_kit4	0x00C65438	STRONG	TKit	1	forced in 1 body
+g_editclubs_screen	-	AMBIGUOUS	TScreen	1	no alignment forced it (1 bodies)
+g_editclubs_table	-	AMBIGUOUS	TTable	1	no alignment forced it (1 bodies)
+g_editcomp_btndelpromplace	0x00C65790	STRONG	TButton	1	forced in 1 body
+g_editcomp_btnidl	0x00C65728	STRONG	TButton	1	forced in 1 body
+g_editcomp_btnidr	0x00C65730	STRONG	TButton	1	forced in 1 body
+g_editcomp_btnnewpromplace	0x00C6578C	STRONG	TButton	1	forced in 1 body
+g_editcomp_btnnoofteams	0x00C65778	CERTAIN	TButton	2	forced in 2 bodies, unanimous
+g_editcomp_cmbbased	0x00C65744	CERTAIN	TCombo	3	forced in 3 bodies, unanimous
+g_editcomp_cmbcomptype	0x00C65748	CERTAIN	TCombo	3	forced in 3 bodies, unanimous
+g_editcomp_cmblegs	0x00C6576C	CERTAIN	TCombo	3	forced in 3 bodies, unanimous
+g_editcomp_cmblevel	0x00C6573C	CERTAIN	TCombo	3	forced in 3 bodies, unanimous
+g_editcomp_cmblocale	0x00C65740	CERTAIN	TCombo	3	forced in 3 bodies, unanimous
+g_editcomp_cmbmatchday1	0x00C6575C	CERTAIN	TCombo	3	forced in 3 bodies, unanimous
+g_editcomp_cmbmatchday2	0x00C65760	CERTAIN	TCombo	3	forced in 3 bodies, unanimous
+g_editcomp_cmbrecurring	0x00C65750	CERTAIN	TCombo	3	forced in 3 bodies, unanimous
+g_editcomp_cmbregion	0x00C65770	CERTAIN	TCombo	3	forced in 3 bodies, unanimous
+g_editcomp_cmbstartyear	0x00C6574C	CERTAIN	TCombo	3	forced in 3 bodies, unanimous
+g_editcomp_cmbstatus	0x00C65774	CERTAIN	TCombo	3	forced in 3 bodies, unanimous
+g_editcomp_comp	0x00C65720	STRONG	TCompetition	1	forced in 1 body
+g_editcomp_from	0x00C6571C	CERTAIN	String	2	forced in 2 bodies, unanimous
+g_editcomp_inpduration	0x00C65758	CERTAIN	TInputBox	3	forced in 3 bodies, unanimous
+g_editcomp_inpgroups	0x00C65764	CERTAIN	TInputBox	3	forced in 3 bodies, unanimous
+g_editcomp_inpid	0x00C6572C	CERTAIN	TInputBox	3	forced in 3 bodies, unanimous
+g_editcomp_inpname	0x00C65734	CERTAIN	TInputBox	3	forced in 3 bodies, unanimous
+g_editcomp_inpnewpromcomp	0x00C65788	STRONG	TInputBox	1	forced in 1 body
+g_editcomp_inpnewpromplace	0x00C65784	CERTAIN	TInputBox	2	forced in 2 bodies, unanimous
+g_editcomp_inprounds	0x00C65768	CERTAIN	TInputBox	3	forced in 3 bodies, unanimous
+g_editcomp_inpstartweek	0x00C65754	CERTAIN	TInputBox	3	forced in 3 bodies, unanimous
+g_editcomp_inptla	0x00C65738	CERTAIN	TInputBox	3	forced in 3 bodies, unanimous
+g_editcomp_table	0x00C6577C	STRONG	TTable	1	forced in 1 body
+g_editcomp_tbldetails	0x00C65724	STRONG	TTable	1	forced in 1 body
+g_editcomp_tblpromfromcomps	0x00C65780	CERTAIN	TTable	2	forced in 2 bodies, unanimous
+g_editcomp_tblpromplaces	0x00C6577C	CERTAIN	TTable	2	forced in 2 bodies, unanimous
+g_editcont_cont	-	AMBIGUOUS	TContinent	1	no alignment forced it (1 bodies)
+g_editcont_in1	-	AMBIGUOUS	TInputBox	1	no alignment forced it (1 bodies)
+g_editcont_in2	-	AMBIGUOUS	TInputBox	1	no alignment forced it (1 bodies)
+g_editcont_in3	-	AMBIGUOUS	TInputBox	1	no alignment forced it (1 bodies)
+g_editcont_in4	-	AMBIGUOUS	TInputBox	1	no alignment forced it (1 bodies)
+g_editcont_in5	-	AMBIGUOUS	TInputBox	1	no alignment forced it (1 bodies)
+g_editcont_in6	-	AMBIGUOUS	TInputBox	1	no alignment forced it (1 bodies)
+g_editkits_btnkit	-	AMBIGUOUS	TButton[]	1	no alignment forced it (1 bodies)
+g_editkits_cmbkittype	-	AMBIGUOUS	TCombo[]	1	no alignment forced it (1 bodies)
+g_editkits_cmbshirt1	-	AMBIGUOUS	TCombo[]	1	no alignment forced it (1 bodies)
+g_editkits_cmbshirt2	-	AMBIGUOUS	TCombo[]	1	no alignment forced it (1 bodies)
+g_editkits_cmbshorts	-	AMBIGUOUS	TCombo[]	1	no alignment forced it (1 bodies)
+g_editkits_cmbsocks	-	AMBIGUOUS	TCombo[]	1	no alignment forced it (1 bodies)
+g_editkits_focus	0x00C61CF8	STRONG	TGadget	1	forced in 1 body
+g_editkits_inp_shirt1	0x00C65CE8	STRONG	TGadget[]	1	forced in 1 body
+g_editkits_inp_shirt2	0x00C65CF8	STRONG	TGadget[]	1	forced in 1 body
+g_editkits_inp_shorts	0x00C65D08	STRONG	TGadget[]	1	forced in 1 body
+g_editkits_inp_socks	0x00C65D18	STRONG	TGadget[]	1	forced in 1 body
+g_editkits_inpshirt1	-	AMBIGUOUS	TInputBox[]	1	no alignment forced it (1 bodies)
+g_editkits_inpshirt2	-	AMBIGUOUS	TInputBox[]	1	no alignment forced it (1 bodies)
+g_editkits_inpshorts	-	AMBIGUOUS	TInputBox[]	1	no alignment forced it (1 bodies)
+g_editkits_inpsocks	-	AMBIGUOUS	TInputBox[]	1	no alignment forced it (1 bodies)
+g_editkits_screen	0x00C65C6C	CERTAIN	TScreen	4	forced in 2 bodies, unanimous
+g_editkits_skin1	0x00C65C74	STRONG	Int	2	forced in 1 body
+g_editkits_skin2	0x00C65C78	STRONG	Int	2	forced in 1 body
+g_editkits_team	0x00C65C70	CERTAIN	TBase_Team	4	forced in 3 bodies, unanimous
+g_editmenu_btn	0x00C64D1C	STRONG	TButton	1	forced in 1 body
+g_editnat_btngo	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_editnat_btnid	0x00C65044	STRONG	TButton	2	forced in 1 body
+g_editnat_btnkit1	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_editnat_btnkit2	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_editnat_btnkit3	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_editnat_btnkit4	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_editnat_btnmembers	0x00C6508C	STRONG	TButton	2	forced in 1 body
+g_editnat_btnnext	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_editnat_btnprev	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_editnat_cmbclimate	0x00C65070	STRONG	TCombo	3	forced in 1 body
+g_editnat_cmbcontinent	0x00C65060	STRONG	TCombo	3	forced in 1 body
+g_editnat_cmbrival1	0x00C65064	STRONG	TCombo	3	forced in 1 body
+g_editnat_cmbrival2	0x00C65068	STRONG	TCombo	3	forced in 1 body
+g_editnat_cmbrival3	0x00C6506C	STRONG	TCombo	3	forced in 1 body
+g_editnat_cmbskin1	0x00C65074	STRONG	TCombo	3	forced in 1 body
+g_editnat_cmbskin2	0x00C65078	STRONG	TCombo	3	forced in 1 body
+g_editnat_ibname	0x00C6504C	STRONG	TInputBox	3	forced in 1 body
+g_editnat_ibnationality	0x00C65058	STRONG	TInputBox	3	forced in 1 body
+g_editnat_ibshortname	0x00C65050	STRONG	TInputBox	3	forced in 1 body
+g_editnat_ibstadiumcapacity	0x00C65080	STRONG	TInputBox	2	forced in 1 body
+g_editnat_ibstadiumlat	0x00C65088	STRONG	TInputBox	2	forced in 1 body
+g_editnat_ibstadiumlong	0x00C65084	STRONG	TInputBox	2	forced in 1 body
+g_editnat_ibstadiumname	0x00C6507C	STRONG	TInputBox	2	forced in 1 body
+g_editnat_ibstrength	0x00C6505C	STRONG	TInputBox	3	forced in 1 body
+g_editnat_ibtla	0x00C65054	STRONG	TInputBox	3	forced in 1 body
+g_editnat_nation	-	AMBIGUOUS	TNation	1	no alignment forced it (1 bodies)
+g_editnat_screen	-	AMBIGUOUS	TScreen	1	no alignment forced it (1 bodies)
+g_editnat_tblmembers	0x00C65090	STRONG	TTable	2	forced in 1 body
+g_editnation	0x00C65034	STRONG	TNation	1	forced in 1 body
+g_ek_activegadget	0x00C61CF8	STRONG	TGadget	1	forced in 1 body
+g_ek_cmb_shirt1	0x00C65CB0	STRONG	TCombo[]	1	forced in 1 body
+g_ek_cmb_shirt2	0x00C65CBC	STRONG	TCombo[]	1	forced in 1 body
+g_ek_cmb_shorts	0x00C65CCC	STRONG	TCombo[]	1	forced in 1 body
+g_ek_cmb_socks	0x00C65CD8	STRONG	TCombo[]	1	forced in 1 body
+g_ek_cmb_style	0x00C65CA4	STRONG	TCombo[]	1	forced in 1 body
+g_ek_team	0x00C65C70	STRONG	TBase_Team	1	forced in 1 body
+g_en_btn1	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_en_btn2	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_en_btn3	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_en_btn4	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_en_kit1	-	AMBIGUOUS	TKit	1	no alignment forced it (1 bodies)
+g_en_kit2	-	AMBIGUOUS	TKit	1	no alignment forced it (1 bodies)
+g_en_kit3	-	AMBIGUOUS	TKit	1	no alignment forced it (1 bodies)
+g_en_kit4	-	AMBIGUOUS	TKit	1	no alignment forced it (1 bodies)
+g_en_nation	-	AMBIGUOUS	TNation	1	no alignment forced it (1 bodies)
+g_eng_awayteam	-	AMBIGUOUS	TTeam	1	no alignment forced it (1 bodies)
+g_eng_ch1	-	AMBIGUOUS	brl.audio.TChannel	1	no alignment forced it (1 bodies)
+g_eng_ch2	-	AMBIGUOUS	brl.audio.TChannel	1	no alignment forced it (1 bodies)
+g_eng_ch3	-	AMBIGUOUS	brl.audio.TChannel	1	no alignment forced it (1 bodies)
+g_eng_ch4	-	AMBIGUOUS	brl.audio.TChannel	1	no alignment forced it (1 bodies)
+g_eng_ch5	-	AMBIGUOUS	brl.audio.TChannel	1	no alignment forced it (1 bodies)
+g_eng_ch6	-	AMBIGUOUS	brl.audio.TChannel	1	no alignment forced it (1 bodies)
+g_eng_fixture	-	AMBIGUOUS	TFixture	1	no alignment forced it (1 bodies)
+g_eng_font	-	AMBIGUOUS	TBitmapFont	1	no alignment forced it (1 bodies)
+g_eng_hasjoystick	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_eng_hometeam	-	AMBIGUOUS	TTeam	1	no alignment forced it (1 bodies)
+g_eng_msgint	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_eng_replaysaved	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_eng_screenw	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_eng_snd1	-	AMBIGUOUS	brl.audio.TSound	1	no alignment forced it (1 bodies)
+g_engine_agg1	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_engine_agg2	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_engine_arr01	-	AMBIGUOUS	Int[]	2	no alignment forced it (2 bodies)
+g_engine_camx	0x00C5B1D8	STRONG	Float	1	forced in 1 body
+g_engine_camy	0x00C5B1DC	STRONG	Float	1	forced in 1 body
+g_engine_chan	-	AMBIGUOUS	TChannel	1	no alignment forced it (1 bodies)
+g_engine_clock	0x00C5B210	CERTAIN	Int	5	forced in 2 bodies, unanimous
+g_engine_double01	-	AMBIGUOUS	Double	1	no alignment forced it (1 bodies)
+g_engine_double02	-	AMBIGUOUS	Double	1	no alignment forced it (1 bodies)
+g_engine_fixture	0x00C5B22C	STRONG	TFixture	6	forced in 1 body
+g_engine_flag20	0x00C5B210	STRONG	Int	1	forced in 1 body
+g_engine_flag28	0x00C5B258	CERTAIN	Int	1	forced, agrees with verified pair
+g_engine_float01	-	AMBIGUOUS	Float	6	bodies disagree: 00c5d238:1 00c5b1d4:1
+g_engine_float02	-	AMBIGUOUS	Float	3	no alignment forced it (3 bodies)
+g_engine_float03	-	AMBIGUOUS	Float	3	no alignment forced it (3 bodies)
+g_engine_float04	-	AMBIGUOUS	Float	2	no alignment forced it (2 bodies)
+g_engine_float05	-	AMBIGUOUS	Float	2	no alignment forced it (2 bodies)
+g_engine_float06	-	AMBIGUOUS	Float	2	no alignment forced it (2 bodies)
+g_engine_float07	0x00C5B25C	STRONG	Float	2	forced in 1 body
+g_engine_float08	0x00C5B260	STRONG	Float	2	forced in 1 body
+g_engine_float09	-	AMBIGUOUS	Float	3	bodies disagree: 00c5b1d4:1 00c5d238:1
+g_engine_float10	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_engine_float11	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_engine_float12	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_engine_float13	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_engine_float17	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_engine_fnend	-	AMBIGUOUS	Int	2	no alignment forced it (2 bodies)
+g_engine_font	-	AMBIGUOUS	TBitmapFont	5	no alignment forced it (5 bodies)
+g_engine_gfxh	0x00C6EFE8	STRONG	Int	5	forced in 1 body
+g_engine_gfxw	0x00C6EFE4	STRONG	Int	3	forced in 1 body
+g_engine_h	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_engine_half	0x00C5B208	STRONG	Int	3	forced in 1 body
+g_engine_ico_injury	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_engine_ico_suboff	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_engine_int103	0x00C5D64C	CERTAIN	Int	3	forced in 2 bodies, unanimous
+g_engine_int104	0x00C5D65C	STRONG	Int	2	forced in 1 body
+g_engine_int12	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_engine_int13	0x00C5B1CC	CERTAIN	Int	9	forced in 2 bodies, unanimous
+g_engine_int14	-	AMBIGUOUS	Int	2	no alignment forced it (2 bodies)
+g_engine_int15	-	AMBIGUOUS	Int	2	no alignment forced it (2 bodies)
+g_engine_int16	-	AMBIGUOUS	Int	2	no alignment forced it (2 bodies)
+g_engine_int161	0x00C6EF50	CERTAIN	Int	9	forced in 8 bodies, unanimous
+g_engine_int162	0x00C6EFE4	CERTAIN	Int	14	forced in 2 bodies, unanimous
+g_engine_int163	0x00C6EFE8	CERTAIN	Int	23	forced in 7 bodies, unanimous
+g_engine_int164	0x00C6EFEC	CERTAIN	Int	6	forced in 3 bodies, unanimous
+g_engine_int165	0x00C6F02C	STRONG	Int	1	forced in 1 body
+g_engine_int168	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_engine_int169	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_engine_int17	-	AMBIGUOUS	Int	7	no alignment forced it (7 bodies)
+g_engine_int170	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_engine_int172	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_engine_int18	0x00C5B208	CERTAIN	Int	6	forced in 2 bodies, unanimous
+g_engine_int20	0x00C5B210	CERTAIN	Int	16	forced in 6 bodies, unanimous
+g_engine_int22	0x00C5B228	STRONG	Int	4	forced in 1 body
+g_engine_int23	0x00C5B230	STRONG	Int	2	forced in 1 body
+g_engine_int24	0x00C5B234	STRONG	Int	2	forced in 1 body
+g_engine_int25	0x00C5B238	CERTAIN	Int	5	forced in 2 bodies, unanimous
+g_engine_int26	0x00C5B24C	STRONG	Int	4	forced in 1 body
+g_engine_int27	-	AMBIGUOUS	Int	5	bodies disagree: 00c5b254:1 00c6efd4:1
+g_engine_int29	0x00C5B264	STRONG	Int	3	forced in 1 body
+g_engine_int30	0x00C5B268	STRONG	Int	3	forced in 1 body
+g_engine_int31	0x00C5B26C	CERTAIN	Int	4	forced in 2 bodies, unanimous
+g_engine_int32	0x00C5B270	CERTAIN	Int	4	forced in 2 bodies, unanimous
+g_engine_int33	0x00C5B274	STRONG	Int	3	forced in 1 body
+g_engine_int34	0x00C5B278	STRONG	Int	3	forced in 1 body
+g_engine_int35	0x00C5B27C	STRONG	Int	3	forced in 1 body
+g_engine_int36	0x00C5B280	STRONG	Int	3	forced in 1 body
+g_engine_int37	0x00C5B284	STRONG	Int	2	forced in 1 body
+g_engine_int38	0x00C5B288	STRONG	Int	2	forced in 1 body
+g_engine_int39	0x00C5B28C	STRONG	Int	2	forced in 1 body
+g_engine_int40	0x00C5B290	STRONG	Int	2	forced in 1 body
+g_engine_int41	0x00C5B294	STRONG	Int	1	forced in 1 body
+g_engine_int42	0x00C5B298	STRONG	Int	1	forced in 1 body
+g_engine_int43	0x00C5B29C	STRONG	Int	1	forced in 1 body
+g_engine_int44	0x00C5B2A0	STRONG	Int	1	forced in 1 body
+g_engine_int47	0x00C5B2B4	STRONG	Int	1	forced in 1 body
+g_engine_int49	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_engine_int51	0x00C5B2C8	STRONG	Int	1	forced in 1 body
+g_engine_int52	0x00C5B2C4	STRONG	Int	5	forced in 1 body
+g_engine_int53	0x00C5B2CC	STRONG	Int	2	forced in 1 body
+g_engine_int55	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_engine_isreplay	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_engine_kickoffside	0x00C5B24C	STRONG	Int	1	forced in 1 body
+g_engine_labels	-	AMBIGUOUS	TLabel[]	3	no alignment forced it (3 bodies)
+g_engine_memend	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_engine_memstart	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_engine_obj20	-	AMBIGUOUS	TTable	1	no alignment forced it (1 bodies)
+g_engine_oldx	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_engine_oldy	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_engine_oldz	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_engine_player	-	AMBIGUOUS	TPlayer	1	no alignment forced it (1 bodies)
+g_engine_replaytimer	0x00C6EFD4	STRONG	Int	1	forced in 1 body
+g_engine_screenh	0x00C6EFE8	STRONG	Int	1	forced in 1 body
+g_engine_screenw	0x00C6EFE4	STRONG	Int	1	forced in 1 body
+g_engine_showcontrols	0x00C5B2D0	STRONG	Int	2	forced in 1 body
+g_engine_snd	-	AMBIGUOUS	TSound	1	no alignment forced it (1 bodies)
+g_engine_state	0x00C5B208	STRONG	Int	2	forced in 1 body
+g_engine_tball	0x00C5B22C	CERTAIN	TFixture	2	forced, agrees with verified pair
+g_engine_team	0x00C5B21C	STRONG	TTeam	1	forced in 1 body
+g_engine_tplayer	0x00C5B22C	CERTAIN	TFixture	2	forced, agrees with verified pair
+g_engine_w	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_engine_zoom	0x00C5B1D4	STRONG	Float	3	forced in 1 body
+g_engine_zoomdefault	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_enginefloat	0x00C5D23C	CERTAIN	Float	2	forced, agrees with verified pair
+g_enginestate	0x00C5B1CC	STRONG	Int	2	forced in 1 body
+g_enginetick	0x00C5B210	STRONG	Int	1	forced in 1 body
+g_fansimg	0x00C5D60C	CERTAIN	TImage[]	2	forced in 2 bodies, unanimous
+g_finances_lifestyle_bar	0x00C68174	CERTAIN	TProgressBar	2	forced in 2 bodies, unanimous
+g_finances_screen	0x00C68150	STRONG	TScreen	1	forced in 1 body
+g_finances_sponsors_table	0x00C68164	CERTAIN	TTable	2	forced in 2 bodies, unanimous
+g_finances_summary_table	0x00C68160	CERTAIN	TTable	2	forced in 2 bodies, unanimous
+g_finances_table	0x00C68168	CERTAIN	TTable	3	forced in 3 bodies, unanimous
+g_finances_totalperyear_label	0x00C68170	CERTAIN	TLabel	2	forced in 2 bodies, unanimous
+g_finances_weeklybalance_label	0x00C6816C	CERTAIN	TLabel	2	forced in 2 bodies, unanimous
+g_fixture	0x00C5B22C	CERTAIN	TFixture	17	forced in 9 bodies, unanimous
+g_flagdefault	0x00C596F8	STRONG	TImage	1	forced in 1 body
+g_flagimage	0x00C63CF4	STRONG	TImage	1	forced in 1 body
+g_flagimg	0x00C5D5D4	STRONG	TImage	2	forced in 1 body
+g_fmt_lock	0x00C677D8	STRONG	Int	1	forced in 1 body
+g_fmt_sel	0x00C677D4	STRONG	Int	1	forced in 1 body
+g_fnaccept	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_focus	0x00C61CF8	STRONG	TGadget	1	forced in 1 body
+g_focusplayer	-	AMBIGUOUS	TPlayer	1	no alignment forced it (1 bodies)
+g_font	-	AMBIGUOUS	TBitmapFont	4	no alignment forced it (4 bodies)
+g_font16	-	AMBIGUOUS	TBitmapFont	1	no alignment forced it (1 bodies)
+g_font2	-	AMBIGUOUS	TBitmapFont	2	no alignment forced it (2 bodies)
+g_font_main	-	AMBIGUOUS	TBitmapFont	3	no alignment forced it (3 bodies)
+g_font_match_l	-	AMBIGUOUS	TBitmapFont	1	no alignment forced it (1 bodies)
+g_font_match_m	-	AMBIGUOUS	TBitmapFont	6	no alignment forced it (6 bodies)
+g_font_msg	-	AMBIGUOUS	TBitmapFont	3	no alignment forced it (3 bodies)
+g_fonts	0x00C61710	CERTAIN	TImageFont[]	7	forced in 5 bodies, unanimous
+g_form_depth	0x00C5BB44	STRONG	Float	2	forced in 1 body
+g_form_height	0x00C5BB38	STRONG	Float	2	forced in 1 body
+g_form_hscale_default	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_form_posnoise	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_form_widepush	0x00C5BB48	STRONG	Float	2	forced in 1 body
+g_form_width	0x00C5BB3C	STRONG	Float	2	forced in 1 body
+g_form_widthnoball	0x00C5BB40	STRONG	Float	2	forced in 1 body
+g_form_wscale_default	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_form_xshift	0x00C5BB4C	STRONG	Float	2	forced in 1 body
+g_form_xshiftnoball	0x00C5BB50	STRONG	Float	2	forced in 1 body
+g_form_ymargin	0x00C5BB58	STRONG	Float	2	forced in 1 body
+g_form_yshift	0x00C5BB54	STRONG	Float	2	forced in 1 body
+g_formation_int01	0x00C5BB6C	STRONG	String	1	forced in 1 body
+g_formation_int02	0x00C5BB80	STRONG	String	1	forced in 1 body
+g_formation_int03	0x00C5BB94	STRONG	String	1	forced in 1 body
+g_formation_int05	0x00C5BBBC	STRONG	String	1	forced in 1 body
+g_formation_int06	0x00C5BBD0	STRONG	String	1	forced in 1 body
+g_formation_int07	0x00C5BBE4	STRONG	String	1	forced in 1 body
+g_formation_int08	0x00C5BBF8	STRONG	String	1	forced in 1 body
+g_formation_int09	0x00C5BC0C	STRONG	String	1	forced in 1 body
+g_formation_newstarselno	0x00C677D4	STRONG	Int	1	forced in 1 body
+g_formation_selno	0x00C677DC	STRONG	Int	1	forced in 1 body
+g_formation_str01	0x00C5BB6C	CERTAIN	String	2	forced in 2 bodies, unanimous
+g_formation_str02	0x00C5BB80	CERTAIN	String	2	forced in 2 bodies, unanimous
+g_formation_str03	0x00C5BB94	CERTAIN	String	2	forced in 2 bodies, unanimous
+g_formation_str04	0x00C5BBA8	CERTAIN	String	2	forced in 2 bodies, unanimous
+g_formation_str05	0x00C5BBBC	CERTAIN	String	2	forced in 2 bodies, unanimous
+g_formation_str06	0x00C5BBD0	CERTAIN	String	2	forced in 2 bodies, unanimous
+g_formation_str07	0x00C5BBE4	CERTAIN	String	2	forced in 2 bodies, unanimous
+g_formation_str08	0x00C5BBF8	CERTAIN	String	2	forced in 2 bodies, unanimous
+g_formation_str09	0x00C5BC0C	CERTAIN	String	2	forced in 2 bodies, unanimous
+g_formation_team	-	AMBIGUOUS	TTeam	1	no alignment forced it (1 bodies)
+g_formbtn	-	AMBIGUOUS	TButton	2	no alignment forced it (2 bodies)
+g_formlist	-	AMBIGUOUS	TList	2	no alignment forced it (2 bodies)
+g_formmode	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_formscreen	-	AMBIGUOUS	TScreen	2	no alignment forced it (2 bodies)
+g_formsel	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_formselno	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_formteam	-	AMBIGUOUS	TTeam	1	no alignment forced it (1 bodies)
+g_frameaccum	0x00C6F034	STRONG	Int	1	forced in 1 body
+g_frametime	0x00C5B2BC	STRONG	Int	1	forced in 1 body
+g_g1	0x00C639D8	STRONG	TGadget	1	forced in 1 body
+g_g2	0x00C639E0	STRONG	TGadget	1	forced in 1 body
+g_gad1	0x00C639E0	STRONG	TGadget	1	forced in 1 body
+g_gad2	0x00C639D8	STRONG	TGadget	1	forced in 1 body
+g_gada	0x00C6B858	STRONG	TGadget	1	forced in 1 body
+g_gadb	0x00C6C49C	STRONG	TGadget	1	forced in 1 body
+g_gadc	0x00C6C4A0	STRONG	TGadget	1	forced in 1 body
+g_gadget_arr	-	AMBIGUOUS	Object[]	1	no alignment forced it (1 bodies)
+g_gadget_float	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_gadget_int01	-	AMBIGUOUS	Int	2	no alignment forced it (2 bodies)
+g_gadgets	0x00C61CF0	CERTAIN	TList	1	forced, agrees with verified pair
+g_game_second	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_gamestate	0x00C5B1CC	STRONG	Int	2	forced in 1 body
+g_gametime	0x00C6EFD4	STRONG	Int	2	forced in 1 body
+g_gfx_height	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_gfx_width	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_gfxh	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_gfxmodes	0x00C60500	CERTAIN	TList	5	forced in 3 bodies, unanimous
+g_gfxw	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_goal1img	0x00C5D5C0	STRONG	TImage	2	forced in 1 body
+g_goal1netimg	0x00C5D5C4	STRONG	TImage	2	forced in 1 body
+g_goal1shadowimg	0x00C5D5C8	STRONG	TImage	2	forced in 1 body
+g_goal2img	0x00C5D5CC	STRONG	TImage	2	forced in 1 body
+g_goal2shadowimg	0x00C5D5D0	STRONG	TImage	2	forced in 1 body
+g_goal_halfw	-	AMBIGUOUS	Int	2	bodies disagree: 00c5d634:1 00c5d63c:1
+g_goalline	0x00C5D638	CERTAIN	Int	6	forced in 3 bodies, unanimous
+g_goalliney	0x00C5D638	STRONG	Int	1	forced in 1 body
+g_goalpost	0x00C5D63C	STRONG	Int	1	forced in 1 body
+g_grassimg	0x00C5D594	STRONG	TImage	2	forced in 1 body
+g_greenhex	0x00C6E91C	STRONG	String	1	forced in 1 body
+g_groupno	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_grouppage	0x00C671EC	CERTAIN	Int	4	forced in 3 bodies, unanimous
+g_half	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_halflength	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_hand1	0x00C6C16C	CERTAIN	TList	2	forced in 2 bodies, unanimous
+g_hand2	0x00C6C170	CERTAIN	TList	2	forced in 2 bodies, unanimous
+g_helpicon	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_holdframes	0x00C5DF28	STRONG	Int[]	1	forced in 1 body
+g_home_screen	-	AMBIGUOUS	TScreen	1	no alignment forced it (1 bodies)
+g_homebadge	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_hometeam	0x00C5B218	CERTAIN	TTeam	22	forced in 8 bodies, unanimous
+g_homeurl	0x00C6EA98	STRONG	String	1	forced in 1 body
+g_homeyellows	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_hookfn	-	UNGROUNDED	Byte	0	in no body pairable with an original
+g_horse_arr	0x00C6E2A8	STRONG	TImage[]	1	forced in 1 body
+g_horse_arrowd	0x00C6E2C0	STRONG	TImage	1	forced in 1 body
+g_horse_flag	0x00C6DF64	STRONG	Int	1	forced in 1 body
+g_horse_marker	0x00C6E2C0	STRONG	TImage	1	forced in 1 body
+g_horse_owned	0x00C6E2C4	STRONG	TImage	1	forced in 1 body
+g_horse_shadow	0x00C6E2BC	CERTAIN	TImage	2	forced in 2 bodies, unanimous
+g_horse_star	0x00C6E2C4	STRONG	TImage	1	forced in 1 body
+g_horselist	0x00C6E294	CERTAIN	TList	1	forced, agrees with verified pair
+g_horselist2	0x00C6E298	STRONG	TList	1	forced in 1 body
+g_horses	-	AMBIGUOUS	TList	14	bodies disagree: 00c6e294:8 00c6e298:5
+g_huddleoffset	0x00C5D634	STRONG	Int	1	forced in 1 body
+g_icon	-	AMBIGUOUS	TImage	2	no alignment forced it (2 bodies)
+g_icon_boss	0x00C6675C	STRONG	TImage	1	forced in 1 body
+g_icon_coach	0x00C66760	STRONG	TImage	1	forced in 1 body
+g_icon_cup	0x00C66750	STRONG	TImage	1	forced in 1 body
+g_icon_end	0x00C6674C	STRONG	TImage	1	forced in 1 body
+g_icon_endtutorial	0x00C6F2A0	CERTAIN	TImage	1	forced, agrees with verified pair
+g_icon_help	0x00C6F2EC	CERTAIN	TImage	2	forced in 2 bodies, unanimous
+g_icon_home	0x00C6F254	STRONG	TImage	1	forced in 1 body
+g_icon_league	0x00C66748	STRONG	TImage	1	forced in 1 body
+g_icon_match	0x00C66744	STRONG	TImage	1	forced in 1 body
+g_icon_none	0x00C5D218	CERTAIN	TImage	2	forced in 2 bodies, unanimous
+g_icon_ok	0x00C6F2CC	CERTAIN	TImage	1	forced, agrees with verified pair
+g_icon_physio	0x00C66758	STRONG	TImage	1	forced in 1 body
+g_icon_tick	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_icon_train	0x00C66754	STRONG	TImage	1	forced in 1 body
+g_iconback	-	AMBIGUOUS	TImage	3	no alignment forced it (3 bodies)
+g_iconclub	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_iconcountry	0x00C66F08	STRONG	TImage	2	forced in 1 body
+g_iconhome	-	AMBIGUOUS	TImage	2	no alignment forced it (2 bodies)
+g_iconlevel	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_iconpath	0x00C6F170	CERTAIN	String	15	forced in 5 bodies, unanimous
+g_icons	-	AMBIGUOUS	TImage[]	2	no alignment forced it (2 bodies)
+g_iconworld	0x00C66F04	STRONG	TImage	2	forced in 1 body
+g_idx	0x00C5D1A8	STRONG	Int	1	forced in 1 body
+g_img_866	-	AMBIGUOUS	TImage	2	no alignment forced it (2 bodies)
+g_img_867	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_871	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_ach_done	0x00C68318	STRONG	TImage	1	forced in 1 body
+g_img_ach_locked	0x00C6831C	STRONG	TImage	1	forced in 1 body
+g_img_arrow	-	AMBIGUOUS	TImage	2	no alignment forced it (2 bodies)
+g_img_arrow1	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_arrow2	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_arrowr	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_back	0x00C6F254	CERTAIN	TImage	6	forced in 2 bodies, unanimous
+g_img_backicon	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_ball	0x00C5A4B0	STRONG	TImage	2	forced in 1 body
+g_img_ballicon	0x00C6CF84	STRONG	TImage	1	forced in 1 body
+g_img_ballmarker	0x00C5A4B8	STRONG	TImage	1	forced in 1 body
+g_img_ballshadow	0x00C5A4B4	STRONG	TImage	2	forced in 1 body
+g_img_blob	-	AMBIGUOUS	TImage	2	no alignment forced it (2 bodies)
+g_img_boot	-	AMBIGUOUS	TImage	2	no alignment forced it (2 bodies)
+g_img_boot28	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_bootboost	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_booze	-	AMBIGUOUS	TImage	2	no alignment forced it (2 bodies)
+g_img_booze28	-	AMBIGUOUS	TImage	2	no alignment forced it (2 bodies)
+g_img_boozeboost	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_boss	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_bowling	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_calling	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_casino	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_cinema	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_console	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_contract	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_drugs28	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_drugsboost	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_drunk	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_endrelationship	0x00C66BE0	STRONG	TImage	1	forced in 1 body
+g_img_energy	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_energy1	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_energy2	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_energyback	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_energybackred	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_energybar	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_eye	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_fans	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_finances	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_goalicon	0x00C6CF88	CERTAIN	TImage	1	forced, agrees with verified pair
+g_img_golf	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_helpicon	-	AMBIGUOUS	TImage	4	no alignment forced it (4 bodies)
+g_img_home	0x00C6672C	STRONG	TImage	2	forced in 1 body
+g_img_injury	-	AMBIGUOUS	TImage	2	no alignment forced it (2 bodies)
+g_img_iv	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_joy1	0x00C640C8	CERTAIN	TImage	2	forced in 2 bodies, unanimous
+g_img_joy2	0x00C640CC	CERTAIN	TImage	2	forced in 2 bodies, unanimous
+g_img_keys	0x00C640D0	CERTAIN	TImage	2	forced in 2 bodies, unanimous
+g_img_marker	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_money	-	AMBIGUOUS	TImage	2	no alignment forced it (2 bodies)
+g_img_music	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_negcross	-	AMBIGUOUS	TImage	2	no alignment forced it (2 bodies)
+g_img_negtick	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_next	0x00C6675C	STRONG	TImage	1	forced in 1 body
+g_img_nextrace	0x00C6F1B8	CERTAIN	TImage	1	forced, agrees with verified pair
+g_img_nrg	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_nrg28	-	AMBIGUOUS	TImage	2	no alignment forced it (2 bodies)
+g_img_offside	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_opponent	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_options	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_painkiller	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_play	0x00C6F274	CERTAIN	TImage	17	forced in 5 bodies, unanimous
+g_img_playball	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_playboss	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_playcoach	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_playcup	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_playicon	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_playnewspaper	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_playphysio	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_playrelations	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_playweb	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_proceed	0x00C6F274	CERTAIN	TImage	2	forced in 2 bodies, unanimous
+g_img_pub	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_quit	0x00C6F194	CERTAIN	TImage	3	forced in 2 bodies, unanimous
+g_img_radarplayer	-	AMBIGUOUS	TImage	3	no alignment forced it (3 bodies)
+g_img_red	-	AMBIGUOUS	TImage	2	no alignment forced it (2 bodies)
+g_img_relationships	-	AMBIGUOUS	TImage	2	no alignment forced it (2 bodies)
+g_img_restaurant	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_secondyellow	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_shinpads28	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_shinpadsboost	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_shirt	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_shopping	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_sick	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_slotstrip	0x00C6C658	STRONG	TImage	1	forced in 1 body
+g_img_sponsors	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_star	-	AMBIGUOUS	TImage	3	no alignment forced it (3 bodies)
+g_img_star52	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_stomach	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_stopwatch	0x00C6CF8C	CERTAIN	TImage	1	forced, agrees with verified pair
+g_img_sub	-	AMBIGUOUS	TImage	2	no alignment forced it (2 bodies)
+g_img_suboff	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_subondown	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_subonup	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_tablet	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_tenyards	0x00C5A4BC	STRONG	TImage	1	forced in 1 body
+g_img_tick	0x00C6F274	CERTAIN	TImage	2	forced, agrees with verified pair
+g_img_tired	-	AMBIGUOUS	TImage	3	no alignment forced it (3 bodies)
+g_img_training	-	AMBIGUOUS	TImage	2	no alignment forced it (2 bodies)
+g_img_trophy	-	AMBIGUOUS	TImage	2	no alignment forced it (2 bodies)
+g_img_unhappy	-	AMBIGUOUS	TImage	3	no alignment forced it (3 bodies)
+g_img_world	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_img_yellow	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_imgarrow	-	AMBIGUOUS	TImage	2	no alignment forced it (2 bodies)
+g_imgpitch	-	AMBIGUOUS	TImage	2	no alignment forced it (2 bodies)
+g_imgquit	0x00C6F254	STRONG	TImage	1	forced in 1 body
+g_imgstar	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_imgstar52	-	AMBIGUOUS	TImage	2	no alignment forced it (2 bodies)
+g_imgstar52grey	-	AMBIGUOUS	TImage	2	no alignment forced it (2 bodies)
+g_imgteam1	-	AMBIGUOUS	TImage	2	no alignment forced it (2 bodies)
+g_imgteam2	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_inpemail	0x00C64440	STRONG	TInputBox	1	forced in 1 body
+g_inpkey	0x00C6444C	STRONG	TInputBox	1	forced in 1 body
+g_inpname	0x00C6443C	CERTAIN	TInputBox	2	forced in 2 bodies, unanimous
+g_inppassword1	0x00C64444	STRONG	TInputBox	1	forced in 1 body
+g_inppassword2	0x00C64448	STRONG	TInputBox	1	forced in 1 body
+g_inputbox	-	AMBIGUOUS	TInputBox	1	no alignment forced it (1 bodies)
+g_inputtext	-	AMBIGUOUS	String	2	bodies disagree: 00c61734:1 00c61700:1
+g_interview_button	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_interview_channel	-	AMBIGUOUS	TChannel	1	no alignment forced it (1 bodies)
+g_interview_failsound	-	AMBIGUOUS	TSound	1	no alignment forced it (1 bodies)
+g_interview_ret	0x00C6CDE8	STRONG	String	2	forced in 1 body
+g_intraining	0x00C6CF90	CERTAIN	Int	6	forced in 5 bodies, unanimous
+g_iv_beep	-	AMBIGUOUS	TSound	2	no alignment forced it (2 bodies)
+g_iv_bg	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_iv_btnok	-	AMBIGUOUS	TButton	2	no alignment forced it (2 bodies)
+g_iv_label	-	AMBIGUOUS	TLabel	2	no alignment forced it (2 bodies)
+g_iv_panel	-	AMBIGUOUS	TPanel	2	no alignment forced it (2 bodies)
+g_iv_screen	0x00C6CDD8	STRONG	TScreen	4	forced in 1 body
+g_jockeyimages	0x00C6E2B8	STRONG	TImage[]	1	forced in 1 body
+g_joy_dragging	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_joyactive	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_joycount	0x00C6EFEC	STRONG	Int	2	forced in 1 body
+g_joyenabled	0x00C6EFEC	STRONG	Int	2	forced in 1 body
+g_joynegthresh	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_joyport	0x00C5D1A8	STRONG	Int	1	forced in 1 body
+g_joyposthresh	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_jumpzvel	0x00C5DE5C	STRONG	Float	1	forced in 1 body
+g_keeper_maxheight	0x00C5DE70	STRONG	Int	1	forced in 1 body
+g_keeperframes	0x00C5DF00	STRONG	Int[]	1	forced in 1 body
+g_key_a	0x00C5D1B4	CERTAIN	Int[]	2	forced in 2 bodies, unanimous
+g_key_b	0x00C5D1CC	STRONG	Int[]	1	forced in 1 body
+g_key_c	0x00C5D1C4	CERTAIN	Int[]	2	forced in 2 bodies, unanimous
+g_key_d	-	AMBIGUOUS	Int[]	2	bodies disagree: 00c5d1cc:1 00c5d1bc:1
+g_key_e	0x00C5D1D4	CERTAIN	Int[]	2	forced in 2 bodies, unanimous
+g_key_f	0x00C5D1DC	STRONG	Int[]	1	forced in 1 body
+g_key_g	0x00C5D1E4	STRONG	Int[]	1	forced in 1 body
+g_key_i	0x00C5D1F4	STRONG	Int[]	1	forced in 1 body
+g_kickbuttonhits	0x00C6EFD4	STRONG	Int	1	forced in 1 body
+g_kickcount	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_kickhits	0x00C6EFD4	STRONG	Int	1	forced in 1 body
+g_kickresults	-	AMBIGUOUS	Int[]	1	no alignment forced it (1 bodies)
+g_kit_arr01	0x00C5C1E4	STRONG	String[]	1	forced in 1 body
+g_kit_arr02	0x00C5C1EC	CERTAIN	Int[]	3	forced in 3 bodies, unanimous
+g_kitfiles	0x00C5C1E4	STRONG	String[]	1	forced in 1 body
+g_kits_a	-	AMBIGUOUS	Object	1	no alignment forced it (1 bodies)
+g_kits_away	-	AMBIGUOUS	TBase_Team	1	no alignment forced it (1 bodies)
+g_kits_b	-	AMBIGUOUS	Object	1	no alignment forced it (1 bodies)
+g_kits_cancelfunc	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_kits_club1	-	AMBIGUOUS	TClub	2	no alignment forced it (2 bodies)
+g_kits_club2	-	AMBIGUOUS	TClub	2	no alignment forced it (2 bodies)
+g_kits_energy	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_kits_fixture	-	AMBIGUOUS	TFixture	2	no alignment forced it (2 bodies)
+g_kits_fn	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_kits_home	-	AMBIGUOUS	TBase_Team	1	no alignment forced it (1 bodies)
+g_kits_int05	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_kits_int06	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_kits_int07	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_kits_int08	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_kits_int09	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_kits_int1	-	AMBIGUOUS	Int	2	no alignment forced it (2 bodies)
+g_kits_int2	-	AMBIGUOUS	Int	2	no alignment forced it (2 bodies)
+g_kits_int3	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_kits_kit1	-	AMBIGUOUS	TKit	3	no alignment forced it (3 bodies)
+g_kits_kit2	-	AMBIGUOUS	TKit	3	no alignment forced it (3 bodies)
+g_kits_kit3	-	AMBIGUOUS	TKit	2	no alignment forced it (2 bodies)
+g_kits_kit4	-	AMBIGUOUS	TKit	2	no alignment forced it (2 bodies)
+g_kits_label1	-	AMBIGUOUS	TGadget	1	no alignment forced it (1 bodies)
+g_kits_label2	-	AMBIGUOUS	TGadget	1	no alignment forced it (1 bodies)
+g_kits_lbl1	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_kits_lbl2	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_kits_obj1	-	AMBIGUOUS	Object	1	no alignment forced it (1 bodies)
+g_kits_obj2	-	AMBIGUOUS	Object	1	no alignment forced it (1 bodies)
+g_kits_okfunc	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_kits_panel	-	AMBIGUOUS	TGadget	1	no alignment forced it (1 bodies)
+g_kits_quitfn	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_kits_screen	-	AMBIGUOUS	TScreen	1	no alignment forced it (1 bodies)
+g_kits_showaway	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_kits_showhome	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_label_bank	0x00C66788	STRONG	TLabel	2	forced in 1 body
+g_label_clubsinterested	0x00C67D9C	STRONG	TLabel	1	forced in 1 body
+g_label_name	0x00C6677C	STRONG	TLabel	1	forced in 1 body
+g_lang_int05	0x00C638C4	STRONG	Int	1	forced in 1 body
+g_lang_sel	0x00C5D290	STRONG	String	1	forced in 1 body
+g_langmap	0x00C5A328	STRONG	TMap	1	forced in 1 body
+g_langname	0x00C5D290	STRONG	String	1	forced in 1 body
+g_langscreen	0x00C638C0	STRONG	TScreen	1	forced in 1 body
+g_langsel	0x00C638C4	STRONG	Int	1	forced in 1 body
+g_lastincident	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_lastminutetick	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_lastrefresh	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_lbl_agg	-	AMBIGUOUS	TLabel	2	no alignment forced it (2 bodies)
+g_lbl_assistbonus	0x00C67B70	STRONG	TLabel	1	forced in 1 body
+g_lbl_bank	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_lbl_bootmoney	0x00C66E3C	STRONG	TLabel	2	forced in 1 body
+g_lbl_cash	-	AMBIGUOUS	TLabel	2	no alignment forced it (2 bodies)
+g_lbl_cleanbonus	0x00C67B74	STRONG	TLabel	1	forced in 1 body
+g_lbl_clubname	0x00C67B58	STRONG	TLabel	1	forced in 1 body
+g_lbl_controller1	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_lbl_controller2	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_lbl_energy	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_lbl_goalbonus	0x00C67B6C	STRONG	TLabel	1	forced in 1 body
+g_lbl_league	0x00C67B60	STRONG	TLabel	1	forced in 1 body
+g_lbl_length	0x00C67B7C	STRONG	TLabel	1	forced in 1 body
+g_lbl_name	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_lbl_nation	0x00C67B5C	STRONG	TLabel	1	forced in 1 body
+g_lbl_nextopp2	0x00C66794	STRONG	TLabel	2	forced in 1 body
+g_lbl_physioreport	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_lbl_rating1	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_lbl_rating2	-	AMBIGUOUS	TLabel	2	no alignment forced it (2 bodies)
+g_lbl_selection	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_lbl_signingfee	0x00C67B78	STRONG	TLabel	1	forced in 1 body
+g_lbl_status	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_lbl_team1	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_lbl_team2	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_lbl_teamcurrent1	-	AMBIGUOUS	TLabel	2	no alignment forced it (2 bodies)
+g_lbl_teamcurrent2	-	AMBIGUOUS	TLabel	2	no alignment forced it (2 bodies)
+g_lbl_time	-	AMBIGUOUS	TLabel	2	no alignment forced it (2 bodies)
+g_lbl_title	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_lbl_value1	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_lbl_value2	-	AMBIGUOUS	TLabel	2	no alignment forced it (2 bodies)
+g_lbl_wage	0x00C67B68	STRONG	TLabel	1	forced in 1 body
+g_lbl_week	0x00C66784	CERTAIN	TLabel	3	forced in 2 bodies, unanimous
+g_lbl_year	0x00C66780	CERTAIN	TLabel	3	forced in 2 bodies, unanimous
+g_lblname	-	AMBIGUOUS	TLabel	2	no alignment forced it (2 bodies)
+g_lblvalue	-	AMBIGUOUS	TLabel	2	no alignment forced it (2 bodies)
+g_lcompetitions	0x00C6099C	CERTAIN	TList	1	forced, agrees with verified pair
+g_league_comp	-	AMBIGUOUS	TCompetition	1	no alignment forced it (1 bodies)
+g_league_prevmode	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_league_setround	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_leagues_btnfixturesfirst	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_leagues_btnfixtureslast	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_leagues_btnfixturesleft	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_leagues_btnfixturesright	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_leagues_btnlevel	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_leagues_btnround	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_leagues_comp	0x00C66F5C	STRONG	TCompetition	6	5/6 bodies agree
+g_leagues_page	0x00C66F44	CERTAIN	Int	3	forced in 3 bodies, unanimous
+g_leagues_panfixtures	-	AMBIGUOUS	TPanel	1	no alignment forced it (1 bodies)
+g_leagues_pantable	-	AMBIGUOUS	TPanel	1	no alignment forced it (1 bodies)
+g_leagues_pantitle	-	AMBIGUOUS	TPanel	1	no alignment forced it (1 bodies)
+g_leagues_screen	-	AMBIGUOUS	TScreen	1	no alignment forced it (1 bodies)
+g_leagues_setupid	0x00C66F40	CERTAIN	Int	2	forced in 2 bodies, unanimous
+g_leagues_tblfixturesclub	-	AMBIGUOUS	TTable	1	no alignment forced it (1 bodies)
+g_leagues_tblfixturesleague	-	AMBIGUOUS	TTable	1	no alignment forced it (1 bodies)
+g_leagues_tbltable	-	AMBIGUOUS	TTable	1	no alignment forced it (1 bodies)
+g_lg_combo1	0x00C66F30	STRONG	TCombo	1	forced in 1 body
+g_lg_combo2	0x00C66F34	STRONG	TCombo	1	forced in 1 body
+g_lg_combo3	0x00C66F38	STRONG	TCombo	1	forced in 1 body
+g_lg_combo4	0x00C66F3C	STRONG	TCombo	1	forced in 1 body
+g_lg_combo_league	0x00C66F38	STRONG	TCombo	1	forced in 1 body
+g_lg_combocontinent	0x00C66F30	STRONG	TCombo	1	forced in 1 body
+g_lg_combonation	0x00C66F34	CERTAIN	TCombo	2	forced in 2 bodies, unanimous
+g_lg_table1	0x00C66F20	CERTAIN	TTable	2	forced in 2 bodies, unanimous
+g_lg_table2	0x00C66F24	CERTAIN	TTable	3	forced in 3 bodies, unanimous
+g_lg_table3	0x00C66F28	CERTAIN	TTable	4	forced in 4 bodies, unanimous
+g_limit_scroll_x	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_limit_scroll_y1	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_limit_scroll_y2	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_listdown	0x00C61D04	STRONG	TImage	1	forced in 1 body
+g_listup	0x00C61D00	STRONG	TImage	1	forced in 1 body
+g_loadtable	0x00C639DC	STRONG	TTable	1	forced in 1 body
+g_locale_lang	0x00C5A33C	CERTAIN	String	2	forced in 2 bodies, unanimous
+g_locale_maps	0x00C5A328	CERTAIN	TMap	3	forced in 3 bodies, unanimous
+g_logstream	-	UNGROUNDED	TStream	0	in no body pairable with an original
+g_mainmenu_btnfacebook	0x00C639CC	STRONG	TButton	1	forced in 1 body
+g_mainmenu_btnhome	0x00C639C4	STRONG	TButton	1	forced in 1 body
+g_mainmenu_btnmobile	0x00C639D0	STRONG	TButton	1	forced in 1 body
+g_mainmenu_btntwitter	0x00C639C8	STRONG	TButton	1	forced in 1 body
+g_mainmenu_imgarrow	0x00C639A4	STRONG	TImage	1	forced in 1 body
+g_mainmenu_imgboot	0x00C6399C	STRONG	TImage	1	forced in 1 body
+g_mainmenu_imgfacebook	0x00C639B8	STRONG	TImage	1	forced in 1 body
+g_mainmenu_imghome	0x00C639B4	STRONG	TImage	1	forced in 1 body
+g_mainmenu_imgmobile	0x00C639C0	STRONG	TImage	1	forced in 1 body
+g_mainmenu_imgoffline	0x00C639A8	STRONG	TImage	1	forced in 1 body
+g_mainmenu_imgoptions	0x00C639A0	STRONG	TImage	1	forced in 1 body
+g_mainmenu_imgreplays	0x00C63998	STRONG	TImage	1	forced in 1 body
+g_mainmenu_imgstar	0x00C63994	STRONG	TImage	1	forced in 1 body
+g_mainmenu_imgtwitter	0x00C639BC	STRONG	TImage	1	forced in 1 body
+g_mainmenu_lblversion	0x00C6E900	STRONG	TLabel	1	forced in 1 body
+g_mainmenu_panback	0x00C639AC	STRONG	TPanel	1	forced in 1 body
+g_mainmenu_panloadgame	0x00C639D8	STRONG	TPanel	2	forced in 1 body
+g_mainmenu_panloadreplay	0x00C639E0	STRONG	TPanel	1	forced in 1 body
+g_mainmenu_pansocial	0x00C639B0	STRONG	TPanel	1	forced in 1 body
+g_mainmenu_replaytable	0x00C639E4	STRONG	TTable	1	forced in 1 body
+g_mainmenu_screen	0x00C6398C	STRONG	TScreen	1	forced in 1 body
+g_mainmenu_str	0x00C639FC	STRONG	String	1	forced in 1 body
+g_mainmenu_tblloadgame	0x00C639DC	STRONG	TTable	1	forced in 1 body
+g_mainmenu_tblloadreplay	0x00C639E4	STRONG	TTable	1	forced in 1 body
+g_marker_on	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_match_time	0x00C6EFD4	STRONG	Int	1	forced in 1 body
+g_matchclock	-	AMBIGUOUS	Int	5	bodies disagree: 00c6efd4:2 00c6efd8:1
+g_matchcontext	0x00C5D228	STRONG	Int	1	forced in 1 body
+g_matchframe	0x00C5B2BC	STRONG	Int	1	forced in 1 body
+g_matchlength	0x00C5D230	STRONG	Int	1	forced in 1 body
+g_matchminute	0x00C5B210	STRONG	Int	1	forced in 1 body
+g_matchmode	0x00C5B1FC	STRONG	Int	2	forced in 1 body
+g_matchpaused	-	AMBIGUOUS	TScreen	1	no alignment forced it (1 bodies)
+g_matchpaused_bg	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_matchprep_barboots	-	AMBIGUOUS	TProgressBar	1	no alignment forced it (1 bodies)
+g_matchprep_barbooze	-	AMBIGUOUS	TProgressBar	1	no alignment forced it (1 bodies)
+g_matchprep_bardribbling	-	AMBIGUOUS	TProgressBar	1	no alignment forced it (1 bodies)
+g_matchprep_bardrugs	-	AMBIGUOUS	TProgressBar	1	no alignment forced it (1 bodies)
+g_matchprep_barenergy	-	AMBIGUOUS	TProgressBar	1	no alignment forced it (1 bodies)
+g_matchprep_barflair	-	AMBIGUOUS	TProgressBar	1	no alignment forced it (1 bodies)
+g_matchprep_barheading	-	AMBIGUOUS	TProgressBar	1	no alignment forced it (1 bodies)
+g_matchprep_barinjury	-	AMBIGUOUS	TProgressBar	1	no alignment forced it (1 bodies)
+g_matchprep_barnrg	-	AMBIGUOUS	TProgressBar	1	no alignment forced it (1 bodies)
+g_matchprep_barpace	-	AMBIGUOUS	TProgressBar	1	no alignment forced it (1 bodies)
+g_matchprep_barpassing	-	AMBIGUOUS	TProgressBar	1	no alignment forced it (1 bodies)
+g_matchprep_barshinpads	-	AMBIGUOUS	TProgressBar	1	no alignment forced it (1 bodies)
+g_matchprep_barshooting	-	AMBIGUOUS	TProgressBar	1	no alignment forced it (1 bodies)
+g_matchprep_bartackling	-	AMBIGUOUS	TProgressBar	1	no alignment forced it (1 bodies)
+g_matchprep_btnboots	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_matchprep_btnbooze	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_matchprep_btndrugs	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_matchprep_btnnrg	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_matchprep_btnpainkillers	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_matchprep_btnplay	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_matchprep_btnshinpads	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_matchprep_energy	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_matchprep_energycost	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_matchprep_iconboots	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_matchprep_iconbooze	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_matchprep_icondrugs	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_matchprep_iconshinpads	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_matchprep_imgwatch	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_matchprep_lblmoney	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_matchprep_lblreason	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_matchprep_lblstatus	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_matchspeed	0x00C5D234	CERTAIN	Int	2	forced, agrees with verified pair
+g_matchstate	0x00C5B1FC	CERTAIN	Int	21	forced in 9 bodies, unanimous
+g_matchtime	0x00C6EFD4	CERTAIN	Int	6	forced in 5 bodies, unanimous
+g_matchtimer	0x00C6EFD4	STRONG	Int	2	forced in 1 body
+g_mc_bar_relationboss	0x00C67B34	STRONG	TProgressBar	1	forced in 1 body
+g_mc_btn_reqtransfer	0x00C67D90	STRONG	TButton	1	forced in 1 body
+g_mc_btn_requestloan	0x00C67D94	CERTAIN	TButton	2	forced in 2 bodies, unanimous
+g_mc_btn_requesttransfer	0x00C67D90	CERTAIN	TButton	2	forced in 2 bodies, unanimous
+g_mc_cmb_club	0x00C67DAC	CERTAIN	TCombo	3	forced in 2 bodies, unanimous
+g_mc_cmb_continent	0x00C67DA0	STRONG	TCombo	1	forced in 1 body
+g_mc_cmb_division	0x00C67DA8	STRONG	TCombo	1	forced in 1 body
+g_mc_cmb_nation	0x00C67DA4	CERTAIN	TCombo	3	forced in 2 bodies, unanimous
+g_mc_combodivision	0x00C67DA8	STRONG	TCombo	1	forced in 1 body
+g_mc_combonation	0x00C67DA4	STRONG	TCombo	1	forced in 1 body
+g_mc_lbl_clubsinterested2	0x00C67D9C	STRONG	TLabel	1	forced in 1 body
+g_mc_lbl_desired	0x00C67D98	CERTAIN	TLabel	2	forced in 2 bodies, unanimous
+g_mc_lbl_offers	0x00C67DB0	STRONG	TLabel	1	forced in 1 body
+g_mc_lbl_translisted1	0x00C67D88	CERTAIN	TLabel	2	forced in 2 bodies, unanimous
+g_mc_lbl_translisted2	0x00C67D8C	CERTAIN	TLabel	2	forced in 2 bodies, unanimous
+g_mc_pan_transferstatus	0x00C67D84	STRONG	TPanel	1	forced in 1 body
+g_mc_screen	0x00C67D7C	STRONG	TScreen	1	forced in 1 body
+g_media_path	-	AMBIGUOUS	String	1	no alignment forced it (1 bodies)
+g_mediapath	-	AMBIGUOUS	String	7	no alignment forced it (7 bodies)
+g_mediaprefix	0x00C6E950	CERTAIN	String	3	forced in 3 bodies, unanimous
+g_messages	0x00C6AFDC	CERTAIN	TList	2	forced in 2 bodies, unanimous
+g_millis	0x00C6EFD4	STRONG	Int	1	forced in 1 body
+g_minutes	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_missingart	-	UNGROUNDED	TImage	0	in no body pairable with an original
+g_mm_a	0x00C639FC	STRONG	String	1	forced in 1 body
+g_mm_b	0x00C63A00	STRONG	String	1	forced in 1 body
+g_mm_c	0x00C6E900	STRONG	String	1	forced in 1 body
+g_mm_delay	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_mm_index	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_mm_items	-	AMBIGUOUS	String[]	1	no alignment forced it (1 bodies)
+g_mm_lasttime	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_mm_offw	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_mm_offx	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_mm_panel	-	AMBIGUOUS	TPanel	1	no alignment forced it (1 bodies)
+g_mm_tableload	0x00C639DC	STRONG	TTable	1	forced in 1 body
+g_mobile_url	0x00C6EB58	STRONG	String	1	forced in 1 body
+g_modeflag	0x00C5D228	STRONG	Int	1	forced in 1 body
+g_mouseactive	0x00C6173C	CERTAIN	Int	1	forced, agrees with verified pair
+g_mow0img	0x00C5D598	STRONG	TImage	2	forced in 1 body
+g_mow1img	0x00C5D59C	STRONG	TImage	2	forced in 1 body
+g_mowsimg	0x00C5D5A0	STRONG	TImage	2	forced in 1 body
+g_mp_btn1	0x00C67650	STRONG	TButton	1	forced in 1 body
+g_mp_btn2	0x00C67654	STRONG	TButton	1	forced in 1 body
+g_mp_btn3	0x00C67658	STRONG	TButton	1	forced in 1 body
+g_msg_int01	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_msg_style	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_msgfont	-	AMBIGUOUS	TBitmapFont	1	no alignment forced it (1 bodies)
+g_msgimg	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_msgresult	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_msgtime	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_msgtop	0x00C6EFD4	STRONG	Int	1	forced in 1 body
+g_msgx	0x00C5D674	STRONG	Int	1	forced in 1 body
+g_msgy_away	0x00C5D678	STRONG	Int	1	forced in 1 body
+g_msgy_home	0x00C5D67C	STRONG	Int	1	forced in 1 body
+g_musicchannel	0x00C6F08C	CERTAIN	TChannel	1	forced, agrees with verified pair
+g_musicvol	-	UNGROUNDED	Float	0	in no body pairable with an original
+g_mycon_cmb1	-	AMBIGUOUS	TCombo	1	no alignment forced it (1 bodies)
+g_mycon_cmb2	-	AMBIGUOUS	TCombo	1	no alignment forced it (1 bodies)
+g_mycon_cmb3	-	AMBIGUOUS	TCombo	1	no alignment forced it (1 bodies)
+g_mycon_cmb4	-	AMBIGUOUS	TCombo	1	no alignment forced it (1 bodies)
+g_mycontract_btnplay	0x00C67B4C	STRONG	TButton	1	forced in 1 body
+g_mycontract_label	0x00C67D9C	STRONG	TGadget	1	forced in 1 body
+g_mycontract_panel	0x00C67B24	STRONG	TPanel	1	forced in 1 body
+g_myprofile	-	AMBIGUOUS	TPlayer	1	no alignment forced it (1 bodies)
+g_myteam	0x00C677B0	CERTAIN	TTeam	1	forced, agrees with verified pair
+g_nation_int01	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_nation_int05	0x00C59E44	STRONG	Int	1	forced in 1 body
+g_nation_sortby	0x00C596F4	CERTAIN	Int	4	forced in 3 bodies, unanimous
+g_nation_sortmode	-	AMBIGUOUS	Int	3	bodies disagree: 00c59e44:2 00c596f4:1
+g_nationlist	0x00C596F0	STRONG	TList	1	forced in 1 body
+g_nations	0x00C596F0	STRONG	TList	27	24/25 bodies agree
+g_natsortby	0x00C596F4	STRONG	Int	1	forced in 1 body
+g_neg02	0x00C6CC40	STRONG	Int	1	forced in 1 body
+g_neg_a	0x00C6EFD4	STRONG	Int	1	forced in 1 body
+g_neg_b	0x00C6CC48	STRONG	Int	1	forced in 1 body
+g_neg_base	0x00C6CC44	STRONG	Int	1	forced in 1 body
+g_neg_btn	0x00C6CC0C	STRONG	TButton	1	forced in 1 body
+g_neg_btn1	0x00C6CBFC	CERTAIN	TButton	2	forced in 2 bodies, unanimous
+g_neg_btn2	0x00C6CC00	CERTAIN	TButton	2	forced in 2 bodies, unanimous
+g_neg_btn3	0x00C6CC0C	CERTAIN	TButton	2	forced in 2 bodies, unanimous
+g_neg_btnaccept	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_neg_btnhigher	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_neg_btnlower	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_neg_btnok	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_neg_count	0x00C6CC40	STRONG	Int	1	forced in 1 body
+g_neg_flag	0x00C6CC48	STRONG	Int	1	forced in 1 body
+g_neg_imgdown	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_neg_imgup	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_neg_lbl1	0x00C6CC04	STRONG	TLabel	1	forced in 1 body
+g_neg_lbl2	0x00C6CC08	STRONG	TLabel	1	forced in 1 body
+g_neg_lblinstrucs	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_neg_lblpercent	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_neg_offer	0x00C6CC3C	STRONG	TContractOffer	3	forced in 1 body
+g_neg_offers	0x00C6CC40	STRONG	Int	1	forced in 1 body
+g_neg_okbutton	-	AMBIGUOUS	TButton	2	no alignment forced it (2 bodies)
+g_neg_panhl	-	AMBIGUOUS	TPanel	1	no alignment forced it (1 bodies)
+g_neg_panhl2	-	AMBIGUOUS	TPanel	1	no alignment forced it (1 bodies)
+g_neg_screen	-	AMBIGUOUS	TScreen	1	no alignment forced it (1 bodies)
+g_neg_stage	-	AMBIGUOUS	Int	2	no alignment forced it (2 bodies)
+g_neg_step	0x00C6CC40	STRONG	Int	1	forced in 1 body
+g_neg_value	0x00C6EFD4	STRONG	Int	1	forced in 1 body
+g_negotiate_icon	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_netline	0x00C5D648	STRONG	Int	1	forced in 1 body
+g_netliney	0x00C5D660	STRONG	Int	1	forced in 1 body
+g_newsobj	0x00C68244	STRONG	Object	1	forced in 1 body
+g_newspaper_img	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_newstar	0x00C5B248	CERTAIN	TPlayer	2	forced in 2 bodies, unanimous
+g_nextscreen	0x00C64504	STRONG	String	1	forced in 1 body
+g_nomsgs	0x00C5D298	STRONG	Int	1	forced in 1 body
+g_noprogress	0x00C5B210	STRONG	Int	1	forced in 1 body
+g_now	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_np_bg1	0x00C68230	CERTAIN	TImage	2	forced in 2 bodies, unanimous
+g_np_bg2	0x00C68234	CERTAIN	TImage	2	forced in 2 bodies, unanimous
+g_np_btnflag	0x00C64224	CERTAIN	TButton	3	forced in 3 bodies, unanimous
+g_np_btnkit	0x00C64244	CERTAIN	TButton	2	forced in 2 bodies, unanimous
+g_np_cmbclubnation	0x00C64228	CERTAIN	TCombo	1	forced, agrees with verified pair
+g_np_cmbhair	0x00C64240	CERTAIN	TCombo	1	forced, agrees with verified pair
+g_np_cmbnation	0x00C64220	CERTAIN	TCombo	2	forced in 2 bodies, unanimous
+g_np_cmbposition	0x00C64234	CERTAIN	TCombo	1	forced, agrees with verified pair
+g_np_cmbside	0x00C64238	CERTAIN	TCombo	1	forced, agrees with verified pair
+g_np_cmbskin	0x00C6423C	CERTAIN	TCombo	1	forced, agrees with verified pair
+g_np_comboclub	-	AMBIGUOUS	TCombo	2	no alignment forced it (2 bodies)
+g_np_comboclubnation	0x00C64228	CERTAIN	TCombo	1	forced, agrees with verified pair
+g_np_combohair	0x00C64238	CERTAIN	TCombo	1	forced, agrees with verified pair
+g_np_combohaircol	0x00C64240	CERTAIN	TCombo	1	forced, agrees with verified pair
+g_np_combonation	0x00C64220	CERTAIN	TCombo	2	forced, agrees with verified pair
+g_np_comboposition	-	AMBIGUOUS	TCombo	1	no alignment forced it (1 bodies)
+g_np_comboside	-	AMBIGUOUS	TCombo	1	no alignment forced it (1 bodies)
+g_np_comboskin	0x00C64234	CERTAIN	TCombo	1	forced, agrees with verified pair
+g_np_comboskincol	0x00C6423C	CERTAIN	TCombo	1	forced, agrees with verified pair
+g_np_heads	0x00C68240	CERTAIN	TImage[]	2	forced in 2 bodies, unanimous
+g_np_inpname	0x00C6421C	STRONG	TInputBox	1	forced in 1 body
+g_np_nameinput	-	AMBIGUOUS	TInputBox	1	no alignment forced it (1 bodies)
+g_np_page	0x00C64218	STRONG	Int	1	forced in 1 body
+g_np_photo	0x00C68244	STRONG	TImage	1	forced in 1 body
+g_np_screen	0x00C64214	STRONG	TScreen	1	forced in 1 body
+g_np_star	0x00C68248	CERTAIN	TImage	2	forced in 2 bodies, unanimous
+g_nsgimg	0x00C5D5BC	STRONG	TImage	2	forced in 1 body
+g_nums	-	AMBIGUOUS	Int[]	1	no alignment forced it (1 bodies)
+g_object05	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_object06	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_object07	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_object08	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_object102	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_object108	0x00C61CF8	CERTAIN	TGadget	7	forced in 4 bodies, unanimous
+g_object109	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_object110	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_object111	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_object133	0x00C60500	CERTAIN	TList	1	forced, agrees with verified pair
+g_object169	0x00C64EC4	CERTAIN	TContinent	2	forced in 2 bodies, unanimous
+g_object17	0x00C5B218	CERTAIN	TTeam	6	forced in 5 bodies, unanimous
+g_object18	0x00C5B21C	CERTAIN	TTeam	3	forced in 2 bodies, unanimous
+g_object21	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_object22	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_object280	0x00C64BC0	STRONG	TList	1	forced in 1 body
+g_object29	-	AMBIGUOUS	TImage	2	no alignment forced it (2 bodies)
+g_object293	0x00C65A24	STRONG	TCompetition	1	forced in 1 body
+g_object30	-	AMBIGUOUS	TImage	2	no alignment forced it (2 bodies)
+g_object329	0x00C66724	STRONG	TScreen	1	forced in 1 body
+g_object348	0x00C66770	CERTAIN	TButton	2	forced in 2 bodies, unanimous
+g_object349	0x00C66774	CERTAIN	TButton	2	forced in 2 bodies, unanimous
+g_object41	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_object42	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_object46	0x00C5B348	CERTAIN	TChannel	3	forced in 2 bodies, unanimous
+g_object462	0x00C66F1C	CERTAIN	TPanel	2	forced in 2 bodies, unanimous
+g_object467	0x00C66F3C	CERTAIN	TCombo	2	forced in 2 bodies, unanimous
+g_object468	0x00C66F48	CERTAIN	TButton	2	forced in 2 bodies, unanimous
+g_object469	0x00C66F4C	CERTAIN	TButton	2	forced in 2 bodies, unanimous
+g_object470	0x00C66F50	CERTAIN	TButton	2	forced in 2 bodies, unanimous
+g_object471	0x00C66F54	CERTAIN	TButton	2	forced in 2 bodies, unanimous
+g_object472	0x00C66F58	CERTAIN	TButton	2	forced in 2 bodies, unanimous
+g_object51	0x00C5B368	CERTAIN	TSound	2	forced, agrees with verified pair
+g_object52	0x00C5B36C	CERTAIN	TSound	1	forced, agrees with verified pair
+g_object523	0x00C679B0	STRONG	TGadget	1	forced in 1 body
+g_object526	0x00C679BC	STRONG	TGadget	1	forced in 1 body
+g_object539	0x00C67B28	STRONG	TLabel	1	forced in 1 body
+g_object540	0x00C67B2C	STRONG	TLabel	1	forced in 1 body
+g_object541	0x00C67B30	STRONG	TLabel	1	forced in 1 body
+g_object542	0x00C67B34	CERTAIN	TProgressBar	2	forced in 2 bodies, unanimous
+g_object543	0x00C67B38	STRONG	TLabel	1	forced in 1 body
+g_object544	0x00C67B3C	STRONG	TLabel	1	forced in 1 body
+g_object545	0x00C67B40	STRONG	TLabel	1	forced in 1 body
+g_object546	0x00C67B44	STRONG	TLabel	1	forced in 1 body
+g_object547	0x00C67B48	STRONG	TLabel	1	forced in 1 body
+g_object55	-	AMBIGUOUS	TImage	2	bodies disagree: 00c5d208:1 00c5d218:1
+g_object56	-	AMBIGUOUS	TImage	2	bodies disagree: 00c5d214:1 00c5d21c:1
+g_object568	0x00C67D94	STRONG	TButton	1	forced in 1 body
+g_object575	0x00C67DB0	STRONG	TLabel	1	forced in 1 body
+g_object60	0x00C59A44	CERTAIN	TList	1	forced, agrees with verified pair
+g_object711	0x00C6A658	STRONG	TImage	2	forced in 1 body
+g_object712	0x00C6A65C	STRONG	TImage	2	forced in 1 body
+g_object713	0x00C6A660	STRONG	TImage	2	forced in 1 body
+g_object714	0x00C6A664	STRONG	TImage	2	forced in 1 body
+g_object727	-	AMBIGUOUS	TSound	1	no alignment forced it (1 bodies)
+g_object729	0x00C6B858	STRONG	TPanel	1	forced in 1 body
+g_object752	0x00C6C018	STRONG	TScreen	1	forced in 1 body
+g_object753	0x00C6C01C	STRONG	TButton	2	forced in 1 body
+g_object754	0x00C6C020	STRONG	TButton	2	forced in 1 body
+g_object755	0x00C6C024	STRONG	TButton	2	forced in 1 body
+g_object756	0x00C6C028	STRONG	TButton	2	forced in 1 body
+g_object77	0x00C5DB1C	CERTAIN	TList	2	forced in 2 bodies, unanimous
+g_object770	-	AMBIGUOUS	TSound	2	no alignment forced it (2 bodies)
+g_object782	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_object783	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_object786	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_object79	0x00C5DE10	CERTAIN	TList	4	forced in 3 bodies, unanimous
+g_object796	-	AMBIGUOUS	TLabel	2	no alignment forced it (2 bodies)
+g_object80	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_object802	-	AMBIGUOUS	TSound	1	no alignment forced it (1 bodies)
+g_object811	0x00C6CFC8	CERTAIN	TTrainingZone	3	forced in 2 bodies, unanimous
+g_object812	0x00C6CFCC	CERTAIN	TTrainingZone	3	forced in 2 bodies, unanimous
+g_object813	0x00C6D568	CERTAIN	TList	6	forced in 5 bodies, unanimous
+g_object837	0x00C6DED4	STRONG	TButton	1	forced in 1 body
+g_object839	0x00C6DEE0	STRONG	TButton	1	forced in 1 body
+g_object845	0x00C6DF28	CERTAIN	TImage	1	forced, agrees with verified pair
+g_object846	0x00C6DF30	CERTAIN	TImage	1	forced, agrees with verified pair
+g_object847	0x00C6DF34	CERTAIN	TImage	1	forced, agrees with verified pair
+g_object848	0x00C6DF38	CERTAIN	TImage	1	forced, agrees with verified pair
+g_object849	0x00C6DF48	CERTAIN	TImage	1	forced, agrees with verified pair
+g_object851	0x00C6E298	CERTAIN	TList	2	forced in 2 bodies, unanimous
+g_object859	0x00C6F090	CERTAIN	TChannel	7	forced in 2 bodies, unanimous
+g_object861	0x00C6F124	STRONG	TSound	1	forced in 1 body
+g_object864	0x00C6F1DC	STRONG	TImage	1	forced in 1 body
+g_object865	0x00C6F208	STRONG	TImage	1	forced in 1 body
+g_object872	0x00C6F34C	CERTAIN	TImage	5	forced, agrees with verified pair
+g_object873	0x00C6F3B0	CERTAIN	TImage	5	forced, agrees with verified pair
+g_offer	0x00C67B88	STRONG	TContractOffer	2	forced in 1 body
+g_offers	0x00C6B428	CERTAIN	TList	1	forced, agrees with verified pair
+g_offside_away	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_offside_home	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_oldcamx	0x00C5B1E0	STRONG	Float	2	forced in 1 body
+g_oldcamy	0x00C5B1E4	STRONG	Float	2	forced in 1 body
+g_oldcamz	0x00C5B1E8	STRONG	Float	2	forced in 1 body
+g_opponentteam	-	AMBIGUOUS	TTeam	2	no alignment forced it (2 bodies)
+g_opt_a	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_opt_b	-	AMBIGUOUS	Int	2	no alignment forced it (2 bodies)
+g_opt_bossfx	0x00C5D298	STRONG	Int	2	forced in 1 body
+g_opt_bossoff	-	AMBIGUOUS	Int	2	no alignment forced it (2 bodies)
+g_opt_c	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_opt_cam	0x00C5D24C	STRONG	Int	1	forced in 1 body
+g_opt_ctrlbutton	-	AMBIGUOUS	Int[]	3	no alignment forced it (3 bodies)
+g_opt_ctrlbutton2	-	AMBIGUOUS	Int[]	3	no alignment forced it (3 bodies)
+g_opt_ctrlbutton3	-	AMBIGUOUS	Int[]	3	no alignment forced it (3 bodies)
+g_opt_ctrlbutton4	-	AMBIGUOUS	Int[]	3	no alignment forced it (3 bodies)
+g_opt_ctrldown	0x00C5D1BC	STRONG	Int[]	4	forced in 1 body
+g_opt_ctrlidx	0x00C5D1A8	CERTAIN	Int	5	forced in 2 bodies, unanimous
+g_opt_ctrlleft	0x00C5D1C4	CERTAIN	Int[]	5	forced in 2 bodies, unanimous
+g_opt_ctrlpause	-	AMBIGUOUS	Int[]	2	no alignment forced it (2 bodies)
+g_opt_ctrlreplay	-	AMBIGUOUS	Int[]	2	no alignment forced it (2 bodies)
+g_opt_ctrlright	0x00C5D1CC	STRONG	Int[]	4	forced in 1 body
+g_opt_ctrlup	0x00C5D1B4	CERTAIN	Int[]	5	forced in 2 bodies, unanimous
+g_opt_currency	0x00C5D274	CERTAIN	Int	3	forced, agrees with verified pair
+g_opt_d	-	AMBIGUOUS	Int	2	no alignment forced it (2 bodies)
+g_opt_difficulty	0x00C5D228	CERTAIN	Int	3	forced, agrees with verified pair
+g_opt_displayinitials	-	AMBIGUOUS	Int	2	no alignment forced it (2 bodies)
+g_opt_dist	0x00C5D254	CERTAIN	Int	1	forced, agrees with verified pair
+g_opt_distance	-	AMBIGUOUS	Int	3	no alignment forced it (3 bodies)
+g_opt_e	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_opt_f	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_opt_fixkick	0x00C5D294	STRONG	Int	3	forced in 1 body
+g_opt_highlightball	-	AMBIGUOUS	Int	3	no alignment forced it (3 bodies)
+g_opt_hlball	0x00C5D26C	CERTAIN	Int	1	forced, agrees with verified pair
+g_opt_kickmode	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_opt_labels	0x00C5A324	STRONG	String[]	1	forced in 1 body
+g_opt_language	-	AMBIGUOUS	String	2	no alignment forced it (2 bodies)
+g_opt_lbfindme	-	AMBIGUOUS	Int	2	no alignment forced it (2 bodies)
+g_opt_lbmyage	-	AMBIGUOUS	Int	2	no alignment forced it (2 bodies)
+g_opt_lbmyclub	-	AMBIGUOUS	Int	2	no alignment forced it (2 bodies)
+g_opt_lbmynation	-	AMBIGUOUS	Int	2	no alignment forced it (2 bodies)
+g_opt_lbview	-	AMBIGUOUS	Int	2	no alignment forced it (2 bodies)
+g_opt_matchfx	0x00C5D250	STRONG	Int	4	forced in 1 body
+g_opt_matchlength	0x00C5D230	CERTAIN	Int	4	forced in 2 bodies, unanimous
+g_opt_matchscale	-	AMBIGUOUS	Float	2	no alignment forced it (2 bodies)
+g_opt_matchspeed	0x00C5D234	CERTAIN	Int	3	forced, agrees with verified pair
+g_opt_mode	0x00C5D1A8	STRONG	Int	1	forced in 1 body
+g_opt_msgshown	0x00C63D08	STRONG	Int	1	forced in 1 body
+g_opt_music	-	AMBIGUOUS	Float	2	no alignment forced it (2 bodies)
+g_opt_musicvol	0x00C5D224	STRONG	Float	1	forced in 1 body
+g_opt_playercam	-	AMBIGUOUS	Int	4	no alignment forced it (4 bodies)
+g_opt_radar	0x00C5D22C	CERTAIN	Int	3	forced, agrees with verified pair
+g_opt_refresh	-	AMBIGUOUS	Int	6	no alignment forced it (6 bodies)
+g_opt_replayscale	-	AMBIGUOUS	Float	2	no alignment forced it (2 bodies)
+g_opt_reqcorners	0x00C5D27C	STRONG	Int	3	forced in 1 body
+g_opt_reqfreekicks	0x00C5D278	STRONG	Int	3	forced in 1 body
+g_opt_res	0x00C5D248	STRONG	Int	1	forced in 1 body
+g_opt_scheme	-	AMBIGUOUS	Int	2	no alignment forced it (2 bodies)
+g_opt_screen	-	AMBIGUOUS	Int	3	no alignment forced it (3 bodies)
+g_opt_sfxvol	0x00C5D220	CERTAIN	Float	1	forced, agrees with verified pair
+g_opt_showenergy	0x00C5D270	STRONG	Int	4	forced in 1 body
+g_opt_soundfx	-	AMBIGUOUS	Float	3	no alignment forced it (3 bodies)
+g_opt_tooltips	0x00C5D258	CERTAIN	Int	4	forced, agrees with verified pair
+g_opt_window	-	AMBIGUOUS	Int	3	no alignment forced it (3 bodies)
+g_opt_windowed	0x00C5D248	STRONG	Int	1	forced in 1 body
+g_optfreekicks	0x00C5D278	STRONG	Int	1	forced in 1 body
+g_options_arr01	0x00C5A324	STRONG	String[]	1	forced in 1 body
+g_options_arr02	0x00C5D1B4	STRONG	Int[]	4	forced in 1 body
+g_options_arr03	0x00C5D1BC	STRONG	Int[]	4	forced in 1 body
+g_options_arr04	0x00C5D1C4	STRONG	Int[]	4	forced in 1 body
+g_options_arr05	0x00C5D1CC	STRONG	Int[]	4	forced in 1 body
+g_options_arr06	0x00C5D1D4	CERTAIN	Int[]	7	forced in 4 bodies, unanimous
+g_options_arr07	0x00C5D1DC	CERTAIN	Int[]	5	forced in 3 bodies, unanimous
+g_options_arr08	0x00C5D1E4	CERTAIN	Int[]	5	forced in 3 bodies, unanimous
+g_options_arr10	0x00C5D1F4	CERTAIN	Int[]	6	forced in 4 bodies, unanimous
+g_options_arr11	0x00C5D1FC	CERTAIN	Int[]	4	forced in 3 bodies, unanimous
+g_options_arr12	-	AMBIGUOUS	TImage[]	2	bodies disagree: 00c5d218:1 00c5d208:1
+g_options_arr13	-	AMBIGUOUS	TImage[]	2	bodies disagree: 00c5d21c:1 00c5d214:1
+g_options_buttons	0x00C5D1D4	STRONG	Int[]	1	forced in 1 body
+g_options_controlidx	0x00C5D1A8	STRONG	Int	1	forced in 1 body
+g_options_controlmode	0x00C5D1A8	STRONG	Int	1	forced in 1 body
+g_options_controls	-	AMBIGUOUS	Int[]	2	bodies disagree: 00c5d1dc:1 00c5d1fc:1
+g_options_corners	0x00C5D27C	STRONG	Int	1	forced in 1 body
+g_options_ctlidx	0x00C5D1A8	STRONG	Int	1	forced in 1 body
+g_options_flagbutton	0x00C63CF0	STRONG	TButton	2	forced in 1 body
+g_options_float01	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_options_inputbox	-	AMBIGUOUS	TInputBox	2	no alignment forced it (2 bodies)
+g_options_int01	0x00C5D1A8	CERTAIN	Int	13	forced in 9 bodies, unanimous
+g_options_int02	0x00C5D22C	CERTAIN	Int	3	forced, agrees with verified pair
+g_options_int03	0x00C5D230	CERTAIN	Int	2	forced in 2 bodies, unanimous
+g_options_int04	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_options_int05	0x00C5D240	CERTAIN	Int	3	forced in 2 bodies, unanimous
+g_options_int09	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_options_int11	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_options_int15	0x00C5D278	STRONG	Int	1	forced in 1 body
+g_options_int16	0x00C5D27C	STRONG	Int	1	forced in 1 body
+g_options_int19	0x00C5D294	STRONG	Int	2	forced in 1 body
+g_options_matchspeed	0x00C5D234	STRONG	Int	1	forced in 1 body
+g_options_musicvol	0x00C5D224	CERTAIN	Float	1	forced, agrees with verified pair
+g_options_prevscreen	0x00C63CEC	CERTAIN	String	2	forced, agrees with verified pair
+g_options_rescombo	-	AMBIGUOUS	TCombo	2	no alignment forced it (2 bodies)
+g_options_sfxvol	0x00C5D220	CERTAIN	Float	2	forced, agrees with verified pair
+g_options_tooltips	0x00C5D258	CERTAIN	Int	2	forced, agrees with verified pair
+g_options_units	0x00C5D254	STRONG	Int	2	forced in 1 body
+g_options_volume	0x00C6DF18	STRONG	Float	1	forced in 1 body
+g_optionsfloat	0x00C5B1D4	STRONG	Float	1	forced in 1 body
+g_optlang	0x00C5D290	STRONG	String	1	forced in 1 body
+g_optroot	-	AMBIGUOUS	String	2	no alignment forced it (2 bodies)
+g_pair_backs	0x00C6C9F0	STRONG	TImage[]	1	forced in 1 body
+g_pair_fronts	0x00C6E950	STRONG	TImage[]	1	forced in 1 body
+g_pair_icon_arr01	0x00C6C9F0	STRONG	TImage[]	1	forced in 1 body
+g_pair_icon_int	0x00C6C9E4	CERTAIN	Int	2	forced in 2 bodies, unanimous
+g_pair_icons	0x00C6C9E0	CERTAIN	TList	2	forced in 2 bodies, unanimous
+g_pairicons	0x00C6C9E0	CERTAIN	TList	2	forced in 2 bodies, unanimous
+g_pairs_buttons	0x00C6C81C	CERTAIN	TButton[]	3	forced in 3 bodies, unanimous
+g_pairs_chan	0x00C6F090	STRONG	TChannel	1	forced in 1 body
+g_pairs_clicked	0x00C6C82C	STRONG	Int	1	forced in 1 body
+g_pairs_icons	0x00C6C9E0	CERTAIN	TList	2	forced in 2 bodies, unanimous
+g_pairs_id	0x00C6C828	STRONG	Int	1	forced in 1 body
+g_pairs_int03	0x00C6C82C	STRONG	Int	2	forced in 1 body
+g_pairs_int04	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_pairs_int05	0x00C6EFD4	STRONG	Int	2	forced in 1 body
+g_pairs_mode	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_pairs_snd	0x00C6C550	CERTAIN	TSound	1	forced, agrees with verified pair
+g_pairs_state	0x00C6C82C	STRONG	Int	1	forced in 1 body
+g_pairs_time	0x00C6EFD4	STRONG	Int	1	forced in 1 body
+g_pairs_tries	0x00C6C830	STRONG	Int	1	forced in 1 body
+g_pan_a	0x00C679B0	STRONG	TPanel	1	forced in 1 body
+g_pan_abilities	-	AMBIGUOUS	TPanel	2	no alignment forced it (2 bodies)
+g_pan_achievements	-	AMBIGUOUS	TPanel	1	no alignment forced it (1 bodies)
+g_pan_advanced	0x00C640D8	CERTAIN	TPanel	2	forced in 2 bodies, unanimous
+g_pan_b	0x00C679BC	STRONG	TPanel	1	forced in 1 body
+g_pan_background	-	AMBIGUOUS	TPanel	1	no alignment forced it (1 bodies)
+g_pan_finances	0x00C68154	STRONG	TPanel	1	forced in 1 body
+g_pan_happiness	-	AMBIGUOUS	TPanel	1	no alignment forced it (1 bodies)
+g_pan_health	-	AMBIGUOUS	TPanel	1	no alignment forced it (1 bodies)
+g_pan_levels	-	AMBIGUOUS	TPanel	1	no alignment forced it (1 bodies)
+g_pan_lifestyle	0x00C6815C	STRONG	TPanel	2	forced in 1 body
+g_pan_money	0x00C667B0	CERTAIN	TPanel	7	forced in 4 bodies, unanimous
+g_pan_nav	0x00C667B0	CERTAIN	TPanel	2	forced, agrees with verified pair
+g_pan_physionav	-	AMBIGUOUS	TPanel	1	no alignment forced it (1 bodies)
+g_pan_physioreport	-	AMBIGUOUS	TPanel	1	no alignment forced it (1 bodies)
+g_pan_profile	-	AMBIGUOUS	TPanel	1	no alignment forced it (1 bodies)
+g_pan_simple	0x00C640D4	CERTAIN	TPanel	2	forced in 2 bodies, unanimous
+g_pan_skills	-	AMBIGUOUS	TPanel	1	no alignment forced it (1 bodies)
+g_pan_sponsors	0x00C68158	STRONG	TPanel	1	forced in 1 body
+g_pan_stable	0x00C66768	CERTAIN	TPanel	14	forced in 7 bodies, unanimous
+g_pan_title	0x00C66768	CERTAIN	TPanel	6	forced in 2 bodies, unanimous
+g_pancash	-	AMBIGUOUS	TPanel	1	no alignment forced it (1 bodies)
+g_pandetails	0x00C64438	STRONG	TPanel	1	forced in 1 body
+g_panel_bg	0x00C66768	STRONG	TPanel	1	forced in 1 body
+g_panel_controls_kick	0x00C6DD6C	CERTAIN	TLabel[]	2	forced in 2 bodies, unanimous
+g_panel_controls_lbl	0x00C6DD60	CERTAIN	TLabel[]	5	forced in 5 bodies, unanimous
+g_panel_controls_pan	0x00C6DD50	CERTAIN	TPanel	2	forced in 2 bodies, unanimous
+g_panel_controls_panreplay	0x00C6DD54	CERTAIN	TPanel	2	forced in 2 bodies, unanimous
+g_panmenu	-	AMBIGUOUS	TPanel	2	no alignment forced it (2 bodies)
+g_particleimage	0x00C6AD84	CERTAIN	TImage	2	forced in 2 bodies, unanimous
+g_particles	0x00C6AD80	CERTAIN	TList	7	forced in 7 bodies, unanimous
+g_particles_on	0x00C5D250	STRONG	Int	1	forced in 1 body
+g_particlesound	0x00C6AD88	STRONG	TSound	1	forced in 1 body
+g_path	0x00C6E950	CERTAIN	String	4	forced in 2 bodies, unanimous
+g_pathprefix	-	AMBIGUOUS	String	7	bodies disagree: 00c6e950:2 00c65e2c:1 00c65574:1 00c65718:1 00c658f4:1 00c6c54c:1
+g_pauseclock	0x00C6F030	STRONG	Int	2	forced in 1 body
+g_pausedms	-	AMBIGUOUS	Int	4	bodies disagree: 00c6efd8:2 00c6efd4:1
+g_pauseticks	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_pb_rel	0x00C67B64	STRONG	TProgressBar	1	forced in 1 body
+g_pbf1	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_pbf2	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_penboxd	0x00C5D650	STRONG	Int	3	forced in 1 body
+g_penboxside	0x00C5D64C	CERTAIN	Int	4	forced in 2 bodies, unanimous
+g_penspoty	0x00C5D658	STRONG	Int	1	forced in 1 body
+g_photographer_arr	0x00C5DB28	STRONG	TImage[]	1	forced in 1 body
+g_photographer_imgs	-	AMBIGUOUS	TImage[]	1	no alignment forced it (1 bodies)
+g_photographer_int01	-	AMBIGUOUS	Int	2	bodies disagree: 00c5db2c:1 00c5db30:1
+g_photographer_int02	-	AMBIGUOUS	Int	2	bodies disagree: 00c5db30:1 00c5db2c:1
+g_photographer_int03	-	AMBIGUOUS	Int	2	bodies disagree: 00c5db34:1 00c5db38:1
+g_photographer_int04	-	AMBIGUOUS	Int	2	bodies disagree: 00c5db38:1 00c5db34:1
+g_photographers	0x00C5DB1C	CERTAIN	TList	2	forced in 2 bodies, unanimous
+g_physio_btn	0x00C68A14	STRONG	TButton	1	forced in 1 body
+g_physio_icon	0x00C6675C	STRONG	TImage	1	forced in 1 body
+g_physio_img	0x00C68A04	STRONG	TImage	1	forced in 1 body
+g_pitch05	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_pitch06	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_pitch07	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_pitch_arr02	0x00C5D5F4	STRONG	TImage[]	1	forced in 1 body
+g_pitch_arr03	0x00C5D600	STRONG	TImage[]	1	forced in 1 body
+g_pitch_arr04	-	AMBIGUOUS	TImage[]	1	no alignment forced it (1 bodies)
+g_pitch_arr05	0x00C5D614	CERTAIN	Int[,,]	2	forced, agrees with verified pair
+g_pitch_arr06	0x00C5D620	STRONG	TImage[]	2	forced in 1 body
+g_pitch_float01	0x00C5D628	CERTAIN	Float	2	forced in 2 bodies, unanimous
+g_pitch_float02	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_pitch_float03	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_pitch_float04	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_pitch_float05	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_pitch_float06	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_pitch_float07	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_pitch_float08	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_pitch_halfh	0x00C5D638	CERTAIN	Int	2	forced in 2 bodies, unanimous
+g_pitch_halflength	0x00C5D638	STRONG	Int	1	forced in 1 body
+g_pitch_halfw	-	AMBIGUOUS	Int	2	bodies disagree: 00c5d634:1 00c5d63c:1
+g_pitch_hh	0x00C5D638	STRONG	Int	1	forced in 1 body
+g_pitch_hw	0x00C5D634	STRONG	Int	1	forced in 1 body
+g_pitch_int02	-	AMBIGUOUS	Int	2	no alignment forced it (2 bodies)
+g_pitch_int05	0x00C5D624	STRONG	Int	3	forced in 1 body
+g_pitch_int06	-	AMBIGUOUS	Int	2	no alignment forced it (2 bodies)
+g_pitch_int07	-	AMBIGUOUS	Int	2	no alignment forced it (2 bodies)
+g_pitch_int08	0x00C5D640	STRONG	Int	1	forced in 1 body
+g_pitch_int09	0x00C5D644	STRONG	Int	1	forced in 1 body
+g_pitch_int10	0x00C5D648	STRONG	Int	3	forced in 1 body
+g_pitch_int11	0x00C5D650	CERTAIN	Int	3	forced in 2 bodies, unanimous
+g_pitch_int12	0x00C5D634	STRONG	Int	2	forced in 1 body
+g_pitch_int13	0x00C5D664	STRONG	Int	1	forced in 1 body
+g_pitch_int14	0x00C5D668	STRONG	Int	1	forced in 1 body
+g_pitch_int15	0x00C5D66C	STRONG	Int	2	forced in 1 body
+g_pitch_int16	0x00C5D670	STRONG	Int	2	forced in 1 body
+g_pitch_int17	0x00C5D638	STRONG	Int	3	forced in 1 body
+g_pitch_int18	-	AMBIGUOUS	Int	2	no alignment forced it (2 bodies)
+g_pitch_int19	-	AMBIGUOUS	Int	2	no alignment forced it (2 bodies)
+g_pitch_int21	0x00C5D69C	CERTAIN	Int	5	forced in 3 bodies, unanimous
+g_pitch_mowtype	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_pitch_pitchtype	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_pitch_wallcolour	0x00C5D698	STRONG	String	1	forced in 1 body
+g_pitchcond	0x00C5D630	CERTAIN	Int	2	forced in 2 bodies, unanimous
+g_pitchgoalhalf	0x00C5D650	STRONG	Int	1	forced in 1 body
+g_pitchhalfheight	0x00C5D634	STRONG	Int	3	forced in 1 body
+g_pitchhalfwidth	-	AMBIGUOUS	Int	4	bodies disagree: 00c5d66c:1 00c5d638:1
+g_pitchheight	0x00C5D670	STRONG	Int	1	forced in 1 body
+g_pitchimg1	0x00C5D5A4	STRONG	TImage	2	forced in 1 body
+g_pitchimg1b	0x00C5D5AC	STRONG	TImage	2	forced in 1 body
+g_pitchimg2	0x00C5D5A8	STRONG	TImage	2	forced in 1 body
+g_pitchimg2b	0x00C5D5B0	STRONG	TImage	2	forced in 1 body
+g_pitchimg3	0x00C5D5B4	STRONG	TImage	2	forced in 1 body
+g_pitchimg4	0x00C5D5B8	STRONG	TImage	2	forced in 1 body
+g_pitchleft	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_pitchmargin	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_pitchmark_image	0x00C5D9B0	STRONG	TImage	1	forced in 1 body
+g_pitchmarkimage	0x00C5D9B0	STRONG	TImage	1	forced in 1 body
+g_pitchmarks	0x00C5D9AC	CERTAIN	TList	5	forced in 5 bodies, unanimous
+g_pitchscale	0x00C5D628	CERTAIN	Float	2	forced in 2 bodies, unanimous
+g_pitchtopy	0x00C5D638	STRONG	Int	1	forced in 1 body
+g_pitchtype	0x00C5D62C	CERTAIN	Int	2	forced in 2 bodies, unanimous
+g_pitchwidth	0x00C5D664	STRONG	Int	1	forced in 1 body
+g_playbutton	0x00C66798	STRONG	TButton	1	forced in 1 body
+g_player_accel	0x00C5DE48	STRONG	Float	1	forced in 1 body
+g_player_anim_dive	0x00C5DEC0	STRONG	Int[]	1	forced in 1 body
+g_player_anim_keepercatchlow	0x00C5DF18	STRONG	Int[]	1	forced in 1 body
+g_player_anim_keeperjump	0x00C5DF08	STRONG	Int[]	1	forced in 1 body
+g_player_anim_slide	0x00C5DEBC	STRONG	Int[]	1	forced in 1 body
+g_player_arr01	0x00C5DEAC	CERTAIN	Int[]	10	forced in 8 bodies, unanimous
+g_player_arr02	0x00C5DEB0	CERTAIN	Int[]	6	forced in 6 bodies, unanimous
+g_player_arr03	0x00C5DEB4	CERTAIN	Int[]	5	forced in 3 bodies, unanimous
+g_player_arr04	0x00C5DEB8	CERTAIN	Int[]	4	forced in 2 bodies, unanimous
+g_player_arr05	0x00C5DEBC	CERTAIN	Int[]	6	forced in 5 bodies, unanimous
+g_player_arr06	0x00C5DEC0	CERTAIN	Int[]	4	forced in 3 bodies, unanimous
+g_player_arr07	0x00C5DEC4	CERTAIN	Int[]	4	forced in 3 bodies, unanimous
+g_player_arr08	0x00C5DEC8	CERTAIN	Int[]	4	forced in 4 bodies, unanimous
+g_player_arr09	0x00C5DECC	CERTAIN	Int[]	2	forced in 2 bodies, unanimous
+g_player_arr10	0x00C5DED0	CERTAIN	Int[]	5	forced in 3 bodies, unanimous
+g_player_arr11	0x00C5DED4	CERTAIN	Int[]	5	forced in 3 bodies, unanimous
+g_player_arr12	0x00C5DED8	CERTAIN	Int[]	5	forced in 3 bodies, unanimous
+g_player_arr13	0x00C5DEDC	CERTAIN	Int[]	6	forced in 3 bodies, unanimous
+g_player_arr14	0x00C5DEE0	CERTAIN	Int[]	4	forced in 3 bodies, unanimous
+g_player_arr15	0x00C5DEE4	CERTAIN	Int[]	3	forced in 2 bodies, unanimous
+g_player_arr16	0x00C5DEE8	CERTAIN	Int[]	3	forced in 2 bodies, unanimous
+g_player_arr17	0x00C5DEEC	CERTAIN	Int[]	3	forced in 2 bodies, unanimous
+g_player_arr18	0x00C5DEF0	CERTAIN	Int[]	3	forced in 2 bodies, unanimous
+g_player_arr19	0x00C5DEF4	CERTAIN	Int[]	7	forced in 5 bodies, unanimous
+g_player_arr20	0x00C5DEF8	CERTAIN	Int[]	7	forced in 4 bodies, unanimous
+g_player_arr21	0x00C5DEFC	CERTAIN	Int[]	6	forced in 4 bodies, unanimous
+g_player_arr22	0x00C5DF00	CERTAIN	Int[]	8	forced in 5 bodies, unanimous
+g_player_arr23	0x00C5DF04	CERTAIN	Int[]	8	forced in 5 bodies, unanimous
+g_player_arr24	0x00C5DF08	CERTAIN	Int[]	7	forced in 5 bodies, unanimous
+g_player_arr25	0x00C5DF0C	CERTAIN	Int[]	7	forced in 4 bodies, unanimous
+g_player_arr26	0x00C5DF10	CERTAIN	Int[]	5	forced in 3 bodies, unanimous
+g_player_arr27	0x00C5DF14	CERTAIN	Int[]	6	forced in 3 bodies, unanimous
+g_player_arr28	0x00C5DF18	CERTAIN	Int[]	7	forced in 5 bodies, unanimous
+g_player_arr29	0x00C5DF1C	CERTAIN	Int[]	6	forced in 3 bodies, unanimous
+g_player_arr30	0x00C5DF20	CERTAIN	Int[]	2	forced in 2 bodies, unanimous
+g_player_arr31	0x00C5DF24	CERTAIN	Int[]	2	forced in 2 bodies, unanimous
+g_player_arr32	0x00C5DF28	STRONG	Int[]	1	forced in 1 body
+g_player_arrowgreenimg	0x00C5DE1C	STRONG	TImage	1	forced in 1 body
+g_player_arrowyellowimg	0x00C5DE20	STRONG	TImage	1	forced in 1 body
+g_player_b	0x00C5B1FC	CERTAIN	Int	2	forced in 2 bodies, unanimous
+g_player_boozedupsnd	0x00C5DF3C	STRONG	TSound	1	forced in 1 body
+g_player_chan01	-	AMBIGUOUS	TChannel	1	no alignment forced it (1 bodies)
+g_player_chan02	-	AMBIGUOUS	TChannel	1	no alignment forced it (1 bodies)
+g_player_double01	-	AMBIGUOUS	Double	1	no alignment forced it (1 bodies)
+g_player_double05	-	UNGROUNDED	Double	0	in no body pairable with an original
+g_player_double06	-	AMBIGUOUS	Double	1	no alignment forced it (1 bodies)
+g_player_double07	-	AMBIGUOUS	Double	1	no alignment forced it (1 bodies)
+g_player_double08	-	AMBIGUOUS	Double	1	no alignment forced it (1 bodies)
+g_player_double09	-	AMBIGUOUS	Double	1	no alignment forced it (1 bodies)
+g_player_double15	-	AMBIGUOUS	Double	1	no alignment forced it (1 bodies)
+g_player_double18	-	AMBIGUOUS	Double	1	no alignment forced it (1 bodies)
+g_player_double19	-	AMBIGUOUS	Double	1	no alignment forced it (1 bodies)
+g_player_energydrain	0x00C5DE90	CERTAIN	Float	1	forced, agrees with verified pair
+g_player_f07	0x00C5DE58	CERTAIN	Float	3	forced in 2 bodies, unanimous
+g_player_f08	0x00C5DE5C	STRONG	Float	1	forced in 1 body
+g_player_float01	-	AMBIGUOUS	Float	2	no alignment forced it (2 bodies)
+g_player_float02	0x00C5DE44	CERTAIN	Float	7	forced in 5 bodies, unanimous
+g_player_float03	0x00C5DE48	STRONG	Float	2	forced in 1 body
+g_player_float05	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_player_float06	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_player_float07	0x00C5DE58	STRONG	Float	1	forced in 1 body
+g_player_float08	0x00C5DE5C	CERTAIN	Float	2	forced in 2 bodies, unanimous
+g_player_float09	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_player_float10	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_player_float11	0x00C5DE68	STRONG	Float	2	forced in 1 body
+g_player_float13	0x00C5DE7C	STRONG	Float	1	forced in 1 body
+g_player_float14	0x00C5DE84	STRONG	Float	1	forced in 1 body
+g_player_float15	0x00C5DE88	STRONG	Float	1	forced in 1 body
+g_player_float16	0x00C5DE8C	CERTAIN	Float	1	forced, agrees with verified pair
+g_player_float17	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_player_float18	0x00C5DE94	STRONG	Float	1	forced in 1 body
+g_player_float19	0x00C5DE98	CERTAIN	Float	2	forced in 2 bodies, unanimous
+g_player_float20	0x00C5DE9C	CERTAIN	Float	2	forced in 2 bodies, unanimous
+g_player_float21	0x00C5DEA0	CERTAIN	Float	2	forced in 2 bodies, unanimous
+g_player_framelength	0x00C5DEA8	STRONG	Int	1	forced in 1 body
+g_player_friction	0x00C5DE50	CERTAIN	Float	1	forced, agrees with verified pair
+g_player_handlex	0x00C5DE3C	STRONG	Int	1	forced in 1 body
+g_player_handley	0x00C5DE40	STRONG	Int	1	forced in 1 body
+g_player_height	0x00C5DE70	STRONG	Int	1	forced in 1 body
+g_player_highlightimg	0x00C5DE18	STRONG	TImage	1	forced in 1 body
+g_player_highlightpass	0x00C5DE80	STRONG	Int	1	forced in 1 body
+g_player_injuryfrequency	0x00C5DE8C	STRONG	Float	1	forced in 1 body
+g_player_int01	0x00C5B1FC	CERTAIN	Int	49	forced in 26 bodies, unanimous
+g_player_int02	0x00C5B200	CERTAIN	Int	2	forced in 2 bodies, unanimous
+g_player_int03	0x00C5B204	CERTAIN	Int	2	forced in 2 bodies, unanimous
+g_player_int04	0x00C5B250	CERTAIN	Int	4	forced in 2 bodies, unanimous
+g_player_int14	0x00C5D1AC	CERTAIN	Int	13	forced in 10 bodies, unanimous
+g_player_int15	0x00C5D228	CERTAIN	Int	5	forced in 3 bodies, unanimous
+g_player_int16	0x00C5D634	STRONG	Int	24	10/11 bodies agree
+g_player_int17	0x00C5D638	CERTAIN	Int	23	forced in 13 bodies, unanimous
+g_player_int18	0x00C5D63C	CERTAIN	Int	4	forced in 2 bodies, unanimous
+g_player_int19	0x00C5D658	CERTAIN	Int	8	forced in 4 bodies, unanimous
+g_player_int27	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_player_int28	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_player_int29	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_player_int30	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_player_int31	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_player_int32	0x00C5DE6C	STRONG	Int	1	forced in 1 body
+g_player_int33	0x00C5DE70	CERTAIN	Int	11	forced in 9 bodies, unanimous
+g_player_int34	0x00C5DE74	CERTAIN	Int	3	forced in 3 bodies, unanimous
+g_player_int36	0x00C6EFD4	STRONG	Int	1	forced in 1 body
+g_player_int50	0x00C6EFD4	STRONG	Int	40	13/16 bodies agree
+g_player_int51	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_player_joggingspeed	0x00C5DE60	CERTAIN	Float	1	forced, agrees with verified pair
+g_player_jumpspotradius	0x00C5DE6C	STRONG	Int	1	forced in 1 body
+g_player_jumpvelocity	0x00C5DE5C	STRONG	Float	1	forced in 1 body
+g_player_keeperaccel	0x00C5DE4C	STRONG	Float	1	forced in 1 body
+g_player_kickratiocross	0x00C5DEA0	STRONG	Float	1	forced in 1 body
+g_player_kickratiolob	0x00C5DE98	STRONG	Float	1	forced in 1 body
+g_player_kickratiopass	0x00C5DE9C	STRONG	Float	1	forced in 1 body
+g_player_kickratioshoot	0x00C5DE94	STRONG	Float	1	forced in 1 body
+g_player_offsideflagimg	0x00C5DE24	STRONG	TImage	1	forced in 1 body
+g_player_oofchannel	0x00C5DF30	STRONG	TChannel	1	forced in 1 body
+g_player_oofsnd	0x00C5DF38	STRONG	TSound	1	forced in 1 body
+g_player_p50	0x00C6CC44	STRONG	Int	1	forced in 1 body
+g_player_powerbarspeed	0x00C5DE7C	STRONG	Float	1	forced in 1 body
+g_player_radius	0x00C5DE74	STRONG	Int	1	forced in 1 body
+g_player_selected	-	AMBIGUOUS	TPlayer	2	no alignment forced it (2 bodies)
+g_player_shotdistanceparry	0x00C5DE88	STRONG	Float	1	forced in 1 body
+g_player_shotpowerparry	0x00C5DE84	STRONG	Float	1	forced in 1 body
+g_player_slidechannel	0x00C5DF2C	STRONG	TChannel	1	forced in 1 body
+g_player_slidefriction	0x00C5DE54	CERTAIN	Float	1	forced, agrees with verified pair
+g_player_slidesnd	0x00C5DF34	STRONG	TSound	1	forced in 1 body
+g_player_slidevelocity	0x00C5DE58	STRONG	Float	1	forced in 1 body
+g_player_speechimg	0x00C5DE28	STRONG	TImage	1	forced in 1 body
+g_player_spritecount	0x00C5DE38	STRONG	Int	1	forced in 1 body
+g_player_spriteheight	0x00C5DE34	STRONG	Int	1	forced in 1 body
+g_player_spritename	0x00C5DE2C	STRONG	String	1	forced in 1 body
+g_player_spritescale	0x00C5DE44	STRONG	Float	1	forced in 1 body
+g_player_spritewidth	0x00C5DE30	STRONG	Int	1	forced in 1 body
+g_player_touchdistball	0x00C5DE68	STRONG	Float	1	forced in 1 body
+g_player_tplayer01	0x00C5B248	CERTAIN	TPlayer	8	forced in 2 bodies, unanimous
+g_player_trainingerrorsnd	0x00C5DF40	STRONG	TSound	1	forced in 1 body
+g_player_turningcircle	0x00C5DE78	STRONG	Float	1	forced in 1 body
+g_player_walkingspeed	0x00C5DE64	CERTAIN	Float	1	forced, agrees with verified pair
+g_playerlist	0x00C5DE10	CERTAIN	TList	3	forced in 3 bodies, unanimous
+g_players	0x00C5DE10	CERTAIN	TList	30	forced in 22 bodies, unanimous
+g_playerscale	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_playerteam	0x00C677B0	CERTAIN	TTeam	6	forced in 2 bodies, unanimous
+g_playicon	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_playtimearg	0x00C5B210	STRONG	Int	1	forced in 1 body
+g_plr	0x00C6F028	STRONG	TPlayer	1	forced in 1 body
+g_ply_turnrate	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_pm_x	0x00C5D658	STRONG	Int	1	forced in 1 body
+g_pmimage	0x00C5D9B0	STRONG	TImage	1	forced in 1 body
+g_pole_chan	-	AMBIGUOUS	TChannel	1	no alignment forced it (1 bodies)
+g_pole_img	0x00C6D8F0	STRONG	TImage	1	forced in 1 body
+g_pole_maxz	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_pole_snd	0x00C6D8F4	STRONG	TSound	1	forced in 1 body
+g_pole_sound	-	AMBIGUOUS	TSound	1	no alignment forced it (1 bodies)
+g_poles	0x00C6D568	CERTAIN	TList	1	forced, agrees with verified pair
+g_possaway	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_possbara	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_possbarh	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_possessionaway	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_possessionhome	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_posshome	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_postwidth	0x00C5D640	STRONG	Int	1	forced in 1 body
+g_ppsortby	0x00C64600	STRONG	Int	1	forced in 1 body
+g_pr_combo_comp1	0x00C65900	CERTAIN	TCombo	1	forced, agrees with verified pair
+g_pr_combo_comp2	0x00C65904	CERTAIN	TCombo	1	forced, agrees with verified pair
+g_pr_combo_nation	0x00C658FC	CERTAIN	TCombo	1	forced, agrees with verified pair
+g_pr_nation	0x00C658F8	STRONG	TNation	1	forced in 1 body
+g_prevscreen	0x00C63CEC	CERTAIN	String	4	forced, agrees with verified pair
+g_prevstate	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_prg_achievements	-	AMBIGUOUS	TProgressBar	3	no alignment forced it (3 bodies)
+g_prg_aggression	0x00C66AC0	STRONG	TProgressBar	2	forced in 1 body
+g_prg_boots	-	AMBIGUOUS	TProgressBar	1	no alignment forced it (1 bodies)
+g_prg_booze	-	AMBIGUOUS	TProgressBar	1	no alignment forced it (1 bodies)
+g_prg_corners	0x00C66AAC	STRONG	TProgressBar	2	forced in 1 body
+g_prg_crossing	0x00C66AA4	STRONG	TProgressBar	2	forced in 1 body
+g_prg_dribbling	0x00C66A7C	STRONG	TProgressBar	3	forced in 1 body
+g_prg_drugs	-	AMBIGUOUS	TProgressBar	1	no alignment forced it (1 bodies)
+g_prg_energy	-	AMBIGUOUS	TProgressBar	2	no alignment forced it (2 bodies)
+g_prg_fame	-	AMBIGUOUS	TProgressBar	2	no alignment forced it (2 bodies)
+g_prg_finishing	0x00C66AA0	STRONG	TProgressBar	2	forced in 1 body
+g_prg_flair	0x00C66A90	STRONG	TProgressBar	3	forced in 1 body
+g_prg_freekicks	0x00C66AA8	STRONG	TProgressBar	2	forced in 1 body
+g_prg_happiness	-	AMBIGUOUS	TProgressBar	2	no alignment forced it (2 bodies)
+g_prg_heading	0x00C66A8C	STRONG	TProgressBar	3	forced in 1 body
+g_prg_injury	-	AMBIGUOUS	TProgressBar	1	no alignment forced it (1 bodies)
+g_prg_lifestyle	-	AMBIGUOUS	TProgressBar	2	no alignment forced it (2 bodies)
+g_prg_longpassing	0x00C66ABC	STRONG	TProgressBar	2	forced in 1 body
+g_prg_longshots	0x00C66A9C	STRONG	TProgressBar	2	forced in 1 body
+g_prg_nrg	-	AMBIGUOUS	TProgressBar	1	no alignment forced it (1 bodies)
+g_prg_pace	0x00C66A78	STRONG	TProgressBar	3	forced in 1 body
+g_prg_passing	0x00C66A84	STRONG	TProgressBar	3	forced in 1 body
+g_prg_penalties	0x00C66AB0	STRONG	TProgressBar	2	forced in 1 body
+g_prg_positioning	0x00C66AB4	STRONG	TProgressBar	2	forced in 1 body
+g_prg_shinpads	-	AMBIGUOUS	TProgressBar	1	no alignment forced it (1 bodies)
+g_prg_shooting	0x00C66A88	STRONG	TProgressBar	3	forced in 1 body
+g_prg_shortpassing	0x00C66AB8	STRONG	TProgressBar	2	forced in 1 body
+g_prg_skills	0x00C66A94	STRONG	TProgressBar	4	forced in 1 body
+g_prg_tackling	0x00C66A80	STRONG	TProgressBar	3	forced in 1 body
+g_profile	0x00C6F028	CERTAIN	TProfile	186	forced in 138 bodies, unanimous
+g_profile_float02	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_profile_float03	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_profile_float04	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_profile_int26	0x00C68BC8	STRONG	String	1	forced in 1 body
+g_profile_int27	0x00C68BCC	CERTAIN	Int	2	forced in 2 bodies, unanimous
+g_profile_int28	0x00C68BD0	CERTAIN	Int	2	forced in 2 bodies, unanimous
+g_profile_int43	0x00C6F3B8	STRONG	Int	1	forced in 1 body
+g_profile_obj	0x00C6E808	STRONG	Object	1	forced in 1 body
+g_prom_combo	0x00C65900	STRONG	TCombo	1	forced in 1 body
+g_prom_combo1	-	AMBIGUOUS	TCombo	1	no alignment forced it (1 bodies)
+g_prom_combo2	-	AMBIGUOUS	TCombo	1	no alignment forced it (1 bodies)
+g_prom_combonation	-	AMBIGUOUS	TCombo	1	no alignment forced it (1 bodies)
+g_prom_nation	0x00C658F8	STRONG	TNation	2	forced in 1 body
+g_prom_table1	0x00C65908	STRONG	TTable	1	forced in 1 body
+g_prom_table2	0x00C6590C	STRONG	TTable	1	forced in 1 body
+g_promo_btn_promote	0x00C65910	STRONG	TButton	1	forced in 1 body
+g_promo_btn_relegate	0x00C65914	STRONG	TButton	1	forced in 1 body
+g_promo_combo	0x00C65904	STRONG	TCombo	1	forced in 1 body
+g_promo_combo1	0x00C65900	STRONG	TCombo	1	forced in 1 body
+g_promo_combo2	0x00C65904	STRONG	TCombo	1	forced in 1 body
+g_promo_combo_nation	0x00C658FC	STRONG	TCombo	1	forced in 1 body
+g_promo_nation	0x00C658F8	STRONG	TNation	1	forced in 1 body
+g_promo_table1	0x00C65908	CERTAIN	TTable	2	forced in 2 bodies, unanimous
+g_promo_table2	0x00C6590C	CERTAIN	TTable	2	forced in 2 bodies, unanimous
+g_promotionplace_int02	0x00C64600	STRONG	Int	1	forced in 1 body
+g_promotionplace_int05	0x00C6E950	CERTAIN	String	2	forced, agrees with verified pair
+g_promotionplace_max	0x00C64600	STRONG	Int	1	forced in 1 body
+g_pscale	0x00C5DE44	CERTAIN	Float	4	forced in 4 bodies, unanimous
+g_ptrimage	0x00C6329C	STRONG	TImage	2	forced in 1 body
+g_radarcol_away	0x00C5B21C	STRONG	String	3	forced in 1 body
+g_radarcol_home	0x00C5B218	STRONG	String	3	forced in 1 body
+g_rainchan	-	AMBIGUOUS	TChannel	1	no alignment forced it (1 bodies)
+g_rainchannel	-	AMBIGUOUS	TChannel	1	no alignment forced it (1 bodies)
+g_rainframe	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_rainimage	0x00C600C8	STRONG	TImage	1	forced in 1 body
+g_rainmode	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_rainpan	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_rainsound	0x00C600D0	STRONG	TSound	2	forced in 1 body
+g_raintime	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_rainvol	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_redcards_away	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_redcards_home	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_reel1	0x00C6C558	STRONG	TSlotStrip	1	forced in 1 body
+g_reel2	0x00C6C55C	STRONG	TSlotStrip	1	forced in 1 body
+g_reel3	0x00C6C560	STRONG	TSlotStrip	1	forced in 1 body
+g_rel_btn01	0x00C66BC4	STRONG	TButton	1	forced in 1 body
+g_rel_btn02	0x00C66BC8	STRONG	TButton	1	forced in 1 body
+g_rel_btn03	0x00C66BCC	STRONG	TButton	1	forced in 1 body
+g_rel_btn04	0x00C66BD0	STRONG	TButton	1	forced in 1 body
+g_rel_btn05	0x00C66BD4	STRONG	TButton	1	forced in 1 body
+g_rel_btn06	0x00C66BD8	STRONG	TButton	1	forced in 1 body
+g_rel_btn07	0x00C66BDC	STRONG	TButton	1	forced in 1 body
+g_rel_btn08	0x00C66BE0	STRONG	TButton	1	forced in 1 body
+g_rel_btn09	0x00C66BE4	STRONG	TButton	1	forced in 1 body
+g_rel_btnboss	0x00C66BC4	STRONG	TButton	1	forced in 1 body
+g_rel_btnfans	0x00C66BD0	STRONG	TButton	1	forced in 1 body
+g_rel_btnfriends	0x00C66BD4	STRONG	TButton	1	forced in 1 body
+g_rel_btnfriendsracing	0x00C66BD8	STRONG	TButton	1	forced in 1 body
+g_rel_btngirlfriend	0x00C66BDC	STRONG	TButton	1	forced in 1 body
+g_rel_btngirlfriendend	0x00C6F254	STRONG	TButton	1	forced in 1 body
+g_rel_btnsponsors	0x00C66BE4	STRONG	TButton	1	forced in 1 body
+g_rel_btnteam	0x00C66BC8	STRONG	TButton	1	forced in 1 body
+g_rel_btnteamcasino	0x00C66BCC	STRONG	TButton	1	forced in 1 body
+g_rel_imgboss	0x00C66B84	STRONG	TImage	1	forced in 1 body
+g_rel_imgcasino	0x00C66B9C	STRONG	TImage	1	forced in 1 body
+g_rel_imgfans	0x00C66B8C	STRONG	TImage	1	forced in 1 body
+g_rel_imgfriends	0x00C66B90	STRONG	TImage	1	forced in 1 body
+g_rel_imggirlfriend	0x00C66B94	STRONG	TImage	1	forced in 1 body
+g_rel_imgsponsors	0x00C66B98	STRONG	TImage	1	forced in 1 body
+g_rel_imgstable	0x00C66BA0	STRONG	TImage	1	forced in 1 body
+g_rel_imgteam	0x00C66B88	STRONG	TImage	1	forced in 1 body
+g_rel_panrelations	0x00C66BA4	STRONG	TPanel	1	forced in 1 body
+g_rel_pb_boss	0x00C66BA8	STRONG	TProgressBar	1	forced in 1 body
+g_rel_pb_fans	0x00C66BB0	STRONG	TProgressBar	1	forced in 1 body
+g_rel_pb_friends	0x00C66BB4	STRONG	TProgressBar	1	forced in 1 body
+g_rel_pb_girlfriend	0x00C66BB8	STRONG	TProgressBar	1	forced in 1 body
+g_rel_pb_happy	0x00C66BC0	STRONG	TProgressBar	1	forced in 1 body
+g_rel_pb_sponsors	0x00C66BBC	STRONG	TProgressBar	1	forced in 1 body
+g_rel_pb_team	0x00C66BAC	STRONG	TProgressBar	1	forced in 1 body
+g_rel_prgboss	0x00C66BA8	STRONG	TProgressBar	1	forced in 1 body
+g_rel_prgfans	0x00C66BB0	STRONG	TProgressBar	1	forced in 1 body
+g_rel_prgfriends	0x00C66BB4	STRONG	TProgressBar	1	forced in 1 body
+g_rel_prggirlfriend	0x00C66BB8	STRONG	TProgressBar	1	forced in 1 body
+g_rel_prghappiness	0x00C66BC0	STRONG	TProgressBar	1	forced in 1 body
+g_rel_prgsponsors	0x00C66BBC	STRONG	TProgressBar	1	forced in 1 body
+g_rel_prgteam	0x00C66BAC	STRONG	TProgressBar	1	forced in 1 body
+g_rel_screen	0x00C66B80	STRONG	TScreen	2	forced in 1 body
+g_replay	0x00C5B2B0	STRONG	TList	1	forced in 1 body
+g_replay_clubid	0x00C5B24C	STRONG	Int	1	forced in 1 body
+g_replay_div	0x00C6F02C	STRONG	Int	2	forced in 1 body
+g_replay_id	0x00C5B1FC	STRONG	Int	1	forced in 1 body
+g_replay_len	-	AMBIGUOUS	Int	2	no alignment forced it (2 bodies)
+g_replay_maxtime	0x00C5B2B4	STRONG	Int	1	forced in 1 body
+g_replay_mode	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_replay_time	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_replayballs	0x00C5A4C0	CERTAIN	TList	1	forced, agrees with verified pair
+g_replaybg	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_replaycur	0x00C5B2C8	STRONG	Int	2	forced in 1 body
+g_replayflag	0x00C5B2B8	STRONG	Int	1	forced in 1 body
+g_replayframe	-	AMBIGUOUS	Int	4	bodies disagree: 00c5b2c4:1 00c5b2c8:1
+g_replayframes	0x00C5B2B0	CERTAIN	TList	4	forced in 3 bodies, unanimous
+g_replaymax	0x00C5B2C4	STRONG	Int	2	forced in 1 body
+g_replaymaxframe	0x00C5B2C8	STRONG	Int	1	forced in 1 body
+g_replaymin	0x00C5B2C0	STRONG	Int	2	forced in 1 body
+g_replayplayers	0x00C5DE10	CERTAIN	TList	1	forced, agrees with verified pair
+g_replayspeedup	0x00C5B2CC	STRONG	Int	1	forced in 1 body
+g_replaytable	0x00C639E4	STRONG	TTable	1	forced in 1 body
+g_reportboss_btn_play	0x00C68B04	STRONG	TButton	2	forced in 1 body
+g_reportboss_img	0x00C68AE0	CERTAIN	TImage	2	forced in 2 bodies, unanimous
+g_reportboss_lbl_boss	0x00C68AEC	STRONG	TLabel	2	forced in 1 body
+g_reportboss_lbl_coachboss	0x00C68AF0	STRONG	TLabel	2	forced in 1 body
+g_reportboss_lbl_coachfame	0x00C68B00	STRONG	TLabel	2	forced in 1 body
+g_reportboss_lbl_coachfans	0x00C68AF8	STRONG	TLabel	2	forced in 1 body
+g_reportboss_lbl_coachsponsors	0x00C68AFC	STRONG	TLabel	2	forced in 1 body
+g_reportboss_lbl_coachteam	0x00C68AF4	STRONG	TLabel	2	forced in 1 body
+g_reportboss_pan_nav	-	AMBIGUOUS	TPanel	1	no alignment forced it (1 bodies)
+g_reportboss_pan_report	0x00C68AE8	STRONG	TPanel	2	forced in 1 body
+g_reportboss_screen	0x00C68ADC	STRONG	TScreen	2	forced in 1 body
+g_reslist	-	AMBIGUOUS	TList	1	no alignment forced it (1 bodies)
+g_rl1	0x00C6BA50	STRONG	TGadget	1	forced in 1 body
+g_rl2	0x00C6BA58	STRONG	TGadget	1	forced in 1 body
+g_rl3	0x00C6BA54	STRONG	TGadget	1	forced in 1 body
+g_roul_ball	0x00C6BBC0	CERTAIN	TRouletteBall	2	forced in 2 bodies, unanimous
+g_roul_bets	0x00C6BA60	STRONG	Int[]	1	forced in 1 body
+g_roul_btn1	0x00C6BA54	STRONG	TButton	1	forced in 1 body
+g_roul_btn2	0x00C6BA58	STRONG	TButton	1	forced in 1 body
+g_roul_f	0x00C6172C	STRONG	Float	1	forced in 1 body
+g_roul_panel	0x00C6BA50	STRONG	TPanel	1	forced in 1 body
+g_roul_spinning	0x00C6BBC4	STRONG	Int	1	forced in 1 body
+g_roul_wheel	0x00C6BBBC	STRONG	TRouletteWheel	1	forced in 1 body
+g_roulette_arr	-	AMBIGUOUS	Int[]	1	no alignment forced it (1 bodies)
+g_roulette_ball	0x00C6BBC0	CERTAIN	TRouletteBall	3	forced in 2 bodies, unanimous
+g_roulette_ballimage	0x00C6BE58	STRONG	TImage	1	forced in 1 body
+g_roulette_bets	-	AMBIGUOUS	Int[]	1	no alignment forced it (1 bodies)
+g_roulette_btnplay	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_roulette_btnquit	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_roulette_chan	0x00C6F090	STRONG	TChannel	1	forced in 1 body
+g_roulette_chan_spin	0x00C6BE60	STRONG	TChannel	1	forced in 1 body
+g_roulette_float	0x00C6172C	CERTAIN	Float	2	forced in 2 bodies, unanimous
+g_roulette_imgbg	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_roulette_pantitle	-	AMBIGUOUS	TPanel	1	no alignment forced it (1 bodies)
+g_roulette_pockets	-	AMBIGUOUS	Int[]	1	no alignment forced it (1 bodies)
+g_roulette_result	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_roulette_screen	0x00C6BA48	STRONG	TScreen	2	forced in 1 body
+g_roulette_snd	0x00C6BBD4	STRONG	TSound	1	forced in 1 body
+g_roulette_sndhit	0x00C6BBD0	CERTAIN	TSound	2	forced in 2 bodies, unanimous
+g_roulette_sndland	-	AMBIGUOUS	TSound	2	bodies disagree: 00c6bbcc:1 00c6f090:1
+g_roulette_sndspin	0x00C6BBD4	STRONG	TSound	1	forced in 1 body
+g_roulette_spinning	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_roulette_state	0x00C6BBC4	STRONG	Int	1	forced in 1 body
+g_roulette_wheel	0x00C6BBBC	CERTAIN	TRouletteWheel	3	forced in 2 bodies, unanimous
+g_rouletteball_img	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_rouletteball_int	0x00C6BE5C	CERTAIN	Int	2	forced in 2 bodies, unanimous
+g_roulettewheel	0x00C6BBBC	STRONG	TRouletteWheel	1	forced in 1 body
+g_roulettewheelimage	0x00C6BCB4	STRONG	TImage	1	forced in 1 body
+g_roulettewheelimage2	0x00C6BCB8	STRONG	TImage	1	forced in 1 body
+g_round	0x00C67208	STRONG	Int	1	forced in 1 body
+g_roundmode	0x00C67204	STRONG	Int	1	forced in 1 body
+g_rp_bg	0x00C68A04	STRONG	TImage	1	forced in 1 body
+g_rp_btn	0x00C68A14	STRONG	TButton	1	forced in 1 body
+g_rp_label	0x00C68A10	STRONG	TLabel	1	forced in 1 body
+g_rp_panel	0x00C68A0C	STRONG	TPanel	1	forced in 1 body
+g_runners	0x00C6E298	STRONG	TList	1	forced in 1 body
+g_savedir	0x00C6E9A8	CERTAIN	String	2	forced in 2 bodies, unanimous
+g_savename	0x00C68BC8	STRONG	String	4	forced in 1 body
+g_sbalpha	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_sbfadein	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_sbfadeout	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_sbfontscale	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_sbpage	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_sbscroll	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_sc_table	0x00C65588	STRONG	TTable	1	forced in 1 body
+g_scale	0x00C5DE44	STRONG	Float	1	forced in 1 body
+g_scorer	0x00C5B248	CERTAIN	TPlayer	1	forced, agrees with verified pair
+g_scr_borderimg	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_scr_borderx	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_scr_bordery	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_scr_h	0x00C6EFE8	STRONG	Int	1	forced in 1 body
+g_scr_matchpaused	0x00C6764C	STRONG	TScreen	1	forced in 1 body
+g_scr_w	0x00C6EFE4	STRONG	Int	1	forced in 1 body
+g_screen	-	AMBIGUOUS	TScreen	9	bodies disagree: 00c64d18:2 00c63ce8:2 00c61734:1 00c66724:1 00c64434:1 00c6635c:1
+g_screen_abilities	0x00C66A68	STRONG	TScreen	2	forced in 1 body
+g_screen_bg	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_screen_blackjack_int01	0x00C6B85C	CERTAIN	Int	2	forced in 2 bodies, unanimous
+g_screen_bootshop	0x00C66E20	STRONG	TScreen	2	forced in 1 body
+g_screen_clubs_int02	0x00C6524C	STRONG	Int	1	forced in 1 body
+g_screen_competitions	0x00C6E950	STRONG	TScreen	1	forced in 1 body
+g_screen_continentalcomps	-	AMBIGUOUS	TScreen	1	no alignment forced it (1 bodies)
+g_screen_continents_int01	0x00C59310	STRONG	Int	1	forced in 1 body
+g_screen_continents_int05	0x00C67208	STRONG	Int	1	forced in 1 body
+g_screen_continents_int06	0x00C67224	STRONG	Int	1	forced in 1 body
+g_screen_controls	0x00C640C4	STRONG	TScreen	1	forced in 1 body
+g_screen_cursor	0x00C61738	STRONG	TImage	2	forced in 1 body
+g_screen_difficulty	0x00C64500	STRONG	TScreen	1	forced in 1 body
+g_screen_difficulty_name	0x00C64504	STRONG	String	1	forced in 1 body
+g_screen_dilemma	0x00C68048	STRONG	TScreen	1	forced in 1 body
+g_screen_dragobj	0x00C61CF8	CERTAIN	Object	1	forced, agrees with verified pair
+g_screen_editcompetition	0x00C6E950	STRONG	TScreen	1	forced in 1 body
+g_screen_editkits_arr01	-	AMBIGUOUS	TKit[]	1	no alignment forced it (1 bodies)
+g_screen_editkits_arr02	-	AMBIGUOUS	TButton[]	1	no alignment forced it (1 bodies)
+g_screen_editkits_arr03	-	AMBIGUOUS	TCombo[]	1	no alignment forced it (1 bodies)
+g_screen_editkits_arr04	-	AMBIGUOUS	TCombo[]	1	no alignment forced it (1 bodies)
+g_screen_editkits_arr05	-	AMBIGUOUS	TCombo[]	1	no alignment forced it (1 bodies)
+g_screen_editkits_arr06	-	AMBIGUOUS	TCombo[]	1	no alignment forced it (1 bodies)
+g_screen_editkits_arr07	-	AMBIGUOUS	TCombo[]	1	no alignment forced it (1 bodies)
+g_screen_float01	0x00C61724	CERTAIN	Float	11	forced, agrees with verified pair
+g_screen_float02	0x00C61728	CERTAIN	Float	15	forced in 4 bodies, unanimous
+g_screen_float03	0x00C61740	CERTAIN	Float	4	forced in 2 bodies, unanimous
+g_screen_float04	0x00C61744	CERTAIN	Float	4	forced in 2 bodies, unanimous
+g_screen_float05	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_screen_float06	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_screen_float07	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_screen_float08	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_screen_float09	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_screen_float10	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_screen_formation_int05	-	AMBIGUOUS	Int	2	no alignment forced it (2 bodies)
+g_screen_formation_int06	0x00C677DC	STRONG	Int	4	forced in 1 body
+g_screen_formation_ready	0x00C677D8	STRONG	Int	2	forced in 1 body
+g_screen_formation_screen	-	AMBIGUOUS	TScreen	1	no alignment forced it (1 bodies)
+g_screen_formation_selno	0x00C677D4	STRONG	Int	2	forced in 1 body
+g_screen_formation_selno2	0x00C677DC	STRONG	Int	1	forced in 1 body
+g_screen_formation_team	-	AMBIGUOUS	TTeam	1	no alignment forced it (1 bodies)
+g_screen_fx	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_screen_fy	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_screen_gamemenu	-	AMBIGUOUS	TScreen	1	no alignment forced it (1 bodies)
+g_screen_h	0x00C6EFE8	CERTAIN	Int	12	forced in 2 bodies, unanimous
+g_screen_height	0x00C6EFDC	STRONG	Int	3	forced in 1 body
+g_screen_helpok	0x00C61730	STRONG	Int	1	forced in 1 body
+g_screen_home	-	AMBIGUOUS	TScreen	1	no alignment forced it (1 bodies)
+g_screen_int01	0x00C61730	STRONG	Int	2	forced in 1 body
+g_screen_int02	0x00C61734	CERTAIN	String	1	forced, agrees with verified pair
+g_screen_int03	0x00C6173C	CERTAIN	Int	6	forced in 3 bodies, unanimous
+g_screen_int21	0x00C6EFDC	CERTAIN	Int	10	forced in 4 bodies, unanimous
+g_screen_int22	-	AMBIGUOUS	Int	5	no alignment forced it (5 bodies)
+g_screen_int23	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_screen_int24	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_screen_interview	0x00C6CDD8	STRONG	TScreen	1	forced in 1 body
+g_screen_interview_arr	-	AMBIGUOUS	Int[]	3	no alignment forced it (3 bodies)
+g_screen_interview_int02	-	AMBIGUOUS	Int	3	no alignment forced it (3 bodies)
+g_screen_interview_int03	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_screen_interview_int04	-	AMBIGUOUS	Int	3	no alignment forced it (3 bodies)
+g_screen_interview_int05	-	AMBIGUOUS	Int	2	no alignment forced it (2 bodies)
+g_screen_interview_int06	-	AMBIGUOUS	String	2	no alignment forced it (2 bodies)
+g_screen_interview_int07	-	AMBIGUOUS	Int	3	no alignment forced it (3 bodies)
+g_screen_interview_int15	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_screen_kits	-	AMBIGUOUS	TScreen	1	no alignment forced it (1 bodies)
+g_screen_kits_int05	0x00C674C4	STRONG	Int	1	forced in 1 body
+g_screen_leagues_comp	0x00C66F5C	CERTAIN	TCompetition	2	forced in 2 bodies, unanimous
+g_screen_leagues_table	0x00C66F20	CERTAIN	TTable	2	forced in 2 bodies, unanimous
+g_screen_leagues_tplayer02	0x00C66F24	STRONG	TTable	1	forced in 1 body
+g_screen_leagues_tplayer03	0x00C66F28	STRONG	TTable	1	forced in 1 body
+g_screen_mainmenu_int03	0x00C6E900	STRONG	String	2	forced in 1 body
+g_screen_mainmenu_int25	0x00C639FC	STRONG	String	1	forced in 1 body
+g_screen_mainmenu_int26	0x00C6E9A8	CERTAIN	String	2	forced in 2 bodies, unanimous
+g_screen_mainmenu_int31	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_screen_mainmenu_table	0x00C639E4	STRONG	TTable	1	forced in 1 body
+g_screen_matchpaused	0x00C6764C	STRONG	TScreen	1	forced in 1 body
+g_screen_matchpaused_replay	0x00C67650	STRONG	TButton	1	forced in 1 body
+g_screen_matchpaused_skiptime	0x00C67658	STRONG	TButton	1	forced in 1 body
+g_screen_matchpaused_tactics	0x00C67654	STRONG	TButton	1	forced in 1 body
+g_screen_matchprep	-	AMBIGUOUS	TScreen	1	no alignment forced it (1 bodies)
+g_screen_mousex	0x00C61724	CERTAIN	Float	2	forced in 2 bodies, unanimous
+g_screen_mousey	0x00C61728	CERTAIN	Float	2	forced in 2 bodies, unanimous
+g_screen_mycontract_arr	0x00C67DC0	CERTAIN	TButton[]	2	forced in 2 bodies, unanimous
+g_screen_negotiate_arr01	-	AMBIGUOUS	TImage[]	1	no alignment forced it (1 bodies)
+g_screen_negotiate_arr02	-	AMBIGUOUS	TButton[]	1	no alignment forced it (1 bodies)
+g_screen_negotiate_arr03	-	AMBIGUOUS	Int[]	1	no alignment forced it (1 bodies)
+g_screen_negotiate_int02	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_screen_negotiate_int03	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_screen_negotiate_int04	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_screen_newplayer_flag	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_screen_newplayer_int04	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_screen_newplayer_int17	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_screen_newspaper	0x00C6822C	STRONG	TScreen	1	forced in 1 body
+g_screen_options	-	AMBIGUOUS	TScreen	1	no alignment forced it (1 bodies)
+g_screen_options_int01	-	AMBIGUOUS	Int	2	no alignment forced it (2 bodies)
+g_screen_options_int02	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_screen_options_int03	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_screen_options_int12	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_screen_pairs	0x00C6C800	STRONG	TScreen	1	forced in 1 body
+g_screen_pairs_arr	0x00C6C81C	CERTAIN	TButton[]	3	forced in 3 bodies, unanimous
+g_screen_prev	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_screen_promotions	0x00C6E950	STRONG	TScreen	1	forced in 1 body
+g_screen_promotions_tplayer01	0x00C65908	STRONG	TTable	1	forced in 1 body
+g_screen_promotions_tplayer02	0x00C6590C	STRONG	TTable	1	forced in 1 body
+g_screen_relationships	0x00C66B80	CERTAIN	TScreen	2	forced in 2 bodies, unanimous
+g_screen_reportphysio	-	AMBIGUOUS	TScreen	1	no alignment forced it (1 bodies)
+g_screen_roulette_arr	0x00C6BA60	CERTAIN	Int[]	3	forced in 3 bodies, unanimous
+g_screen_scrollx	0x00C61740	STRONG	Float	1	forced in 1 body
+g_screen_scrolly	0x00C61744	STRONG	Float	1	forced in 1 body
+g_screen_showmouse	0x00C6173C	CERTAIN	Int	1	forced, agrees with verified pair
+g_screen_stable	-	AMBIGUOUS	TScreen	1	no alignment forced it (1 bodies)
+g_screen_stable_arr03	0x00C6DF44	STRONG	TImage[]	1	forced in 1 body
+g_screen_stable_arr05	0x00C6E2B8	STRONG	TImage[]	1	forced in 1 body
+g_screen_stable_colour	-	AMBIGUOUS	String	1	no alignment forced it (1 bodies)
+g_screen_stable_float03	0x00C6DF54	STRONG	Float	1	forced in 1 body
+g_screen_stable_int02	0x00C6DF64	STRONG	Int	1	forced in 1 body
+g_screen_stable_int03	0x00C6DF68	STRONG	Int	1	forced in 1 body
+g_screen_stable_int04	0x00C6DF6C	STRONG	Int	1	forced in 1 body
+g_screen_stable_int05	0x00C6DF70	CERTAIN	Int	4	forced in 4 bodies, unanimous
+g_screen_stable_int26	0x00C6E29C	STRONG	Int	1	forced in 1 body
+g_screen_stable_tplayer01	0x00C6DEC8	CERTAIN	TTable	4	forced in 4 bodies, unanimous
+g_screen_stable_tplayer02	0x00C6DEDC	STRONG	TTable	1	forced in 1 body
+g_screen_state	0x00C61730	STRONG	Int	1	forced in 1 body
+g_screen_testmenu	0x00C6635C	STRONG	TScreen	1	forced in 1 body
+g_screen_top	-	AMBIGUOUS	Float	2	no alignment forced it (2 bodies)
+g_screen_usemouse	0x00C6173C	CERTAIN	Int	1	forced, agrees with verified pair
+g_screen_w	-	AMBIGUOUS	Int	15	bodies disagree: 00c6efe4:2 00c6efdc:1 00c6cfb0:1
+g_screen_webpage	-	AMBIGUOUS	TScreen	1	no alignment forced it (1 bodies)
+g_screen_width	0x00C6EFE0	CERTAIN	Int	4	forced in 2 bodies, unanimous
+g_screen_worldmap	-	AMBIGUOUS	TScreen	1	no alignment forced it (1 bodies)
+g_screen_worldmap_int01	0x00C68428	STRONG	Int	1	forced in 1 body
+g_screen_x	-	AMBIGUOUS	Int	2	bodies disagree: 00c6efe0:1 00c6efdc:1
+g_screen_y	0x00C6EFDC	STRONG	Int	1	forced in 1 body
+g_screencomps_table	0x00C65588	STRONG	TTable	1	forced in 1 body
+g_screenflag	0x00C6173C	CERTAIN	Int	1	forced, agrees with verified pair
+g_screenh	0x00C6EFE0	CERTAIN	Int	4	forced, agrees with verified pair
+g_screenheight	-	AMBIGUOUS	Int	38	bodies disagree: 00c6efe0:9 00c6efdc:6 00c6efe8:1
+g_screenmessagelist	0x00C6AFDC	STRONG	TList	1	forced in 1 body
+g_screenmessages	0x00C6AFDC	CERTAIN	TList	4	forced in 4 bodies, unanimous
+g_screenname	-	AMBIGUOUS	String	1	no alignment forced it (1 bodies)
+g_screens	0x00C616FC	CERTAIN	TList	6	forced in 4 bodies, unanimous
+g_screentime	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_screenw	0x00C6EFDC	CERTAIN	Int	4	forced, agrees with verified pair
+g_screenwidth	-	AMBIGUOUS	Int	40	bodies disagree: 00c6efdc:13 00c6efe0:6 00c6efe4:1
+g_scrh	0x00C6EFE8	STRONG	Int	1	forced in 1 body
+g_scrw	0x00C6EFE4	STRONG	Int	1	forced in 1 body
+g_seasonreview_screen	0x00C687C4	CERTAIN	TScreen	2	forced in 2 bodies, unanimous
+g_secondyellowimg	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_secondyellowtime	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_sel_comp	0x00C65720	STRONG	TCompetition	1	forced in 1 body
+g_selected	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_selgadget	0x00C61CF8	CERTAIN	TGadget	1	forced, agrees with verified pair
+g_setpiecepower	-	AMBIGUOUS	Int	2	no alignment forced it (2 bodies)
+g_setpiecetype	0x00C5B1FC	STRONG	Int	1	forced in 1 body
+g_sfxchannel	-	UNGROUNDED	TChannel	0	in no body pairable with an original
+g_sfxvol	-	UNGROUNDED	Float	0	in no body pairable with an original
+g_shared_panel1	0x00C66F18	CERTAIN	TPanel	2	forced in 2 bodies, unanimous
+g_shootout_team	-	AMBIGUOUS	TTeam	1	no alignment forced it (1 bodies)
+g_shootout_xoff	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_shootout_yoff	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_shootoutkicks	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_shootoutstarted	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_shop_img_items	0x00C66D24	STRONG	TImage[]	1	forced in 1 body
+g_shop_img_property	0x00C66D3C	STRONG	TImage[]	1	forced in 1 body
+g_shop_img_vehicles	0x00C66D30	STRONG	TImage[]	1	forced in 1 body
+g_shop_pan_tabs	0x00C66D40	STRONG	TPanel	1	forced in 1 body
+g_shop_panel1	0x00C66D44	STRONG	TPanel	1	forced in 1 body
+g_shop_panel2	0x00C66D48	STRONG	TPanel	1	forced in 1 body
+g_shop_panel3	0x00C66D4C	STRONG	TPanel	1	forced in 1 body
+g_shop_panel_items	0x00C66D4C	STRONG	TPanel	2	forced in 1 body
+g_shop_panel_property	0x00C66D44	STRONG	TPanel	2	forced in 1 body
+g_shop_panel_vehicles	0x00C66D48	STRONG	TPanel	2	forced in 1 body
+g_shop_screen	0x00C66D18	STRONG	TScreen	2	forced in 1 body
+g_shop_tab	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_showhud	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_sideline	0x00C5D634	STRONG	Int	3	forced in 1 body
+g_signaturesound	0x00C6B424	CERTAIN	TSound	2	forced in 2 bodies, unanimous
+g_sixyardside	0x00C5D65C	STRONG	Int	1	forced in 1 body
+g_skinpath	-	AMBIGUOUS	String	3	no alignment forced it (3 bodies)
+g_sla_attackingmid	0x00C5BBF8	STRONG	String	1	forced in 1 body
+g_sla_centre	0x00C5BB80	STRONG	String	1	forced in 1 body
+g_sla_defender	0x00C5BBBC	STRONG	String	1	forced in 1 body
+g_sla_defensivemid	0x00C5BBD0	STRONG	String	1	forced in 1 body
+g_sla_forward	0x00C5BC0C	STRONG	String	1	forced in 1 body
+g_sla_goalkeeper	0x00C5BBA8	STRONG	String	1	forced in 1 body
+g_sla_left	0x00C5BB6C	STRONG	String	1	forced in 1 body
+g_sla_midfielder	0x00C5BBE4	STRONG	String	1	forced in 1 body
+g_sla_right	0x00C5BB94	STRONG	String	1	forced in 1 body
+g_sla_substitute	0x00C5BC20	STRONG	String	1	forced in 1 body
+g_slot_bet	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_slot_btn1	0x00C6C49C	STRONG	TButton	1	forced in 1 body
+g_slot_btn2	0x00C6C4A0	STRONG	TButton	1	forced in 1 body
+g_slot_chan	0x00C6F090	STRONG	TChannel	1	forced in 1 body
+g_slot_panel	0x00C6B858	STRONG	TPanel	1	forced in 1 body
+g_slot_reel1	-	AMBIGUOUS	TSlotStrip	1	no alignment forced it (1 bodies)
+g_slot_reel2	-	AMBIGUOUS	TSlotStrip	1	no alignment forced it (1 bodies)
+g_slot_reel3	-	AMBIGUOUS	TSlotStrip	1	no alignment forced it (1 bodies)
+g_slot_snd_win	-	AMBIGUOUS	TSound	1	no alignment forced it (1 bodies)
+g_slot_sound	0x00C6C554	CERTAIN	TSound	1	forced, agrees with verified pair
+g_slot_spinning	0x00C6C564	STRONG	Int	1	forced in 1 body
+g_slot_strip1	0x00C6C558	STRONG	TSlotStrip	1	forced in 1 body
+g_slot_strip2	0x00C6C55C	STRONG	TSlotStrip	1	forced in 1 body
+g_slot_strip3	0x00C6C560	STRONG	TSlotStrip	1	forced in 1 body
+g_slot_viewx	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_slot_viewy1	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_slot_viewy2	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_slotarm	0x00C6C554	STRONG	TSound	1	forced in 1 body
+g_slotchannel	0x00C6F090	STRONG	TChannel	1	forced in 1 body
+g_slotglass	0x00C6E950	STRONG	TImage	1	forced in 1 body
+g_slotmachine_int01	0x00C6C564	CERTAIN	Int	2	forced in 2 bodies, unanimous
+g_slotmachineimage	0x00C6C54C	CERTAIN	TImage	1	forced, agrees with verified pair
+g_slots_btnplay	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_slots_btnquit	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_slots_imgbg	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_slots_imgbutton	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_slots_screen	-	AMBIGUOUS	TScreen	1	no alignment forced it (1 bodies)
+g_slotsound	0x00C6C654	STRONG	TSound	1	forced in 1 body
+g_slotspintime	0x00C6EFD4	STRONG	Int	1	forced in 1 body
+g_slotstate	0x00C6C564	STRONG	Int	1	forced in 1 body
+g_slotstrip1	0x00C6C558	CERTAIN	TSlotStrip	2	forced in 2 bodies, unanimous
+g_slotstrip2	0x00C6C55C	CERTAIN	TSlotStrip	2	forced in 2 bodies, unanimous
+g_slotstrip3	0x00C6C560	CERTAIN	TSlotStrip	2	forced in 2 bodies, unanimous
+g_slotstrip_image	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_slotwin	0x00C6C550	STRONG	TSound	1	forced in 1 body
+g_snd_alert	-	AMBIGUOUS	TSound	1	no alignment forced it (1 bodies)
+g_snd_alert2	-	AMBIGUOUS	TSound	1	no alignment forced it (1 bodies)
+g_snd_beep1	0x00C6CF60	STRONG	TSound	2	forced in 1 body
+g_snd_beep2	0x00C6CF64	STRONG	TSound	2	forced in 1 body
+g_snd_card	0x00C6C168	STRONG	TSound	1	forced in 1 body
+g_snd_chan1	0x00C5B33C	STRONG	TChannel	1	forced in 1 body
+g_snd_chan2	0x00C5B340	STRONG	TChannel	1	forced in 1 body
+g_snd_chan3	0x00C5B344	STRONG	TChannel	1	forced in 1 body
+g_snd_chan4	0x00C5B348	STRONG	TChannel	1	forced in 1 body
+g_snd_chan5	0x00C600D4	STRONG	TChannel	1	forced in 1 body
+g_snd_chants	-	AMBIGUOUS	TSound[]	2	no alignment forced it (2 bodies)
+g_snd_click	-	AMBIGUOUS	TSound	1	no alignment forced it (1 bodies)
+g_snd_crowd	-	AMBIGUOUS	TSound	2	no alignment forced it (2 bodies)
+g_snd_crowdambience	-	AMBIGUOUS	TSound	1	no alignment forced it (1 bodies)
+g_snd_crowdboo	-	AMBIGUOUS	TSound	1	no alignment forced it (1 bodies)
+g_snd_crowdbooshort	-	AMBIGUOUS	TSound	1	no alignment forced it (1 bodies)
+g_snd_crowdcheer	-	AMBIGUOUS	TSound	1	no alignment forced it (1 bodies)
+g_snd_crowdgoal	-	AMBIGUOUS	TSound	1	no alignment forced it (1 bodies)
+g_snd_crowdoh	-	AMBIGUOUS	TSound	1	no alignment forced it (1 bodies)
+g_snd_dummyhit	0x00C6D7C4	STRONG	TSound	1	forced in 1 body
+g_snd_fail	0x00C5DF40	STRONG	TSound	2	forced in 1 body
+g_snd_fulltime	-	AMBIGUOUS	TSound	1	no alignment forced it (1 bodies)
+g_snd_goal	0x00C6CF78	STRONG	TSound	1	forced in 1 body
+g_snd_kick	-	AMBIGUOUS	TSound	1	no alignment forced it (1 bodies)
+g_snd_lose	0x00C6B850	CERTAIN	TSound	2	forced, agrees with verified pair
+g_snd_miss	-	AMBIGUOUS	TSound	2	bodies disagree: 00c5b348:1 00c6cf80:1
+g_snd_move	-	AMBIGUOUS	TSound	2	no alignment forced it (2 bodies)
+g_snd_negotiate	-	AMBIGUOUS	TSound	1	no alignment forced it (1 bodies)
+g_snd_news	0x00C6824C	STRONG	TSound	1	forced in 1 body
+g_snd_newspaper	0x00C6824C	STRONG	TSound	1	forced in 1 body
+g_snd_select	-	AMBIGUOUS	TSound	3	no alignment forced it (3 bodies)
+g_snd_slide	0x00C5DF34	STRONG	TSound	1	forced in 1 body
+g_snd_slotsstop	0x00C6C654	STRONG	TSound	1	forced in 1 body
+g_snd_star	0x00C6AD88	STRONG	TSound	1	forced in 1 body
+g_snd_training_reset	0x00C6CF7C	STRONG	TSound	1	forced in 1 body
+g_snd_training_success1	0x00C6CF74	CERTAIN	TSound	2	forced in 2 bodies, unanimous
+g_snd_training_success2	0x00C6CF78	CERTAIN	TSound	2	forced in 2 bodies, unanimous
+g_snd_whistle	-	AMBIGUOUS	TSound	5	no alignment forced it (5 bodies)
+g_snd_whistlefinal	-	AMBIGUOUS	TSound	1	no alignment forced it (1 bodies)
+g_snd_win	0x00C6F0D4	CERTAIN	TSound	3	forced in 2 bodies, unanimous
+g_sndchannel	0x00C6CF80	STRONG	TChannel	1	forced in 1 body
+g_sndclick	0x00C6171C	CERTAIN	TSound	3	forced in 2 bodies, unanimous
+g_sndcone	0x00C6D6C4	STRONG	TSound	1	forced in 1 body
+g_sndfall	0x00C5DF38	STRONG	TSound	1	forced in 1 body
+g_snow_alph	0x00C6022C	STRONG	Float	1	forced in 1 body
+g_snow_alpha	0x00C60238	CERTAIN	Float	2	forced in 2 bodies, unanimous
+g_snow_count	0x00C6EFE4	STRONG	Int	1	forced in 1 body
+g_snow_f03	0x00C60238	STRONG	Float	1	forced in 1 body
+g_snow_fall	0x00C6EFE8	STRONG	Int	1	forced in 1 body
+g_snow_i2	0x00C60230	STRONG	Int	1	forced in 1 body
+g_snow_image	0x00C6021C	STRONG	TImage	1	forced in 1 body
+g_snow_img	0x00C6021C	STRONG	TImage	1	forced in 1 body
+g_snow_list	0x00C60220	STRONG	TList	1	forced in 1 body
+g_snow_wid	0x00C6EFE4	STRONG	Int	1	forced in 1 body
+g_snow_wind	-	AMBIGUOUS	Float	2	bodies disagree: 00c60234:1 00c6022c:1
+g_snow_winddir	0x00C60230	STRONG	Int	1	forced in 1 body
+g_snow_windspeed	0x00C60234	STRONG	Float	1	forced in 1 body
+g_snowcount	0x00C60218	STRONG	Int	1	forced in 1 body
+g_snowflakes	0x00C60220	CERTAIN	TList	3	forced in 3 bodies, unanimous
+g_snowimage	0x00C600CC	STRONG	TImage	1	forced in 1 body
+g_snowlist	0x00C60220	CERTAIN	TList	1	forced, agrees with verified pair
+g_sortkey	0x00C5DE14	STRONG	Int	1	forced in 1 body
+g_sortmode	-	AMBIGUOUS	Int	2	bodies disagree: 00c59a48:1 00c59e44:1
+g_sound	0x00C6F0D4	CERTAIN	TSound	2	forced in 2 bodies, unanimous
+g_sound_fail	-	AMBIGUOUS	TSound	1	no alignment forced it (1 bodies)
+g_sound_success	-	AMBIGUOUS	TSound	1	no alignment forced it (1 bodies)
+g_speechchannel	-	UNGROUNDED	TChannel	0	in no body pairable with an original
+g_sr_panstats	0x00C687C8	STRONG	TPanel	1	forced in 1 body
+g_sr_pantournaments	0x00C687D0	STRONG	TPanel	1	forced in 1 body
+g_sr_table	0x00C687D4	STRONG	TTable	1	forced in 1 body
+g_sr_tblseason	0x00C687CC	CERTAIN	TTable	2	forced in 2 bodies, unanimous
+g_sr_tbltournaments	0x00C687D4	STRONG	TTable	1	forced in 1 body
+g_stable_arr04	0x00C6DF60	CERTAIN	Float[]	2	forced in 2 bodies, unanimous
+g_stable_bet	0x00C6DF68	STRONG	Int	1	forced in 1 body
+g_stable_btn01	0x00C6DEB8	STRONG	TButton	1	forced in 1 body
+g_stable_btn02	0x00C6DEBC	STRONG	TButton	1	forced in 1 body
+g_stable_btn03	0x00C6DECC	STRONG	TButton	1	forced in 1 body
+g_stable_btn04	0x00C6DED0	STRONG	TButton	1	forced in 1 body
+g_stable_btn05	0x00C6DED4	STRONG	TButton	1	forced in 1 body
+g_stable_btn_treat	0x00C6DED0	STRONG	TButton	1	forced in 1 body
+g_stable_btnbuyhorse	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_stable_btnhome	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_stable_btnhorse	-	AMBIGUOUS	TButton[]	1	no alignment forced it (1 bodies)
+g_stable_btnracehorse	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_stable_btnsellhorse	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_stable_btnstable	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_stable_btnstartrace	0x00C6DEBC	STRONG	TButton	2	forced in 1 body
+g_stable_btntreathorse	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_stable_button	0x00C6DEBC	STRONG	TButton	1	forced in 1 body
+g_stable_chan	0x00C6DF1C	STRONG	TChannel	1	forced in 1 body
+g_stable_channel	0x00C6DF1C	CERTAIN	TChannel	2	forced in 2 bodies, unanimous
+g_stable_horsebuttons	-	AMBIGUOUS	TButton[]	1	no alignment forced it (1 bodies)
+g_stable_horselist	0x00C6E294	CERTAIN	TList	1	forced, agrees with verified pair
+g_stable_icon	0x00C6DEA8	STRONG	TImage	1	forced in 1 body
+g_stable_imgbg	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_stable_imgfinishline	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_stable_imggrass	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_stable_imgplayrace	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_stable_imgpost	-	AMBIGUOUS	TImage[]	1	no alignment forced it (1 bodies)
+g_stable_imgrailing	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_stable_imgstable	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_stable_imgstar	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_stable_int01	0x00C6DF2C	STRONG	Int	1	forced in 1 body
+g_stable_int02	0x00C6DF64	STRONG	Int	1	forced in 1 body
+g_stable_int04	0x00C6DF6C	STRONG	Int	1	forced in 1 body
+g_stable_int05	0x00C6DF70	CERTAIN	Int	2	forced in 2 bodies, unanimous
+g_stable_int26	0x00C6E29C	CERTAIN	Int	2	forced in 2 bodies, unanimous
+g_stable_lblodds	-	AMBIGUOUS	TLabel[]	1	no alignment forced it (1 bodies)
+g_stable_maxrows	0x00C6E29C	STRONG	Int	1	forced in 1 body
+g_stable_obj845	0x00C6DF28	STRONG	Object	1	forced in 1 body
+g_stable_oddslabels	-	AMBIGUOUS	TLabel[]	1	no alignment forced it (1 bodies)
+g_stable_panbuyhorse	-	AMBIGUOUS	TPanel	1	no alignment forced it (1 bodies)
+g_stable_panel	-	AMBIGUOUS	TPanel	2	bodies disagree: 00c6dee8:1 00c6dee4:1
+g_stable_panel1	0x00C66768	STRONG	TPanel	1	forced in 1 body
+g_stable_panel2	0x00C6DEE4	STRONG	TPanel	1	forced in 1 body
+g_stable_panel3	0x00C6DEB0	STRONG	TPanel	1	forced in 1 body
+g_stable_panel4	0x00C6DEE8	STRONG	TPanel	1	forced in 1 body
+g_stable_pannav	0x00C6DEB0	STRONG	TPanel	2	forced in 1 body
+g_stable_panowned	-	AMBIGUOUS	TPanel	1	no alignment forced it (1 bodies)
+g_stable_panrace	0x00C6DEE4	STRONG	TPanel	2	forced in 1 body
+g_stable_panstake	0x00C6DEE8	STRONG	TPanel	2	forced in 1 body
+g_stable_pnl01	0x00C6DEC0	STRONG	TPanel	1	forced in 1 body
+g_stable_pnl02	0x00C6DED8	STRONG	TPanel	1	forced in 1 body
+g_stable_pnl03	0x00C6DEE4	STRONG	TPanel	1	forced in 1 body
+g_stable_pnl04	0x00C6DEE8	STRONG	TPanel	1	forced in 1 body
+g_stable_racedistance	0x00C6E29C	STRONG	Int	1	forced in 1 body
+g_stable_racelist	0x00C6E298	STRONG	TList	1	forced in 1 body
+g_stable_racenum	-	AMBIGUOUS	Int	3	bodies disagree: 00c6df6c:2 00c6df64:1
+g_stable_racetime	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_stable_screen	0x00C6DEA0	STRONG	TScreen	1	forced in 1 body
+g_stable_selectedrunner	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_stable_sndflash	-	AMBIGUOUS	TSound	1	no alignment forced it (1 bodies)
+g_stable_sndgallop	0x00C6DF24	STRONG	TSound	2	forced in 1 body
+g_stable_stake	0x00C6DF68	STRONG	Int	1	forced in 1 body
+g_stable_startx	0x00C6DF4C	CERTAIN	Float	2	forced in 2 bodies, unanimous
+g_stable_state	0x00C6DF70	CERTAIN	Int	3	forced in 3 bodies, unanimous
+g_stable_table	-	AMBIGUOUS	TTable	2	bodies disagree: 00c6dedc:1 00c6dec8:1
+g_stable_tbl01	0x00C6E294	CERTAIN	TGadget	1	forced, agrees with verified pair
+g_stable_tbl02	0x00C6E298	CERTAIN	TGadget	1	forced, agrees with verified pair
+g_stable_tblbuyhorse	-	AMBIGUOUS	TTable	1	no alignment forced it (1 bodies)
+g_stable_tblowned	-	AMBIGUOUS	TTable	1	no alignment forced it (1 bodies)
+g_stable_volume	0x00C5D220	STRONG	Float	1	forced in 1 body
+g_stadiumgimg	0x00C5D600	STRONG	TImage[]	1	forced in 1 body
+g_stadiumheight	0x00C5D668	STRONG	Int	1	forced in 1 body
+g_stadiumimg	0x00C5D5F4	STRONG	TImage[]	1	forced in 1 body
+g_stadiumlist	0x00C64BC0	STRONG	TList	1	forced in 1 body
+g_stadiums	0x00C64BC0	CERTAIN	TList	2	forced in 2 bodies, unanimous
+g_stadiumsize	0x00C5D69C	STRONG	Int	2	forced in 1 body
+g_stake	0x00C6B85C	CERTAIN	Int	2	forced in 2 bodies, unanimous
+g_stakeamount	0x00C6DF68	STRONG	Int	1	forced in 1 body
+g_starttime	-	AMBIGUOUS	Int	4	bodies disagree: 00c6efd8:1 00c6efd4:1
+g_stat_corners_a	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_stat_corners_h	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_stat_freekicks_a	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_stat_freekicks_h	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_stat_int	0x00C6A8A4	STRONG	Int	1	forced in 1 body
+g_stat_offside_a	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_stat_offside_h	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_stat_ontarget_a	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_stat_ontarget_h	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_stat_pens_a	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_stat_pens_h	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_stat_reds_a	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_stat_reds_h	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_stat_shots_a	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_stat_shots_h	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_stat_yellows_a	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_stat_yellows_h	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_state	0x00C5B1FC	STRONG	Int	1	forced in 1 body
+g_statestarted	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_stats_btnhistory	0x00C679B4	STRONG	TButton	1	forced in 1 body
+g_stats_btnstats	0x00C679C0	STRONG	TButton	1	forced in 1 body
+g_stats_combo_club	0x00C679C8	STRONG	TCombo	1	forced in 1 body
+g_stats_combo_comp	0x00C679D8	STRONG	TCombo	1	forced in 1 body
+g_stats_combo_season	0x00C679CC	STRONG	TCombo	1	forced in 1 body
+g_stats_comboclub	0x00C679C8	CERTAIN	TCombo	3	forced in 3 bodies, unanimous
+g_stats_comboyear	0x00C679CC	STRONG	TCombo	1	forced in 1 body
+g_stats_comboyearint	0x00C679D8	STRONG	TCombo	1	forced in 1 body
+g_stats_gad1	0x00C679B0	STRONG	TGadget	1	forced in 1 body
+g_stats_gad2	0x00C679BC	STRONG	TGadget	1	forced in 1 body
+g_stats_gad3	0x00C679B4	STRONG	TGadget	1	forced in 1 body
+g_stats_match_float01	0x00C6A62C	CERTAIN	Float	2	forced in 2 bodies, unanimous
+g_stats_match_float02	0x00C6A630	CERTAIN	Float	2	forced in 2 bodies, unanimous
+g_stats_match_float03	0x00C6A634	CERTAIN	Float	2	forced in 2 bodies, unanimous
+g_stats_match_float04	0x00C6A638	CERTAIN	Float	2	forced in 2 bodies, unanimous
+g_stats_match_float05	0x00C6A63C	CERTAIN	Float	2	forced in 2 bodies, unanimous
+g_stats_match_float06	0x00C6A640	CERTAIN	Float	2	forced in 2 bodies, unanimous
+g_stats_match_float07	0x00C6A644	STRONG	Float	1	forced in 1 body
+g_stats_match_float08	0x00C6A648	CERTAIN	Float	2	forced in 2 bodies, unanimous
+g_stats_match_float09	0x00C6A64C	CERTAIN	Float	2	forced in 2 bodies, unanimous
+g_stats_match_float10	0x00C6A650	CERTAIN	Float	2	forced in 2 bodies, unanimous
+g_stats_match_float11	0x00C6A654	CERTAIN	Float	2	forced in 2 bodies, unanimous
+g_stats_match_int01	0x00C6A628	STRONG	Int	2	forced in 1 body
+g_stats_panhistory	0x00C679B0	STRONG	TPanel	1	forced in 1 body
+g_stats_panstats	0x00C679BC	STRONG	TPanel	1	forced in 1 body
+g_stats_panstatsint	0x00C679D0	STRONG	TPanel	1	forced in 1 body
+g_stats_scr	0x00C679A4	STRONG	TScreen	1	forced in 1 body
+g_stats_shirtimg	0x00C679AC	STRONG	TImage	1	forced in 1 body
+g_stats_sortby	0x00C6A8A4	STRONG	Int	1	forced in 1 body
+g_stats_table	0x00C679C4	STRONG	TTable	1	forced in 1 body
+g_stats_tblhistory	0x00C679B8	STRONG	TTable	1	forced in 1 body
+g_stats_tblstats	0x00C679C4	STRONG	TTable	1	forced in 1 body
+g_stats_tblstatsint	0x00C679D4	STRONG	TTable	1	forced in 1 body
+g_stats_totals	0x00C679D4	STRONG	TTable	1	forced in 1 body
+g_stats_trophyimg	0x00C679A8	STRONG	TImage	1	forced in 1 body
+g_stbl_btn1	0x00C6DEB8	CERTAIN	TButton	2	forced in 2 bodies, unanimous
+g_stbl_btn2	0x00C6DEBC	CERTAIN	TButton	2	forced in 2 bodies, unanimous
+g_stbl_pnl1	0x00C6DEE4	CERTAIN	TPanel	2	forced in 2 bodies, unanimous
+g_stbl_pnl2	0x00C6DEE8	CERTAIN	TPanel	2	forced in 2 bodies, unanimous
+g_stbl_pnl3	0x00C6DEC0	CERTAIN	TPanel	2	forced in 2 bodies, unanimous
+g_stbl_pnl4	0x00C6DED8	CERTAIN	TPanel	2	forced in 2 bodies, unanimous
+g_steamstate	-	UNGROUNDED	Int	0	in no body pairable with an original
+g_table	-	AMBIGUOUS	TTable	4	bodies disagree: 00c65a48:1 00c65090:1 00c679b8:1
+g_table_02	0x00C671D4	CERTAIN	TTable	2	forced in 2 bodies, unanimous
+g_table_03	0x00C671D8	CERTAIN	TTable	2	forced in 2 bodies, unanimous
+g_table_float	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_table_int02	-	AMBIGUOUS	Int	2	no alignment forced it (2 bodies)
+g_table_int03	0x00C625F0	CERTAIN	Int	5	forced in 2 bodies, unanimous
+g_table_int05	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_table_league	0x00C671CC	CERTAIN	TTable	2	forced in 2 bodies, unanimous
+g_table_pad	0x00C625F0	STRONG	Int	1	forced in 1 body
+g_tableimage	0x00C625F4	CERTAIN	TImage	2	forced in 2 bodies, unanimous
+g_target_chan	0x00C5B344	STRONG	TChannel	1	forced in 1 body
+g_target_snd	0x00C6DC78	STRONG	TSound	1	forced in 1 body
+g_targetimg	0x00C6DC74	STRONG	TImage	1	forced in 1 body
+g_targetsnd	0x00C6DC78	STRONG	TSound	1	forced in 1 body
+g_tbl_gap	0x00C625F0	STRONG	Int	1	forced in 1 body
+g_tblsaves	0x00C639DC	STRONG	TTable	1	forced in 1 body
+g_team	0x00C677B0	CERTAIN	TTeam	1	forced, agrees with verified pair
+g_team1	0x00C5B218	CERTAIN	TTeam	9	forced in 6 bodies, unanimous
+g_team2	0x00C5B21C	CERTAIN	TTeam	7	forced in 5 bodies, unanimous
+g_team_arr01	0x00C5A430	CERTAIN	String[]	2	forced in 2 bodies, unanimous
+g_team_arr02	0x00C5A434	CERTAIN	String[]	2	forced in 2 bodies, unanimous
+g_team_away	-	AMBIGUOUS	TTeam	2	bodies disagree: 00c5b2ac:1 00c5b21c:1
+g_team_home	-	AMBIGUOUS	TTeam	4	bodies disagree: 00c5b2a8:1 00c5b218:1
+g_team_int03	0x00C5DE14	CERTAIN	Int	3	forced in 3 bodies, unanimous
+g_teamaway	0x00C5B21C	STRONG	TTeam	1	forced in 1 body
+g_teamhome	0x00C5B218	STRONG	TTeam	1	forced in 1 body
+g_teampool_int01	0x00C649A0	STRONG	Int	1	forced in 1 body
+g_teampool_sortby	0x00C649A0	STRONG	Int	1	forced in 1 body
+g_testfix_combo	0x00C66610	STRONG	TCombo	1	forced in 1 body
+g_testfix_label	0x00C6660C	STRONG	TButton	2	forced in 1 body
+g_testfix_screen	-	AMBIGUOUS	TScreen	1	no alignment forced it (1 bodies)
+g_testfix_table	0x00C66608	STRONG	TTable	2	forced in 1 body
+g_testgroup	0x00C66428	STRONG	Int	1	forced in 1 body
+g_tf_combocontinent	0x00C66610	CERTAIN	TCombo	3	forced in 2 bodies, unanimous
+g_tf_combonation	0x00C66614	CERTAIN	TCombo	3	forced in 2 bodies, unanimous
+g_ticks	-	AMBIGUOUS	Int	9	bodies disagree: 00c6efd4:3 00c6efd8:1
+g_time	-	AMBIGUOUS	Int	5	bodies disagree: 00c6efd4:2 00c6c834:1
+g_timer	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_tr_active	0x00C6CF98	STRONG	Int	1	forced in 1 body
+g_tr_challenge	0x00C6CF98	STRONG	Int	1	forced in 1 body
+g_tr_chan	0x00C5B33C	STRONG	TChannel	1	forced in 1 body
+g_tr_count	0x00C6CFFC	STRONG	Int	1	forced in 1 body
+g_tr_mode	0x00C6CF90	CERTAIN	Int	3	forced in 2 bodies, unanimous
+g_tr_prevscreen	0x00C6EFD4	STRONG	Int	1	forced in 1 body
+g_tr_screen	0x00C6CFA0	STRONG	Int	1	forced in 1 body
+g_tr_snd	0x00C5B34C	CERTAIN	TSound	1	forced, agrees with verified pair
+g_tr_x2	0x00C6CFD8	STRONG	Int	1	forced in 1 body
+g_tr_y2	0x00C6CFDC	STRONG	Int	1	forced in 1 body
+g_tracks	-	UNGROUNDED	TSound[]	0	in no body pairable with an original
+g_train_ballicon	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_train_fade	-	AMBIGUOUS	Float	2	no alignment forced it (2 bodies)
+g_train_fadestep	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_train_goalicon	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_train_goalline	0x00C5D638	STRONG	Int	1	forced in 1 body
+g_train_goalsleft	0x00C6CFF8	STRONG	Int	1	forced in 1 body
+g_train_int05	0x00C6CF98	STRONG	Int	1	forced in 1 body
+g_train_lasttick	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_train_mode	0x00C6CF90	STRONG	Int	2	forced in 1 body
+g_train_msg1	0x00C6CFA4	STRONG	String	1	forced in 1 body
+g_train_msg2	0x00C6CFAC	STRONG	String	1	forced in 1 body
+g_train_scrolltext	-	AMBIGUOUS	String	1	no alignment forced it (1 bodies)
+g_train_scrollx	0x00C6EFE4	STRONG	Float	3	forced in 1 body
+g_train_scrollx2	-	AMBIGUOUS	Float	2	no alignment forced it (2 bodies)
+g_train_state	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_train_stopwatchicon	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_train_targetyards	0x00C6CFEC	STRONG	Int	1	forced in 1 body
+g_training	0x00C6CF90	STRONG	Int	2	forced in 1 body
+g_training_a	0x00C6CF98	STRONG	Int	1	forced in 1 body
+g_training_arr	0x00C6CF70	STRONG	TSound[]	2	forced in 1 body
+g_training_dist	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_training_float03	-	AMBIGUOUS	Float	2	no alignment forced it (2 bodies)
+g_training_float04	-	AMBIGUOUS	Float	2	no alignment forced it (2 bodies)
+g_training_headline	0x00C6CFA4	STRONG	String	1	forced in 1 body
+g_training_int03	0x00C6CF90	CERTAIN	Int	35	forced in 17 bodies, unanimous
+g_training_int04	0x00C6CF94	STRONG	Int	9	forced in 1 body
+g_training_int05	0x00C6CF98	CERTAIN	Int	4	forced in 3 bodies, unanimous
+g_training_int06	-	AMBIGUOUS	Int	9	no alignment forced it (9 bodies)
+g_training_int08	-	AMBIGUOUS	String	8	no alignment forced it (8 bodies)
+g_training_int09	-	AMBIGUOUS	String	8	no alignment forced it (8 bodies)
+g_training_int10	0x00C6CFB8	STRONG	String	9	forced in 1 body
+g_training_int11	0x00C6CFD0	CERTAIN	Int	10	forced in 2 bodies, unanimous
+g_training_int12	0x00C6CFD4	CERTAIN	Int	10	forced in 2 bodies, unanimous
+g_training_int13	-	AMBIGUOUS	Int	6	bodies disagree: 00c6cfdc:2 00c6cfd8:1
+g_training_int14	-	AMBIGUOUS	Int	6	bodies disagree: 00c6cfd8:2 00c6cfdc:1
+g_training_int15	-	AMBIGUOUS	Int	2	no alignment forced it (2 bodies)
+g_training_int16	-	AMBIGUOUS	Int	2	no alignment forced it (2 bodies)
+g_training_int17	0x00C6CFE8	CERTAIN	Int	5	forced in 2 bodies, unanimous
+g_training_int18	-	AMBIGUOUS	Int	2	no alignment forced it (2 bodies)
+g_training_int19	0x00C6CFF0	STRONG	Int	5	forced in 1 body
+g_training_int20	0x00C6CFF4	STRONG	Int	5	forced in 1 body
+g_training_int21	0x00C6CFF8	CERTAIN	Int	7	forced in 4 bodies, unanimous
+g_training_int22	0x00C6CFFC	CERTAIN	Int	9	forced in 3 bodies, unanimous
+g_training_int23	0x00C6D000	STRONG	Int	2	forced in 1 body
+g_training_int24	0x00C6D004	STRONG	Int	1	forced in 1 body
+g_training_lines	0x00C6D568	CERTAIN	TList	1	forced, agrees with verified pair
+g_training_message	0x00C6CFAC	STRONG	String	1	forced in 1 body
+g_training_mode	0x00C6CF90	STRONG	Int	1	forced in 1 body
+g_training_s1	0x00C6CFA4	STRONG	String	1	forced in 1 body
+g_training_s2	0x00C6CFAC	STRONG	String	1	forced in 1 body
+g_training_setpiecex	0x00C6CFDC	STRONG	Int	2	forced in 1 body
+g_training_setpiecey	0x00C6CFD8	STRONG	Int	2	forced in 1 body
+g_training_state	0x00C6CF98	CERTAIN	Int	4	forced in 3 bodies, unanimous
+g_trainingfocus	0x00C6CF90	STRONG	Int	1	forced in 1 body
+g_traininglabel1	-	AMBIGUOUS	TLabel	9	bodies disagree: 00c6cfb8:1 00c6cfac:1
+g_traininglabel2	0x00C6CFBC	CERTAIN	TLabel	4	forced in 2 bodies, unanimous
+g_traininglabel3	0x00C6CFC0	CERTAIN	TLabel	4	forced in 2 bodies, unanimous
+g_traininglabel4	0x00C6CFC4	CERTAIN	TLabel	4	forced in 2 bodies, unanimous
+g_traininglabel_msg	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_trainingline_chan	0x00C5B348	STRONG	TChannel	2	forced in 1 body
+g_trainingline_sound	0x00C6DAF8	STRONG	TSound	1	forced in 1 body
+g_traininglines	0x00C6D568	CERTAIN	TList	1	forced, agrees with verified pair
+g_trainingmode	0x00C6CF90	CERTAIN	Int	6	forced in 4 bodies, unanimous
+g_trainingobjects	0x00C6D568	CERTAIN	TList	2	forced in 2 bodies, unanimous
+g_trainingobs	0x00C6D568	CERTAIN	TList	1	forced, agrees with verified pair
+g_trainingstate	0x00C6CF90	STRONG	Int	3	forced in 1 body
+g_trainingsub	0x00C6CF98	STRONG	Int	1	forced in 1 body
+g_trainingzone_end	-	AMBIGUOUS	TTrainingZone	1	no alignment forced it (1 bodies)
+g_trainingzone_start	-	AMBIGUOUS	TTrainingZone	1	no alignment forced it (1 bodies)
+g_trainobjs	0x00C6D568	CERTAIN	TList	5	forced in 4 bodies, unanimous
+g_trainobs	0x00C6D568	CERTAIN	TList	1	forced, agrees with verified pair
+g_traintime	0x00C6EFD4	STRONG	Int	1	forced in 1 body
+g_tt_btn_groupl	0x00C6641C	STRONG	TButton	1	forced in 1 body
+g_tt_btn_groupr	0x00C66424	STRONG	TButton	1	forced in 1 body
+g_tt_btn_roundf	0x00C66430	STRONG	TButton	1	forced in 1 body
+g_tt_btn_roundff	0x00C6642C	STRONG	TButton	1	forced in 1 body
+g_tt_btn_roundn	0x00C66438	STRONG	TButton	1	forced in 1 body
+g_tt_btn_roundnn	0x00C6643C	STRONG	TButton	1	forced in 1 body
+g_tt_button	0x00C66434	CERTAIN	TButton	2	forced in 2 bodies, unanimous
+g_tt_cmb_comp	0x00C66450	CERTAIN	TCombo	2	forced in 2 bodies, unanimous
+g_tt_combo319	0x00C66444	STRONG	TCombo	1	forced in 1 body
+g_tt_combo320	0x00C66448	STRONG	TCombo	1	forced in 1 body
+g_tt_comp	0x00C66454	CERTAIN	TCompetition	2	forced in 2 bodies, unanimous
+g_tt_group	0x00C66428	STRONG	Int	1	forced in 1 body
+g_tt_int02	0x00C66440	STRONG	Int	1	forced in 1 body
+g_tt_int03	0x00C66458	STRONG	Int	1	forced in 1 body
+g_tt_lbl_date	0x00C66418	CERTAIN	TButton	2	forced in 2 bodies, unanimous
+g_tt_refresh	0x00C66440	STRONG	Int	1	forced in 1 body
+g_tt_round	0x00C66440	CERTAIN	Int	2	forced in 2 bodies, unanimous
+g_tt_screen	0x00C6640C	STRONG	TScreen	1	forced in 1 body
+g_tt_sdate	0x00C66458	STRONG	Int	1	forced in 1 body
+g_tt_tbl_fixtures	0x00C66414	CERTAIN	TTable	2	forced in 2 bodies, unanimous
+g_tt_tbl_teams	0x00C66410	CERTAIN	TTable	2	forced in 2 bodies, unanimous
+g_twitterurl	0x00C6EC34	STRONG	String	1	forced in 1 body
+g_units	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_url_facebook	0x00C6EBE4	STRONG	String	1	forced in 1 body
+g_userpath	0x00C6E9A8	CERTAIN	String	8	forced in 7 bodies, unanimous
+g_version	-	AMBIGUOUS	String	2	bodies disagree: 00c6e900:1 00c639e8:1
+g_walldist	0x00C5D638	CERTAIN	Int	2	forced in 2 bodies, unanimous
+g_weather_alpha	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_weather_amount	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_weather_f1	0x00C600E4	STRONG	Float	1	forced in 1 body
+g_weather_f2	0x00C600E8	STRONG	Float	1	forced in 1 body
+g_weather_finish	0x00C600F0	STRONG	Int	1	forced in 1 body
+g_weather_float01	0x00C600E4	CERTAIN	Float	3	forced in 2 bodies, unanimous
+g_weather_frame	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_weather_i1	0x00C600D8	STRONG	Int	1	forced in 1 body
+g_weather_i2	0x00C600DC	STRONG	Int	1	forced in 1 body
+g_weather_i3	0x00C600E0	CERTAIN	Int	1	forced, agrees with verified pair
+g_weather_img	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_weather_int01	0x00C600C4	CERTAIN	Int	5	forced in 3 bodies, unanimous
+g_weather_int02	0x00C600D8	CERTAIN	Int	4	forced in 2 bodies, unanimous
+g_weather_int05	0x00C600EC	CERTAIN	Int	2	forced in 2 bodies, unanimous
+g_weather_int06	0x00C600F0	CERTAIN	Int	2	forced in 2 bodies, unanimous
+g_weather_scroll	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_weather_start	0x00C600EC	STRONG	Int	1	forced in 1 body
+g_weather_type	0x00C600C4	STRONG	Int	3	forced in 1 body
+g_weathertime	0x00C5B210	STRONG	Int	1	forced in 1 body
+g_webpage_btn_fb	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_webpage_btn_tw	-	AMBIGUOUS	TButton	1	no alignment forced it (1 bodies)
+g_webpage_headline	0x00C68904	CERTAIN	String	2	forced in 2 bodies, unanimous
+g_webpage_img_bg	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_webpage_img_fb	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_webpage_img_tw	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_webpage_lbl_comp	0x00C688EC	STRONG	TLabel	1	forced in 1 body
+g_webpage_lbl_headline	0x00C688E8	STRONG	TLabel	2	forced in 1 body
+g_webpage_lbl_league	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_webpage_name	0x00C68900	STRONG	String	1	forced in 1 body
+g_webpage_pan_nav	-	AMBIGUOUS	TPanel	1	no alignment forced it (1 bodies)
+g_webpage_table	0x00C688F0	STRONG	TTable	1	forced in 1 body
+g_webpage_tbl_league	-	AMBIGUOUS	TTable	1	no alignment forced it (1 bodies)
+g_webpage_url	0x00C68900	STRONG	String	1	forced in 1 body
+g_wheel	0x00C6BCB4	STRONG	TImage	1	forced in 1 body
+g_wheelinner	0x00C6BCB8	STRONG	TImage	1	forced in 1 body
+g_wm_bar	-	AMBIGUOUS	TProgressBar	1	no alignment forced it (1 bodies)
+g_wm_bg	-	AMBIGUOUS	TImage	2	no alignment forced it (2 bodies)
+g_wm_btn_film	-	AMBIGUOUS	TButton	2	no alignment forced it (2 bodies)
+g_wm_btn_game	-	AMBIGUOUS	TButton	2	no alignment forced it (2 bodies)
+g_wm_btn_music	-	AMBIGUOUS	TButton	2	no alignment forced it (2 bodies)
+g_wm_comp	-	AMBIGUOUS	TCompetition	2	no alignment forced it (2 bodies)
+g_wm_float01	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_wm_float02	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_wm_float07	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_wm_int01	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_wm_lat1	-	AMBIGUOUS	Float	2	no alignment forced it (2 bodies)
+g_wm_lat2	-	AMBIGUOUS	Float	2	no alignment forced it (2 bodies)
+g_wm_lbl_capacity	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_wm_lbl_cash	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_wm_lbl_comp	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_wm_lbl_competition	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_wm_lbl_fixture	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_wm_lbl_money	0x00C683EC	CERTAIN	TLabel	3	forced in 2 bodies, unanimous
+g_wm_lbl_stadcap1	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_wm_lbl_stadcap2	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_wm_lbl_stadium	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_wm_lbl_stadname	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_wm_lbl_team	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_wm_lbl_team1	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_wm_lbl_versus	-	AMBIGUOUS	TLabel	1	no alignment forced it (1 bodies)
+g_wm_long1	-	AMBIGUOUS	Float	2	no alignment forced it (2 bodies)
+g_wm_long2	-	AMBIGUOUS	Float	2	no alignment forced it (2 bodies)
+g_wm_pan_fixtures	-	AMBIGUOUS	TPanel	1	no alignment forced it (1 bodies)
+g_wm_pan_info	-	AMBIGUOUS	TPanel	1	no alignment forced it (1 bodies)
+g_wm_pan_nav	-	AMBIGUOUS	TPanel	1	no alignment forced it (1 bodies)
+g_wm_pan_title	-	AMBIGUOUS	TPanel	1	no alignment forced it (1 bodies)
+g_wm_pan_travel	-	AMBIGUOUS	TPanel	1	no alignment forced it (1 bodies)
+g_wm_panel	-	AMBIGUOUS	TPanel	1	no alignment forced it (1 bodies)
+g_wm_pnl_year	-	AMBIGUOUS	TPanel	1	no alignment forced it (1 bodies)
+g_wm_prg_energy	-	AMBIGUOUS	TProgressBar	1	no alignment forced it (1 bodies)
+g_wm_stadiumcap	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_wm_stadiumname	-	AMBIGUOUS	String	1	no alignment forced it (1 bodies)
+g_wm_table	-	AMBIGUOUS	TTable	1	no alignment forced it (1 bodies)
+g_wm_tbl_fixtures	-	AMBIGUOUS	TTable	1	no alignment forced it (1 bodies)
+g_wm_team1	-	AMBIGUOUS	TBase_Team	2	no alignment forced it (2 bodies)
+g_wm_team2	-	AMBIGUOUS	TBase_Team	2	no alignment forced it (2 bodies)
+g_wm_zoom	-	AMBIGUOUS	Float	2	no alignment forced it (2 bodies)
+g_worldmap_lblcash	0x00C683EC	STRONG	TLabel	1	forced in 1 body
+g_worldmap_traveltime	0x00C68428	CERTAIN	Int	3	forced in 3 bodies, unanimous
+g_wx_alpha	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
+g_wx_frame	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_wx_idx	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_wx_last	-	AMBIGUOUS	Int	1	no alignment forced it (1 bodies)
+g_yellowcardimg	-	AMBIGUOUS	TImage	1	no alignment forced it (1 bodies)
+g_zoneimg	0x00C6D9F4	STRONG	TImage	1	forced in 1 body
+g_zonelist	0x00C6D568	CERTAIN	TList	1	forced, agrees with verified pair
+g_zoom	0x00C5DE44	STRONG	Float	1	forced in 1 body

@@ -14,7 +14,7 @@
 '        TCompetition.PlayFixtures tests against -1).
 '      g_engine_player:TPlayer 0x00C5B248  (released and nulled; type not byte-observable)
 '      g_training_int03:Int    0x00C6CF90
-'      g_playerteam:TTeam      0x00C5B218   g_opponentteam:TTeam 0x00C5B21C
+'      g_hometeam:TTeam      0x00C5B218   g_opponentteam:TTeam 0x00C5B21C
 '        globals_final says TKit for 0x00C5B218; TKit slot 0x40 is GetPaintedFan(i,i) which
 '        takes two arguments, and the call site passes none.  TTeam slot 0x40 is Clear().
 '        0x00C5B218 is already TTeam in TBall.CheckSideLines.
@@ -37,7 +37,7 @@
 		'!Global g_engine_int20:Int
 		'!Global g_engine_fixture:TFixture
 		'!Global g_training_int03:Int
-		'!Global g_playerteam:TTeam
+		'!Global g_hometeam:TTeam
 		'!Global g_opponentteam:TTeam
 		'!Global g_engine_obj20:TTable
 		'!Global g_profile:TProfile
@@ -58,9 +58,9 @@
 		ResetStats()
 		g_engine_player = Null
 		TBall.ClearAll()
-		If g_playerteam <> Null
-			g_playerteam.Clear()
-			g_playerteam = Null
+		If g_hometeam <> Null
+			g_hometeam.Clear()
+			g_hometeam = Null
 		EndIf
 		If g_opponentteam <> Null
 			g_opponentteam.Clear()

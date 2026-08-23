@@ -26,7 +26,16 @@
 ' unchanged per rule 4: nothing achievable in this file raises this score.
 ' ==================================================================================
 ' ZipFile.getFileInfoByName -- VA 0x0058DDA7, 28 bytes
-' byte-identical vs NSS5.exe
+' NOT VERIFIED -- and deliberately does not carry the MATCHED marker.
+' The marker was here until 2026-08-22 and progress.py counted these 28 bytes in the
+' numerator, while line 1 of this same header says BUILD_FAIL, oracle-confirmed. Both
+' cannot be true: the oracle cannot build this body at all (TZipFileList has no rows in
+' object_model.json, so the placeholder generator emits an empty stub and
+' `.getEntryByName` does not resolve), so nothing has ever compared its bytes against
+' NSS5.exe. The reasoning below for why the body is probably right is unchanged and may
+' well be correct -- but 'probably right' is not what the marker claims, and a body the
+' oracle cannot reach must not be counted as proven. Restore the marker only after a
+' real try_method/try_function run reports MATCH.
 ' Parameter names are not recoverable from the binary and do not affect codegen.
 Method getFileInfoByName:SZipFileEntry(a0:String)
 	Return m_zipFileList.getEntryByName(a0)

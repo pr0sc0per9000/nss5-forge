@@ -8,7 +8,7 @@
 '  * Module Globals -- names are OURS, types are the assumption:
 '      g_matchstate:Int        0x00C5B1FC  (globals_final says Int, type_source=verified,
 '                                           hand-verified in globals_corrections.tsv)
-'      g_playerteam:TTeam      0x00C5B218  -- globals_final says "TKit  CONFLICT TKit=2;TTeam=1".
+'      g_hometeam:TTeam      0x00C5B218  -- globals_final says "TKit  CONFLICT TKit=2;TTeam=1".
 '                                             IT IS TTeam.  The code reads field +8 and compares
 '                                             it to TPlayer.teamid (an Int).  TKit+8 is
 '                                             pixmap:TPixmap (an object) -- that comparison would
@@ -33,7 +33,7 @@
 ' GetShootingDirection tests are If/Else, not early returns.
 Method CheckSideLines:Int()
 	'!Global g_matchstate:Int
-	'!Global g_playerteam:TTeam
+	'!Global g_hometeam:TTeam
 	'!Global g_pitchhalfwidth:Int
 	'!Global g_pitchmargin:Int
 	'!Global g_pitchhalfheight:Int
@@ -43,7 +43,7 @@ Method CheckSideLines:Int()
 	If Self.controlledby <> Null Then p = Self.controlledby
 	If Not p Then Return 0
 	Local t:Int = 1
-	If g_playerteam.id = p.teamid Then t = 2
+	If g_hometeam.id = p.teamid Then t = 2
 	If Self.x > g_pitchhalfwidth + g_pitchmargin
 		TEngine.SetUpSetPiece(3, t, 0, 0)
 		Return 0

@@ -34,6 +34,15 @@
 '
 ' The fourth arm is emitted as `lo > 16 Or hi > 16 -> state = 3` with the Hit() in the
 ' Else; Ghidra prints the De Morgan dual (`lo < 17 && hi < 17`). Read the setg/0x10.
+' CASE DIRECTION CORRECTED 2026-08-22: 3 call sites -> .ToUpper().
+' extracted/runtime_helpers.tsv named 0x004A7410 `_brl_retro_Lower` and 0x004A74E0
+' `_brl_retro_Upper`. Both were wrong and neither address is a brl.retro wrapper:
+' 0x004A7410 is `_bbStringToUpper` and 0x004A74E0 is `_bbStringToLower`. NSS5.exe's
+' own 21-byte retro wrappers at 0x0059C8FD (Lower) and 0x0059C912 (Upper) CALL those
+' two addresses, and a wrapper cannot be the function it calls. The wrong row masked
+' by name, so this body certified with the case conversion running backwards. Full
+' derivation and the discriminating 3x4 matrix: docs/reference/codegen-patterns.md
+' 15.6. Re-verified under NSS5_NO_LEARN=1 on worker trees 380 and 380b.
 	Function DealersTurn:Int()
 		'!Global g_bj_state:Int
 		'!Global g_bj_result:Int
@@ -50,14 +59,14 @@
 		If lo > 21
 			g_bj_state = 3
 			g_bj_result = 1
-			TScreenMessage.Create(g_screen_w / 2, g_screen_h / 2 - 100, Lower(GetText("blackjack_Bust")), g_bj_msgstyle, g_font_msg, Null, 1.0, "FFFFFF")
+			TScreenMessage.Create(g_screen_w / 2, g_screen_h / 2 - 100, GetText("blackjack_Bust").ToUpper(), g_bj_msgstyle, g_font_msg, Null, 1.0, "FFFFFF")
 		ElseIf hi = 21 And g_bj_dealercards.Count() = 2
 			g_bj_state = 3
 			g_bj_result = 2
-			TScreenMessage.Create(g_screen_w / 2, g_screen_h / 2 - 100, Lower(GetText("blackjack_BlackJack")), g_bj_msgstyle, g_font_msg, Null, 1.0, "FFFFFF")
+			TScreenMessage.Create(g_screen_w / 2, g_screen_h / 2 - 100, GetText("blackjack_BlackJack").ToUpper(), g_bj_msgstyle, g_font_msg, Null, 1.0, "FFFFFF")
 		ElseIf g_bj_dealercards.Count() = 5
 			g_bj_state = 3
-			TScreenMessage.Create(g_screen_w / 2, g_screen_h / 2 - 100, Lower(GetText("blackjack_5CardTrick")), g_bj_msgstyle, g_font_msg, Null, 1.0, "FFFFFF")
+			TScreenMessage.Create(g_screen_w / 2, g_screen_h / 2 - 100, GetText("blackjack_5CardTrick").ToUpper(), g_bj_msgstyle, g_font_msg, Null, 1.0, "FFFFFF")
 		ElseIf lo > 16 Or hi > 16
 			g_bj_state = 3
 		Else

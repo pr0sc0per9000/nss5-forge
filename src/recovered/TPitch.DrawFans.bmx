@@ -45,14 +45,23 @@
 '                 after End Select carries a zero-displacement `EB 00`;
 '     alt      -- the no-match path is a bare `jmp` and the fxch is pushed down into the
 '                 Case 0 false-tail and the Case 1 join instead.
-'   Total length is INVARIANT at 4664 in every build; only placement moves.  The three
-'   MISMATCH signatures identify which site flipped:
-'     matched=4046 -> A only   matched=3982 -> B only   matched=3940 -> both
-'   All FOUR outputs predicted by the two-site model were observed, and no fifth ever was:
-'     fcd3481746aa MATCH 4664 | 637899b2ab89 A 4046 | 433539b03163 B 3982 | b8e2a75a31ad AB 3940
-'   Measured MATCH rate 10 of 35 builds (28.6%), consistent with two independent ~55% coins.
-'   Verified MATCH 4664/4664 mode=reloc reloc_masked=192 under NSS5_NO_LEARN=1 on ten
-'   separate builds; the matching output hashes identically (fcd3481746aa) every time.
+'   RE-MEASURED 2026-08-22, 60 builds, NSS5_NO_LEARN=1, worker trees 382 and 382b.
+'   MATCH 4664/4664 mode=reloc reloc_masked=192 in 23 of 60 (38.3%), on BOTH trees.
+'   Two earlier claims in this note were WRONG and are corrected here:
+'     * "Total length is INVARIANT at 4664" is FALSE.  6 of 60 builds came out SHORT
+'       (5 x 4656, 1 x 4652).  Those are mode='len' rows whose `matched` is a POSITIONAL
+'       count, not a prefix length, so 2583/4664 is not a fidelity figure -- see
+'       localise_diff.py's docstring.  localise_diff on one of them: 16 gaps, -8 total,
+'       the four viewport guards reordered and fxch st(2)/st(1) reassigned.  Same source.
+'     * the signature table 4046/3982/3940 is stale.  Observed in 60 builds:
+'         matched=4110  masked=192  first_diff=3052   (11)   site A flipped
+'         matched=4046  masked=185  first_diff=3161   (13)   site B flipped
+'         matched=4004  masked=185  first_diff=3052   ( 7)   both flipped
+'       3982 and 3940 never appeared.  The two-site model itself still holds: on a
+'       matched=4004 build localise_diff reports 8 length-changing gaps summing to +0,
+'       four per site, each pair moving one `D9 C9 fxch st(1)` off the Select's no-match
+'       path and into the Case 0 false-tail (ORIGINAL +3064/+3096/+3123/+3132 for site A,
+'       +3173/... for site B).  Every other instruction is identical.
 '   This is a bcc defect, not a body defect: a 314-byte function using the same
 '   Select/Float/Continue shape (scripts/w14L11_repro.py) is deterministic 6 of 6, so the
 '   trigger is scale-dependent.  RE-RUN THE ORACLE UNTIL IT MATCHES; a single MISMATCH on

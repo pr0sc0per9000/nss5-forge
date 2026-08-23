@@ -33,7 +33,7 @@ Object header occupies offsets 0 (class/vtable pointer) and 4 (GC word); user fi
 | `*X` | pointer to X |
 | `(a,b)r` | function taking a,b returning r |
 
-**Totals: 348 Types, 2775 fields, 2809 methods/functions (133 game Types).**
+**Totals: 349 Types, 2780 fields, 2862 methods/functions (133 game Types).**
 
 ---
 

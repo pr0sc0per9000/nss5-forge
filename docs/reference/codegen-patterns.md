@@ -1166,6 +1166,90 @@ so read them. Second, when a body is *semantically* odd - `StartsWith(".")` on a
 number like `"1.5"` is never true, making both `While` loops in `FormatMoney` dead code - 
 that is a signal the predicate is wrong, not that the game has dead code.
 
+## 15.6 A wrapper is not the function it wraps - `Lower`/`Upper`, and 152 inverted call sites
+
+`extracted/runtime_helpers.tsv` is learned and **gitignored**, so a wrong row there survives
+only until somebody regenerates it - and comes straight back when they do. These two rows are
+recorded here because they were wrong for a long time and cost 41 verified bodies:
+
+| VA | learned (WRONG) | correct |
+|---|---|---|
+| `0x004A7410` | `_brl_retro_Lower`, 205 witnesses | **`_bbStringToUpper`** |
+| `0x004A74E0` | `_brl_retro_Upper`, 14 witnesses | **`_bbStringToLower`** |
+
+They were not merely swapped. **Neither address is a `brl.retro` wrapper at all**, and that
+distinction is the whole lesson: `Function Lower$(str$) Return str.ToLower()` compiles to a
+21-byte wrapper that *calls* `bbStringToLower`, so the wrapper and the C function are two
+different `E8` targets and the source forms `Lower(s)` and `s.ToLower()` are **not
+interchangeable**. NSS5 uses both, in different places.
+
+Four independent proofs, none of them the oracle:
+
+1. **The instruction that does the work.** `0x004A74E0` is `lea eax,[edi-0x41] / cmp eax,0x19 /
+   or edi,0x20` - tests `A`-`Z` and *sets* bit 0x20, so it lowercases. `0x004A7410` is
+   `lea eax,[edi-0x61] / cmp eax,0x19 / and edi,0xFFFFFFDF` - tests `a`-`z` and *clears* it.
+2. **`blitz_string.c`.** `bbStringToLower` gates its ASCII path on `c<192` and `bbStringToUpper`
+   on `c<181`; the two bodies compare against `0xBF` and `0xB4` respectively.
+3. **NSS5.exe names them itself.** The `brl.retro` wrappers survive in the original at
+   `0x0059C8E8` Trim / `0x0059C8FD` Lower / `0x0059C912` Upper - 21 bytes each, in the same
+   `Mid/Instr/Left/Right/LSet/RSet/Replace/Trim/Lower/Upper/Hex` order and byte sizes as our
+   own build of `retro.mod`, with `Replace` at `0x0059C8CB` and `Hex` at `0x0059C927` already
+   named in `brl_functions.tsv`. Each is one call: Trim to `0x004A7740` (independently named
+   `_bbStringTrim`), Lower to `0x004A74E0`, Upper to `0x004A7410`.
+4. **Semantics.** With the old rows `RGBToHex` returned lowercase hex while every colour
+   literal in the game is uppercase (`"FFFFFF"`, `"00FF00"`), `Sha256Hex` returned an
+   uppercase digest, and `TCompetition.IsCupFinal` tested `Lower(c.tla) = "SUPER CUP"`, which
+   can never be true. Section 15.5's rule again: a semantically dead predicate means the name
+   is wrong, not that the game has dead code.
+
+**The oracle cannot pick between the candidate namings, and that is the point.** Measured on
+`TScreen.CreateScreen` (381 bytes, the differing byte is the operand of the `E8` at
+`0x005104A2`), a 3x4 matrix of table row against source form:
+
+| table | `Lower(s.name)` | `s.name.ToLower()` | `Upper(s.name)` | `s.name.ToUpper()` |
+|---|---|---|---|---|
+| `7410=retro_Lower, 74E0=retro_Upper` (as learned) | MISMATCH | MISMATCH | **MATCH 381/381** | MISMATCH |
+| `7410=retro_Upper, 74E0=retro_Lower` (swapped) | **MATCH 381/381** | MISMATCH | MISMATCH | MISMATCH |
+| `7410=bbToUpper, 74E0=bbToLower` (correct) | MISMATCH | **MATCH 381/381** | MISMATCH | MISMATCH |
+
+Three different sources all certify at full length; only the binary decides which is right.
+
+**Blast radius is computable exactly, and does not need a corpus sweep.** A row is consulted
+only at an `E8` whose target is that VA, so scan the original for them. In NSS5.exe there are
+142 calls to `0x004A7410` and 34 to `0x004A74E0`, of which 140 and 12 are in game code,
+spread over **50 functions**. Four call sites reach the `Lower` wrapper at `0x0059C8FD`
+(`ReadSettingFloat`, `ReadSettingString`) and five reach the `Trim` wrapper at `0x0059C8E8`
+(`TProfile.LoadProfile`); the `Upper` wrapper at `0x0059C912` is called from nowhere. Those
+nine sites are genuinely `Lower(...)` and `Trim(...)` in source and are masked through
+`brl_functions.tsv`'s alias set, not through this table.
+
+**Cross-check any `_brl_*` name that lands on a C-runtime address.** Every other row in the
+C-runtime range `0x00401000..0x004BA000` is a `_bb*` symbol. A BlitzMax module symbol sitting
+in that range is the shape of this defect.
+
+**That cross-check is now a checker, not advice** (RULES.md's rule about rules).
+`python scripts/helper_map.py` has two additional audits:
+`audit_module_symbols_in_runtime_range()` fails any `.text` row carrying a `_brl_*`/`_pub_*`
+symbol - wrong by construction, because bcc output lives in `code` at `0x004BA000+` - and
+`audit_cross_table_symbols()` fails any symbol claimed by a runtime-helper row **and** by a
+different address in `brl_functions.tsv`. Both fire on the old rows and are silent on the
+corrected ones. Either would have caught this the day it was learned.
+
+**Witness counts are not evidence.** Once a wrong pairing is learned, every later site that
+repeats the same wrong source spelling is counted as corroboration, so 205 witnesses were 205
+repetitions of one mistake. The audit's "single-witness entries" warning points at the
+*weakest* rows; this row was the strongest-looking one in the table and the most wrong.
+
+**Two earlier passes already had this and it still shipped.**
+`docs/archive/waves/wave11-helper-naming.md` reached the correct pair from the same
+instruction evidence and did not rewrite the table.
+`docs/archive/waves/wave13-modulebody.md` rewrote the conclusion the wrong way round -
+`0x004A7410 = _bbStringToLower` - by keeping the old rows' *semantics* while fixing their
+*symbol*, and it is self-refuting: its own table row shows `ReadSettingFloat`'s `Lower(a1)`
+reaching `0x0059C8FD`, and `0x0059C8FD` calls `0x004A74E0`, so `0x004A74E0` is the lowercaser
+and `0x004A7410` is not. Read the wrapper's own `E8`, and do not trust an archived
+conclusion over the binary.
+
 # 19. Whole-program invariants the ORACLE CANNOT CHECK
 
 The per-function oracle proves method bodies. It deliberately masks four things, and two of
@@ -1519,3 +1603,82 @@ the operands of a commutative binary operation before reaching for the allocator
 * **A count that also exists as `array.Length` still needs its own Local** if the original
   declared one - `wordcount` and `w.Length` are interchangeable in meaning, but omitting the
   Local made the frame one dword short.
+
+# 24. Conversions bcc does for you, and why writing them out is not equivalent
+
+## 24.1 A String argument to a `Byte Ptr` parameter converts itself, and frees itself
+
+`Val::funArgCast` (`_src/compiler/val.cpp`:352, the "convert string to cstring/wstring"
+block at :381) fires whenever a `String` argument meets a `Byte Ptr` (or `Short Ptr`)
+parameter. It emits `bbStringToCString`, stores the result into a compiler temp, and pushes
+`bbMemFree(temp)` onto the **call's cleanup list**, which is emitted after the call returns:
+
+```
+push <the String>
+call bbStringToCString
+add  esp,4
+mov  ebx,eax            <- the temp
+push ebx
+call <the Extern>
+add  esp,4
+push ebx
+call bbMemFree          <- the cleanup, after the call
+add  esp,4
+```
+
+So `FindLeaderboard("Player Value")` on its own produces all ten of those instructions.
+**If you see that shape, do not reconstruct it as a Local plus an explicit `MemFree`.**
+
+## 24.2 The hand-written spelling is NOT byte-equivalent - it moves a live range
+
+This is the part that costs time if you get it wrong, because both spellings compile and
+both look right. Writing it out by hand:
+
+```blitzmax
+Local q:Byte Ptr = obj.name.ToCString()
+Extern_Fn(2, obj.GetValue(), q)
+MemFree q
+```
+
+puts the conversion in its own **earlier statement**. Letting `funArgCast` do it folds the
+conversion into the call statement, and the statements hoisted out of the arguments then come
+out **left to right**: the receiver materialisation for `obj.GetValue()` first, then the
+`bbStringToCString` call for the later argument. That single reordering changes which values
+are live across which calls, and therefore the register assignment and the frame:
+
+| spelling | receiver temp | its load | frame |
+|---|---|---|---|
+| hand-written Local + `MemFree` | short-lived, **eax** | `mov eax,esi` survives as a real copy | no spill |
+| `funArgCast` does it | live across the conversion call, so **callee-saved esi** | folds into `mov esi,[global]` | a fourth value competes, one spills, `sub esp,4` appears |
+
+Measured on `SteamPostPlayerValue` (0x0058D987): the hand-written form was 327 bytes, the
+compiler-converted form is 325, byte-identical. The two bytes were the `89 F0 mov eax,esi`,
+and fifteen different spellings of the *receiver* had already been measured trying to remove
+it - the receiver was never the cause.
+
+## 24.3 The receiver copy itself is unconditional - stop trying to spell it away
+
+`type.cpp` `ClassType::resolve` builds a non-final virtual method's template as
+`vfn( mem(CG_PTR, tmp("@type"), slot), tmp("@self") )`. `Val::find` (`val.cpp`:513) counts
+`n_self=1` and `n_type=1` for **every** ordinary virtual call, so `n_self+n_type>1` always
+holds and it always emits `mov cg,cg_exp` to materialise the receiver into a fresh temp.
+No source spelling of the receiver avoids that branch. Whether the `mov` survives into the
+bytes is decided by whether the allocator can fold the temp into the register the receiver
+already occupies, and that is decided by the temp's **live range** - which, per 24.2, is a
+property of statement structure. Look at the statements around the call, not at the receiver.
+
+## 24.4 `_same_callee` cannot prove a callee that calls C-runtime helpers
+
+Related, and worth knowing before you try to close a caller by compiling its callee into the
+probe. `harness.compare`'s masking has three routes for an `E8`: (a) by name, (b) by bytes
+via `_same_callee`, (c) learn. Route (b) recurses with **no** `ournames`/`origtab`/`ourfns`,
+so inside the callee any call to a C-runtime helper (`bbStringToCString`, `bbMemFree`, ...)
+cannot mask, the callee compares `diff`, and the fallback correctly refuses.
+
+Consequence: **route (b) only works for a callee that is pure game code.** For anything else
+the ORIGINAL side must be named, and `helper_map.orig_functions()` builds that table by
+scanning `src/recovered_module/` and nothing else. Measured on `TProfile.SaveGame`:
+compiling the real 325-byte callee into the probe gave 850/850 `mode=diff` with one differing
+operand; moving the callee's file into `src/recovered_module/` gave 850/850 `mode=reloc`,
+MATCH. That is not 13.3 stubbing - 13.3 forbids a *placeholder file for an unrecovered VA*,
+and the name here is earned by a body that is itself byte-identical.

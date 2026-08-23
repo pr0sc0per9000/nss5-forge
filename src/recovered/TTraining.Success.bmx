@@ -41,12 +41,21 @@
 '!Global g_training_message:String
 '!Global g_trainingmode:Int
 '!Global g_profile:TProfile
+' CASE DIRECTION CORRECTED 2026-08-22: 1 call site -> .ToUpper().
+' extracted/runtime_helpers.tsv named 0x004A7410 `_brl_retro_Lower` and 0x004A74E0
+' `_brl_retro_Upper`. Both were wrong and neither address is a brl.retro wrapper:
+' 0x004A7410 is `_bbStringToUpper` and 0x004A74E0 is `_bbStringToLower`. NSS5.exe's
+' own 21-byte retro wrappers at 0x0059C8FD (Lower) and 0x0059C912 (Upper) CALL those
+' two addresses, and a wrapper cannot be the function it calls. The wrong row masked
+' by name, so this body certified with the case conversion running backwards. Full
+' derivation and the discriminating 3x4 matrix: docs/reference/codegen-patterns.md
+' 15.6. Re-verified under NSS5_NO_LEARN=1 on worker trees 380 and 380b.
 PlaySound(g_snd_training_success1, g_chan_training)
 PlaySound(g_snd_training_success2, g_crowd_oohchannel)
 TScreenMessage.ClearAll(0)
 g_training_state = 2
 g_matchmode = 11
-g_training_headline = Lower(GetText("Success!"))
+g_training_headline = GetText("Success!").ToUpper()
 g_training_message = GetText("CMESSAGE_TRAININGSUCCESS")
 If g_profile.matchskipped = 0
 	g_profile.UpdateRelationship(1, 2)

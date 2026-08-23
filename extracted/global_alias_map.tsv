@@ -1,0 +1,298 @@
+address	alias	canonical	reason	alias_files
+0x00C596F4	g_nation_sortby	g_nation_int01	globals_final.tsv	4
+0x00C596F4	g_nation_sortmode	g_nation_int01	globals_final.tsv	3
+0x00C59A48	g_club_sortby	g_club_sortmode	most-used (3 files)	3
+0x00C5B1C4	g_engine_fntmatch	g_object15	globals_final.tsv	1
+0x00C5B1C4	g_font_match_m	g_object15	globals_final.tsv	1
+0x00C5B1C4	g_font_scroll	g_object15	globals_final.tsv	1
+0x00C5B1C8	g_bj_font	g_font	most-used (4 files)	1
+0x00C5B1C8	g_font_main	g_font	most-used (4 files)	3
+0x00C5B1C8	g_font_match_l	g_font	most-used (4 files)	1
+0x00C5B1C8	g_font_msg	g_font	most-used (4 files)	3
+0x00C5B1CC	g_gamestate	g_engine_int13	globals_final.tsv	2
+0x00C5B1FC	g_camsubmode	g_player_int01	globals_final.tsv	1
+0x00C5B1FC	g_matchmode	g_player_int01	globals_final.tsv	2
+0x00C5B1FC	g_matchstate	g_player_int01	globals_final.tsv	17
+0x00C5B208	g_minutes	g_engine_half	most-used (3 files)	1
+0x00C5B210	g_engine_clock	g_engine_int20	globals_final.tsv	4
+0x00C5B210	g_lastminutetick	g_engine_int20	globals_final.tsv	1
+0x00C5B218	g_team_home	g_hometeam	most-used (16 files)	4
+0x00C5B21C	g_team_away	g_awayteam	most-used (11 files)	2
+0x00C5B22C	g_engine_fixture	g_fixture	most-used (13 files)	6
+0x00C5B238	g_kickcount	g_engine_int25	globals_final.tsv	1
+0x00C5B248	g_player_selected	g_player_tplayer01	globals_final.tsv	2
+0x00C5B254	g_matchtimer	g_engine_int27	globals_final.tsv	1
+0x00C5B25C	g_possessionaway	g_engine_float07	globals_final.tsv	1
+0x00C5B25C	g_posshome	g_engine_float07	globals_final.tsv	1
+0x00C5B260	g_possaway	g_engine_float08	globals_final.tsv	1
+0x00C5B2CC	g_replayspeedup	g_engine_int53	globals_final.tsv	1
+0x00C5B2EC	g_engine_ico_injury	g_img_injury	most-used (2 files)	1
+0x00C5B348	g_chn5	g_object46	globals_final.tsv	1
+0x00C5B348	g_crowd_oohchannel	g_object46	globals_final.tsv	2
+0x00C5B348	g_engine_chan	g_object46	globals_final.tsv	1
+0x00C5B348	g_sndchannel	g_object46	globals_final.tsv	1
+0x00C5D1A8	g_opt_ctrlidx	g_options_int01	globals_final.tsv	5
+0x00C5D1A8	g_options_controlmode	g_options_int01	globals_final.tsv	1
+0x00C5D1AC	g_opt_scheme	g_player_int14	globals_final.tsv	2
+0x00C5D1B4	g_key_a	g_options_arr02	globals_final.tsv	2
+0x00C5D1B4	g_opt_ctrlup	g_options_arr02	globals_final.tsv	5
+0x00C5D1BC	g_key_b	g_options_arr03	globals_final.tsv	1
+0x00C5D1BC	g_opt_ctrldown	g_options_arr03	globals_final.tsv	4
+0x00C5D1C4	g_ctrlleft	g_options_arr04	globals_final.tsv	2
+0x00C5D1C4	g_key_c	g_options_arr04	globals_final.tsv	2
+0x00C5D1C4	g_opt_ctrlleft	g_options_arr04	globals_final.tsv	5
+0x00C5D1CC	g_ctrlright	g_options_arr05	globals_final.tsv	2
+0x00C5D1CC	g_key_d	g_options_arr05	globals_final.tsv	2
+0x00C5D1CC	g_opt_ctrlright	g_options_arr05	globals_final.tsv	4
+0x00C5D1D4	g_key_e	g_options_arr06	globals_final.tsv	2
+0x00C5D1D4	g_opt_ctrlbutton	g_options_arr06	globals_final.tsv	3
+0x00C5D1D4	g_options_buttons	g_options_arr06	globals_final.tsv	1
+0x00C5D1DC	g_key_f	g_options_arr07	globals_final.tsv	1
+0x00C5D1DC	g_opt_ctrlbutton2	g_options_arr07	globals_final.tsv	3
+0x00C5D1E4	g_key_g	g_options_arr08	globals_final.tsv	1
+0x00C5D1E4	g_opt_ctrlbutton3	g_options_arr08	globals_final.tsv	3
+0x00C5D1F4	g_key_i	g_options_arr10	globals_final.tsv	1
+0x00C5D1F4	g_opt_ctrlpause	g_options_arr10	globals_final.tsv	2
+0x00C5D1FC	g_opt_ctrlreplay	g_options_arr11	globals_final.tsv	2
+0x00C5D220	g_opt_sfxvol	g_opt_soundfx	most-used (3 files)	1
+0x00C5D220	g_options_sfxvol	g_opt_soundfx	most-used (3 files)	2
+0x00C5D220	g_options_volume	g_opt_soundfx	most-used (3 files)	1
+0x00C5D220	g_sfxvol	g_opt_soundfx	most-used (3 files)	1
+0x00C5D224	g_musicvol	g_opt_music	most-used (2 files)	2
+0x00C5D224	g_opt_musicvol	g_opt_music	most-used (2 files)	1
+0x00C5D224	g_options_musicvol	g_opt_music	most-used (2 files)	1
+0x00C5D228	g_captaincy_level	g_player_int15	globals_final.tsv	1
+0x00C5D228	g_difficulty	g_player_int15	globals_final.tsv	5
+0x00C5D228	g_opt_difficulty	g_player_int15	globals_final.tsv	3
+0x00C5D22C	g_opt_radar	g_options_int02	globals_final.tsv	3
+0x00C5D230	g_opt_matchlength	g_options_int03	globals_final.tsv	4
+0x00C5D238	g_engine_zoomdefault	g_opt_matchscale	most-used (2 files)	1
+0x00C5D240	g_opt_displayinitials	g_options_int05	globals_final.tsv	2
+0x00C5D244	g_opt_a	g_screen_options_int01	globals_final.tsv	1
+0x00C5D244	g_opt_screen	g_screen_options_int01	globals_final.tsv	3
+0x00C5D248	g_opt_c	g_opt_window	most-used (3 files)	1
+0x00C5D248	g_opt_windowed	g_opt_window	most-used (3 files)	1
+0x00C5D24C	g_opt_cam	g_opt_playercam	most-used (2 files)	1
+0x00C5D254	g_opt_dist	g_opt_distance	most-used (3 files)	1
+0x00C5D254	g_options_units	g_opt_distance	most-used (3 files)	2
+0x00C5D254	g_units	g_opt_distance	most-used (3 files)	1
+0x00C5D258	g_opt_tooltips	g_options_int09	globals_final.tsv	4
+0x00C5D258	g_options_tooltips	g_options_int09	globals_final.tsv	2
+0x00C5D26C	g_opt_highlightball	g_screen_options_int03	globals_final.tsv	3
+0x00C5D26C	g_opt_hlball	g_screen_options_int03	globals_final.tsv	1
+0x00C5D270	g_showhud	g_opt_showenergy	most-used (4 files)	1
+0x00C5D274	g_currency	g_opt_currency	most-used (3 files)	2
+0x00C5D274	g_opt_e	g_opt_currency	most-used (3 files)	1
+0x00C5D298	g_nomsgs	g_opt_bossoff	most-used (2 files)	1
+0x00C5D298	g_opt_bossfx	g_opt_bossoff	most-used (2 files)	2
+0x00C5D62C	g_pitch_pitchtype	g_pitch_int06	globals_final.tsv	1
+0x00C5D630	g_pitch_mowtype	g_pitch_int07	globals_final.tsv	1
+0x00C5D634	g_pitch_halfw	g_player_int16	globals_final.tsv	2
+0x00C5D634	g_pitchleft	g_player_int16	globals_final.tsv	1
+0x00C5D638	g_goalliney	g_player_int17	globals_final.tsv	1
+0x00C5D638	g_pitch_halfh	g_player_int17	globals_final.tsv	2
+0x00C5D638	g_train_goalline	g_player_int17	globals_final.tsv	1
+0x00C5D638	g_walldist	g_player_int17	globals_final.tsv	2
+0x00C5D660	g_netliney	g_pitch_int12	globals_final.tsv	1
+0x00C5D674	g_dugouty	g_msgx	most-used (1 files)	1
+0x00C5DE10	g_players	g_object79	globals_final.tsv	27
+0x00C5DE18	g_img_marker	g_object80	globals_final.tsv	1
+0x00C5DE18	g_player_highlightimg	g_object80	globals_final.tsv	1
+0x00C5DE1C	g_img_arrow1	g_player_arrowgreenimg	most-used (1 files)	1
+0x00C5DE20	g_img_arrow2	g_player_arrowyellowimg	most-used (1 files)	1
+0x00C5DE24	g_img_offside	g_player_offsideflagimg	most-used (1 files)	1
+0x00C5DE28	g_img_calling	g_player_speechimg	most-used (1 files)	1
+0x00C5DE44	g_player_spritescale	g_player_float02	globals_final.tsv	1
+0x00C5DE44	g_playerscale	g_player_float02	globals_final.tsv	1
+0x00C5DE44	g_zoom	g_player_float02	globals_final.tsv	1
+0x00C5DE5C	g_jumpzvel	g_player_f08	most-used (1 files)	1
+0x00C5DEA4	g_ball	g_player_tplayer02	globals_final.tsv	23
+0x00C5DF2C	g_chan_slide	g_player_slidechannel	most-used (1 files)	1
+0x00C5DF34	g_player_slidesnd	g_snd_slide	most-used (1 files)	1
+0x00C600E4	g_wx_alpha	g_weather_float01	globals_final.tsv	1
+0x00C60500	g_reslist	g_gfxmodes	most-used (6 files)	1
+0x00C6099C	g_complist	g_competitions	most-used (28 files)	7
+0x00C6099C	g_comps	g_competitions	most-used (28 files)	7
+0x00C61700	g_activescreen	g_curscreen	most-used (16 files)	5
+0x00C61728	g_screen_mousey	g_screen_float02	globals_final.tsv	1
+0x00C6173C	g_screen_usemouse	g_screen_int03	globals_final.tsv	1
+0x00C61740	g_screen_scrollx	g_screen_float03	globals_final.tsv	1
+0x00C61744	g_screen_scrolly	g_screen_float04	globals_final.tsv	1
+0x00C61CF8	g_editkits_focus	g_activegadget	most-used (21 files)	1
+0x00C61CF8	g_ek_activegadget	g_activegadget	most-used (21 files)	1
+0x00C62D9C	g_combo_arrow	g_comboimg	most-used (1 files)	1
+0x00C63CEC	g_screenname	g_options_prevscreen	most-used (2 files)	1
+0x00C63D0C	g_inputbox	g_options_inputbox	most-used (2 files)	1
+0x00C64218	g_np_page	g_screen_newplayer_flag	most-used (1 files)	1
+0x00C6421C	g_np_inpname	g_np_nameinput	most-used (1 files)	1
+0x00C64220	g_np_cmbnation	g_np_combonation	most-used (2 files)	2
+0x00C64228	g_np_cmbclubnation	g_np_comboclub	most-used (2 files)	1
+0x00C64228	g_np_comboclubnation	g_np_comboclub	most-used (2 files)	1
+0x00C64234	g_np_cmbposition	g_np_comboskin	most-used (1 files)	1
+0x00C64234	g_np_comboposition	g_np_comboskin	most-used (1 files)	1
+0x00C64238	g_np_cmbside	g_np_comboside	most-used (1 files)	1
+0x00C64238	g_np_combohair	g_np_comboside	most-used (1 files)	1
+0x00C6423C	g_np_cmbskin	g_np_comboskincol	most-used (1 files)	1
+0x00C64240	g_np_cmbhair	g_np_combohaircol	most-used (1 files)	1
+0x00C65588	g_screencomps_table	g_comptable	most-used (3 files)	1
+0x00C65C70	g_ek_team	g_editkits_team	most-used (3 files)	1
+0x00C66610	g_testfix_combo	g_tf_combocontinent	most-used (3 files)	1
+0x00C66744	g_icon_match	g_img_playball	most-used (1 files)	1
+0x00C66748	g_icon_league	g_img_playrelations	most-used (1 files)	1
+0x00C6674C	g_icon_end	g_img_playnewspaper	most-used (1 files)	1
+0x00C66750	g_icon_cup	g_img_playcup	most-used (1 files)	1
+0x00C66754	g_icon_train	g_img_playweb	most-used (1 files)	1
+0x00C66758	g_icon_physio	g_img_playphysio	most-used (1 files)	1
+0x00C6675C	g_icon_boss	g_img_playboss	most-used (1 files)	1
+0x00C6675C	g_img_next	g_img_playboss	most-used (1 files)	1
+0x00C66760	g_icon_coach	g_img_playcoach	most-used (1 files)	1
+0x00C66768	g_pan_background	g_pan_stable	most-used (13 files)	1
+0x00C66768	g_pan_title	g_pan_stable	most-used (13 files)	5
+0x00C66768	g_panel_bg	g_pan_stable	most-used (13 files)	1
+0x00C6677C	g_label_name	g_lbl_name	most-used (1 files)	1
+0x00C66788	g_lbl_bank	g_label_bank	most-used (2 files)	1
+0x00C66788	g_lbl_cash	g_label_bank	most-used (2 files)	1
+0x00C66798	g_playbutton	g_btn_play	most-used (2 files)	1
+0x00C667A4	g_btn_main	g_btn_training	most-used (1 files)	1
+0x00C667B0	g_pan_nav	g_pan_money	most-used (7 files)	2
+0x00C66B80	g_rel_screen	g_screen_relationships	most-used (2 files)	2
+0x00C66F20	g_screen_leagues_table	g_lg_table1	most-used (2 files)	1
+0x00C66F38	g_lg_combo_league	g_combo_league	most-used (3 files)	1
+0x00C66F3C	g_combo_club	g_object467	globals_final.tsv	5
+0x00C66F5C	g_screen_leagues_comp	g_leagues_comp	most-used (5 files)	1
+0x00C671E0	g_continents_cmbcontinent	g_combo_continent	most-used (4 files)	2
+0x00C671E4	g_combo_group	g_continents_cmbcompetition	most-used (2 files)	2
+0x00C671E8	g_continents_cmbteam	g_continents_combo	most-used (2 files)	2
+0x00C671EC	g_continents_int03	g_continents_selrow	most-used (1 files)	1
+0x00C67204	g_continents_compid	g_continents_int04	most-used (1 files)	1
+0x00C67204	g_continents_fixmode	g_continents_int04	most-used (1 files)	1
+0x00C67220	g_continents_competition	g_continents_comp	most-used (3 files)	1
+0x00C67224	g_continents_level	g_continents_mode	most-used (3 files)	2
+0x00C6764C	g_scr_matchpaused	g_screen_matchpaused	most-used (1 files)	1
+0x00C67650	g_mp_btn1	g_screen_matchpaused_replay	most-used (1 files)	1
+0x00C67654	g_mp_btn2	g_screen_matchpaused_tactics	most-used (1 files)	1
+0x00C67658	g_mp_btn3	g_screen_matchpaused_skiptime	most-used (1 files)	1
+0x00C677D8	g_fmt_lock	g_screen_formation_int05	globals_final.tsv	1
+0x00C677D8	g_screen_formation_ready	g_screen_formation_int05	globals_final.tsv	1
+0x00C677DC	g_screen_formation_selno2	g_screen_formation_int06	globals_final.tsv	1
+0x00C67B34	g_co_prg542	g_object542	globals_final.tsv	1
+0x00C67B34	g_mc_bar_relationboss	g_object542	globals_final.tsv	1
+0x00C67B64	g_co_prg554	g_pb_rel	most-used (1 files)	1
+0x00C67B78	g_co_lbl559	g_lbl_signingfee	most-used (1 files)	1
+0x00C67B7C	g_co_lbl560	g_lbl_length	most-used (1 files)	1
+0x00C67B80	g_btn_accept	g_co_btn561	most-used (2 files)	1
+0x00C67D90	g_mc_btn_reqtransfer	g_mc_btn_requesttransfer	most-used (2 files)	1
+0x00C67D94	g_mc_btn_requestloan	g_object568	globals_final.tsv	2
+0x00C67D9C	g_label_clubsinterested	g_mc_lbl_clubsinterested2	most-used (1 files)	1
+0x00C683E8	g_wm_lbl_comp	g_wm_lbl_competition	most-used (1 files)	1
+0x00C683EC	g_wm_lbl_cash	g_wm_lbl_money	most-used (3 files)	1
+0x00C683F4	g_wm_lbl_fixture	g_wm_lbl_versus	most-used (1 files)	1
+0x00C683FC	g_wm_lbl_team	g_wm_lbl_team1	most-used (1 files)	1
+0x00C68400	g_wm_lbl_stadium	g_wm_lbl_stadname	most-used (1 files)	1
+0x00C68408	g_wm_lbl_capacity	g_wm_lbl_stadcap2	most-used (1 files)	1
+0x00C6840C	g_wm_pan_fixtures	g_wm_pnl_year	most-used (1 files)	1
+0x00C68410	g_wm_table	g_wm_tbl_fixtures	most-used (1 files)	1
+0x00C68428	g_wm_int01	g_screen_worldmap_int01	globals_final.tsv	1
+0x00C68428	g_worldmap_traveltime	g_screen_worldmap_int01	globals_final.tsv	3
+0x00C688F0	g_webpage_table	g_webpage_tbl_league	most-used (1 files)	1
+0x00C68A0C	g_pan_physioreport	g_rp_panel	most-used (1 files)	1
+0x00C68A10	g_lbl_physioreport	g_rp_label	most-used (1 files)	1
+0x00C68A14	g_btn_physioplay	g_rp_btn	most-used (1 files)	1
+0x00C6B834	g_bj_fntsize	g_blackjack_int01	globals_final.tsv	1
+0x00C6B850	g_casino_snderror	g_snd_lose	most-used (2 files)	1
+0x00C6B85C	g_bet	g_bj_bet	most-used (1 files)	1
+0x00C6BBBC	g_roulettewheel	g_roulette_wheel	most-used (3 files)	1
+0x00C6BBC0	g_roul_ball	g_roulette_ball	most-used (3 files)	2
+0x00C6CF78	g_snd_goal	g_snd_training_success2	most-used (1 files)	1
+0x00C6CF90	g_tr_mode	g_training_int03	globals_final.tsv	2
+0x00C6CF90	g_train_mode	g_training_int03	globals_final.tsv	2
+0x00C6CF90	g_training	g_training_int03	globals_final.tsv	2
+0x00C6CF90	g_trainingmode	g_training_int03	globals_final.tsv	6
+0x00C6CF90	g_trainingstate	g_training_int03	globals_final.tsv	3
+0x00C6CF98	g_tr_active	g_training_int05	globals_final.tsv	1
+0x00C6CF98	g_train_state	g_training_int05	globals_final.tsv	1
+0x00C6CFAC	g_train_scrolltext	g_training_message	most-used (1 files)	1
+0x00C6CFD8	g_tr_x2	g_training_setpiecex	most-used (2 files)	1
+0x00C6CFDC	g_tr_y2	g_training_setpiecey	most-used (2 files)	1
+0x00C6CFF8	g_train_goalsleft	g_training_int21	globals_final.tsv	1
+0x00C6D568	g_dummies	g_trainobjs	most-used (5 files)	3
+0x00C6DD60	g_panel_controls_btn	g_panel_controls_arr01	globals_final.tsv	1
+0x00C6DEA0	g_screen_stable	g_stable_screen	most-used (1 files)	1
+0x00C6DEA8	g_stable_icon	g_stable_imgplayrace	most-used (1 files)	1
+0x00C6DEBC	g_stable_button	g_stable_btnstartrace	most-used (2 files)	1
+0x00C6DEC0	g_stable_panowned	g_stable_pnl01	most-used (1 files)	1
+0x00C6DEC8	g_stable_tblowned	g_screen_stable_tplayer01	globals_final.tsv	1
+0x00C6DED8	g_stable_panbuyhorse	g_stable_pnl02	most-used (1 files)	1
+0x00C6DEDC	g_stable_tblbuyhorse	g_screen_stable_tplayer02	globals_final.tsv	1
+0x00C6DEE0	g_stable_btnbuyhorse	g_object839	globals_final.tsv	1
+0x00C6DEE4	g_stable_panel	g_stable_panrace	most-used (2 files)	2
+0x00C6DEE4	g_stable_pnl03	g_stable_panrace	most-used (2 files)	1
+0x00C6DEE8	g_stable_pnl04	g_stable_panstake	most-used (2 files)	1
+0x00C6DEF4	g_stable_lblodds	g_stable_oddslabels	most-used (1 files)	1
+0x00C6DF04	g_stable_btnhorse	g_stable_horsebuttons	most-used (1 files)	1
+0x00C6DF1C	g_chan_race	g_stable_channel	most-used (2 files)	1
+0x00C6DF68	g_stable_bet	g_stable_stake	most-used (1 files)	1
+0x00C6DF6C	g_stable_int04	g_stable_racenum	most-used (3 files)	1
+0x00C6DF6C	g_stable_selectedrunner	g_stable_racenum	most-used (3 files)	1
+0x00C6DF70	g_stable_int05	g_stable_state	most-used (3 files)	2
+0x00C6E2B8	g_jockeyimages	g_screen_stable_arr05	globals_final.tsv	1
+0x00C6E2C0	g_horse_arrowd	g_horse_marker	most-used (1 files)	1
+0x00C6E2C4	g_horse_owned	g_horse_star	most-used (1 files)	1
+0x00C6E91C	g_col_key	g_col_highlight	most-used (4 files)	2
+0x00C6E91C	g_colour_disabled	g_col_highlight	most-used (4 files)	1
+0x00C6E91C	g_colour_sel	g_col_highlight	most-used (4 files)	2
+0x00C6E91C	g_colourselected	g_col_highlight	most-used (4 files)	1
+0x00C6E950	g_datapath	g_promotionplace_int05	globals_final.tsv	23
+0x00C6E950	g_media_path	g_promotionplace_int05	globals_final.tsv	1
+0x00C6E950	g_mediapath	g_promotionplace_int05	globals_final.tsv	6
+0x00C6E950	g_path	g_promotionplace_int05	globals_final.tsv	4
+0x00C6E950	g_pathprefix	g_promotionplace_int05	globals_final.tsv	14
+0x00C6EFD4	g_gametime	g_player_int50	globals_final.tsv	2
+0x00C6EFD4	g_kickhits	g_player_int50	globals_final.tsv	1
+0x00C6EFD4	g_match_time	g_player_int50	globals_final.tsv	1
+0x00C6EFD4	g_matchclock	g_player_int50	globals_final.tsv	5
+0x00C6EFD4	g_screen_prev	g_player_int50	globals_final.tsv	1
+0x00C6EFD4	g_shootoutstarted	g_player_int50	globals_final.tsv	1
+0x00C6EFD4	g_ticks	g_player_int50	globals_final.tsv	9
+0x00C6EFD4	g_time	g_player_int50	globals_final.tsv	4
+0x00C6EFD4	g_timer	g_player_int50	globals_final.tsv	1
+0x00C6EFD8	g_starttime	g_pausedms	most-used (5 files)	4
+0x00C6EFDC	g_screen_width	g_screen_int21	globals_final.tsv	3
+0x00C6EFDC	g_screen_x	g_screen_int21	globals_final.tsv	2
+0x00C6EFDC	g_screenwidth	g_screen_int21	globals_final.tsv	36
+0x00C6EFE0	g_screen_height	g_screen_int22	globals_final.tsv	3
+0x00C6EFE0	g_screen_y	g_screen_int22	globals_final.tsv	1
+0x00C6EFE0	g_screenheight	g_screen_int22	globals_final.tsv	34
+0x00C6EFE4	g_engine_screenw	g_engine_int162	globals_final.tsv	1
+0x00C6EFE4	g_engine_w	g_engine_int162	globals_final.tsv	1
+0x00C6EFE4	g_screen_w	g_engine_int162	globals_final.tsv	10
+0x00C6EFE4	g_screenw	g_engine_int162	globals_final.tsv	7
+0x00C6EFE8	g_engine_h	g_engine_int163	globals_final.tsv	1
+0x00C6EFE8	g_engine_screenh	g_engine_int163	globals_final.tsv	1
+0x00C6EFE8	g_screen_h	g_engine_int163	globals_final.tsv	8
+0x00C6EFE8	g_screenh	g_engine_int163	globals_final.tsv	7
+0x00C6EFEC	g_joyactive	g_engine_int164	globals_final.tsv	1
+0x00C6EFEC	g_joycount	g_engine_int164	globals_final.tsv	2
+0x00C6EFEC	g_joyenabled	g_engine_int164	globals_final.tsv	2
+0x00C6F028	g_contractoffer_tprofile	g_contractoffer_tplayer	globals_final.tsv	2
+0x00C6F028	g_profile	g_contractoffer_tplayer	globals_final.tsv	139
+0x00C6F028	g_profile_co	g_contractoffer_tplayer	globals_final.tsv	1
+0x00C6F090	g_chan	g_chan_sfx	most-used (3 files)	3
+0x00C6F090	g_chan_bet	g_chan_sfx	most-used (3 files)	3
+0x00C6F090	g_chan_training	g_chan_sfx	most-used (3 files)	1
+0x00C6F090	g_roulette_chan	g_chan_sfx	most-used (3 files)	1
+0x00C6F090	g_slotchannel	g_chan_sfx	most-used (3 files)	1
+0x00C6F090	g_speechchannel	g_chan_sfx	most-used (3 files)	1
+0x00C6F194	g_iconhome	g_iconback	most-used (3 files)	2
+0x00C6F194	g_img_quit	g_iconback	most-used (3 files)	2
+0x00C6F1B8	g_img_nextrace	g_img_opponent	most-used (1 files)	1
+0x00C6F254	g_icon_home	g_img_back	most-used (6 files)	1
+0x00C6F254	g_img_867	g_img_back	most-used (6 files)	1
+0x00C6F254	g_img_endrelationship	g_img_back	most-used (6 files)	1
+0x00C6F254	g_imgquit	g_img_back	most-used (6 files)	1
+0x00C6F274	g_img_proceed	g_img_play	most-used (15 files)	2
+0x00C6F274	g_imgteam1	g_img_play	most-used (15 files)	2
+0x00C6F274	g_playicon	g_img_play	most-used (15 files)	1
+0x00C6F2EC	g_helpicon	g_img_helpicon	most-used (3 files)	1
+0x00C6F2EC	g_icon_help	g_img_helpicon	most-used (3 files)	2
+0x00C6F2EC	g_img_871	g_img_helpicon	most-used (3 files)	1

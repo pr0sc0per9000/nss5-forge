@@ -3,10 +3,10 @@
 ' byte-identical vs NSS5.exe (252/252, original length from Ghidra's inventory, mode=reloc)
 ' Driven through the oracle from scratch, with helper_map.record stubbed.
 ' Body-only format: statements only; parameters are a0, a1, ...
-'!Global g_training_state:Int
+'!Global g_intraining:Int
 If a0.selectionno = 0 Then Return 1
 Local b:TBall = TBall.GetActiveBall()
-Select g_training_state
+Select g_intraining
 Case 1
 Case 2
 Case 3

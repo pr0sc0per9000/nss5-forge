@@ -59,7 +59,7 @@
 ' `ReadLine(a1).Replace(";", ",").Trim()`), so this is not a novel construct for bcc here.
 
 	Method InterceptBall:Int(a0:TBall)
-		'!Global g_player_double15:Double
+		'!Global g_player_double15:Double = 90.0	' 0x00C7A048 holds 90.0 in .data and nothing in NSS5.exe writes it; the original reads the literal. Without the initialiser it is 0.0, and since AngleDiff(...,1) is non-negative the guard is true for every angle, so a chaser always discards the predicted landing point and runs at the ball's current position instead of leading it.
 		If a0.velocity < 2.0
 			desx = a0.x
 			desy = a0.y

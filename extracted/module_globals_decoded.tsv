@@ -1,0 +1,95 @@
+name	va	body_offset	flags_word	bit	kind	bmx_type	size	note
+g_options_arr01	0x00c5a324	528	0x00c5a31c	0	ARRAY	String	300	
+g_engine_arr01	0x00c5b240	626	0x00c5a31c	1	ARRAY	Int	99	
+g_engine_arr02	0x00c5b32c	669	0x00c5a31c	2	ARRAY	TLabel	4	existing pragma has generic TGadget; this is a refinement, not a conflict
+g_engine_arr03	0x00c5b360	712	0x00c5a31c	3	ARRAY	TSound	8	
+g_kit_arr01	0x00c5c1e4	794	0x00c5a31c	4	ARRAY	String	26	
+g_kit_arr02	0x00c5c1ec	837	0x00c5a31c	5	ARRAY	Int	26	
+g_options_arr02	0x00c5d1b4	945	0x00c5a31c	6	ARRAY	Int	2	
+g_options_arr03	0x00c5d1bc	988	0x00c5a31c	7	ARRAY	Int	2	
+g_options_arr04	0x00c5d1c4	1036	0x00c5a31c	8	ARRAY	Int	2	
+g_options_arr05	0x00c5d1cc	1084	0x00c5a31c	9	ARRAY	Int	2	
+g_options_arr06	0x00c5d1d4	1132	0x00c5a31c	10	ARRAY	Int	2	
+g_options_arr07	0x00c5d1dc	1180	0x00c5a31c	11	ARRAY	Int	2	
+g_options_arr08	0x00c5d1e4	1228	0x00c5a31c	12	ARRAY	Int	2	
+g_options_arr09	0x00c5d1ec	1276	0x00c5a31c	13	ARRAY	Int	2	
+g_options_arr10	0x00c5d1f4	1324	0x00c5a31c	14	ARRAY	Int	2	
+g_options_arr11	0x00c5d1fc	1372	0x00c5a31c	15	ARRAY	Int	2	
+g_options_arr12	0x00c5d208	1420	0x00c5a31c	16	ARRAY	TImage	16	
+g_options_arr13	0x00c5d214	1468	0x00c5a31c	17	ARRAY	TImage	16	
+g_pitch_arr01	0x00c5d5e0	1529	0x00c5a31c	18	ARRAY	TImage	9	
+g_pitch_arr02	0x00c5d5f4	1577	0x00c5a31c	19	ARRAY	TImage	16	
+g_pitch_arr03	0x00c5d600	1625	0x00c5a31c	20	ARRAY	TImage	6	
+g_pitch_arr04	0x00c5d60c	1673	0x00c5a31c	21	ARRAY	TImage	10	
+g_pitch_arr05	0x00c5d614	1721	0x00c5a31c	22	SCALAR_OR_COMPLEX			no _bbArrayNew1D near guard -- real init expression, not a bare array; not decoded by this script
+g_pitch_arr06	0x00c5d620	1775	0x00c5a31c	23	ARRAY	TImage	2	
+g_photographer_arr	0x00c5db28	1849	0x00c5a31c	24	ARRAY	TImage	3	
+g_cameraman_arr	0x00c5dcac	1910	0x00c5a31c	25	ARRAY	TImage	2	
+g_gadget_arr	0x00c61710	2114	0x00c5a31c	26	ARRAY	TImageFont	4	existing pragma has generic Object; this is a refinement, not a conflict
+g_screen_editkits_arr01	0x00c65c88	2578	0x00c5a31c	27	ARRAY	TKit	4	
+g_screen_editkits_arr02	0x00c65c98	2626	0x00c5a31c	28	ARRAY	TButton	4	
+g_screen_editkits_arr03	0x00c65ca4	2674	0x00c5a31c	29	ARRAY	TCombo	4	
+g_screen_editkits_arr04	0x00c65cb0	2722	0x00c5a31c	30	ARRAY	TCombo	4	
+g_screen_editkits_arr05	0x00c65cbc	2770	0x00c5a31c	31	ARRAY	TCombo	4	
+g_screen_editkits_arr06	0x00c65ccc	2818	0x00c65cc0	0	ARRAY	TCombo	4	
+g_screen_editkits_arr07	0x00c65cd8	2861	0x00c65cc0	1	ARRAY	TCombo	4	
+g_screen_editkits_arr08	0x00c65ce8	2904	0x00c65cc0	2	ARRAY	TInputBox	4	
+g_screen_editkits_arr09	0x00c65cf8	2947	0x00c65cc0	3	ARRAY	TInputBox	4	
+g_screen_editkits_arr10	0x00c65d08	2990	0x00c65cc0	4	ARRAY	TInputBox	4	
+g_screen_editkits_arr11	0x00c65d18	3033	0x00c65cc0	5	ARRAY	TInputBox	4	
+g_screen_shop_arr01	0x00c66d24	3219	0x00c65cc0	6	ARRAY	TImage	10	
+g_screen_shop_arr02	0x00c66d30	3262	0x00c65cc0	7	ARRAY	TImage	10	
+g_screen_shop_arr03	0x00c66d3c	3310	0x00c65cc0	8	ARRAY	TImage	10	
+g_screen_bootshop_arr	0x00c66e2c	3371	0x00c65cc0	9	ARRAY	TImage	10	
+g_screen_mycontract_arr	0x00c67dc0	3523	0x00c65cc0	10	ARRAY	TButton	5	
+g_screen_newspaper_arr	0x00c68240	3610	0x00c65cc0	11	ARRAY	TImage	5	
+g_screen_casino_arr	0x00c6b840	3879	0x00c65cc0	12	ARRAY	TImage	7	
+g_screen_roulette_arr	0x00c6ba60	3940	0x00c65cc0	13	ARRAY	Int	6	
+g_roulette_arr	0x00c6bcbc	4014	0x00c65cc0	14	SCALAR_OR_COMPLEX			no _bbArrayNew1D near guard -- real init expression, not a bare array; not decoded by this script
+g_misc_arr01	0x00c6c80c	4472	0x00c65cc0	15	ARRAY	TImage	5	
+g_screen_pairs_arr	0x00c6c81c	4520	0x00c65cc0	16	ARRAY	TButton	16	
+g_misc_arr02	0x00c6c824	4568	0x00c65cc0	17	ARRAY	Int	9	
+g_pair_icon_arr01	0x00c6c9f0	4629	0x00c65cc0	18	ARRAY	TImage	5	
+g_pair_icon_arr02	0x00c6c9fc	4677	0x00c65cc0	19	ARRAY	TImage	4	
+g_screen_negotiate_arr01	0x00c6cc1c	4751	0x00c65cc0	20	ARRAY	TImage	12	
+g_screen_negotiate_arr02	0x00c6cc38	4799	0x00c65cc0	21	ARRAY	TButton	6	
+g_screen_negotiate_arr03	0x00c6cc50	4847	0x00c65cc0	22	ARRAY	Int	6	
+g_screen_interview_arr	0x00c6ce08	4908	0x00c65cc0	23	ARRAY	Int	15	
+g_training_arr	0x00c6cf70	4969	0x00c65cc0	24	ARRAY	TSound	4	
+g_panel_controls_arr01	0x00c6dd60	5121	0x00c65cc0	25	ARRAY	TLabel	10	CONFLICT vs existing pragma (TButton) in src/recovered/TPanel_Controls.RenderPauseSkipTime.bmx -- see wave21 report; that body calls .SetImage() but TLabel only has .SetIcon() at the SAME slot 0x8c, which is why the substitution still byte-matched (slot-identity masking, codegen-patterns S15.5)
+g_panel_controls_arr02	0x00c6dd6c	5169	0x00c65cc0	26	ARRAY	TLabel	2	
+g_screen_stable_arr01	0x00c6def4	5230	0x00c65cc0	27	ARRAY	TLabel	6	
+g_screen_stable_arr02	0x00c6df04	5278	0x00c65cc0	28	ARRAY	TButton	6	
+g_screen_stable_arr03	0x00c6df44	5326	0x00c65cc0	29	ARRAY	TImage	7	
+g_screen_stable_arr04	0x00c6df60	5374	0x00c65cc0	30	ARRAY	Float	3	
+g_horse_arr	0x00c6e2a8	5435	0x00c65cc0	31	ARRAY	TImage	4	
+g_screen_stable_arr05	0x00c6e2b8	5483	0x00c6e2ac	0	ARRAY	TImage	6	
+g_screen_mainmenu_int26	0x00c6e9a8	5585	0x00c6e2ac	1	SCALAR_OR_COMPLEX			no _bbArrayNew1D near guard -- real init expression, not a bare array; not decoded by this script
+g_engine_int161	0x00c6ef50	5991	0x00c6e2ac	2	SCALAR_OR_COMPLEX			no _bbArrayNew1D near guard -- real init expression, not a bare array; not decoded by this script
+g_club_int07	0x00c6ef74	6070	0x00c6e2ac	3	SCALAR_OR_COMPLEX			no _bbArrayNew1D near guard -- real init expression, not a bare array; not decoded by this script
+g_misc_int62	0x00c6ef98	6149	0x00c6e2ac	4	SCALAR_OR_COMPLEX			no _bbArrayNew1D near guard -- real init expression, not a bare array; not decoded by this script
+g_misc_int63	0x00c6efb0	6231	0x00c6e2ac	5	SCALAR_OR_COMPLEX			no _bbArrayNew1D near guard -- real init expression, not a bare array; not decoded by this script
+g_misc_int64	0x00c6efcc	6310	0x00c6e2ac	6	SCALAR_OR_COMPLEX			no _bbArrayNew1D near guard -- real init expression, not a bare array; not decoded by this script
+g_screen_int20	0x00c6efd8	6371	0x00c6e2ac	7	SCALAR_OR_COMPLEX			no _bbArrayNew1D near guard -- real init expression, not a bare array; not decoded by this script
+g_engine_int164	0x00c6efec	6420	0x00c6e2ac	8	SCALAR_OR_COMPLEX			no _bbArrayNew1D near guard -- real init expression, not a bare array; not decoded by this script
+g_contractoffer_tplayer	0x00c6f028	6559	0x00c6e2ac	9	SCALAR_OR_COMPLEX			no _bbArrayNew1D near guard -- real init expression, not a bare array; not decoded by this script
+g_engine_int167	0x00c6f034	6605	0x00c6e2ac	10	SCALAR_OR_COMPLEX			no _bbArrayNew1D near guard -- real init expression, not a bare array; not decoded by this script
+g_Object857	0x00c6f088	6827	0x00c6e2ac	11	SCALAR_OR_COMPLEX			no _bbArrayNew1D near guard -- real init expression, not a bare array; not decoded by this script
+g_Object858	0x00c6f08c	6865	0x00c6e2ac	12	SCALAR_OR_COMPLEX			no _bbArrayNew1D near guard -- real init expression, not a bare array; not decoded by this script
+g_Object859	0x00c6f090	6903	0x00c6e2ac	13	SCALAR_OR_COMPLEX			no _bbArrayNew1D near guard -- real init expression, not a bare array; not decoded by this script
+g_Object860	0x00c6f0d4	6941	0x00c6e2ac	14	SCALAR_OR_COMPLEX			no _bbArrayNew1D near guard -- real init expression, not a bare array; not decoded by this script
+g_Object861	0x00c6f124	6989	0x00c6e2ac	15	SCALAR_OR_COMPLEX			no _bbArrayNew1D near guard -- real init expression, not a bare array; not decoded by this script
+g_misc_arr03	0x00c6f130	7037	0x00c6e2ac	16	ARRAY	TSound	6	
+g_screen_achievements_int03	0x00c6f170	7112	0x00c6e2ac	17	SCALAR_OR_COMPLEX			no _bbArrayNew1D near guard -- real init expression, not a bare array; not decoded by this script
+g_Object862	0x00c6f194	7164	0x00c6e2ac	18	SCALAR_OR_COMPLEX			no _bbArrayNew1D near guard -- real init expression, not a bare array; not decoded by this script
+g_Object863	0x00c6f1b8	7227	0x00c6e2ac	19	SCALAR_OR_COMPLEX			no _bbArrayNew1D near guard -- real init expression, not a bare array; not decoded by this script
+g_Object864	0x00c6f1dc	7290	0x00c6e2ac	20	SCALAR_OR_COMPLEX			no _bbArrayNew1D near guard -- real init expression, not a bare array; not decoded by this script
+g_Object865	0x00c6f208	7353	0x00c6e2ac	21	SCALAR_OR_COMPLEX			no _bbArrayNew1D near guard -- real init expression, not a bare array; not decoded by this script
+g_Object866	0x00c6f230	7416	0x00c6e2ac	22	SCALAR_OR_COMPLEX			no _bbArrayNew1D near guard -- real init expression, not a bare array; not decoded by this script
+g_Object867	0x00c6f254	7479	0x00c6e2ac	23	SCALAR_OR_COMPLEX			no _bbArrayNew1D near guard -- real init expression, not a bare array; not decoded by this script
+g_Object868	0x00c6f274	7542	0x00c6e2ac	24	SCALAR_OR_COMPLEX			no _bbArrayNew1D near guard -- real init expression, not a bare array; not decoded by this script
+g_Object869	0x00c6f2a0	7605	0x00c6e2ac	25	SCALAR_OR_COMPLEX			no _bbArrayNew1D near guard -- real init expression, not a bare array; not decoded by this script
+g_Object870	0x00c6f2cc	7668	0x00c6e2ac	26	SCALAR_OR_COMPLEX			no _bbArrayNew1D near guard -- real init expression, not a bare array; not decoded by this script
+g_Object871	0x00c6f2ec	7731	0x00c6e2ac	27	SCALAR_OR_COMPLEX			no _bbArrayNew1D near guard -- real init expression, not a bare array; not decoded by this script
+g_Object872	0x00c6f34c	7794	0x00c6e2ac	28	SCALAR_OR_COMPLEX			no _bbArrayNew1D near guard -- real init expression, not a bare array; not decoded by this script
+g_Object873	0x00c6f3b0	7842	0x00c6e2ac	29	SCALAR_OR_COMPLEX			no _bbArrayNew1D near guard -- real init expression, not a bare array; not decoded by this script

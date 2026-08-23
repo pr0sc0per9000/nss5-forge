@@ -22,9 +22,20 @@ These five are all you need to build and run the project.
   byte-identical. `--write-status` regenerates `docs/STATUS.md`.
 * [`smoke_boot.py`](/scripts/smoke_boot.py): Boots the build briefly, kills it,
   and reports how far it got. The regression gate.
-* [`play.py`](/scripts/play.py): Runs the game, forced windowed and
-  watchdog-killed. `--debug` runs the debug build, which names a fault instead of
-  vanishing.
+* [`debug_game.py`](/scripts/debug_game.py): **The way to run the game.** Forced
+  windowed and watchdog-killed like `play.py`, which it calls for those guarantees,
+  but it also KEEPS the evidence: every run lands in `status/debugruns/<timestamp>/`
+  with stdout, stderr, the decoded call trace, and `globals.tsv` -- every module
+  Global and its value at the moment of a fault.
+* [`instrument_trace.py`](/scripts/instrument_trace.py): Injects a call tracer into
+  the assembled source. Use `--filter` and `--arm`; tracing everything produces ~41M
+  records for a 21-second boot.
+* [`dead_globals.py`](/scripts/dead_globals.py): Every module Global that is read but
+  never written, triaged by severity. Approximately the remaining runtime-bug backlog.
+* [`play.py`](/scripts/play.py): The plain launcher, and the home of the
+  forced-windowed guarantee that the others reuse. Prefer `debug_game.py`; on a fault
+  `play.py --debug` captures the exception line but NOT the stack trace or the Globals
+  dump, because it does not answer the debug stub's prompt.
 
 Never launch the executable yourself. It can start in exclusive fullscreen and
 hang holding the display and the input queue, which needs a power cycle to clear.
@@ -65,6 +76,17 @@ the oracle cannot see.
   their declared length. An out-of-bounds write kills the process.
 * [`predict_crashes.py`](/scripts/predict_crashes.py): Dereferences of Globals
   that nothing ever writes.
+* [`check_docs.py`](/scripts/check_docs.py): The header claims themselves. A body
+  whose VA header does not parse leaves the corpus entirely, numerator and
+  denominator both, so the reported percentage goes UP when work is lost. Also
+  catches two bodies claiming one VA, match markers spelled in a form
+  `progress.py` does not count, and a header asserting both `BUILD_FAIL` and
+  byte-identical. Build-free, so there is no excuse for not running it.
+* [`check_global_calls.py`](/scripts/check_global_calls.py): Globals that are
+  called but whose declared type is not callable. `assemble.py` regenerates each
+  `Global name:Type` line rather than copying the `'!Global` pragma, so a
+  function-pointer type can lose everything after its first space and turn a call
+  into `Expression of type 'Byte' cannot be invoked`.
 
 ## Global name unification
 

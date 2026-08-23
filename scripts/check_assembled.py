@@ -373,13 +373,45 @@ def main():
     # Name resolution for the assembled side, exactly as try_method builds it.
     ournames, origtab, ourfns = {}, {}, {}
     try:
-        syms, _base = HM.our_helpers(ASMDIR, ASM)
-        for s, va in syms.items():
-            ournames[va] = s
         origtab = HM.full_table()
-        objs = [os.path.join(ASMDIR, ".bmx", f)
-                for f in os.listdir(os.path.join(ASMDIR, ".bmx")) if f.endswith(".o")]
-        ourfns = HM.our_functions(max(objs, key=os.path.getsize), ASM)
+        # PICK THE OBJECT THAT BELONGS TO nss5_assembled.exe, BY NAME.
+        #
+        # `max(objs, key=getsize)` looked reasonable and was catastrophically wrong. bmk
+        # drops its intermediates next to the source, so src/assembled/.bmx accumulates
+        # objects from every build ever run there -- including nss5_dbg and nss5_dbgprobe,
+        # the DEBUG builds, which carry debug metadata and are half again the size of the
+        # release object. The biggest .o is therefore whichever debug build ran last,
+        # possibly days ago and against different source.
+        #
+        # The failure is silent and it inverts this whole check: `ourfns` then holds the
+        # wrong image's symbols, so compare()'s (a0) path can name neither side of a
+        # game-to-game call, no E8 masks, and every body that calls anything reads as
+        # DIVERGED. Measured on the tree this was found in: 52 of 80 sampled bodies
+        # reported diverged, 79 of 80 identical once the right object is used -- and the
+        # 52 were not a regression in any of them.
+        _objdir = os.path.join(ASMDIR, ".bmx")
+        _stem = os.path.basename(ASM)[:-4]                   # nss5_assembled
+        objs = [os.path.join(_objdir, f) for f in os.listdir(_objdir)
+                if f.endswith(".o") and ".debug." not in f
+                and (f.startswith(_stem + ".bmx") or f.startswith("nss5_external.bmx"))]
+        if not objs:
+            raise RuntimeError("no release object for %s in %s -- re-run assemble.py"
+                               % (_stem, _objdir))
+        # BOTH objects, merged. nss5_assembled.exe is linked from the main module AND
+        # nss5_external.bmx, which is where every third-party body lives, so reading one
+        # object leaves the other unit's calls unnameable on our side -- they cannot mask
+        # and their bodies read as diverged however right they are. TBitmapFont.Load was
+        # the one that showed it: MATCH 1855/1855 as a probe, DIVERGED at the GCResume
+        # call operand here, purely because the relocation naming it sits in the external
+        # object.
+        for _o in sorted(objs):
+            try:
+                _syms, _ = HM.our_helpers(ASMDIR, ASM, objpath=_o)
+            except Exception:                                     # noqa: BLE001
+                continue
+            for _s, _va in _syms.items():
+                ournames.setdefault(_va, _s)
+            ourfns.update(HM.our_functions(_o, ASM))
     except Exception as exc:                                      # noqa: BLE001
         print("WARNING: could not build the assembled-side symbol tables (%s)." % exc)
         print("Without them nothing can be masked and every relocation reads as a diff.")

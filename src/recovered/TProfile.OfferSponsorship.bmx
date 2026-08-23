@@ -22,13 +22,22 @@
 '    `cmp/je` are consecutive and every target is past the last compare (section 10.2).
 '  * The sponsorship term is 364 days, not 365 (`add ecx,0x16C`).
 
+' CASE DIRECTION CORRECTED 2026-08-22: 1 call site -> .ToUpper().
+' extracted/runtime_helpers.tsv named 0x004A7410 `_brl_retro_Lower` and 0x004A74E0
+' `_brl_retro_Upper`. Both were wrong and neither address is a brl.retro wrapper:
+' 0x004A7410 is `_bbStringToUpper` and 0x004A74E0 is `_bbStringToLower`. NSS5.exe's
+' own 21-byte retro wrappers at 0x0059C8FD (Lower) and 0x0059C912 (Upper) CALL those
+' two addresses, and a wrapper cannot be the function it calls. The wrong row masked
+' by name, so this body certified with the case conversion running backwards. Full
+' derivation and the discriminating 3x4 matrix: docs/reference/codegen-patterns.md
+' 15.6. Re-verified under NSS5_NO_LEARN=1 on worker trees 380 and 380b.
 	Method OfferSponsorship:Int(a0:Int)
 		Local cash:Int = a0 * 15000
 		cash :+ Self.relationsponsors * 2500
 		cash :+ Self.GetLifestyle() * 1500
 		cash :+ Self.GetFame() * 1500.0
 		Local s:String = GetText("CMESSAGE_SPONSOROFFER")
-		s = s.Replace("$sponsor", Lower(SponsorName(a0)))
+		s = s.Replace("$sponsor", SponsorName(a0).ToUpper())
 		s = s.Replace("$cash", FormatMoney(cash, 0))
 		If TScreen.DoMessage(s, 1, 0)
 			Self.sponsor_amount[a0 - 1] = cash

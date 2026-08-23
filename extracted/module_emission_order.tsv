@@ -1,0 +1,230 @@
+seq	kind	body_offset	ordinal	name	decl_type	va	flags_word	bit	type_evidence
+0	TYPE	437	0	z_1a09b2da_7c75_4a81_b2c3_6774c843be3d_3_0	Object(runtime)	0x00c58ff4			
+1	TYPE	450	1	z_blide_bg1a09b2da_7c75_4a81_b2c3_6774c843be3d	Object(runtime)	0x00c59250			
+2	TYPE	463	2	z_My_1a09b2da_7c75_4a81_b2c3_6774c843be3d	Object(runtime)	0x00c592e0			
+3	TYPE	476	3	TBase_Team	Object(runtime)	0x00c596ac			
+4	TYPE	489	4	TNation	TBase_Team	0x00c599c8			
+5	TYPE	502	5	TClub	TBase_Team	0x00c59dac			
+6	TYPE	515	6	TFixture	Object(runtime)	0x00c5a2a0			
+7	GLOBAL	528	0	g_options_arr01	Object[]	0x00c5a324	0x00c5a31c	0	usage
+8	TYPE	574	7	TLocale	Object(runtime)	0x00c5a3f0			
+9	TYPE	587	8	TNames	Object(runtime)	0x00c5a47c			
+10	TYPE	600	9	TBall	Object(runtime)	0x00c5ae98			
+11	TYPE	613	10	TDrawOb	Object(runtime)	0x00c5b180			
+12	GLOBAL	626	1	g_engine_arr01	Object[]	0x00c5b240	0x00c5a31c	1	usage
+13	GLOBAL	669	2	g_engine_arr02	Object[]	0x00c5b32c	0x00c5a31c	2	usage
+14	GLOBAL	712	3	g_engine_arr03	Object[]	0x00c5b360	0x00c5a31c	3	usage
+15	TYPE	755	11	TEngine	Object(runtime)	0x00c5ba30			
+16	TYPE	768	12	TFormation	Object(runtime)	0x00c5bfbc			
+17	TYPE	781	13	TJoy	Object(runtime)	0x00c5c1a0			
+18	GLOBAL	794	4	g_kit_arr01	Object[]	0x00c5c1e4	0x00c5a31c	4	usage
+19	GLOBAL	837	5	g_kit_arr02	Object[]	0x00c5c1ec	0x00c5a31c	5	usage
+20	TYPE	880	14	TKit	Object(runtime)	0x00c5c480			
+21	TYPE	893	15	TKitStrings	Object(runtime)	0x00c5c67c			
+22	TYPE	906	16	TPlayerColours	Object(runtime)	0x00c5c770			
+23	TYPE	919	17	TTeam	Object(runtime)	0x00c5cd68			
+24	TYPE	932	18	TMyVector	Object(runtime)	0x00c5d118			
+25	GLOBAL	945	6	g_options_arr02	Object[]	0x00c5d1b4	0x00c5a31c	6	usage
+26	GLOBAL	988	7	g_options_arr03	Object[]	0x00c5d1bc	0x00c5a31c	7	usage
+27	GLOBAL	1036	8	g_options_arr04	Object[]	0x00c5d1c4	0x00c5a31c	8	usage
+28	GLOBAL	1084	9	g_options_arr05	Object[]	0x00c5d1cc	0x00c5a31c	9	usage
+29	GLOBAL	1132	10	g_options_arr06	Object[]	0x00c5d1d4	0x00c5a31c	10	usage
+30	GLOBAL	1180	11	g_options_arr07	Object[]	0x00c5d1dc	0x00c5a31c	11	usage
+31	GLOBAL	1228	12	g_options_arr08	Object[]	0x00c5d1e4	0x00c5a31c	12	usage
+32	GLOBAL	1276	13	g_options_arr09	Object[]	0x00c5d1ec	0x00c5a31c	13	usage
+33	GLOBAL	1324	14	g_options_arr10	Object[]	0x00c5d1f4	0x00c5a31c	14	usage
+34	GLOBAL	1372	15	g_options_arr11	Object[]	0x00c5d1fc	0x00c5a31c	15	usage
+35	GLOBAL	1420	16	g_options_arr12	Object[]	0x00c5d208	0x00c5a31c	16	usage
+36	GLOBAL	1468	17	g_options_arr13	Object[]	0x00c5d214	0x00c5a31c	17	usage
+37	TYPE	1516	19	TOptions	Object(runtime)	0x00c5d518			
+38	GLOBAL	1529	18	g_pitch_arr01	Object[]	0x00c5d5e0	0x00c5a31c	18	usage
+39	GLOBAL	1577	19	g_pitch_arr02	Object[]	0x00c5d5f4	0x00c5a31c	19	usage
+40	GLOBAL	1625	20	g_pitch_arr03	Object[]	0x00c5d600	0x00c5a31c	20	usage
+41	GLOBAL	1673	21	g_pitch_arr04	Object[]	0x00c5d60c	0x00c5a31c	21	usage
+42	GLOBAL	1721	22	g_pitch_arr05	Object[]	0x00c5d614	0x00c5a31c	22	usage
+43	GLOBAL	1775	23	g_pitch_arr06	Object[]	0x00c5d620	0x00c5a31c	23	usage
+44	TYPE	1823	20	TPitch	Object(runtime)	0x00c5d92c			
+45	TYPE	1836	21	TPitchMark	Object(runtime)	0x00c5dad8			
+46	GLOBAL	1849	24	g_photographer_arr	Object[]	0x00c5db28	0x00c5a31c	24	usage
+47	TYPE	1897	22	TPhotographer	Object(runtime)	0x00c5dc58			
+48	GLOBAL	1910	25	g_cameraman_arr	Object[]	0x00c5dcac	0x00c5a31c	25	usage
+49	TYPE	1958	23	TCameraMan	Object(runtime)	0x00c5ddc0			
+50	TYPE	1971	24	TPlayer	Object(runtime)	0x00c5f94c			
+51	TYPE	1984	25	TReplay	Object(runtime)	0x00c5fe58			
+52	TYPE	1997	26	TReplayFrame	Object(runtime)	0x00c6008c			
+53	TYPE	2010	27	TWeather	Object(runtime)	0x00c601cc			
+54	TYPE	2023	28	TSnowFlake	Object(runtime)	0x00c603d4			
+55	TYPE	2036	29	TInterceptPoint	Object(runtime)	0x00c604d0			
+56	TYPE	2049	30	TMyGfxModes	Object(runtime)	0x00c6059c			
+57	TYPE	2062	31	TMyBankStream	TBankStream	0x00c60650			
+58	TYPE	2075	32	TMyStream	TStreamWrapper	0x00c60764			
+59	TYPE	2088	33	TContinent	Object(runtime)	0x00c60958			
+60	TYPE	2101	34	TCompetition	Object(runtime)	0x00c615c0			
+61	GLOBAL	2114	26	g_gadget_arr	Object[]	0x00c61710	0x00c5a31c	26	usage
+62	TYPE	2162	35	TScreen	Object(runtime)	0x00c61c2c			
+63	TYPE	2175	36	TGadget	Object(runtime)	0x00c62150			
+64	TYPE	2188	37	TButton	TGadget	0x00c62344			
+65	TYPE	2201	38	TInputBox	TGadget	0x00c62558			
+66	TYPE	2214	39	TTable	TGadget	0x00c62b24			
+67	TYPE	2227	40	TColumn	Object(runtime)	0x00c62cb4			
+68	TYPE	2240	41	TRow	Object(runtime)	0x00c62d6c			
+69	TYPE	2253	42	TCombo	TGadget	0x00c63058			
+70	TYPE	2266	43	TPanel	TGadget	0x00c6320c			
+71	TYPE	2279	44	TLabel	TGadget	0x00c63438			
+72	TYPE	2292	45	TProgressBar	TGadget	0x00c63720			
+73	TYPE	2305	46	THelpBox	Object(runtime)	0x00c6388c			
+74	TYPE	2318	47	TScreen_Language	Object(runtime)	0x00c63950			
+75	TYPE	2331	48	TScreen_MainMenu	Object(runtime)	0x00c63c6c			
+76	TYPE	2344	49	TScreen_Options	Object(runtime)	0x00c6402c			
+77	TYPE	2357	50	TScreen_Controls	Object(runtime)	0x00c641c4			
+78	TYPE	2370	51	TScreen_NewPlayer	Object(runtime)	0x00c643d0			
+79	TYPE	2383	52	TScreen_CreateAccount	Object(runtime)	0x00c644c4			
+80	TYPE	2396	53	TScreen_Difficulty	Object(runtime)	0x00c645bc			
+81	TYPE	2409	54	TPromotionPlace	Object(runtime)	0x00c64754			
+82	TYPE	2422	55	TTeamPool	Object(runtime)	0x00c64940			
+83	TYPE	2435	56	TTableData	Object(runtime)	0x00c64b80			
+84	TYPE	2448	57	TStadium	Object(runtime)	0x00c64cd8			
+85	TYPE	2461	58	TScreen_EditMenu	Object(runtime)	0x00c64e68			
+86	TYPE	2474	59	TScreen_EditContinents	Object(runtime)	0x00c64fe4			
+87	TYPE	2487	60	TScreen_EditNations	Object(runtime)	0x00c651d8			
+88	TYPE	2500	61	TScreen_Clubs	Object(runtime)	0x00c65368			
+89	TYPE	2513	62	TScreen_EditClubs	Object(runtime)	0x00c65524			
+90	TYPE	2526	63	TScreen_Competitions	Object(runtime)	0x00c656bc			
+91	TYPE	2539	64	TScreen_EditCompetition	Object(runtime)	0x00c658a4			
+92	TYPE	2552	65	TScreen_Promotions	Object(runtime)	0x00c659d4			
+93	TYPE	2565	66	TScreen_ContinentalComps	Object(runtime)	0x00c65c08			
+94	GLOBAL	2578	27	g_screen_editkits_arr01	Object[]	0x00c65c88	0x00c5a31c	27	usage
+95	GLOBAL	2626	28	g_screen_editkits_arr02	Object[]	0x00c65c98	0x00c5a31c	28	usage
+96	GLOBAL	2674	29	g_screen_editkits_arr03	Object[]	0x00c65ca4	0x00c5a31c	29	usage
+97	GLOBAL	2722	30	g_screen_editkits_arr04	Object[]	0x00c65cb0	0x00c5a31c	30	usage
+98	GLOBAL	2770	31	g_screen_editkits_arr05	Object[]	0x00c65cbc	0x00c5a31c	31	usage
+99	GLOBAL	2818	32	g_screen_editkits_arr06	Object[]	0x00c65ccc	0x00c65cc0	0	usage
+100	GLOBAL	2861	33	g_screen_editkits_arr07	Object[]	0x00c65cd8	0x00c65cc0	1	usage
+101	GLOBAL	2904	34	g_screen_editkits_arr08	Object[]	0x00c65ce8	0x00c65cc0	2	usage
+102	GLOBAL	2947	35	g_screen_editkits_arr09	Object[]	0x00c65cf8	0x00c65cc0	3	usage
+103	GLOBAL	2990	36	g_screen_editkits_arr10	Object[]	0x00c65d08	0x00c65cc0	4	usage
+104	GLOBAL	3033	37	g_screen_editkits_arr11	Object[]	0x00c65d18	0x00c65cc0	5	usage
+105	TYPE	3076	67	TScreen_EditKits	Object(runtime)	0x00c65de4			
+106	TYPE	3089	68	TScreen_Calendar	Object(runtime)	0x00c65ea8			
+107	TYPE	3102	69	TDate	Object(runtime)	0x00c6610c			
+108	TYPE	3115	70	TMyDate	Object(runtime)	0x00c662fc			
+109	TYPE	3128	71	TScreen_TestMenu	Object(runtime)	0x00c663d0			
+110	TYPE	3141	72	TScreen_TestTournaments	Object(runtime)	0x00c665a4			
+111	TYPE	3154	73	TScreen_TestFixtures	Object(runtime)	0x00c666dc			
+112	TYPE	3167	74	TScreen_GameMenu	Object(runtime)	0x00c668dc			
+113	TYPE	3180	75	TScreen_Home	Object(runtime)	0x00c66a2c			
+114	TYPE	3193	76	TScreen_Abilities	Object(runtime)	0x00c66b44			
+115	TYPE	3206	77	TScreen_Relationships	Object(runtime)	0x00c66cd0			
+116	GLOBAL	3219	38	g_screen_shop_arr01	Object[]	0x00c66d24	0x00c65cc0	6	usage
+117	GLOBAL	3262	39	g_screen_shop_arr02	Object[]	0x00c66d30	0x00c65cc0	7	usage
+118	GLOBAL	3310	40	g_screen_shop_arr03	Object[]	0x00c66d3c	0x00c65cc0	8	usage
+119	TYPE	3358	78	TScreen_Shop	Object(runtime)	0x00c66de0			
+120	GLOBAL	3371	41	g_screen_bootshop_arr	Object[]	0x00c66e2c	0x00c65cc0	9	usage
+121	TYPE	3419	79	TScreen_BootShop	Object(runtime)	0x00c66ec0			
+122	TYPE	3432	80	TScreen_Leagues	Object(runtime)	0x00c67154			
+123	TYPE	3445	81	TScreen_Continents	Object(runtime)	0x00c67434			
+124	TYPE	3458	82	TScreen_Kits	Object(runtime)	0x00c675fc			
+125	TYPE	3471	83	TScreen_MatchPaused	Object(runtime)	0x00c67754			
+126	TYPE	3484	84	TScreen_Formation	Object(runtime)	0x00c67944			
+127	TYPE	3497	85	TScreen_Stats	Object(runtime)	0x00c67ac8			
+128	TYPE	3510	86	TScreen_ContractOffer	Object(runtime)	0x00c67d24			
+129	GLOBAL	3523	42	g_screen_mycontract_arr	Object[]	0x00c67dc0	0x00c65cc0	10	usage
+130	TYPE	3571	87	TScreen_MyContract	Object(runtime)	0x00c67fd8			
+131	TYPE	3584	88	TScreen_Dilemma	Object(runtime)	0x00c68110			
+132	TYPE	3597	89	TScreen_Finances	Object(runtime)	0x00c681f0			
+133	GLOBAL	3610	43	g_screen_newspaper_arr	Object[]	0x00c68240	0x00c65cc0	11	usage
+134	TYPE	3658	90	TScreen_Newspaper	Object(runtime)	0x00c682d4			
+135	TYPE	3671	91	TScreen_Achievements	Object(runtime)	0x00c68390			
+136	TYPE	3684	92	TScreen_WorldMap	Object(runtime)	0x00c68528			
+137	TYPE	3697	93	TScreen_MatchPrep	Object(runtime)	0x00c6876c			
+138	TYPE	3710	94	TScreen_SeasonReview	Object(runtime)	0x00c68894			
+139	TYPE	3723	95	TScreen_WebPage	Object(runtime)	0x00c689b8			
+140	TYPE	3736	96	TScreen_ReportPhysio	Object(runtime)	0x00c68a9c			
+141	TYPE	3749	97	TScreen_ReportBoss	Object(runtime)	0x00c68b88			
+142	TYPE	3762	98	TProfile	Object(runtime)	0x00c6a4c0			
+143	TYPE	3775	99	TStats_Match	Object(runtime)	0x00c6a854			
+144	TYPE	3788	100	TStat	Object(runtime)	0x00c6a97c			
+145	TYPE	3801	101	TStats_Team	Object(runtime)	0x00c6ac0c			
+146	TYPE	3814	102	THistory	Object(runtime)	0x00c6ad44			
+147	TYPE	3827	103	TParticle	Object(runtime)	0x00c6af88			
+148	TYPE	3840	104	TScreenMessage	Object(runtime)	0x00c6b234			
+149	TYPE	3853	105	TBossMessage	Object(runtime)	0x00c6b3e0			
+150	TYPE	3866	106	TContractOffer	Object(runtime)	0x00c6b7b8			
+151	GLOBAL	3879	44	g_screen_casino_arr	Object[]	0x00c6b840	0x00c65cc0	12	usage
+152	TYPE	3927	107	TScreen_Casino	Object(runtime)	0x00c6b9ec			
+153	GLOBAL	3940	45	g_screen_roulette_arr	Object[]	0x00c6ba60	0x00c65cc0	13	usage
+154	TYPE	3988	108	TScreen_Roulette	Object(runtime)	0x00c6bb64			
+155	TYPE	4001	109	TRoulette	Object(runtime)	0x00c6bc70			
+156	GLOBAL	4014	46	g_roulette_arr	Object[]	0x00c6bcbc	0x00c65cc0	14	usage
+157	TYPE	4368	110	TRouletteWheel	Object(runtime)	0x00c6be0c			
+158	TYPE	4381	111	TRouletteBall	Object(runtime)	0x00c6bfd4			
+159	TYPE	4394	112	TScreen_BlackJack	Object(runtime)	0x00c6c118			
+160	TYPE	4407	113	TBlackJack	Object(runtime)	0x00c6c2e8			
+161	TYPE	4420	114	TCard	Object(runtime)	0x00c6c450			
+162	TYPE	4433	115	TScreen_Slots	Object(runtime)	0x00c6c510			
+163	TYPE	4446	116	TSlotMachine	Object(runtime)	0x00c6c60c			
+164	TYPE	4459	117	TSlotStrip	Object(runtime)	0x00c6c7c0			
+165	GLOBAL	4472	47	g_misc_arr01	Object[]	0x00c6c80c	0x00c65cc0	15	usage
+166	GLOBAL	4520	48	g_screen_pairs_arr	Object[]	0x00c6c81c	0x00c65cc0	16	usage
+167	GLOBAL	4568	49	g_misc_arr02	Object[]	0x00c6c824	0x00c65cc0	17	usage
+168	TYPE	4616	118	TScreen_Pairs	Object(runtime)	0x00c6c984			
+169	GLOBAL	4629	50	g_pair_icon_arr01	Object[]	0x00c6c9f0	0x00c65cc0	18	usage
+170	GLOBAL	4677	51	g_pair_icon_arr02	Object[]	0x00c6c9fc	0x00c65cc0	19	usage
+171	TYPE	4725	119	TPair_Icon	Object(runtime)	0x00c6caec			
+172	TYPE	4738	120	TButtonPos	Object(runtime)	0x00c6cbbc			
+173	GLOBAL	4751	52	g_screen_negotiate_arr01	Object[]	0x00c6cc1c	0x00c65cc0	20	usage
+174	GLOBAL	4799	53	g_screen_negotiate_arr02	Object[]	0x00c6cc38	0x00c65cc0	21	usage
+175	GLOBAL	4847	54	g_screen_negotiate_arr03	Object[]	0x00c6cc50	0x00c65cc0	22	usage
+176	TYPE	4895	121	TScreen_Negotiate	Object(runtime)	0x00c6cd78			
+177	GLOBAL	4908	55	g_screen_interview_arr	Object[]	0x00c6ce08	0x00c65cc0	23	usage
+178	TYPE	4956	122	TScreen_Interview	Object(runtime)	0x00c6cf0c			
+179	GLOBAL	4969	56	g_training_arr	Object[]	0x00c6cf70	0x00c65cc0	24	usage
+180	TYPE	5017	123	TTraining	Object(runtime)	0x00c6d4a4			
+181	TYPE	5030	124	TTrainingObject	Object(runtime)	0x00c6d678			
+182	TYPE	5043	125	TCone	TTrainingObject	0x00c6d770			
+183	TYPE	5056	126	TDummy	TTrainingObject	0x00c6d898			
+184	TYPE	5069	127	TPole	TTrainingObject	0x00c6d9a4			
+185	TYPE	5082	128	TTrainingZone	TTrainingObject	0x00c6daac			
+186	TYPE	5095	129	TTrainingLine	TTrainingObject	0x00c6dc1c			
+187	TYPE	5108	130	TTarget	TTrainingObject	0x00c6dd00			
+188	GLOBAL	5121	57	g_panel_controls_arr01	Object[]	0x00c6dd60	0x00c65cc0	25	usage
+189	GLOBAL	5169	58	g_panel_controls_arr02	Object[]	0x00c6dd6c	0x00c65cc0	26	usage
+190	TYPE	5217	131	TPanel_Controls	Object(runtime)	0x00c6de58			
+191	GLOBAL	5230	59	g_screen_stable_arr01	Object[]	0x00c6def4	0x00c65cc0	27	usage
+192	GLOBAL	5278	60	g_screen_stable_arr02	Object[]	0x00c6df04	0x00c65cc0	28	usage
+193	GLOBAL	5326	61	g_screen_stable_arr03	Object[]	0x00c6df44	0x00c65cc0	29	usage
+194	GLOBAL	5374	62	g_screen_stable_arr04	Object[]	0x00c6df60	0x00c65cc0	30	usage
+195	TYPE	5422	132	TScreen_Stable	Object(runtime)	0x00c6e208			
+196	GLOBAL	5435	63	g_horse_arr	Object[]	0x00c6e2a8	0x00c65cc0	31	usage
+197	GLOBAL	5483	64	g_screen_stable_arr05	Object[]	0x00c6e2b8	0x00c6e2ac	0	usage
+198	TYPE	5526	133	THorse	Object(runtime)	0x00c6e788			
+199	TYPE	5539	134	TAchievement	Object(runtime)	0x00c6e8b0			
+200	GLOBAL	5585	65	g_screen_mainmenu_int26	String	0x00c6e9a8	0x00c6e2ac	1	callee-return String
+201	GLOBAL	5991	66	g_engine_int161	Int	0x00c6ef50	0x00c6e2ac	2	usage
+202	GLOBAL	6070	67	g_club_int07	Int	0x00c6ef74	0x00c6e2ac	3	usage
+203	GLOBAL	6149	68	g_misc_int62	Int	0x00c6ef98	0x00c6e2ac	4	usage
+204	GLOBAL	6231	69	g_misc_int63	Int	0x00c6efb0	0x00c6e2ac	5	usage
+205	GLOBAL	6310	70	g_misc_int64	String	0x00c6efcc	0x00c6e2ac	6	callee-return String
+206	GLOBAL	6371	71	g_screen_int20	Int	0x00c6efd8	0x00c6e2ac	7	usage
+207	GLOBAL	6420	72	g_engine_int164	Int	0x00c6efec	0x00c6e2ac	8	usage
+208	GLOBAL	6559	73	g_contractoffer_tplayer	TProfile	0x00c6f028	0x00c6e2ac	9	verified
+209	GLOBAL	6605	74	g_engine_int167	Int	0x00c6f034	0x00c6e2ac	10	usage
+210	GLOBAL	6827	75	g_Object857	TChannel	0x00c6f088	0x00c6e2ac	11	callee-return TChannel
+211	GLOBAL	6865	76	g_Object858	TChannel	0x00c6f08c	0x00c6e2ac	12	callee-return TChannel
+212	GLOBAL	6903	77	g_Object859	TChannel	0x00c6f090	0x00c6e2ac	13	callee-return TChannel
+213	GLOBAL	6941	78	g_Object860	TSound	0x00c6f0d4	0x00c6e2ac	14	callee-return TSound
+214	GLOBAL	6989	79	g_Object861	TSound	0x00c6f124	0x00c6e2ac	15	callee-return TSound
+215	GLOBAL	7037	80	g_misc_arr03	Object[]	0x00c6f130	0x00c6e2ac	16	usage
+216	GLOBAL	7112	81	g_screen_achievements_int03	String	0x00c6f170	0x00c6e2ac	17	callee-return String
+217	GLOBAL	7164	82	g_Object862	TImage	0x00c6f194	0x00c6e2ac	18	callee-return TImage
+218	GLOBAL	7227	83	g_Object863	TImage	0x00c6f1b8	0x00c6e2ac	19	callee-return TImage
+219	GLOBAL	7290	84	g_Object864	TImage	0x00c6f1dc	0x00c6e2ac	20	callee-return TImage
+220	GLOBAL	7353	85	g_Object865	TImage	0x00c6f208	0x00c6e2ac	21	callee-return TImage
+221	GLOBAL	7416	86	g_Object866	TImage	0x00c6f230	0x00c6e2ac	22	callee-return TImage
+222	GLOBAL	7479	87	g_Object867	TImage	0x00c6f254	0x00c6e2ac	23	callee-return TImage
+223	GLOBAL	7542	88	g_Object868	TImage	0x00c6f274	0x00c6e2ac	24	verified
+224	GLOBAL	7605	89	g_Object869	TImage	0x00c6f2a0	0x00c6e2ac	25	callee-return TImage
+225	GLOBAL	7668	90	g_Object870	TImage	0x00c6f2cc	0x00c6e2ac	26	callee-return TImage
+226	GLOBAL	7731	91	g_Object871	TImage	0x00c6f2ec	0x00c6e2ac	27	callee-return TImage
+227	GLOBAL	7794	92	g_Object872	TImage	0x00c6f34c	0x00c6e2ac	28	callee-return TImage
+228	GLOBAL	7842	93	g_Object873	TImage	0x00c6f3b0	0x00c6e2ac	29	callee-return TImage

@@ -22,10 +22,19 @@
 '!Global g_screen_width:Int
 '!Global g_screen_height:Int
 
+' CASE DIRECTION CORRECTED 2026-08-22: 1 call site -> .ToUpper().
+' extracted/runtime_helpers.tsv named 0x004A7410 `_brl_retro_Lower` and 0x004A74E0
+' `_brl_retro_Upper`. Both were wrong and neither address is a brl.retro wrapper:
+' 0x004A7410 is `_bbStringToUpper` and 0x004A74E0 is `_bbStringToLower`. NSS5.exe's
+' own 21-byte retro wrappers at 0x0059C8FD (Lower) and 0x0059C912 (Upper) CALL those
+' two addresses, and a wrapper cannot be the function it calls. The wrong row masked
+' by name, so this body certified with the case conversion running backwards. Full
+' derivation and the discriminating 3x4 matrix: docs/reference/codegen-patterns.md
+' 15.6. Re-verified under NSS5_NO_LEARN=1 on worker trees 380 and 380b.
 Function CreateScreen:Int()
 	g_screen_pairs = TScreen.CreateScreen("pairs", Null, Null, Update)
 	g_screen_pairs.AddGadget(g_panel_bg)
-	g_screen_pairs.AddGadget(TPanel.CreatePanel("pan_Pairs", Lower(GetText("CINSTRUCS_PAIRS")), 185, 80, 425, 30, "FFFFFF", "FFFFFF", 3, 0.8, 1, 420, 0))
+	g_screen_pairs.AddGadget(TPanel.CreatePanel("pan_Pairs", GetText("CINSTRUCS_PAIRS").ToUpper(), 185, 80, 425, 30, "FFFFFF", "FFFFFF", 3, 0.8, 1, 420, 0))
 	g_screen_pairs.AddGadget(TPanel.CreatePanel("navpanel", "", 0, g_screen_height - 60, g_screen_width, 60, "FFFFFF", "FFFFFF", 3, 1.0, 0, 0, 0))
 	Local w:Int = 94
 	Local h:Int = 94

@@ -45,6 +45,15 @@
 ' No image/flag loading in this function (unlike TNation.CreateNation) -- TClub's own
 ' imgFlag/imgFlagSmall are populated elsewhere.
 
+' CASE DIRECTION CORRECTED 2026-08-22: 1 call site -> .ToUpper().
+' extracted/runtime_helpers.tsv named 0x004A7410 `_brl_retro_Lower` and 0x004A74E0
+' `_brl_retro_Upper`. Both were wrong and neither address is a brl.retro wrapper:
+' 0x004A7410 is `_bbStringToUpper` and 0x004A74E0 is `_bbStringToLower`. NSS5.exe's
+' own 21-byte retro wrappers at 0x0059C8FD (Lower) and 0x0059C912 (Upper) CALL those
+' two addresses, and a wrapper cannot be the function it calls. The wrong row masked
+' by name, so this body certified with the case conversion running backwards. Full
+' derivation and the discriminating 3x4 matrix: docs/reference/codegen-patterns.md
+' 15.6. Re-verified under NSS5_NO_LEARN=1 on worker trees 380 and 380b.
 Function CreateClub(a0:String)
 	'!Global g_club_int07:Int
 	Local line:String = a0
@@ -54,7 +63,7 @@ Function CreateClub(a0:String)
 	c.id = id
 	c.name = NextField(line, "~t")
 	c.shortname = NextField(line, "~t")
-	c.tla = Lower(NextField(line, "~t"))
+	c.tla = NextField(line, "~t").ToUpper()
 	If g_club_int07 <> 0
 		c.labelname = c.name
 		c.labelshortname = c.shortname

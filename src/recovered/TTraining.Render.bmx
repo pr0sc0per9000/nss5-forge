@@ -4,7 +4,7 @@
 ' Assumptions: module Global at 0x00c6cf90 declared g_training_state:Int (globals_named: g_training_int03);
 ' class-table pointer 0x00c6d6ac = TTrainingObject+0x34 = TTrainingObject.RenderAll.
 	Function Render()
-		'!Global g_training_state:Int
-		If g_training_state = 0 Then Return 0
+		'!Global g_intraining:Int
+		If g_intraining = 0 Then Return 0
 		TTrainingObject.RenderAll()
 	End Function

@@ -3,8 +3,8 @@
 ' byte-identical vs NSS5.exe (106/106, original length from Ghidra's inventory)
 ' parameter a0 is unused. Each empty Case must be SEPARATE ('Case 1,2' grouped is 8 bytes short). Global at 0x00c6cf90 assumed Int
 	Function TrainingSetPiece:Int(a0:TPlayer)
-		'!Global g_training_state:Int
-		Select g_training_state
+		'!Global g_intraining:Int
+		Select g_intraining
 			Case 1
 			Case 2
 			Case 3

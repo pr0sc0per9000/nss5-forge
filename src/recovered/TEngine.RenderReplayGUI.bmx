@@ -13,13 +13,22 @@
 ' TPanel_Controls.RenderReplay(i,i) -- different Type, so prefixed.
 ' 0x004A7410 is _brl_retro_Lower; 0x004C5549 is the recovered module Function GetText.
 ' "Replay" / "FFFFFF" read out of .rdata at 0x00C70E90 / 0x00C5D680.
+' CASE DIRECTION CORRECTED 2026-08-22: 1 call site -> .ToUpper().
+' extracted/runtime_helpers.tsv named 0x004A7410 `_brl_retro_Lower` and 0x004A74E0
+' `_brl_retro_Upper`. Both were wrong and neither address is a brl.retro wrapper:
+' 0x004A7410 is `_bbStringToUpper` and 0x004A74E0 is `_bbStringToLower`. NSS5.exe's
+' own 21-byte retro wrappers at 0x0059C8FD (Lower) and 0x0059C912 (Upper) CALL those
+' two addresses, and a wrapper cannot be the function it calls. The wrong row masked
+' by name, so this body certified with the case conversion running backwards. Full
+' derivation and the discriminating 3x4 matrix: docs/reference/codegen-patterns.md
+' 15.6. Re-verified under NSS5_NO_LEARN=1 on worker trees 380 and 380b.
 	Function RenderReplayGUI:Int()
 		'!Global g_engine_replaytimer:Int
 		'!Global g_engine_gfxw:Int
 		'!Global g_engine_showcontrols:Int
 		'!Global g_engine_gfxh:Int
 		If g_engine_replaytimer Mod 2000 < 1000
-			TEngine.DrawMyText(Lower(GetText("Replay")), g_engine_gfxw-20, 0, 2, 0, 0.5, 1.0, "FFFFFF", 1)
+			TEngine.DrawMyText(GetText("Replay").ToUpper(), g_engine_gfxw-20, 0, 2, 0, 0.5, 1.0, "FFFFFF", 1)
 		EndIf
 		If g_engine_showcontrols <> 0
 			TPanel_Controls.RenderReplay(g_engine_gfxw-154, g_engine_gfxh-214)

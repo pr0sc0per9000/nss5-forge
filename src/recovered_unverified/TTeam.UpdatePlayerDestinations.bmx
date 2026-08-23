@@ -559,8 +559,8 @@
 '!Global g_matchstate:Int
 '!Global g_trainingmode:Int
 '!Global g_trainingsub:Int
-'!Global g_trainingx:Int
-'!Global g_trainingy:Int
+'!Global g_training_int11:Int
+'!Global g_training_int12:Int
 '!Global g_pitchhalfwidth:Int
 '!Global g_pitchhalfheight:Int
 '!Global g_pitchgoalhalf:Int
@@ -608,8 +608,8 @@ If g_trainingmode <> 0
 			Else
 				For Local p:TPlayer = EachIn Self.squad
 					If p.newstar
-						p.desx = g_trainingx
-						p.desy = g_trainingy
+						p.desx = g_training_int11
+						p.desy = g_training_int12
 					Else
 						If p.selectionno = 0
 							p.UpdateKeeperPosition()

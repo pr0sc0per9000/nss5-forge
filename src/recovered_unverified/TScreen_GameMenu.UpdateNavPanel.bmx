@@ -112,6 +112,15 @@
 '!Global g_lbl_week:TLabel
 '!Global g_lbl_nextopp2:TLabel
 '!Global g_profile:TProfile
+' CASE DIRECTION CORRECTED 2026-08-22: 4 call sites -> .ToUpper().
+' extracted/runtime_helpers.tsv named 0x004A7410 `_brl_retro_Lower` and 0x004A74E0
+' `_brl_retro_Upper`. Both were wrong and neither address is a brl.retro wrapper:
+' 0x004A7410 is `_bbStringToUpper` and 0x004A74E0 is `_bbStringToLower`. NSS5.exe's
+' own 21-byte retro wrappers at 0x0059C8FD (Lower) and 0x0059C912 (Upper) CALL those
+' two addresses, and a wrapper cannot be the function it calls. The wrong row masked
+' by name, so this body certified with the case conversion running backwards. Full
+' derivation and the discriminating 3x4 matrix: docs/reference/codegen-patterns.md
+' 15.6. Re-verified under NSS5_NO_LEARN=1 on worker trees 380 and 380b.
 g_lbl_year.SetText(g_profile.date.GetString("YYYY"), "", -1, -1)
 g_lbl_week.SetText(g_profile.date.GetString("WWWW"), "", -1, -1)
 g_lbl_nextopp2.SetText(GetText("fixture_Bye"), "", -1, -1)
@@ -127,15 +136,15 @@ If fx <> Null And opp <> Null And comp <> Null
 		txt = "(" + GetText("sla_Away") + ") " + opp.labelname
 	EndIf
 	If g_profile.baninternational And isIntl
-		txt = txt + (" - " + Lower(GetText("Banned"))[..3] + " (" + String(g_profile.baninternational) + ")")
+		txt = txt + (" - " + GetText("Banned").ToUpper()[..3] + " (" + String(g_profile.baninternational) + ")")
 	Else
 		If g_profile.bancontinent And comp.locale = 1
-			txt = txt + (" - " + Lower(GetText("Banned"))[..3] + " (" + String(g_profile.bancontinent) + ")")
+			txt = txt + (" - " + GetText("Banned").ToUpper()[..3] + " (" + String(g_profile.bancontinent) + ")")
 		ElseIf g_profile.banclub And comp.locale = 0
-			txt = txt + (" - " + Lower(GetText("Banned"))[..3] + " (" + String(g_profile.banclub) + ")")
+			txt = txt + (" - " + GetText("Banned").ToUpper()[..3] + " (" + String(g_profile.banclub) + ")")
 			g_lbl_nextopp2.SetColour("FF0000", "FFFFFF")
 		ElseIf g_profile.injury
-			txt = txt + (" - " + Lower(GetText("Injury"))[..3] + " (" + String(g_profile.injury) + ")")
+			txt = txt + (" - " + GetText("Injury").ToUpper()[..3] + " (" + String(g_profile.injury) + ")")
 		EndIf
 	EndIf
 	g_lbl_nextopp2.SetText(txt, "", -1, -1)

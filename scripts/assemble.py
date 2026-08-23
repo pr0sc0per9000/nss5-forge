@@ -77,16 +77,18 @@ UNVERIFIED = os.path.join(ROOT, "src", "recovered_unverified")
 # blocked body cannot take the whole program down with it; each is left as the empty stub
 # an unrecovered function gets.
 #
-# All three call methods on the zip container Type (getCount / getEntry / getEntryByName)
-# that no recovered body defines -- ZipFile.getFileCount.bmx's own header records the
-# identical failure ("Compile Error: Identifier 'getCount' not found") and notes that
-# neither the container's method set nor its vtable slot ORDER was ever recovered, so
-# inventing them would put real methods at wrong slots. Low priority regardless:
-# The project uses a clean-break save format, so the original's encrypted-zip reader is not
-# on any critical path.
+# ZipFile.getFileInfoByName.bmx calls getEntryByName on the zip container Type, and no
+# such method exists, so it fails with "Compile Error: Identifier 'getEntryByName' not
+# found". That is a body defect, not a tooling gap: TZipFileList's full member set IS in
+# the reflection data (extracted/vtable_map.tsv lines 2783-2791, extracted/object_model.json),
+# harness.py emits it as a real stub with the correct slots, and the container method this
+# body wants is findFile($):SZipFileEntry at slot 0x3c (VA 0x0058EA90).
+#
+# Its two siblings carried the same invented-name defect (getCount / getEntry for the real
+# getFileCount @0x34 / getFileInfo @0x38) plus headers blaming a nonexistent missing
+# TZipFileList placeholder. Corrected and byte-verified 2026-08-22, so they are now in
+# src/recovered/ and are no longer listed here.
 UNVERIFIED_SKIP = {
-    "ZipFile.getFileCount.bmx",
-    "ZipFile.getFileInfo.bmx",
     "ZipFile.getFileInfoByName.bmx",
 
     # --- Steam. Excluded because this reconstruction strips Steam entirely, not because
@@ -97,28 +99,56 @@ UNVERIFIED_SKIP = {
     # build outright with "'End Extern' without matching 'Extern'".
     "Fn_0058D987.SteamPostPlayerValue.bmx",   # The dead leaderboard call: it stalls every
                                               # save for up to 2s waiting on a server that
-                                              # does not answer.
+                                              # does not answer. MOVED 2026-08-22 to
+                                              # src/recovered_module/ (byte-identical,
+                                              # 325/325) so helper_map.orig_functions() can
+                                              # name VA 0x0058D987 for its caller; it is
+                                              # kept out of the build by harness.py
+                                              # MODULE_SKIP now, not by this line. The name
+                                              # is retained here only as a guard in case the
+                                              # file ever returns to recovered_unverified.
     "TLocale.SetUp.bmx",                      # Duplicate: the VERIFIED body already exists
                                               # at src/recovered/TLocale.SetUp.bmx and wins
                                               # the tier contest anyway. Listing it here
                                               # keeps its Steam pragmas out too.
     "TProfile.SaveGame.bmx",                  # Also moot under the clean-break save format
                                               # (this project writes its own).
-    "TProfile.CheckAchievement.bmx",          # Steam too, and additionally MALFORMED for
-                                              # this assembler: it carries a bare
-                                              # `Extern / Function GetSteamAchievement /
-                                              # Function SetSteamAchievement / End Extern`
-                                              # block as ordinary statements rather than as
-                                              # '!Raw pragmas, so the whole thing is
-                                              # emitted verbatim INSIDE Method
-                                              # CheckAchievement, producing an orphan
-                                              # `End Extern` mid-body and the error
-                                              # "'End Extern' without matching 'Extern'".
-                                              # The body is also wrong on its own terms: it
-                                              # performs a reference-release the original
-                                              # does not, so it needs rewriting rather than
-                                              # including.
+    "TProfile.CheckAchievement.bmx",          # Steam. The other two reasons this entry
+                                              # used to give are both FIXED and no longer
+                                              # true (2026-08-22): the Extern block is
+                                              # '!Raw pragmas now, not ordinary statements,
+                                              # so there is no orphan `End Extern`; and the
+                                              # body does NOT perform an extra
+                                              # reference-release -- the original retains
+                                              # only (`inc [eax+4]` @0x0056cfc7), which is
+                                              # bcc's initGlobalRef path, and the body
+                                              # reproduces it. It now builds and reaches
+                                              # MATCH 625/625 mode=reloc (it needs its
+                                              # '!GlobalInit 98 pragma; see the file's own
+                                              # header). Kept here purely because it
+                                              # Imports libsteamstub.a, which
+                                              # src/recovered_module/SteamInit.bmx exists to
+                                              # keep out of the shipped build -- the same
+                                              # reason the equally-matched
+                                              # Fn_0058D987.SteamPostPlayerValue.bmx is
+                                              # listed above.
 }
+# A '!Global pragma's TYPE is the rest of the declaration, not one whitespace-delimited
+# token. The old `(\S+)` stopped at the first space, so
+#     '!Global g_hookFn:Byte Ptr(a:Int, b:Int)      (src/recovered_module/Fn_00595EF3.bmx)
+# was emitted into the assembled program as
+#     Global g_hookfn:Byte
+# and the call through it failed the whole-program build with
+#     Compile Error: Expression of type 'Byte' cannot be invoked
+# -- an error naming a type nothing in the corpus ever declares, pointing at a call site
+# rather than at the declaration that mistyped it. Single-body probes never see this:
+# harness.merge_globals folds the pragma in verbatim, so the body verifies byte-identical
+# while the assembled build cannot compile.
+#
+# Stop at `=` (an initialiser) and at `'` (a trailing comment), both of which follow the
+# type rather than belong to it, and otherwise take everything to end of line.
+GLOBAL_DECL_RX = re.compile(r"Global\s+(\w+)\s*:\s*([^=']+?)\s*(?:=|'|$)")
+
 BEHAVIOUR = os.path.join(ROOT, "src", "behaviour")
 PLACEHOLDER = os.path.join(ROOT, "src", "placeholder")
 MODBODY_DIR = os.path.join(ROOT, "src", "module_body")
@@ -1244,7 +1274,39 @@ def report_selfcontained(recovered, recovered_prose, inferred, unresolved):
     return 1
 
 
+# extracted/ files this assembler READS and cannot recompute. Every one is tracked
+# in git (see the note in .gitignore); a checkout that lacks them still assembles
+# and still links, which is exactly the problem -- the damage is a runtime one.
+# Absence is silent per file: a missing alias table just contributes no rows, so
+# the merge count drops instead of the build stopping. Measured on a checkout
+# holding only the five adjudication files: 507 merges instead of 1,280, i.e. two
+# thirds of the split Globals left split, with no error anywhere.
+_REQUIRED_INPUTS = [
+    "global_address_map.tsv", "global_alias_adjudicated.tsv", "global_alias_map.tsv",
+    "global_alias_overrides.tsv", "global_alias_unified.tsv", "global_alias_writers.tsv",
+    "globals_type_overrides.tsv", "module_globals_decoded.tsv",
+    "type_declaration_order.tsv",
+]
+
+
+def _check_inputs():
+    ex = os.path.join(ROOT, "extracted")
+    gone = [n for n in _REQUIRED_INPUTS if not os.path.exists(os.path.join(ex, n))]
+    if not gone:
+        return
+    print("  !! MISSING BUILD INPUTS -- %d file(s) under extracted/:" % len(gone))
+    for n in gone:
+        print("  !!     %s" % n)
+    print("  !! These are tracked in git and cannot be recomputed from the exe.")
+    print("  !! The build will SUCCEED and the game will be broken at runtime:")
+    print("  !! Globals sharing one address stay split, so the player does not")
+    print("  !! respond, animation runs far too fast and quitting crashes.")
+    print("  !!     git pull        (then: python scripts/setup.py)")
+    print()
+
+
 def main():
+    _check_inputs()
     d = H.load_data()
     H._build_prelude(d)
     recovered, dupes = load_recovered()
@@ -1264,7 +1326,7 @@ def main():
     gtypes = collections.defaultdict(set)
     for (_t, _m), (_b, gd, _c, _f) in recovered.items():
         for g in gd:
-            mm = re.match(r"Global\s+(\w+)\s*:\s*(\S+)", g.strip())
+            mm = re.match(GLOBAL_DECL_RX, g.strip())
             if mm:
                 nm = mm.group(1).lower()
                 gtypes[alias.get(nm, nm)].add(mm.group(2))
@@ -1272,7 +1334,7 @@ def main():
     # in for a single-body probe. The assembled program needs them for the same reason.
     H.module_functions()                      # populates H._MODGLOBALS
     for g in H._MODGLOBALS:
-        mm = re.match(r"Global\s+(\w+)\s*:\s*(\S+)", g.strip())
+        mm = re.match(GLOBAL_DECL_RX, g.strip())
         if mm:
             nm = mm.group(1).lower()
             gtypes[alias.get(nm, nm)].add(mm.group(2))
@@ -1314,16 +1376,45 @@ def main():
     # already regenerates below ("Duplicate identifier").
     # `re.match` with no `$` anchor -- exactly what the `gtypes` loop above already uses --
     # does not have that failure mode.
-    all_gd = [g for (_t, _m), (_b, gd, _c, _f) in recovered.items() for g in gd] + \
-        list(H._MODGLOBALS)
+    # DEDUPE WHOLE FRAGMENTS, NEVER INDIVIDUAL LINES.
+    #
+    # A '!Raw fragment is a BLOCK -- `Extern "Win32"` / declarations / `End Extern`, or a
+    # placeholder `Function Foo()` / `End Function` pair. Deduping line by line silently
+    # deletes a block's TERMINATOR as soon as any earlier fragment used the same closer,
+    # because `End Function` is textually identical everywhere it appears.
+    #
+    # That is not hypothetical. Measured: TProfile.LoadSavedGame carries a placeholder
+    #     '!Raw Function SyncSteamAchievements()
+    #     '!Raw End Function
+    # and an earlier fragment had already contributed a bare `End Function`. The line-level
+    # `seen_raw` dropped LoadSavedGame's copy, so the assembled source contained
+    #     Function SyncSteamAchievements()
+    #     Extern "Win32"
+    #     ...
+    # with no closer. bcc then consumed the rest of the file looking for one and reported
+    # "Expecting expression but encountered end-of-file" -- pointing at EOF, ~1,900 lines
+    # from the actual defect, with nothing truncated and every other block pair balanced.
+    # The whole-program build was broken outright; the byte corpus was unaffected, which is
+    # exactly why it could go unnoticed.
+    #
+    # Grouping by contributor keeps each fragment intact and still collapses the genuine
+    # duplicate case this dedupe exists for: two bodies carrying the SAME Extern block
+    # produce identical tuples and the second is skipped whole. Two bodies carrying
+    # DIFFERENT blocks now both survive, which is the correct outcome and the one the
+    # line-level version could not express.
+    raw_groups = [list(gd) for (_t, _m), (_b, gd, _c, _f) in recovered.items()]
+    raw_groups.append(list(H._MODGLOBALS))
     seen_raw, raw_lines = set(), []
-    for g in all_gd:
-        gs = g.strip()
-        if not gs or re.match(r"^Global\s", gs, re.I):
+    for group in raw_groups:
+        frag = [g.strip() for g in group
+                if g.strip() and not re.match(r"^Global\s", g.strip(), re.I)]
+        if not frag:
             continue
-        if gs not in seen_raw:
-            seen_raw.add(gs)
-            raw_lines.append(gs)
+        key = tuple(frag)
+        if key in seen_raw:
+            continue
+        seen_raw.add(key)
+        raw_lines.extend(frag)
     # No file under src/recovered/ or src/recovered_thirdparty/ uses '!Import, so
     # H.module_imports() -- which covers src/recovered_module/ only -- is complete. If a
     # Type-method file ever needs one, load_recovered() will also need its own
@@ -1584,6 +1675,17 @@ def main():
         gout.append("Global %s:%s%s%s" % (k, ty, init, note))
     gtext = "\n".join(gout)
     modfns = "\n".join(H.module_functions())
+    # Module-level Functions belonging to the two THIRD-PARTY modules (a file under
+    # src/recovered_thirdparty/<mod>/ whose stem carries no dot). They belong with the
+    # EXTERNAL unit, not the main module: they are that module's own code, they call and
+    # are called by its Types, and the main module never declares them.
+    #
+    # Until this existed load_recovered() dropped every one of them on its
+    # `if "." not in base: continue` line and they reached no build at all. That is not a
+    # cosmetic gap: fontmachine's two point helpers (0x00592A13, 0x00592A37) are called by
+    # all three Draw*Text bodies, i.e. by every glyph the game draws, so without them the
+    # text layer cannot even be compiled, let alone run.
+    tpfns = "\n".join(H.thirdparty_functions())
 
     # H._HEADER[0] is SuperStrict + the BRL Imports + `Type X / End Type` placeholders for
     # names referenced in a signature but absent from the reflection table. The
@@ -1611,7 +1713,7 @@ def main():
     # Which of the dropped Types does the remaining source still NAME? Only those decide
     # the Import list, and it is computed from the emitted text rather than assumed, so a
     # Type that stops being referenced stops costing us a module.
-    body_text = "\n".join(chunks + side_chunks + [gtext, modfns] + ph)
+    body_text = "\n".join(chunks + side_chunks + [gtext, modfns, tpfns] + ph)
     need, ambiguous = imports_needed(body_text, dropped, supply)
     have = {l.split(None, 1)[1].strip().lower() for l in keep if l.startswith("Import ")}
     add = [n for n in sorted(need) if n.lower() not in have]
@@ -1645,7 +1747,7 @@ def main():
         "' NSS5.exe's reflection table because they are in the linked image, not because",
         "' the main module declares them. Kept in a separate compilation unit so they do",
         "' not enter the main module's Type-registration sequence.",
-        ext_head, "\n".join(side_chunks), ""])
+        ext_head, "\n".join(side_chunks), "", tpfns, ""])
     # Rewrite aliased Global references in the emitted bodies. The declarations above are
     # already canonical (gtypes was keyed through the map), so this only touches uses.
     ext, ext_renames = apply_alias_map(ext, alias)
@@ -1712,6 +1814,24 @@ def main():
           % (len(alias), src_renames + ext_renames))
     print("                                (one address had several recovered names;")
     print("                                 scripts/build_alias_map.py, --skipped for the rest)")
+
+    # ZERO IS NOT A NEUTRAL RESULT, IT IS THE BROKEN BUILD.
+    # A checkout missing extracted/global_alias_*.tsv reaches here, prints "0 names,
+    # 0 references rewritten", and goes on to compile and link successfully. What it
+    # produces is the split-Globals binary: one address carrying several names, the
+    # writer updating one variable and the reader seeing another that nothing ever
+    # assigns. Measured on a tracked-files-only checkout -- 0 merges against 1,280,
+    # and 2,797 distinct Globals declared against 1,551. The exe builds either way,
+    # so this line is the only place the difference is visible before the player
+    # stops responding to the keyboard.
+    if not alias:
+        print()
+        print("  !! NO GLOBAL ALIASES MERGED. This build will be broken at RUNTIME,")
+        print("  !! not at compile time: Globals that share one address stay split,")
+        print("  !! so the player will not move, animation runs far too fast and")
+        print("  !! quitting crashes. Expected roughly 1,280 merges, got 0.")
+        print("  !! Cause is almost always missing input files. Check with:")
+        print("  !!     python scripts/setup.py")
 
     path = os.path.join(OUT_DIR, "nss5_assembled.bmx")
     # utf-8-sig, NOT latin-1: bcc's toker.cpp (_src/compiler/toker.cpp:302) picks UTF8
@@ -1840,17 +1960,62 @@ def main():
 
     print()
     print("COMPILING ...")
+    # Without this, a missing toolchain surfaces as subprocess raising
+    # `FileNotFoundError: [WinError 2] The system cannot find the file specified`
+    # out of CreateProcess -- twenty frames of Popen internals naming neither bmk
+    # nor BlitzMax. That is the single least actionable failure on the setup path,
+    # and it is what a newcomer hits the first time they reach this line.
+    if not os.path.exists(H.BMK):
+        print("  result: CANNOT COMPILE")
+        print("    no BlitzMax compiler at %s" % H.BMK)
+        print("    The assembled source WAS written (above) -- only the build is")
+        print("    blocked. Install the toolchain, then re-run:")
+        print("        python scripts/setup.py     # reports exactly what is missing")
+        return 2
     p = subprocess.run([H.BMK, "makelib" if False else "makeapp", "-r", "-t", "console", path],
                        cwd=H.BMX_ROOT, env=H._env(), capture_output=True,
                        text=True, errors="replace", timeout=1800)
     ok = p.returncode == 0
     msg = ((p.stdout or "") + (p.stderr or "")).strip()
     print("  result: %s" % ("BUILD OK" if ok else "BUILD FAILED"))
-    errs = [l for l in msg.split("\n") if "Error" in l or "error" in l]
+    # KEEP THE SOURCE LOCATION. "bcc does not report a line number" has been believed
+    # here for a while and it is FALSE -- bcc prints the offending position on its OWN
+    # line, right after the message, and that line contains neither "Error" nor "error":
+    #     Compile Error: Expression of type 'Byte' cannot be invoked
+    #     [C:/.../src/assembled/nss5_assembled.bmx;47126;2]
+    # Filtering on the word "Error" alone threw the second line away, which is the entire
+    # reason failures of this gate have had to be bisected by hand over a 48,000-line
+    # generated file. Measured 2026-08-22 (worker 324) against a deliberately truncated
+    # Global declaration: bmk relayed the `[file;line;col]` line every time.
+    _lines = msg.split("\n")
+    _loc = re.compile(r"^\[.+;\d+;\d+\]$")
+    errs = []
+    for _i, _l in enumerate(_lines):
+        if "Error" in _l or "error" in _l:
+            errs.append(_l)
+            _nxt = _lines[_i + 1].strip() if _i + 1 < len(_lines) else ""
+            if _loc.match(_nxt):
+                errs.append(_nxt)
     for l in errs[:25]:
         print("    " + l.strip()[:160])
     if not errs and not ok:
         print("    " + msg[-1200:])
+    if not ok:
+        # Only on failure, and advisory only: a static lint for the one bcc error that
+        # this generator can produce by itself, a Global whose regenerated declaration
+        # lost its type. See scripts/check_global_calls.py for the worked case.
+        try:
+            import check_global_calls
+            for _u in (path, os.path.join(os.path.dirname(path), "nss5_external.bmx")):
+                if not os.path.exists(_u):
+                    continue
+                for _n, _ty, _dl, _calls in check_global_calls.check(_u):
+                    print("    !! %s line %d: Global %s:%s is not callable, but is"
+                          % (os.path.basename(_u), _dl, _n, _ty))
+                    print("       invoked at line(s) %s"
+                          % ", ".join(str(c) for c in _calls[:8]))
+        except Exception as _e:                  # a lint must never mask the real error
+            print("    (check_global_calls unavailable: %s)" % _e)
     return 0 if ok else 1
 
 
