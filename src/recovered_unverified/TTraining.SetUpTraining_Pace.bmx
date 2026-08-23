@@ -100,10 +100,10 @@
 '    they use 5.0.
 '  * `g_training_int12 = Int(TPitch.YardsToPixels(-20.0))` -- the exact same -20.0 Dribbling
 '    uses for its own g_training_int12.
-'  * `g_object811`/`g_object812` (TTrainingZone; CERTAIN per scripts/explain_global.py, 2
-'    bodies unanimous with TTraining.UpdateDribbling/UpdatePace.bmx -- NOT the
-'    "g_trainingzone_start/end" names TTraining.SetUpTraining_Dribbling.bmx's own prose uses
-'    for its structurally identical pair of calls) are built with the same "00FF00"/"FF0000",
+'  * `g_object811`/`g_object812` (TTrainingZone; CERTAIN per scripts/explain_global.py, now
+'    unanimous across TTraining.UpdateDribbling/UpdatePace/SetUpTraining_Dribbling.bmx --
+'    Dribbling used to call its structurally identical pair of calls "g_trainingzone_start/
+'    end", which split both slots) are built with the same "00FF00"/"FF0000",
 '    (g_training_int11, g_training_int12, 2.0) shape Dribbling already established; the end
 '    zone sits at `g_training_int11 + (g_training_int20 + 1) * gap`.
 '  * Tail loop is byte-for-byte Dribbling's ELSE-branch shape (single-file poles with vertical
