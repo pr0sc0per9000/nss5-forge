@@ -78,6 +78,15 @@
 '!Global g_pan_money:TPanel
 '!Global g_screenwidth:Int
 '!Global g_col_highlight:String
+' CASE DIRECTION CORRECTED 2026-08-22: 1 call site -> .ToUpper().
+' extracted/runtime_helpers.tsv named 0x004A7410 `_brl_retro_Lower` and 0x004A74E0
+' `_brl_retro_Upper`. Both were wrong and neither address is a brl.retro wrapper:
+' 0x004A7410 is `_bbStringToUpper` and 0x004A74E0 is `_bbStringToLower`. NSS5.exe's
+' own 21-byte retro wrappers at 0x0059C8FD (Lower) and 0x0059C912 (Upper) CALL those
+' two addresses, and a wrapper cannot be the function it calls. The wrong row masked
+' by name, so this body certified with the case conversion running backwards. Full
+' derivation and the discriminating 3x4 matrix: docs/reference/codegen-patterns.md
+' 15.6. Re-verified under NSS5_NO_LEARN=1 on worker trees 380 and 380b.
 	Function CreateScreen:Int()
 		g_finances_screen = TScreen.CreateScreen("finances", Null, Null, Null)
 		g_finances_screen.AddGadget(g_pan_stable)
@@ -126,5 +135,5 @@
 		g_finances_screen.AddGadget(g_pan_lifestyle)
 		g_pan_lifestyle.AddChild(g_finances_table)
 		g_pan_lifestyle.AddChild(g_finances_lifestyle_bar)
-		g_pan_lifestyle.AddChild(TButton.CreateButton("btn_sell", Lower(GetText("finances_Sell")), x + w - 120, y, 120, 36, 1, 2, "FFFFFF", "FFFFFF", Null, ButtonSell, 1.0, 8, ""))
+		g_pan_lifestyle.AddChild(TButton.CreateButton("btn_sell", GetText("finances_Sell").ToUpper(), x + w - 120, y, 120, 36, 1, 2, "FFFFFF", "FFFFFF", Null, ButtonSell, 1.0, 8, ""))
 	End Function

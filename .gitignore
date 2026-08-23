@@ -70,7 +70,42 @@ New Star Soccer 5/
 # your own copy of the game. zeldaret/oot ignores `extracted/` for exactly this
 # reason, and zeldaret/mm additionally ignores the disassembly itself.
 # ----------------------------------------------------------------------------
-/extracted/
+# NOT everything here is derived. Twelve files in extracted/ are the build's INPUTS,
+# not its outputs, and every one of them is required for `python scripts/assemble.py`
+# to produce the game. They are the same kind of work product as the headers in
+# src/recovered/*.bmx, which are tracked. Ignoring them shipped the tooling and
+# withheld the working game -- verified from a tracked-files-only checkout:
+# assemble.py died on the first missing one, and with the five adjudication files
+# alone it merged 0 Global aliases instead of 1,280, which is the build whose player
+# cannot move, whose animation runs 4.8x too fast and which crashes on quit.
+#
+# The two groups differ in how they were made, not in how necessary they are:
+#
+#   ADJUDICATED -- hand-written, each row decided by reading the original's machine
+#   code. Nothing regenerates these.
+/extracted/*
+!/extracted/global_alias_overrides.tsv
+!/extracted/global_alias_adjudicated.tsv
+!/extracted/global_address_adjudicated.tsv
+!/extracted/globals_type_overrides.tsv
+!/extracted/globals_corrections.tsv
+
+#   RESOLVED -- produced once by the analysis tools from inputs that are NOT in the
+#   repository (the Ghidra decompilation under extracted/decomp, ~72 MB, and
+#   extracted/globals_final.tsv). Re-running their generators in a clean clone does
+#   not reproduce them: build_alias_map.py picks a different canonical name without
+#   globals_final.tsv, unify_names.py marks all 436 addresses UNGROUNDED without the
+#   decompilation, and emit_unified_aliases.py then emits 6 rows instead of 704.
+#   type_declaration_order.tsv and module_emission_order.tsv have no generator at all.
+#   ~300 KB total, and with them a clone assembles a byte-identical source to a full
+#   working tree's.
+!/extracted/global_address_map.tsv
+!/extracted/global_alias_map.tsv
+!/extracted/global_alias_unified.tsv
+!/extracted/global_alias_writers.tsv
+!/extracted/module_globals_decoded.tsv
+!/extracted/module_emission_order.tsv
+!/extracted/type_declaration_order.tsv
 
 # Run logs. Never useful to anyone else, and they name local paths.
 /log/

@@ -1,4 +1,5 @@
-' fontmachine module Function -- VA 0x00592B79, 14 bytes
+' Fn_00592B79  --  fontmachine module Function
+' VA 0x00592B79   14 bytes
 ' byte-identical vs NSS5.exe (14/14, mode=exact, verified via try_function)
 '
 ' UNCERTAIN: real name/owner. Zero callers in extracted/callgraph_resolved.tsv and

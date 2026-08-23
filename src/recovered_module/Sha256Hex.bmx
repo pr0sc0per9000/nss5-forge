@@ -5,7 +5,16 @@
 ' byte-identical vs NSS5.exe (1776/1776, mode=reloc -- every remaining difference is an
 ' in-image relocation or a named runtime-call operand, masked by the oracle)
 '
-' SHA-256 of the argument string, then hex-formatted and uppercased. Treats each UTF-16
+' CASE DIRECTION CORRECTED 2026-08-22. The runtime-helper table used to name 0x004A7410
+' `_brl_retro_Lower` and 0x004A74E0 `_brl_retro_Upper`; both were wrong and neither address
+' is a brl.retro wrapper. 0x004A7410 is `_bbStringToUpper` and 0x004A74E0 is
+' `_bbStringToLower` -- proved from the instructions (`and edi,0xFFFFFFDF` vs `or edi,0x20`),
+' from blitz_string.c's 181/192 ASCII gates, and above all from NSS5.exe's own retro
+' wrappers at 0x0059C8FD (Lower) and 0x0059C912 (Upper), which are 21 bytes each and CALL
+' 0x004A74E0 and 0x004A7410 respectively. A wrapper cannot be the function it calls.
+' See docs/reference/codegen-patterns.md 15.6.
+' So the digest is hex-formatted and LOWERCASED, the usual SHA-256 convention.
+' SHA-256 of the argument string, then hex-formatted and lowercased. Treats each UTF-16
 ' character as a single byte (its low 8 bits -- Latin-1/ASCII semantics: `a0[ci] & $ff`),
 ' not the character's full code point. This is what TProfile.CheckSkillHash /
 ' UpdateAbility / SetAbility call to hash "dontcheatatnss5" + seven player-stat digit
@@ -56,7 +65,7 @@
 '      instruction difference (`add eax,edi` vs `mov edx,edi / add edx,eax`) that remained
 '      after every other statement matched.
 '  10. Digest assembly is the plain left-to-right chain
-'      `Upper(Hex(h0)+Hex(h1)+...+Hex(h7))`. bcc evaluates a flat `+` chain's operands in
+'      `(Hex(h0)+Hex(h1)+...+Hex(h7)).ToLower()`. bcc evaluates a flat `+` chain's operands in
 '      REVERSE (h7 first ... h0 last) before folding the concatenations forward
 '      (h0+h1, then +h2, ... then +h7) -- that reverse-then-forward call order in the
 '      disassembly is what this single expression compiles to; nothing hand-tuned.
@@ -143,5 +152,5 @@ Function Sha256Hex:String(a0:String)
 		h7 = h7 + h
 	Next
 
-	Return Upper(Hex(h0) + Hex(h1) + Hex(h2) + Hex(h3) + Hex(h4) + Hex(h5) + Hex(h6) + Hex(h7))
+	Return (Hex(h0) + Hex(h1) + Hex(h2) + Hex(h3) + Hex(h4) + Hex(h5) + Hex(h6) + Hex(h7)).ToLower()
 End Function

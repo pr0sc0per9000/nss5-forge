@@ -1,73 +1,101 @@
-' TProfile.SaveGame -- NOT VERIFIED. DO NOT move to
-' src/recovered/ until FUN_0058D987 (see below) is independently recovered/named.
+' TProfile.SaveGame
 ' VA 0x00565D99   850 bytes   KIND=Method   SIG=($)i   slot 0x40
+' byte-identical vs NSS5.exe (850/850, mode=reloc, reloc_masked=95), verified with
+' harness.try_method under NSS5_NO_LEARN=1 on worker 320 and again on an independently
+' created tree (320b). Closed 2026-08-22, worker 320.
 '
-' STATUS: ours = 845 bytes (delta -5). localise_diff.py: 1 length-changing gap, -5 of -5
-' -> COMPLETE, and it is the LAST thing in the function. Every other byte in the body --
-' all 8 WriteData calls, all 7 DoProgressBar calls, the branch structure, the zip-write
-' block, the refcount-assignment to g_profile_int26 -- is confirmed correct (reloc_masked
-' climbs to 71 successfully-named operands; first_diff sits at ORIGINAL offset +832, i.e.
-' the very last statement).
+' INDEPENDENTLY RE-MEASURED 2026-08-22 by worker 326, four fresh process launches across two
+' trees (326, and 326b created from scratch for this check): MATCH 850/850, mode=reloc,
+' reloc_masked=95, first_diff=None, every run identical. The callee was re-measured in the
+' same runs: MATCH 325/325, mode=reloc, reloc_masked=29, identical every run.
 '
-' THE ONLY GAP: the final call
+' TWO CONTROLS WERE RUN, because "it matches now" does not by itself show that the 5-byte
+' call was the whole defect or that the mask is honest.
+'   ABLATION. Delete the single line `SteamPostPlayerValue()` from this body, change nothing
+'   else, and the oracle returns exactly the state this file sat in for several passes:
+'   MISMATCH, mode=len, our_len 845 vs orig_len 850, delta -5. One line separates -5 from
+'   MATCH, so the call was the only gap. (Read that row's `matched=542`/`first_diff=31` as a
+'   diagnostic, not as agreement: on a length disagreement harness re-derives first_diff
+'   through masked_first_diff with EMPTY ournames/ourfns, so our own call operands cannot
+'   mask and the first unmaskable one lands early. The verdict is decided by the length test
+'   before any masking, which is why -5 can never be masked into a MATCH.)
+'   NAME-DROP. compare() route (a0) masks a call by looking VA 0x0058D987 up in
+'   helper_map.orig_functions(). Remove that one row IN MEMORY ONLY and re-run: MISMATCH,
+'   mode=diff, reloc_masked 95 -> 94, first_diff=+0x341, and the disassembly window shows the
+'   two sides byte-identical on both sides of a single differing rel32:
+'       orig  005660D9  E8 A9 78 02 00   call 0x58d987
+'       ours  0051FB7A  E8 6A 86 00 00   call 0x5281e9
+'   So our body really does emit the call, at the right offset, and the MATCH turns on
+'   exactly one name -- the one contributed by the byte-identical
+'   src/recovered_module/Fn_0058D987.SteamPostPlayerValue.bmx. That is what discharges rule
+'   13.3 here: the name is earned by a verified body, and if it were not there the caller
+'   would fail rather than quietly pass.
+'
+' NO OTHER DEFECT IS HIDING BEHIND THE CALL. Beyond the byte verdict, the one class of error
+' a masked-relocation MATCH cannot catch was checked by hand (CONTRIBUTING, "A byte match
+' does not prove your Globals are right"): the two module Globals this body reads are
+' g_profile_int26 and g_screen_mainmenu_int26, and extracted/globals_final.tsv maps those
+' names to 0x00C68BC8 and 0x00C6E9A8, the same addresses this header records. Disassembling
+' the original 850 bytes shows 19 references to 0xC68BC8 and 6 to 0xC6E9A8, matching the use
+' counts here. g_screen_mainmenu_int26:String also agrees with the already-verified
+' src/recovered/TReplay.LoadReplayFile.bmx, so assemble.py cannot merge two conflicting types
+' for it. (globals_final.tsv still calls both Int; that disagreement is the documented
+' correction above, not a naming conflict.)
+'
+' WHAT CLOSED IT. This body sat at 845/850 for several passes, short by exactly one 5-byte
+' `call 0x0058D987`, deliberately omitted because codegen-patterns 13.3 forbids stubbing an
+' unverified callee to make a caller mask. The callee, SteamPostPlayerValue, is now
+' byte-identical (325/325) and lives at
+' src/recovered_module/Fn_0058D987.SteamPostPlayerValue.bmx, so 13.3's objection is gone:
+' the name the mask relies on is earned by a verified body, not invented by a placeholder.
+' The call is restored below and the length is now exact.
+'
+' TWO THINGS HAD TO BE TRUE, and only one of them was obvious.
+'   1. The callee had to be byte-verified. It is -- see its own header for how its last
+'      2 bytes closed (Val::funArgCast does String -> `Byte Ptr` conversion, and its
+'      matching MemFree, by itself; hand-writing them changes which values are live across
+'      which calls).
+'   2. The callee's FILE had to live in src/recovered_module/, because
+'      helper_map.orig_functions() builds the ORIGINAL-side name table by scanning that
+'      directory and nothing else. Without a name for VA 0x0058D987 the `E8` here cannot
+'      mask. MEASURED, and this is the part worth recording: compiling the REAL 325-byte
+'      body straight into this probe (via '!Raw) is NOT enough. It gives 850/850 mode=diff
+'      with exactly one differing operand, reloc_masked 94. compare()'s byte-level
+'      `_same_callee` fallback recurses WITHOUT ournames/origtab/ourfns, so inside the
+'      callee its own calls to bbStringToCString / bbMemFree / bbStringFromCString cannot
+'      mask, the callee compares "diff", and the fallback correctly refuses to bless the
+'      call. `_same_callee` can only prove a callee that makes no C-runtime calls. Route
+'      (a0), by name, is the only one available here.
+' Once the file moved (and was added to harness.MODULE_SKIP so its STEAMSTUB.DLL Extern
+' stays out of every probe and out of src/assembled/), the local '!Raw placeholder below
+' is all this probe needs to link, and the operand masks by name: 850/850, reloc_masked 95.
+' This is the same shape src/recovered/TProfile.LoadSavedGame.bmx already uses for its own
+' Steam callee at 0x0058D90B.
+'
+' WHY THIS FILE STAYS IN src/recovered_unverified/ although it is byte-identical: it is
+' named in assemble.py's UNVERIFIED_SKIP, and it must stay named there. It now calls
+' SteamPostPlayerValue, which harness.MODULE_SKIP keeps OUT of the whole-program build, so
+' assembling this body would leave an undefined reference. (assemble.py's own note gives a
+' second, independent reason: the save format is a clean break in this project.) The byte
+' verdict is what matters and progress.py counts it from the phrase above regardless of
+' tree; the location is a build-surface decision.
+'
+' THE CALL THAT USED TO BE MISSING:
 '     E8 A9 78 02 00   call 0x0058D987
-' (5 bytes, 0 args, return value discarded, right before the trailing `mov eax,0`) is a
-' MODULE-LEVEL Function -- 325 bytes, 12 callers across the game (per
-' extracted/ghidra/function_inventory.tsv), UNNAMED, and NOT YET RECOVERED anywhere in
-' src/recovered_module/. Per codegen-patterns.md guide 13.3, a caller must never be made to
-' mask by stubbing an unverified callee -- so this line is deliberately OMITTED here rather
-' than faked, and the resulting 5-byte deficit is exactly and only that omission (confirmed
-' by localise_diff: zero other gaps, zero subs).
+' 5 bytes, 0 args, return value discarded, immediately before the trailing `mov eax,0`. It
+' is a MODULE-LEVEL Function of 325 bytes, now recovered and byte-identical at
+' src/recovered_module/Fn_0058D987.SteamPostPlayerValue.bmx. It posts the player's value to
+' a Steam leaderboard: FindLeaderboard("Player Value"), then a 2-second poll of ReadSteam()
+' and an UploadLeaderboardScore when the status reads "leaderboard:found". Read that file
+' for the analysis. It is guarded by the same offline flag SteamInit.bmx pins at 0, so the
+' Steam calls never run.
 '
-' WHAT FUN_0058D987 LOOKS LIKE, for whoever picks it up (VA 0x0058D987, 325 bytes):
-'   * Guarded by `cmp dword ptr [0xc6f3b8],1 / je +continue` -- a Global "Steam
-'     initialised?" flag. If not 1, it just Prints 'Steamstate offline!' (string at
-'     0xc94710, confirmed via harness.read_string) and returns.
-'   * If the flag IS 1, it Prints a second string (0xc94744) and enters what looks like a
-'     directory-scan loop: LoadDir-style setup (`call 0x4a9d30`, `call 0x4a8da0` --
-'     probably CurrentDir/ChangeDir), a MilliSecs()-shaped call (`call 0x4a4860`, called
-'     FOUR times and compared with `+0x7D0` = 2000, i.e. a millisecond timeout/age check),
-'     `call 0x4a9d48` / `call 0x4a7960` (likely ReadDir/NextFile -- returns a filename
-'     string used at [edi+8] as an Int test, i.e. probably a directory-entry struct with a
-'     length or attribute field), `_bbStringCompare` against the string at 0xc9479c, and
-'     `_bbStringContains` (0x4A6BF0 -- CONFIRMED this exact address per codegen-patterns.md
-'     15.5's worked correction, do not use `.StartsWith` here) against the string at
-'     0xc947cc. The tail builds a log message via `_bbStringFromInt` + concat with the
-'     literal at 0xc947e4 and Prints it (0x59cc21 = _brl_standardio_Print, per
-'     brl_functions.tsv), then loops back (`je 0x58d9e6`) for the next directory entry.
-'   * Reads overall like "scan the save folder, and if a backup/temp file is older than a
-'     threshold, log it" -- consistent with being called at the very end of SaveGame, after
-'     the zip is closed. Read the six literal strings at 0xc94744/0xc94778/0xc9479c/
-'     0xc947cc/0xc947e4 with harness.read_string() before starting; they were not pulled
-'     during this pass (time budget) but will very likely name the loop precisely (likely a
-'     directory path, a file extension/suffix, and a log-message template).
-'   * NOT attempted further here: this is a real sub-investigation (directory APIs +
-'     MilliSecs semantics + an unfamiliar list Global at 0xc6f028), not a quick lookup.
-'
-' ######################## CORRECTION -- THE ABOVE IS WRONG ########################
-' Everything in the two bullets above about a DIRECTORY SCAN is disproven. Reading the six
-' string literals first -- exactly as those bullets advised -- settled it in one step:
-'
-'     0xC94744 'Finding leaderboard'   0xC94778 'Player Value'
-'     0xC9479C 'leaderboard:found'     0xC947CC 'upload'      0xC947E4 'Post end: '
-'
-' FUN_0058D987 posts the player's value to a STEAM LEADERBOARD. The supposed LoadDir/ReadDir
-' calls are PE import thunks into STEAMSTUB.DLL -- 0x004A9D30 FindLeaderboard, 0x004A9D48
-' ReadSteam, 0x004A9D58 UploadLeaderboardScore -- and the "file-age check" is a 2000 ms
-' timeout on an asynchronous Steam callback, polled in a loop. 0xC6F028 is not "an
-' unfamiliar list Global": globals_final.tsv already types it TProfile (verified/high), and
-' the loop uses its `name` field (+0x14) and its GetValue() method (slot 0xB8).
-'
-' It is recovered to +2 bytes of 325 and preserved at
-' src/recovered_unverified/Fn_0058D987.SteamPostPlayerValue.bmx, which carries the full
-' analysis and the ten source spellings that were measured. The residual defect is a
-' 2-byte receiver materialisation (`mov eax,esi`) that bcc emits for a Local receiver and
-' the original does not -- the section 18.2 register-identity class, not a comprehension
-' gap.
-'
-' SO SaveGame STILL CANNOT BE PROMOTED. Rule 13.3 forbids stubbing an unverified callee to
-' make a caller mask, and the callee remains unverified. The 5-byte gap here is confirmed
-' to be exactly and only that call.
+' (An earlier pass here recorded a working hypothesis that 0x0058D987 was a save/backup
+' DIRECTORY SCAN -- LoadDir/ReadDir, a file-age check, a log line. Every part of it was
+' wrong; the "directory API" calls are PE import thunks into STEAMSTUB.DLL and the
+' "file-age check" is the 2000 ms callback timeout. Reading the string literals first, as
+' that same note advised, settled it in one step. The hypothesis is dropped rather than
+' preserved because it sent at least one later pass down the wrong path.)
 '
 ' Tooling that came out of it and is now available to every body:
 '   * extracted/dll_imports.tsv -- all 324 import thunks across 11 DLLs, named from the PE
@@ -76,7 +104,6 @@
 '     '!Raw could not carry one. Needed by any body that calls into a DLL.
 '   * extern/steamstub/libsteamstub.a -- a real import library built with dlltool from the
 '     shipped steamstub.dll, not a stub.
-' ##################################################################################
 '
 ' RESOLVED AND TRUSTED (do not re-derive):
 '   Self is `ebx` ([ebp+8]), a0 (the requested save name, "" = keep current) is `esi`
@@ -146,12 +173,16 @@
 '     (guide 15.4 -- the technique only works for bcc output), so it shows as an
 '     unmaskable operand-only difference; harmless, does not affect the length.
 '
-' Oracle: MISMATCH mode=len, orig_len=850 our_len=845 (delta -5), NSS5_NO_LEARN=1,
-'. localise_diff.py delta_accounted -5 of -5 (COMPLETE), single gap, the
-'   missing FUN_0058D987() call.
+' Oracle: MATCH, orig_len=850 our_len=850, mode=reloc, reloc_masked=95, NSS5_NO_LEARN=1.
+' Re-run clean on two independent trees. The `'!Raw Function SteamPostPlayerValue:Int() /
+' '!Raw End Function` placeholder below exists ONLY so this probe links -- the real body is
+' src/recovered_module/Fn_0058D987.SteamPostPlayerValue.bmx and is what names the original
+' side of the call operand. Do not treat the placeholder as a recovered body.
 
 '!Global g_profile_int26:String
 '!Global g_screen_mainmenu_int26:String
+'!Raw Function SteamPostPlayerValue:Int()
+'!Raw End Function
 LogLine("SaveGame")
 LogLine("GCMemAlloced=" + String(GCMemAlloced()))
 If a0 <> ""
@@ -186,4 +217,4 @@ EndIf
 CloseStream(stream)
 zw.CloseZip("")
 GCCollect()
-' FUN_0058D987() -- see header. Omitted: not recovered, must not be stubbed (guide 13.3).
+SteamPostPlayerValue()

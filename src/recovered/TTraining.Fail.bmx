@@ -10,6 +10,15 @@
 ' decompilation are inlined retain/release, not source. TScreenMessage slot 0x40 = ClearAll.
 ' The two GetText keys are masked addresses; their VALUES are not proven.
 ' harness mode=reloc, 17 addresses masked.
+' CASE DIRECTION CORRECTED 2026-08-22: 1 call site -> .ToUpper().
+' extracted/runtime_helpers.tsv named 0x004A7410 `_brl_retro_Lower` and 0x004A74E0
+' `_brl_retro_Upper`. Both were wrong and neither address is a brl.retro wrapper:
+' 0x004A7410 is `_bbStringToUpper` and 0x004A74E0 is `_bbStringToLower`. NSS5.exe's
+' own 21-byte retro wrappers at 0x0059C8FD (Lower) and 0x0059C912 (Upper) CALL those
+' two addresses, and a wrapper cannot be the function it calls. The wrong row masked
+' by name, so this body certified with the case conversion running backwards. Full
+' derivation and the discriminating 3x4 matrix: docs/reference/codegen-patterns.md
+' 15.6. Re-verified under NSS5_NO_LEARN=1 on worker trees 380 and 380b.
 	Function Fail:Int()
 		'!Global g_snd_fail:TSound
 		'!Global g_object859:TChannel
@@ -21,6 +30,6 @@
 		TScreenMessage.ClearAll(0)
 		g_train_int05 = 2
 		g_player_int01 = 11
-		g_train_msg1 = Lower(GetText("Fail!"))
+		g_train_msg1 = GetText("Fail!").ToUpper()
 		g_train_msg2 = GetText("CMESSAGE_TRAININGFAIL")
 	End Function

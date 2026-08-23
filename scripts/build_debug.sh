@@ -13,7 +13,13 @@
 # command with _mingw/mingw/bin on PATH succeeds. The compile step is bmk's; only the link
 # is redone here.
 #
-#   bash scripts/build_debug.sh
+#   bash scripts/build_debug.sh            # debug build of the normal assembled source
+#   bash scripts/build_debug.sh --trace    # debug build of the INSTRUMENTED source
+#
+# --trace builds src/assembled/nss5_trace.bmx (written by scripts/instrument_trace.py)
+# into nss5_trace.exe, leaving nss5_dbg.exe alone. The two are separate binaries on
+# purpose: a traced build is slower and writes a trace file, so it must never quietly
+# replace the plain debug build that smoke_boot.py and play.py --debug expect.
 #
 # Assumes scripts/assemble.py has already written src/assembled/nss5_assembled.bmx.
 set -u
@@ -21,13 +27,19 @@ set -u
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BMX="$ROOT/tools/blitzmax-legacy-src"
 MW="$BMX/_mingw/mingw"
-SRC="$ROOT/src/assembled/nss5_assembled.bmx"
-DBG="$ROOT/src/assembled/nss5_dbg.bmx"
-OUT="$ROOT/src/assembled/nss5_dbg.exe"
-
-[ -f "$SRC" ] || { echo "missing $SRC -- run scripts/assemble.py first"; exit 1; }
-
-cp "$SRC" "$DBG"
+MODE="${1:-}"
+if [ "$MODE" = "--trace" ]; then
+  SRC="$ROOT/src/assembled/nss5_trace.bmx"
+  DBG="$SRC"                      # already its own file; no copy needed
+  OUT="$ROOT/src/assembled/nss5_trace.exe"
+  [ -f "$SRC" ] || { echo "missing $SRC -- run scripts/instrument_trace.py first"; exit 1; }
+else
+  SRC="$ROOT/src/assembled/nss5_assembled.bmx"
+  DBG="$ROOT/src/assembled/nss5_dbg.bmx"
+  OUT="$ROOT/src/assembled/nss5_dbg.exe"
+  [ -f "$SRC" ] || { echo "missing $SRC -- run scripts/assemble.py first"; exit 1; }
+  cp "$SRC" "$DBG"
+fi
 
 echo "compiling (debug) ..."
 # This is expected to fail at the LINK step; the compile output is what we want.
@@ -44,6 +56,10 @@ PATH="$MW/bin:$PATH" "$MW/bin/g++.exe" -m32 -static -s \
 
 ls -la "$OUT"
 echo
-echo "Run it from src/assembled so relative asset paths resolve:"
-echo "  cd src/assembled && ./nss5_dbg.exe"
+echo "Run it via the launcher, which forces windowed mode and applies a watchdog:"
+if [ "$MODE" = "--trace" ]; then
+  echo "  python scripts/debug_game.py --trace"
+else
+  echo "  python scripts/debug_game.py"
+fi
 echo "On a fault it prints the BlitzMax error and a stack trace instead of vanishing."

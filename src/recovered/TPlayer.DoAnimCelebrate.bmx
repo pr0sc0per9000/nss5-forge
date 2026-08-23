@@ -40,6 +40,15 @@
 '!Global g_pitch_int18:Int = 140
 '!Global g_pitch_int19:Int = -140
 '!Global g_pitch_int21:Int
+' CASE DIRECTION CORRECTED 2026-08-22: 3 call sites -> .ToUpper().
+' extracted/runtime_helpers.tsv named 0x004A7410 `_brl_retro_Lower` and 0x004A74E0
+' `_brl_retro_Upper`. Both were wrong and neither address is a brl.retro wrapper:
+' 0x004A7410 is `_bbStringToUpper` and 0x004A74E0 is `_bbStringToLower`. NSS5.exe's
+' own 21-byte retro wrappers at 0x0059C8FD (Lower) and 0x0059C912 (Upper) CALL those
+' two addresses, and a wrapper cannot be the function it calls. The wrong row masked
+' by name, so this body certified with the case conversion running backwards. Full
+' derivation and the discriminating 3x4 matrix: docs/reference/codegen-patterns.md
+' 15.6. Re-verified under NSS5_NO_LEARN=1 on worker trees 380 and 380b.
 Select a0
 	Case 2
 		Self.currentanim = g_player_arr10
@@ -60,7 +69,7 @@ If Self.newstar And g_player_int01 = 8 And g_player_tplayer01 = Self
 		For Local cm:TCameraMan = EachIn g_cameramen
 			If Dist2D(Self.x, Self.y, cm.x, cm.y) < TPitch.YardsToPixels(10.0)
 				Self.bonus = 1
-				TParticle.StarShower(Int(Self.x), Int(Self.y), "+" + Lower(GetText("Fame!")), "FF00FF")
+				TParticle.StarShower(Int(Self.x), Int(Self.y), "+" + GetText("Fame!").ToUpper(), "FF00FF")
 				g_profile.CheckAchievement(37)
 				Select g_profile.position
 					Case 3
@@ -81,7 +90,7 @@ If Self.newstar And g_player_int01 = 8 And g_player_tplayer01 = Self
 		If Self.GetMyTeam() = g_team2 Then goaly = g_pitch_int19
 		If Dist2D(Self.x, Self.y, g_pitch_int17, goaly) < TPitch.YardsToPixels(20.0)
 			Self.bonus = 1
-			TParticle.StarShower(Int(Self.x), Int(Self.y), "+" + Lower(GetText("Boss")), "FF00FF")
+			TParticle.StarShower(Int(Self.x), Int(Self.y), "+" + GetText("Boss").ToUpper(), "FF00FF")
 			g_profile.CheckAchievement(38)
 			Select g_profile.position
 				Case 3
@@ -150,7 +159,7 @@ If Self.newstar And g_player_int01 = 8 And g_player_tplayer01 = Self
 			EndIf
 			If ok
 				Self.bonus = 1
-				TParticle.StarShower(Int(Self.x), Int(Self.y), "+" + Lower(GetText("Fans")), "FF00FF")
+				TParticle.StarShower(Int(Self.x), Int(Self.y), "+" + GetText("Fans").ToUpper(), "FF00FF")
 				g_profile.CheckAchievement(36)
 				Select g_profile.position
 					Case 3

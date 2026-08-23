@@ -36,13 +36,22 @@
 '!Global g_curscreen:TScreen
 '!Global g_activegadget:TGadget
 ' byte-identical vs NSS5.exe
+' CASE DIRECTION CORRECTED 2026-08-22: 4 call sites -> .ToLower().
+' extracted/runtime_helpers.tsv named 0x004A7410 `_brl_retro_Lower` and 0x004A74E0
+' `_brl_retro_Upper`. Both were wrong and neither address is a brl.retro wrapper:
+' 0x004A7410 is `_bbStringToUpper` and 0x004A74E0 is `_bbStringToLower`. NSS5.exe's
+' own 21-byte retro wrappers at 0x0059C8FD (Lower) and 0x0059C912 (Upper) CALL those
+' two addresses, and a wrapper cannot be the function it calls. The wrong row masked
+' by name, so this body certified with the case conversion running backwards. Full
+' derivation and the discriminating 3x4 matrix: docs/reference/codegen-patterns.md
+' 15.6. Re-verified under NSS5_NO_LEARN=1 on worker trees 380 and 380b.
 For Local g:TGadget = EachIn g_curscreen.gadgetlist
-	If Upper(g.name) = Upper(a0)
+	If g.name.ToLower() = a0.ToLower()
 		g_activegadget = g
 		Return 0
 	EndIf
 	For Local c:TGadget = EachIn g.children
-		If Upper(c.name) = Upper(a0)
+		If c.name.ToLower() = a0.ToLower()
 			g_activegadget = c
 			Return 0
 		EndIf

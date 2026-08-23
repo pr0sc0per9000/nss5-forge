@@ -178,7 +178,7 @@ original codebase and from what the tooling can check.
 ## Before opening a pull request
 
 * `python scripts/assemble.py` builds
-* `python scripts/smoke_boot.py 40` reaches `MAIN MENU reached`
+* `python scripts/smoke_boot.py` reaches `MAIN MENU reached` (5s default)
 * if you changed a function body, run `python scripts/progress.py --write-status`
   and commit the regenerated `docs/STATUS.md`. CI fails if it is stale.
 

@@ -1,5 +1,26 @@
 ' TEngine.SetUpMatch
 ' VA 0x004CE7BE   1776 bytes   mode=reloc   byte-identical vs NSS5.exe (matched 1776/1776)
+' CORRECTED 2026-08-22: DebugLog(...) -> LogLine(...) at all 3 call sites.
+' MATCH 1776/1776, first_diff=None, NSS5_NO_LEARN=1, reproduced on two worker trees.
+' Before: MISMATCH, mode=diff, 1776/1776 LENGTH-EXACT, first_diff=+15.
+'
+' +15 is the OPERAND of `E8` at 0x004CE7CC, whose target is 0x00505B91. That address is
+' this corpus's own LogLine (src/recovered_module/LogLine.bmx states VA 0x00505b91,
+' 58 bytes, sig ($)i) and 213 other files call it. `DebugLog` is not a recovered function
+' at all -- it has no body anywhere under src/, and this file was the ONLY one naming it.
+' It is BlitzMax's own built-in, so the body compiled and was length-exact while calling a
+' different function from the original's.
+'
+' Why the byte oracle caught it and localise_diff did not: localise_diff reported
+' "CLEAN -- byte-identical modulo the oracle's masks" throughout, because a call operand is
+' inside its mask set. Only harness.try_method's by-name check compares WHICH function the
+' operand targets. A length-exact body calling the wrong function is invisible to every
+' check except that one -- which is the argument for NSS5_NO_LEARN=1 on every audit, since
+' with learning on this body would teach the table that 0x00505B91 is DebugLog and
+' self-certify (codegen-patterns.md 15.5).
+'
+' Ruled out before changing anything: the file is byte-identical to git HEAD, so it was not
+' edited after being banked.
 ' KIND=Function (STATIC method on TEngine), SIG (:TFixture,:TTeam,:TTeam,()i)i, class-table slot 0x3c
 ' harness.try_method: status=MATCH, mode=reloc, 1776/1776,
 ' learned_helpers=['0x00505b91=_brl_blitz_DebugLog'] (ordinary in-run learning --
@@ -98,10 +119,10 @@
 '!Global g_training_int03:Int
 '!Global g_profile:TProfile
 '!Global g_engine_int22:Int
-DebugLog("SetUpMatch")
+LogLine("SetUpMatch")
 GCCollect()
 g_engine_int55 = GCMemAlloced()
-DebugLog(">>> MemAlloced = " + String(g_engine_int55))
+LogLine(">>> MemAlloced = " + String(g_engine_int55))
 TEngine.SetUpChannels()
 g_enginestate = 2
 If Not g_replayframes Then
@@ -112,7 +133,7 @@ End If
 g_engine_int12 = a3
 g_fixture = a0
 a0.GetFirstLegScore(Varptr g_engine_int23, Varptr g_engine_int24)
-DebugLog("FixtureType:" + String(g_fixture.matchtype))
+LogLine("FixtureType:" + String(g_fixture.matchtype))
 g_Object17 = a1
 g_Object18 = a2
 If g_opt_playercam > 1 Then g_engine_float09 = 2.0

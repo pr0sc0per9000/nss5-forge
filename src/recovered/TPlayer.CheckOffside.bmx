@@ -46,6 +46,15 @@
 '     which is what an enclosing block looks like (10.9).
 '   * `Self.newstar` and `g_ball.lastkickedby.newstar` are bare truth values inside the And
 '     chain; `<> 0` would add 9 bytes each.
+' CASE DIRECTION CORRECTED 2026-08-22: 1 call site -> .ToUpper().
+' extracted/runtime_helpers.tsv named 0x004A7410 `_brl_retro_Lower` and 0x004A74E0
+' `_brl_retro_Upper`. Both were wrong and neither address is a brl.retro wrapper:
+' 0x004A7410 is `_bbStringToUpper` and 0x004A74E0 is `_bbStringToLower`. NSS5.exe's
+' own 21-byte retro wrappers at 0x0059C8FD (Lower) and 0x0059C912 (Upper) CALL those
+' two addresses, and a wrapper cannot be the function it calls. The wrong row masked
+' by name, so this body certified with the case conversion running backwards. Full
+' derivation and the discriminating 3x4 matrix: docs/reference/codegen-patterns.md
+' 15.6. Re-verified under NSS5_NO_LEARN=1 on worker trees 380 and 380b.
 	Method CheckOffside:Int()
 		'!Global g_msg_style:Int = 1750
 		'!Global g_font:TBitmapFont
@@ -54,7 +63,7 @@
 		'!Global g_offside_away:Int
 		'!Global g_ball:TBall
 		If Self.offsidewhenkicked <> 0
-			TScreenMessage.Create(0, 0, Lower(GetText("Offside")), g_msg_style, g_font, Null, 1.0, "FFFFFF")
+			TScreenMessage.Create(0, 0, GetText("Offside").ToUpper(), g_msg_style, g_font, Null, 1.0, "FFFFFF")
 			Local n:Int = 1
 			If Self.teamid = g_hometeam.id
 				n = 2

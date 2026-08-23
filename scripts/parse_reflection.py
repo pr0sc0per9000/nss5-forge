@@ -43,7 +43,16 @@ DECL_KIND = {1: "Const", 2: "Local", 3: "Field", 4: "Global",
              5: "Var", 6: "Method", 7: "Function"}
 
 IDENT_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]{0,63}$")
-TYPE_ATOM = r"(?:\[\])*\*?(?:[bsilfdz$]|:[A-Za-z_][A-Za-z0-9_]*)"
+# A class name in a signature may be NAMESPACED -- `:brl.max2d.TImage` -- and the decl
+# loop breaks on the first signature it cannot parse, so refusing the dot TRUNCATES the
+# whole Type at that member. TBitMapChar lost `Image:TImage` and three methods that way,
+# and TBitmapFont lost fifteen (GetFaceImage .. GetShadowBlend, slots 0x5C-0x94), which
+# is every accessor the Font Machine draw path needs. Measured over the whole table the
+# change is purely additive: 8 Types gain members, none loses one, and no game Type is
+# affected -- all 8 are third-party or BRL Types whose fields cite a module-qualified
+# name. `.` cannot appear in a signature except inside such a name, so consuming it is
+# unambiguous (the same reasoning harness.parse_sig_atom already records).
+TYPE_ATOM = r"(?:\[\])*\*?(?:[bsilfdz$]|:[A-Za-z_][A-Za-z0-9_.]*)"
 SIG_RE = re.compile(r"^(?:\(.*\)(?:%s)?|%s)$" % (TYPE_ATOM, TYPE_ATOM))
 
 # BlitzMax signature atom -> readable BlitzMax type

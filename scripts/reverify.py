@@ -195,7 +195,38 @@ def body_of(text):
                    if l.lstrip().startswith("'!")]
         if outside:
             body = "\n".join(outside) + "\n" + body
-    return ("\n".join(gdecls) + "\n" + body) if gdecls else body
+    # RE-ATTACH THE PRAGMAS AS PRAGMAS, NOT AS CODE.
+    #
+    # H.split_globals() returns the pragma PAYLOAD with the "'!" marker stripped:
+    # GLOBAL_PRAGMA (harness.py:689) captures group(1) starting at the literal word
+    # "Global", and RAW_PRAGMA (harness.py:713) captures whatever followed "'!Raw ".
+    # Joining those payloads straight onto the body hands harness.try_method plain
+    # STATEMENTS where it expected pragmas.
+    #
+    # For a '!Global that is merely redundant. For a multi-line '!Raw it is fatal:
+    # TProfile.LoadSavedGame carries
+    #     '!Raw Function SyncSteamAchievements()
+    #     '!Raw End Function
+    # as a placeholder for its not-yet-promoted callee, and the bare payloads were
+    # injected into the body as a nested Function definition inside the probe's own
+    # Function -- so the body could never build, and the file reported a confident
+    # MISMATCH that had nothing to do with its 936 bytes of reconstruction.
+    #
+    # Restore the marker by prefix, which is the same discriminator scripts/assemble.py
+    # documents for this identical list: a payload beginning "Global " can only have come
+    # from GLOBAL_PRAGMA, anything else can only have come from RAW_PRAGMA. Note that
+    # H.parse_global_decl() is the WRONG test here -- it anchors end-to-end, so a '!Global
+    # carrying a trailing inline comment fails it and would be mis-restored as '!Raw.
+    if not gdecls:
+        return body
+    restored = []
+    for g in gdecls:
+        gs = g.strip()
+        if not gs:
+            continue
+        restored.append(("'!" + gs) if re.match(r"^Global\s", gs, re.I)
+                        else ("'!Raw " + gs))
+    return "\n".join(restored) + "\n" + body
 
 
 def pick():

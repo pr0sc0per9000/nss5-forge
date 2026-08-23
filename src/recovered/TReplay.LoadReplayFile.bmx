@@ -9,13 +9,53 @@
 '   0x005B963C read `mov eax,[ebp+8] / push eax / call [TRuntimeException.Create] /
 '   push eax / call bbExThrow` -- byte-for-byte the compiled body of
 '   `tools/blitzmax-legacy-src/mod/brl.mod/blitz.mod/blitz.bmx`'s `RuntimeError(message$)`,
-'   not the 0-arg `NullMethodError()` (which never reads a parameter at all). Both stubs
-'   happen to compile to 36 bytes, which is almost certainly how name_brl.py's byte-match
-'   picked the wrong one. Independently corroborated by extracted/callgraph_resolved.tsv
-'   line "0x005b963c 0x005b9643 static ... TRuntimeException.Create ... high" already
-'   present in the corpus. Corrected the row to `_brl_blitz_RuntimeError` (same VA, same
-'   archive, same size) -- no currently-banked body referenced the old name (grepped
-'   src/recovered* clean before editing), so this is a pure fix with no blast radius.
+'   not the 0-arg `NullMethodError()` (which never reads a parameter at all). Independently
+'   corroborated by extracted/callgraph_resolved.tsv line "0x005b963c 0x005b9643 static ...
+'   TRuntimeException.Create ... high" already present in the corpus. Corrected the row to
+'   `_brl_blitz_RuntimeError` (same VA, same archive, same size) -- no currently-banked body
+'   referenced the old name (grepped src/recovered* clean before editing), so this is a pure
+'   fix with no blast radius.
+'
+' THE CORRECTION IS NOT DURABLE -- extracted/ is generated and untracked, so regenerating
+'   brl_functions.tsv puts `_brl_blitz_NullMethodError` back and this body silently
+'   un-verifies (measured on re-entry: MISMATCH 482/575, first_diff=+114, which is the
+'   operand of the E8 at 0x00504280; localise_diff.py still reports CLEAN because a call
+'   operand is inside its mask set). Re-apply the row if that happens.
+'
+'   ROOT CAUSE, measured, not "same length": name_brl.archive_functions collects
+'   `objdump -r <archive>` offsets into ONE per-MEMBER set with no section separation, then
+'   attributes any of them that numerically lands inside a .text instruction to that
+'   instruction. For blitz.o that inflates the reloc set of every stub in this family and
+'   masks most of each body before comparison. Replaying name_brl's own matcher over the
+'   six stubs measured:
+'     _brl_blitz_NullObjectError    relocs {0,4,8,9,16,18,20,24,28,32}  19 masked, 3 compared
+'     _brl_blitz_NullMethodError    relocs {0,4,8,9,18}                 12 masked, 19 compared
+'     _brl_blitz_NullFunctionError  relocs {4,9,18}                     12 masked, 24 compared
+'     _brl_blitz_ArrayBoundsError   relocs {0,4,8,9,12,18,24,28}        8 compared
+'     _brl_blitz_OutOfDataError     relocs {4,8,9,18,20,24}             17 compared
+'     _brl_blitz_RuntimeError       relocs {0,4,9,16,18,20,24,32}       8 compared
+'   Only 3 of those sets ({4,9,18} and the two 3-reloc real sets) are the body's actual
+'   relocations. With bytes 0..12 and 18..21 masked, NullMethodError's surviving 19 bytes
+'   (`83 c4 04 50 e8` at 13..17 and the shared `83 c4 04 b8 00 00 00 00 eb 00 89 ec 5d c3`
+'   tail) are satisfied by RuntimeError's body too, so it claims 0x005B963C. RuntimeError,
+'   whose bytes 3..8 are `8b 45 08 50 ff 15` where every throw stub has `68 <ct> e8`, hits
+'   0x005B963C and NOTHING ELSE -- it is the only symbol in the archive that does.
+'   The fix belongs in name_brl.archive_functions (key relocs by member AND section).
+'
+' THE FIVE 0-ARG NEIGHBOURS ARE NOT REALLY AN ALIAS SET EITHER (not corrected here; no
+'   banked body depends on it, and they are referenced as data, never called -- none of
+'   0x005B9588/95AC/95D0/95F4/9618 appears in extracted/call_arity.tsv, while 0x005B963C
+'   has 17 call sites all pushing 4 bytes). Each pushes a DIFFERENT class table, which is
+'   present unmasked in NSS5.exe and named in extracted/class_tables.tsv, so each is
+'   uniquely determined and matches blitz.bmx's declaration order exactly:
+'     0x005B9588 push 0x00CB2E38 TNullObjectException    -> NullObjectError
+'     0x005B95AC push 0x00CB2EBC TNullMethodException    -> NullMethodError
+'     0x005B95D0 push 0x00CB2F40 TNullFunctionException  -> NullFunctionError
+'     0x005B95F4 push 0x00CB2FC4 TArrayBoundsException   -> ArrayBoundsError
+'     0x005B9618 push 0x00CB3044 TOutOfDataException     -> OutOfDataError
+'     0x005B963C call [0x00CB3138] = TRuntimeException+0x30 Create($) -> RuntimeError
+'   (0x005B95D0 = NullFunctionError agrees with what TScreen_ContractOffer.ButtonReject and
+'   TPrivateBitmapFont.New already assume, so narrowing would not disturb them.)
 '
 ' ASSUMPTIONS
 '   '!Global g_screen_mainmenu_int26:String  = 0x00C6E9A8

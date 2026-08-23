@@ -9,6 +9,15 @@
 '   0x004A7410 = _brl_retro_Lower  -> Lower(GetText("Tackle"))
 '   0x00C6AFC0 = TParticle class table + 0x38 = StarShower(i,i,$,$)
 
+' CASE DIRECTION CORRECTED 2026-08-22: 1 call site -> .ToUpper().
+' extracted/runtime_helpers.tsv named 0x004A7410 `_brl_retro_Lower` and 0x004A74E0
+' `_brl_retro_Upper`. Both were wrong and neither address is a brl.retro wrapper:
+' 0x004A7410 is `_bbStringToUpper` and 0x004A74E0 is `_bbStringToLower`. NSS5.exe's
+' own 21-byte retro wrappers at 0x0059C8FD (Lower) and 0x0059C912 (Upper) CALL those
+' two addresses, and a wrapper cannot be the function it calls. The wrong row masked
+' by name, so this body certified with the case conversion running backwards. Full
+' derivation and the discriminating 3x4 matrix: docs/reference/codegen-patterns.md
+' 15.6. Re-verified under NSS5_NO_LEARN=1 on worker trees 380 and 380b.
 	Method BlockTackle:Int()
 		'!Global g_ball:TBall
 		LogLine("BlockTackle")
@@ -22,6 +31,6 @@
 		Self.DoAnimKick(Int(Self.kickpower))
 		g_ball.Kick(Self,Self.directiontoball,Self.kickpower,1,-1)
 		If Self.newstar <> 0
-			TParticle.StarShower(Int(Self.x),Int(Self.y),Lower(GetText("Tackle")),"FF0099")
+			TParticle.StarShower(Int(Self.x),Int(Self.y),GetText("Tackle").ToUpper(),"FF0099")
 		EndIf
 	End Method

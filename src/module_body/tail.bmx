@@ -89,7 +89,11 @@ g_dataDir = AppDir + "/"
 ' is 1 character and trips the Length < 3 fallback below. The configured-path
 ' branch is therefore dead for a stock install, but preserved.
 Print "[boot] reading saveloc"
-g_savedir = Lower(Trim(ReadSettingString(g_dataDir + "Settings/Settings.txt", "saveloc")))
+' CASE DIRECTION CORRECTED 2026-08-22: module-body offset +5632 calls the brl.retro
+' Trim wrapper (0x0059C8E8) and +5641 calls 0x004A7410, which is _bbStringToUpper,
+' not the _brl_retro_Lower the learned helper table used to name it. See
+' docs/reference/codegen-patterns.md 15.6.
+g_savedir = Trim(ReadSettingString(g_dataDir + "Settings/Settings.txt", "saveloc")).ToUpper()
 If Right(g_savedir, 1) <> "/" And Right(g_savedir, 1) <> "\"
 	g_savedir = g_savedir + "/"
 EndIf

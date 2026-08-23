@@ -228,6 +228,23 @@ def main():
     log = os.path.join(STATUS, "play_debug.txt" if debug else "play.txt")
 
     print("PLAY  (%s build)" % ("DEBUG -- null checks ON" if debug else "release"))
+    if debug:
+        # PREFER debug_game.py FOR ANY ACTUAL DEBUGGING.
+        #
+        # This script captures the exception LINE and nothing else. After a fault the
+        # BlitzMax debug stub prints `~>` and BLOCKS in its command loop waiting to be
+        # asked; it never volunteers the stack trace or the state dump. This script does
+        # not answer that prompt, so the two most valuable artefacts a crash produces are
+        # thrown away. Measured on the quit crash: 3,417 captured lines, one fault
+        # message, ZERO stack frames and ZERO Globals.
+        #
+        # debug_game.py sends the stub `t`, which makes it emit StackTrace{...} plus every
+        # module Global and its value -- 1,691 of them on that same crash, which is what
+        # localised it to StopChannel(Null) in the end.
+        print("  NOTE: this captures the fault MESSAGE but not the stack trace or the")
+        print("        Globals dump -- the debug stub waits to be asked and this script")
+        print("        does not ask. For debugging use:")
+        print("            python scripts/debug_game.py --minutes %g" % minutes)
     print("  display : %s" % force_windowed())
     print("  watchdog: %s" % ("NONE -- --forever was passed" if cap is None
                               else "hard kill after %g minutes" % minutes))

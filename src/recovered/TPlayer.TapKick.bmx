@@ -151,7 +151,7 @@
 						LogLine("AI pass")
 						If Self.distancetoteammate > TPitch.YardsToPixels(40.0)
 							kicktype = 3
-							Self.kickpower = Self.distancetoteammate * g_player_float19
+							Self.kickpower = Self.distancetoteammate * g_player_float20
 						ElseIf Self.distancetoteammate > TPitch.YardsToPixels(28.0)
 							kicktype = 3
 							Self.kickpower = Self.distancetoteammate * g_player_float19

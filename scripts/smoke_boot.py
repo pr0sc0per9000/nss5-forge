@@ -1,7 +1,14 @@
 """Boot the game briefly, kill it, and report how far it got.
 
-    python scripts/smoke_boot.py            # 20s boot, then kill
+    python scripts/smoke_boot.py            # 5s boot, then kill
     python scripts/smoke_boot.py 40         # longer
+
+THE DEFAULT IS 5 SECONDS, DELIBERATELY. The build reaches `MAIN MENU reached` -- the
+last milestone this script can observe -- inside five seconds on the machine this is
+developed on, and every second after that is the process sitting idle on the menu
+while the timer runs down. A longer budget buys nothing: the milestone list is
+identical at 5s, 8s and 45s (measured). Pass a bigger number only when you have a
+reason to think boot got slower, and say why.
 
 WHY
 ===
@@ -76,7 +83,7 @@ MARKERS = [
 
 
 def main():
-    secs = 20
+    secs = 5
     for a in sys.argv[1:]:
         if a.isdigit():
             secs = int(a)
@@ -87,6 +94,9 @@ def main():
     print("  display : %s" % play.force_windowed())
 
     before = os.path.getsize(LOG) if os.path.exists(LOG) else 0
+    # status/ is gitignored, so a fresh clone has no such directory and this open()
+    # raised FileNotFoundError on the first run after a successful build.
+    os.makedirs(os.path.join(ROOT, "status"), exist_ok=True)
     cap = open(os.path.join(ROOT, "status", "smoke_stdout.txt"), "wb")
     p = subprocess.Popen([EXE], cwd=RUNDIR, stdout=cap, stderr=subprocess.STDOUT)
     died_at = None
@@ -123,6 +133,24 @@ def main():
     missed = [n for n, _ in MARKERS if n not in reached]
     if missed:
         print("  not reached        : %s" % ", ".join(missed))
+
+    # ALMOST NOTHING REACHED USUALLY MEANS NO LOG, NOT NO PROGRESS.
+    # The game only writes log.txt when Settings.txt says debug=1, and the copy
+    # that ships with the game says debug=0. A fresh checkout therefore reports one
+    # milestone for a build that is in fact running fine, and the last stdout line
+    # is `CALLING GameMain`, which reads as a hang entering the game. Measured: the
+    # same untouched exe reports 1 milestone with debug=0 and 7 with debug=1.
+    if len(reached) <= 1 and p.returncode is None:
+        cfg = os.path.join(RUNDIR, "Settings", "Settings.txt")
+        try:
+            stock = "debug=0" in open(cfg, encoding="utf-8", errors="replace").read()
+        except OSError:
+            stock = False
+        if stock:
+            print()
+            print("  NOTE: %s says debug=0, so the game wrote no" % cfg)
+            print("  startup log and this report is measuring its absence, not a hang.")
+            print("  Set debug=1 there and re-run (python scripts/setup.py does it).")
 
     lines = [l for l in text.split("\n") if l.strip()]
     print()

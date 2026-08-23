@@ -31,6 +31,15 @@
 	'!Global g_profile:TProfile
 	'!Global g_screen_x:Int
 	'!Global g_np_star:TImage
+' CASE DIRECTION CORRECTED 2026-08-22: 2 call sites -> .ToUpper().
+' extracted/runtime_helpers.tsv named 0x004A7410 `_brl_retro_Lower` and 0x004A74E0
+' `_brl_retro_Upper`. Both were wrong and neither address is a brl.retro wrapper:
+' 0x004A7410 is `_bbStringToUpper` and 0x004A74E0 is `_bbStringToLower`. NSS5.exe's
+' own 21-byte retro wrappers at 0x0059C8FD (Lower) and 0x0059C912 (Upper) CALL those
+' two addresses, and a wrapper cannot be the function it calls. The wrong row masked
+' by name, so this body certified with the case conversion running backwards. Full
+' derivation and the discriminating 3x4 matrix: docs/reference/codegen-patterns.md
+' 15.6. Re-verified under NSS5_NO_LEARN=1 on worker trees 380 and 380b.
 	Function Draw:Int()
 		SetDrawStateHex("FFFFFF", 1.0, 1.0, 0, 3)
 		If g_np_photo <> Null
@@ -41,10 +50,10 @@
 		EndIf
 		DrawImage(g_np_heads[g_profile.playercols.skin - 1], 0, 0, 0)
 		TEngine.DrawMyText(g_profile.newsheadline, g_screen_x / 2, 200.0, 1, 0, 1.0, 1.0, "FFFFFF", 0)
-		TEngine.DrawMyText(Lower(GetText("Your Rating")), 545.0, 260.0, 1, 0, 1.0, 1.0, "FFFFFF", 0)
+		TEngine.DrawMyText(GetText("Your Rating").ToUpper(), 545.0, 260.0, 1, 0, 1.0, 1.0, "FFFFFF", 0)
 		TEngine.DrawMyText(FormatDecimals(g_profile.newsrating / 10.0, 1), 550.0, 300.0, 1, 0, 1.0, 1.0, "FFFFFF", 0)
 		If g_profile.newsmotm <> 0
 			DrawImage(g_np_star, 560.0, 420.0, 0)
-			TEngine.DrawMyText(Lower(GetText("Star Man!")), 560.0, 420.0, 1, 1, 1.0, 1.0, "FFFFFF", 0)
+			TEngine.DrawMyText(GetText("Star Man!").ToUpper(), 560.0, 420.0, 1, 1, 1.0, 1.0, "FFFFFF", 0)
 		EndIf
 	End Function

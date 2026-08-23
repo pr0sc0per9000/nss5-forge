@@ -30,6 +30,15 @@
 	'!Global g_bj_bet:Int = 50
 	'!Global g_engine_w:Int
 	'!Global g_engine_h:Int
+' CASE DIRECTION CORRECTED 2026-08-22: 2 call sites -> .ToUpper().
+' extracted/runtime_helpers.tsv named 0x004A7410 `_brl_retro_Lower` and 0x004A74E0
+' `_brl_retro_Upper`. Both were wrong and neither address is a brl.retro wrapper:
+' 0x004A7410 is `_bbStringToUpper` and 0x004A74E0 is `_bbStringToLower`. NSS5.exe's
+' own 21-byte retro wrappers at 0x0059C8FD (Lower) and 0x0059C912 (Upper) CALL those
+' two addresses, and a wrapper cannot be the function it calls. The wrong row masked
+' by name, so this body certified with the case conversion running backwards. Full
+' derivation and the discriminating 3x4 matrix: docs/reference/codegen-patterns.md
+' 15.6. Re-verified under NSS5_NO_LEARN=1 on worker trees 380 and 380b.
 	If g_bj_result = 0
 		Local p1:Int = 0
 		Local p2:Int = 0
@@ -57,12 +66,12 @@
 	EndIf
 	Select g_bj_result
 		Case 0
-			TScreenMessage.Create(g_engine_w / 2, g_engine_h / 2, Lower(GetText("blackjack_Tie")), g_bj_fntsize, g_bj_font, Null, 1.0, "FFFFFF")
+			TScreenMessage.Create(g_engine_w / 2, g_engine_h / 2, GetText("blackjack_Tie").ToUpper(), g_bj_fntsize, g_bj_font, Null, 1.0, "FFFFFF")
 			TScreen_BlackJack.Tie()
 		Case 1
 			TScreenMessage.Create(g_engine_w / 2, g_engine_h / 2, GetText("bet_YouWon") + " " + FormatMoney(g_bj_bet * 2, 1), g_bj_fntsize, g_bj_font, Null, 1.0, "FFFFFF")
 			TScreen_BlackJack.Win()
 		Case 2
-			TScreenMessage.Create(g_engine_w / 2, g_engine_h / 2, Lower(GetText("blackjack_DealerWins")), g_bj_fntsize, g_bj_font, Null, 1.0, "FFFFFF")
+			TScreenMessage.Create(g_engine_w / 2, g_engine_h / 2, GetText("blackjack_DealerWins").ToUpper(), g_bj_fntsize, g_bj_font, Null, 1.0, "FFFFFF")
 			TScreen_BlackJack.Lose()
 	End Select

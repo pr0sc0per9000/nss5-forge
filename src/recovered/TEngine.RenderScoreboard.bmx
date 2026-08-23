@@ -23,6 +23,15 @@
 '   Lower(GetText(...)) -- a String method .ToLower() emits a DIFFERENT helper and does not match.
 ' All string literals recovered with harness.read_string from NSS5.exe.
 
+' CASE DIRECTION CORRECTED 2026-08-22: 21 call sites -> .ToUpper().
+' extracted/runtime_helpers.tsv named 0x004A7410 `_brl_retro_Lower` and 0x004A74E0
+' `_brl_retro_Upper`. Both were wrong and neither address is a brl.retro wrapper:
+' 0x004A7410 is `_bbStringToUpper` and 0x004A74E0 is `_bbStringToLower`. NSS5.exe's
+' own 21-byte retro wrappers at 0x0059C8FD (Lower) and 0x0059C912 (Upper) CALL those
+' two addresses, and a wrapper cannot be the function it calls. The wrong row masked
+' by name, so this body certified with the case conversion running backwards. Full
+' derivation and the discriminating 3x4 matrix: docs/reference/codegen-patterns.md
+' 15.6. Re-verified under NSS5_NO_LEARN=1 on worker trees 380 and 380b.
 	Function RenderScoreboard()
 		'!Global g_matchstate:Int
 		'!Global g_sbalpha:Float
@@ -126,42 +135,42 @@
 				yy :+ h * 2
 				DrawMyText(String(g_stat_shots_h), xleft, yy, 1, 1, 1.0, g_sbalpha, "00FF00", 0)
 				DrawMyText(String(g_stat_shots_a), xright, yy, 1, 1, 1.0, g_sbalpha, "00FF00", 0)
-				DrawMyText(Lower(GetText("Shots")), xmid, yy, 1, 1, 1.0, g_sbalpha, "00FF00", 0)
+				DrawMyText(GetText("Shots").ToUpper(), xmid, yy, 1, 1, 1.0, g_sbalpha, "00FF00", 0)
 
 				yy :+ h
 				DrawMyText(String(g_stat_ontarget_h), xleft, yy, 1, 1, 1.0, g_sbalpha, "99FF99", 0)
 				DrawMyText(String(g_stat_ontarget_a), xright, yy, 1, 1, 1.0, g_sbalpha, "99FF99", 0)
-				DrawMyText(Lower(GetText("On Target")), xmid, yy, 1, 1, 1.0, g_sbalpha, "99FF99", 0)
+				DrawMyText(GetText("On Target").ToUpper(), xmid, yy, 1, 1, 1.0, g_sbalpha, "99FF99", 0)
 
 				yy :+ h
 				DrawMyText(String(g_stat_corners_h), xleft, yy, 1, 1, 1.0, g_sbalpha, "FFFFFF", 0)
 				DrawMyText(String(g_stat_corners_a), xright, yy, 1, 1, 1.0, g_sbalpha, "FFFFFF", 0)
-				DrawMyText(Lower(GetText("Corners")), xmid, yy, 1, 1, 1.0, g_sbalpha, "FFFFFF", 0)
+				DrawMyText(GetText("Corners").ToUpper(), xmid, yy, 1, 1, 1.0, g_sbalpha, "FFFFFF", 0)
 
 				yy :+ h
 				DrawMyText(String(g_stat_offside_h), xleft, yy, 1, 1, 1.0, g_sbalpha, "FFFFFF", 0)
 				DrawMyText(String(g_stat_offside_a), xright, yy, 1, 1, 1.0, g_sbalpha, "FFFFFF", 0)
-				DrawMyText(Lower(GetText("Offside")), xmid, yy, 1, 1, 1.0, g_sbalpha, "FFFFFF", 0)
+				DrawMyText(GetText("Offside").ToUpper(), xmid, yy, 1, 1, 1.0, g_sbalpha, "FFFFFF", 0)
 
 				yy :+ h
 				DrawMyText(String(g_stat_pens_h), xleft, yy, 1, 1, 1.0, g_sbalpha, "FFFFFF", 0)
 				DrawMyText(String(g_stat_pens_a), xright, yy, 1, 1, 1.0, g_sbalpha, "FFFFFF", 0)
-				DrawMyText(Lower(GetText("Penalties")), xmid, yy, 1, 1, 1.0, g_sbalpha, "FFFFFF", 0)
+				DrawMyText(GetText("Penalties").ToUpper(), xmid, yy, 1, 1, 1.0, g_sbalpha, "FFFFFF", 0)
 
 				yy :+ h
 				DrawMyText(String(g_stat_freekicks_h), xleft, yy, 1, 1, 1.0, g_sbalpha, "FFFFFF", 0)
 				DrawMyText(String(g_stat_freekicks_a), xright, yy, 1, 1, 1.0, g_sbalpha, "FFFFFF", 0)
-				DrawMyText(Lower(GetText("Free Kicks")), xmid, yy, 1, 1, 1.0, g_sbalpha, "FFFFFF", 0)
+				DrawMyText(GetText("Free Kicks").ToUpper(), xmid, yy, 1, 1, 1.0, g_sbalpha, "FFFFFF", 0)
 
 				yy :+ h
 				DrawMyText(String(g_stat_yellows_h), xleft, yy, 1, 1, 1.0, g_sbalpha, "FFFF00", 0)
 				DrawMyText(String(g_stat_yellows_a), xright, yy, 1, 1, 1.0, g_sbalpha, "FFFF00", 0)
-				DrawMyText(Lower(GetText("Yellow Cards")), xmid, yy, 1, 1, 1.0, g_sbalpha, "FFFF00", 0)
+				DrawMyText(GetText("Yellow Cards").ToUpper(), xmid, yy, 1, 1, 1.0, g_sbalpha, "FFFF00", 0)
 
 				yy :+ h
 				DrawMyText(String(g_stat_reds_h), xleft, yy, 1, 1, 1.0, g_sbalpha, "FF0000", 0)
 				DrawMyText(String(g_stat_reds_a), xright, yy, 1, 1, 1.0, g_sbalpha, "FF0000", 0)
-				DrawMyText(Lower(GetText("Red Cards")), xmid, yy, 1, 1, 1.0, g_sbalpha, "FF0000", 0)
+				DrawMyText(GetText("Red Cards").ToUpper(), xmid, yy, 1, 1, 1.0, g_sbalpha, "FF0000", 0)
 
 				yy :+ h + 6
 				ph = Int(g_possbarh / (g_posshome + g_possaway) * g_posshome)
@@ -169,7 +178,7 @@
 				If ph + pa < 100 Then ph = 100 - pa
 				DrawMyText(String(ph), xleft, yy, 1, 1, 1.0, g_sbalpha, "FFFFFF", 0)
 				DrawMyText(String(pa), xright, yy, 1, 1, 1.0, g_sbalpha, "FFFFFF", 0)
-				DrawMyText(Lower(GetText("Possession")), xmid, yy, 1, 1, 1.0, g_sbalpha, "FFFFFF", 0)
+				DrawMyText(GetText("Possession").ToUpper(), xmid, yy, 1, 1, 1.0, g_sbalpha, "FFFFFF", 0)
 
 				yy = g_screen_h / 2 - 210
 				yy :+ h
@@ -183,49 +192,49 @@
 					fs = g_sbfontscale
 					h = Int(h * fs)
 
-					DrawMyText(Lower(GetText("Goals")), xmid - 40, yy, 2, 1, fs, g_sbalpha, "00FF00", 0)
+					DrawMyText(GetText("Goals").ToUpper(), xmid - 40, yy, 2, 1, fs, g_sbalpha, "00FF00", 0)
 					DrawMyText(String(p.matchstats.CountStat(5)), xmid, yy, 1, 1, fs, g_sbalpha, "00FF00", 0)
 					yy :+ h + 5
 
-					DrawMyText(Lower(GetText("Shots")), xmid - 40, yy, 2, 1, fs, g_sbalpha, "99FF99", 0)
+					DrawMyText(GetText("Shots").ToUpper(), xmid - 40, yy, 2, 1, fs, g_sbalpha, "99FF99", 0)
 					DrawMyText(String(p.matchstats.CountStat(2)), xmid, yy, 1, 1, fs, g_sbalpha, "99FF99", 0)
 					yy :+ h + 5
 
-					DrawMyText(Lower(GetText("Passes")), xmid - 40, yy, 2, 1, fs, g_sbalpha, "0000FF", 0)
+					DrawMyText(GetText("Passes").ToUpper(), xmid - 40, yy, 2, 1, fs, g_sbalpha, "0000FF", 0)
 					DrawMyText(String(p.matchstats.CountStat(3)), xmid, yy, 1, 1, fs, g_sbalpha, "0000FF", 0)
 					yy :+ h + 5
 
-					DrawMyText(Lower(GetText("Assists")), xmid - 40, yy, 2, 1, fs, g_sbalpha, "990099", 0)
+					DrawMyText(GetText("Assists").ToUpper(), xmid - 40, yy, 2, 1, fs, g_sbalpha, "990099", 0)
 					DrawMyText(String(p.matchstats.CountStat(4)), xmid, yy, 1, 1, fs, g_sbalpha, "990099", 0)
 					yy :+ h + 5
 
-					DrawMyText(Lower(GetText("Headers")), xmid - 40, yy, 2, 1, fs, g_sbalpha, "9999FF", 0)
+					DrawMyText(GetText("Headers").ToUpper(), xmid - 40, yy, 2, 1, fs, g_sbalpha, "9999FF", 0)
 					DrawMyText(String(p.matchstats.CountStat(6)), xmid, yy, 1, 1, fs, g_sbalpha, "9999FF", 0)
 					yy :+ h + 5
 
-					DrawMyText(Lower(GetText("Tackles")), xmid - 40, yy, 2, 1, fs, g_sbalpha, "FF0099", 0)
+					DrawMyText(GetText("Tackles").ToUpper(), xmid - 40, yy, 2, 1, fs, g_sbalpha, "FF0099", 0)
 					Local tk:Int = p.matchstats.CountStat(8) + p.matchstats.CountStat(7)
 					DrawMyText(String(tk), xmid, yy, 1, 1, fs, g_sbalpha, "FF0099", 0)
 					yy :+ h + 5
 
-					DrawMyText(Lower(GetText("Fouls")), xmid - 40, yy, 2, 1, fs, g_sbalpha, "FF9900", 0)
+					DrawMyText(GetText("Fouls").ToUpper(), xmid - 40, yy, 2, 1, fs, g_sbalpha, "FF9900", 0)
 					DrawMyText(String(p.matchstats.CountStat(11)), xmid, yy, 1, 1, fs, g_sbalpha, "FF9900", 0)
 					yy :+ h + 5
 
-					DrawMyText(Lower(GetText("Yellow Cards")), xmid - 40, yy, 2, 1, fs, g_sbalpha, "FFFF00", 0)
+					DrawMyText(GetText("Yellow Cards").ToUpper(), xmid - 40, yy, 2, 1, fs, g_sbalpha, "FFFF00", 0)
 					DrawMyText(String(p.matchstats.yellows), xmid, yy, 1, 1, fs, g_sbalpha, "FFFF00", 0)
 					yy :+ h + 5
 
-					DrawMyText(Lower(GetText("Red Cards")), xmid - 40, yy, 2, 1, fs, g_sbalpha, "FF0000", 0)
+					DrawMyText(GetText("Red Cards").ToUpper(), xmid - 40, yy, 2, 1, fs, g_sbalpha, "FF0000", 0)
 					DrawMyText(String(p.matchstats.reds), xmid, yy, 1, 1, fs, g_sbalpha, "FF0000", 0)
 					yy :+ h + 5
 
 					Select g_units
 					Case 0
-						DrawMyText(Lower(GetText("Distance")) + " (" + GetText("tla_Yards") + ")", xmid - 40, yy, 2, 1, fs, g_sbalpha, "FFFFFF", 0)
+						DrawMyText(GetText("Distance").ToUpper() + " (" + GetText("tla_Yards") + ")", xmid - 40, yy, 2, 1, fs, g_sbalpha, "FFFFFF", 0)
 						DrawMyText(String(Int(TPitch.PixelsToYards(p.matchstats.distance))), xmid, yy, 1, 1, fs, g_sbalpha, "FFFFFF", 0)
 					Case 1
-						DrawMyText(Lower(GetText("Distance")) + " (" + GetText("tla_Metres") + ")", xmid - 40, yy, 2, 1, fs, g_sbalpha, "FFFFFF", 0)
+						DrawMyText(GetText("Distance").ToUpper() + " (" + GetText("tla_Metres") + ")", xmid - 40, yy, 2, 1, fs, g_sbalpha, "FFFFFF", 0)
 						DrawMyText(String(Int(TPitch.PixelsToMetres(p.matchstats.distance))), xmid, yy, 1, 1, fs, g_sbalpha, "FFFFFF", 0)
 					End Select
 
@@ -297,7 +306,7 @@
 			EndIf
 
 			If g_kickcount > 0
-				DrawMyText(Lower(GetText("Penalties")), 10, g_screen_h - 100, 0, 0, 0.5, 1.0, "FFFFFF", 0)
+				DrawMyText(GetText("Penalties").ToUpper(), 10, g_screen_h - 100, 0, 0, 0.5, 1.0, "FFFFFF", 0)
 				If g_homebadge <> Null And g_awaybadge <> Null
 					SetScale(0.5, 0.5)
 					DrawImage(g_homebadge, 30, g_screen_h - 60, 0)

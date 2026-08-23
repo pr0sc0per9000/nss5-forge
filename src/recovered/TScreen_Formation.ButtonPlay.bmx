@@ -6,7 +6,7 @@
 '      0x00C677DC g_screen_formation_int06:Int   0x00C677D8 g_screen_formation_int05:Int
 '      0x00C5B210 g_engine_int20:Int             0x00C6F028 g_profile:TProfile
 '      0x00C5B22C g_engine_fixture:TFixture      0x00C677B0 g_formation_team:TTeam
-'      0x00C5B218 g_playerteam:TTeam             0x00C5B21C g_opponentteam:TTeam
+'      0x00C5B218 g_hometeam:TTeam             0x00C5B21C g_opponentteam:TTeam
 '      0x00C5B364 g_engine_snd:TSound            0x00C5B348 g_engine_chan:TChannel
 '    0x00C5B22C is TPlayer(guess) in globals_final.tsv; TFixture is what other bodies
 '    established (TEngine.EndMatch / DrawScores / CheckShootOutComplete all use it), and
@@ -26,7 +26,7 @@
 	'!Global g_profile:TProfile
 	'!Global g_engine_fixture:TFixture
 	'!Global g_formation_team:TTeam
-	'!Global g_playerteam:TTeam
+	'!Global g_hometeam:TTeam
 	'!Global g_opponentteam:TTeam
 	'!Global g_engine_snd:TSound
 	'!Global g_engine_chan:TChannel
@@ -60,7 +60,7 @@
 	ElseIf g_profile.mynation <> Null
 		g_profile.mynation.formation = TFormation.GetTacticIdByName(g_formation_team.formation.name)
 	EndIf
-	If g_formation_team = g_playerteam And g_opponentteam.controller = 1
+	If g_formation_team = g_hometeam And g_opponentteam.controller = 1
 		g_formation_team = g_opponentteam
 		Return 0
 	EndIf

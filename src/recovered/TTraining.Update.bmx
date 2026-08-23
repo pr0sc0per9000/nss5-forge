@@ -40,7 +40,7 @@
 	Function Update:Int()
 		'!Global g_train_mode:Int
 		'!Global g_train_state:Int
-		'!Global g_train_counter:Int
+		'!Global g_training_int06:Int
 		'!Global g_train_lasttick:Int
 		'!Global g_time:Int
 		'!Global g_snd_beep2:TSound
@@ -57,18 +57,18 @@
 		If g_train_mode = 0 Then Return 0
 		TTrainingObject.UpdateAll()
 		If g_train_state = 1
-			If g_train_counter > -1
+			If g_training_int06 > -1
 				If g_time > g_train_lasttick + 1000
 					g_train_lasttick = g_time
-					g_train_counter :- 1
-					If g_train_counter < 6
+					g_training_int06 :- 1
+					If g_training_int06 < 6
 						PlaySound(g_snd_beep2, g_object859)
 					Else
 						PlaySound(g_snd_beep1, g_object859)
 					EndIf
 				EndIf
-				If g_train_counter <= 0
-					g_train_counter = 0
+				If g_training_int06 <= 0
+					g_training_int06 = 0
 					TTraining.TimeUp()
 				EndIf
 			EndIf

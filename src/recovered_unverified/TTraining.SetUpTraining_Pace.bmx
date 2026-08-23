@@ -164,6 +164,15 @@
 '!Global g_options_arr05:Int[]
 '!Global g_options_arr06:Int[]
 '!Global g_options_arr10:Int[]
+' CASE DIRECTION CORRECTED 2026-08-22: 4 call sites -> .ToUpper().
+' extracted/runtime_helpers.tsv named 0x004A7410 `_brl_retro_Lower` and 0x004A74E0
+' `_brl_retro_Upper`. Both were wrong and neither address is a brl.retro wrapper:
+' 0x004A7410 is `_bbStringToUpper` and 0x004A74E0 is `_bbStringToLower`. NSS5.exe's
+' own 21-byte retro wrappers at 0x0059C8FD (Lower) and 0x0059C912 (Upper) CALL those
+' two addresses, and a wrapper cannot be the function it calls. The wrong row masked
+' by name, so this body certified with the case conversion running backwards. Full
+' derivation and the discriminating 3x4 matrix: docs/reference/codegen-patterns.md
+' 15.6. Re-verified under NSS5_NO_LEARN=1 on worker trees 380 and 380b.
 LogLine("SetUpTraining_Pace")
 g_training_int04 = g_profile.pace / 10 + 1
 ClampInt(Varptr g_training_int04, 1, 10)
@@ -175,12 +184,12 @@ If g_training_int04 = 1 And g_profile.contractwage = 0
 	s :+ TOptions.GetButtonLabel(g_options_arr05[g_options_int01]) + ", "
 	s :+ TOptions.GetButtonLabel(g_options_arr02[g_options_int01]) + ", "
 	s :+ TOptions.GetButtonLabel(g_options_arr03[g_options_int01])
-	s = Lower(s)
+	s = s.ToUpper()
 	If s.Contains("CURSOR")
-		Lower(GetText("controls_CursorKeys"))
+		GetText("controls_CursorKeys").ToUpper()
 	EndIf
-	s = GetText("CMESSAGE_TRIALPACE").Replace("$keypause", Lower(TOptions.GetButtonLabel(g_options_arr10[g_options_int01])))
-	s = s.Replace("$keykick", Lower(TOptions.GetButtonLabel(g_options_arr06[g_options_int01])))
+	s = GetText("CMESSAGE_TRIALPACE").Replace("$keypause", TOptions.GetButtonLabel(g_options_arr10[g_options_int01]).ToUpper())
+	s = s.Replace("$keykick", TOptions.GetButtonLabel(g_options_arr06[g_options_int01]).ToUpper())
 	g_traininglabel1.SetText(s, "", -1, -1)
 	g_traininglabel3.SetText(GetText("CMESSAGE_TRIALTIME"), "", -1, -1)
 End If

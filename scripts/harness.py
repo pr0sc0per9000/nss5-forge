@@ -78,6 +78,32 @@ def _resolve_bmx_root():
     tree = os.path.join(WORKERS_DIR, str(w))
     if not os.path.exists(os.path.join(tree, "bin", "bmk.exe")):
         os.makedirs(WORKERS_DIR, exist_ok=True)
+        # A HALF-POPULATED SLOT USED TO FAIL OBSCURELY. os.replace() cannot overwrite a
+        # non-empty directory on Windows, so if `tree` already existed without a toolchain
+        # in it, this raised from deep inside the copy rather than saying what was wrong.
+        #
+        # The two cases are worth separating, and the difference is not cosmetic:
+        #
+        #   EMPTY -- nothing is lost by removing it, and it is the ordinary residue of an
+        #   interrupted run or a deletion pass. Self-heal silently.
+        #
+        #   NON-EMPTY -- this function never produces that. A failed copy lands in
+        #   `tree + ".partial"` and is only renamed into place once complete, so a populated
+        #   `tree` with no bin/bmk.exe was put there by something else. It happened:
+        #   tools/bmx-workers/603 held hand-written null-dereference probes (now in
+        #   scripts/probes/), and a reclamation pass spared them only by accident. Deleting
+        #   to make regeneration work would destroy exactly the kind of work that has no
+        #   other copy, so refuse and say so instead.
+        if os.path.isdir(tree):
+            if os.listdir(tree):
+                raise RuntimeError(
+                    "NSS5_WORKER=%s points at %s, which exists and is not empty but has no "
+                    "bin/bmk.exe, so it is not a toolchain copy.\nThis is NOT deleted "
+                    "automatically: worker trees are disposable, but whatever is in this one "
+                    "was not put there by the harness and may be the only copy.\nMove its "
+                    "contents somewhere durable, remove the empty directory, and re-run -- "
+                    "the tree then rebuilds itself in 30-60s." % (w, tree))
+            os.rmdir(tree)
         tmp = tree + ".partial"
         shutil.rmtree(tmp, ignore_errors=True)
         shutil.copytree(BASE_BMX_ROOT, tmp)      # ~30-60s, once per worker
@@ -268,14 +294,39 @@ def field_size(bmt):
 
 
 # ---------------------------------------------------------------- data loading
+def _require(path):
+    """Fail with the command that creates `path`, not with a bare traceback.
+
+    A tracked-files-only checkout has no extracted/ at all, so load_data() used to
+    raise FileNotFoundError on extracted/object_model.json -- which is the first
+    thing a newcomer sees after following the README, and it names neither the
+    tool that writes the file nor the fact that setup.py is what runs it.
+    """
+    if os.path.exists(path):
+        return path
+    name = os.path.basename(path)
+    how = {"object_model.json": "python scripts/parse_reflection.py",
+           "vtable_map.tsv": "python scripts/resolve_vtables.py",
+           "class_tables.tsv": "python scripts/resolve_vtables.py"}.get(name)
+    raise SystemExit(
+        "\nMISSING: extracted/%s\n\n"
+        "  This is derived from your own copy of the game and is not in the\n"
+        "  repository. Run setup, which populates all of it:\n\n"
+        "      python scripts/setup.py\n"
+        "%s\n"
+        "  If binary/NSS5.exe is also missing, setup.py is what puts it there --\n"
+        "  see the Building section of README.md.\n"
+        % (name, ("\n  (this one file alone: %s)\n" % how) if how else ""))
+
+
 def load_data():
     if _CACHE:
         return _CACHE
     fields = {}
-    for t in json.load(open(OBJECT_MODEL, encoding="utf8")):
+    for t in json.load(open(_require(OBJECT_MODEL), encoding="utf8")):
         fields[t["type"]] = [m for m in t["members"] if m["kind"] == "Field"]
     methods = {}
-    with open(VTABLE_MAP, encoding="utf8") as f:
+    with open(_require(VTABLE_MAP), encoding="utf8") as f:
         next(f)
         for line in f:
             p = line.rstrip("\n").split("\t")
@@ -284,7 +335,7 @@ def load_data():
             methods.setdefault(p[0], []).append(
                 {"kind": p[1], "name": p[2], "sig": p[3], "slot": int(p[4], 16), "va": p[5]})
     supers = {}
-    with open(CLASS_TABLES, encoding="utf8") as f:
+    with open(_require(CLASS_TABLES), encoding="utf8") as f:
         next(f)
         for line in f:
             p = line.rstrip("\n").split("\t")
@@ -503,8 +554,20 @@ MODFUNC_SEP = "\n"
 # runs. TProfile.LoadSavedGame.bmx (src/recovered_unverified/) is the sole caller and
 # carries its own local '!Raw placeholder declaration so the call site still compiles
 # with the real body excluded.
+#
+# Fn_0058D987.SteamPostPlayerValue.bmx joins it for the identical reason: it Externs
+# FindLeaderboard/ReadSteam/UploadLeaderboardScore out of the same import library. It moved
+# into src/recovered_module/ once it reached 325/325 so that helper_map.orig_functions()
+# can name VA 0x0058D987 -- without that name its sole caller, TProfile.SaveGame, has an
+# `E8` that cannot mask (measured: 850/850 mode=diff, one differing operand, even with the
+# real 325-byte body compiled into the probe, because compare()'s byte-level _same_callee
+# fallback recurses WITHOUT the helper tables and so cannot prove a callee that itself calls
+# C-runtime helpers). Being listed here is what keeps the DLL out of every probe and out of
+# src/assembled/, exactly as for the sibling above; the caller carries its own '!Raw
+# placeholder so the call site still compiles.
 MODULE_SKIP = {
     "Fn_0058D90B.SyncSteamAchievements.bmx",
+    "Fn_0058D987.SteamPostPlayerValue.bmx",
 }
 _MODFUNCS = []
 
@@ -557,9 +620,57 @@ def module_functions():
     return _MODFUNCS
 
 
+# ------------------------------------------------- third-party module Functions
+# The two community modules NSS5 links (fontmachine, zipengine) have module-level
+# Functions of their own, and until now nothing emitted them. A file under
+# src/recovered_thirdparty/<mod>/ whose stem carries no dot is one of those -- the same
+# convention load_recovered() already uses to tell a `<Type>.<Member>` file apart from a
+# bare Function, which it skips outright.
+#
+# They must be emitted for the same reason src/recovered_module/ is: without the
+# declaration, any body that CALLS one cannot be built at all, so the caller is
+# unverifiable rather than merely unverified. TPrivateBitmapFont's three Draw*Text bodies
+# each call both of fontmachine's point helpers (0x00592A13, 0x00592A37), which is every
+# glyph the game draws.
+#
+# They are kept apart from module_functions() rather than folded into it because
+# assemble.py routes the two lists to different compilation units: the game's own module
+# Functions belong in the main module, and these belong in the external unit next to the
+# third-party Types they work on.
+THIRDPARTY_DIR = os.path.join(ROOT, "src", "recovered_thirdparty")
+_TPFUNCS = []
+
+
+def thirdparty_functions():
+    """-> list of full `Function ... End Function` texts from the third-party trees."""
+    if _TPFUNCS:
+        return _TPFUNCS
+    if not os.path.isdir(THIRDPARTY_DIR):
+        return _TPFUNCS
+    for sub in sorted(os.listdir(THIRDPARTY_DIR)):
+        d = os.path.join(THIRDPARTY_DIR, sub)
+        if not os.path.isdir(d):
+            continue
+        for fn in sorted(os.listdir(d)):
+            if not fn.endswith(".bmx") or "." in fn[:-4]:
+                continue
+            text = open(os.path.join(d, fn), encoding="utf-8", errors="replace").read()
+            text, imps = split_imports(text)
+            _MODIMPORTS.extend(imps)
+            text, decls = split_globals(text)
+            _MODGLOBALS.extend(decls)
+            lines = [l for l in text.split("\n") if not l.lstrip().startswith("'")]
+            body = "\n".join(lines).strip()
+            if body:
+                _TPFUNCS.append("\n".join(
+                    l[1:] if l.startswith("\t") else l for l in body.split("\n")))
+    return _TPFUNCS
+
+
 def module_imports():
     """-> deduplicated list of '!Import arguments lifted from src/recovered_module/."""
     module_functions()          # populates _MODIMPORTS as a side effect
+    thirdparty_functions()      # ... and so does this one
     seen, out = set(), []
     for i in _MODIMPORTS:
         if i not in seen:
@@ -588,9 +699,46 @@ GLOBAL_DECL_RX = re.compile(
     r"^Global\s+(\w+)\s*:\s*([^\s=]+)(?:\s*=\s*(.+?))?\s*$")
 
 
+def strip_inline_comment(text):
+    """Drop a trailing BlitzMax comment, respecting double-quoted strings.
+
+    A bare `text.split("'")[0]` would corrupt `Global g_s:String = "it's"`, and this runs
+    over declarations that legitimately carry string initialisers, so track quote state.
+    """
+    inq = False
+    for i, ch in enumerate(text):
+        if ch == '"':
+            inq = not inq
+        elif ch == "'" and not inq:
+            return text[:i]
+    return text
+
+
 def parse_global_decl(text):
-    """'Global g_x:Float = 100.0' -> ('g_x', 'Float', '100.0'); no initialiser -> None."""
-    m = GLOBAL_DECL_RX.match(text.strip())
+    """'Global g_x:Float = 100.0' -> ('g_x', 'Float', '100.0'); no initialiser -> None.
+
+    A TRAILING INLINE COMMENT IS STRIPPED FIRST. GLOBAL_DECL_RX anchors end-to-end, so
+    without this a pragma written as
+
+        '!Global g_profile:TProfile            ' 0x00C6F028
+
+    fails to parse and returns None. That is not a harmless miss:
+
+      * merge_globals() falls back to keying dedup on the WHOLE RAW LINE when parsing
+        fails, so the commented form and the plain `Global g_profile:TProfile` coming from
+        _MODGLOBALS get different keys, BOTH are emitted, and the probe dies with
+        "Compile Error: Duplicate identifier 'g_profile'". Measured: 52 such pragmas across
+        12 files, all in src/recovered/, of which 3 bodies could not build at all
+        (TPlayer.RecordReplayFrame, TScreen_MatchPrep.ButtonBooze,
+        TScreen_Options.ButtonTick) -- bodies counted as byte-verified whose per-function
+        probe was in fact unbuildable.
+      * assemble.py's global_initialisers() uses this function to lift captured initial
+        values; a commented pragma silently lost its initialiser there too.
+
+    The address in that trailing comment is exactly the kind of provenance the corpus
+    should keep, so the parser accommodates it rather than the corpus dropping it.
+    """
+    m = GLOBAL_DECL_RX.match(strip_inline_comment(text).strip())
     if not m:
         return None
     return m.group(1), m.group(2), m.group(3)
@@ -606,9 +754,34 @@ def merge_globals(body_decls):
     the initialiser pragma exists to prevent.
     """
     module_functions()                       # populates _MODGLOBALS
+    thirdparty_functions()                   # ... and so does this one
     by_key = {}
     order = []
     for d in list(body_decls) + list(_MODGLOBALS):
+        # AN EXTERN DELIMITER IS NEVER A DUPLICATE.
+        #
+        # '!Raw payloads arrive here flattened: module_functions() does
+        # _MODGLOBALS.extend(decls) per file, so two files' Extern blocks become one list
+        # with no record of which line closes which block. Keying those lines on bare
+        # lowercased text then makes every bare `End Extern` collide, and the SECOND one is
+        # dropped -- leaving the first block open, swallowing every Global declared after
+        # it, and killing the probe with
+        #     Syntax error in extern block - expecting Const, Global, Function or Type
+        # ...reported at the swallowed declaration, nowhere near the missing closer.
+        #
+        # Reproduced between src/recovered_module/Fn_0058D987.SteamPostPlayerValue.bmx and
+        # Fn_0058D81A.GetClipboardText.bmx. Both files currently defend themselves by
+        # hanging a trailing comment off `End Extern` to keep its TEXT unique -- a
+        # convention no tool enforces and every future author has to know.
+        #
+        # Dropping a block terminator is never correct, so exempt delimiters from the
+        # dedupe outright. Two genuinely identical blocks then emit as one full block plus
+        # a bare `Extern "..."` / `End Extern` pair with its declarations deduped away,
+        # which is an empty extern block and legal.
+        if re.match(r"^(Extern\b|End\s+Extern\b)", d.strip(), re.I):
+            order.append(d)
+            by_key[d] = (d, False)
+            continue
         parsed = parse_global_decl(d)
         key = parsed[0].lower() if parsed else d.strip().lower()
         has_init = bool(parsed and parsed[2])
@@ -662,6 +835,117 @@ FIELD_PRAGMA = re.compile(r"^[ \t]*'!\s*Field\s+([A-Za-z_]\w*)[ \t]*((?::|=)[^\r
 # A verbatim module-scope line. Needed for anything bcc requires at module level that is
 # neither a Global nor a Type -- an Extern block around a Win32 import, for instance.
 RAW_PRAGMA = re.compile(r"^[ \t]*'!\s*Raw[ \t]+([^\r\n]*?)[ \t]*$", re.M)
+
+# ---------------------------------------------------------------- once-init ordinal
+# THE GLOBAL-INIT GUARD COUNTER IS WHOLE-PROGRAM, so a body carrying a lazily initialised
+# Global cannot be certified by a probe that starts the counter at zero. This pragma is
+# how such a body states where in the original's count it really sits, exactly as '!Global
+# states which module Globals it really sees and '!Field states what the Type's field
+# defaults really are: a probe-context fact the isolated build cannot know, written down
+# next to the body that depends on it.
+#
+#     '!GlobalInit 95
+#
+# The number is the 1-based ordinal, in the ORIGINAL program's single bcc compilation
+# unit, of the FIRST `Global x:T = <non-constant>` declaration this body makes.
+#
+# WHY IT CHANGES BYTES. `GlobalDeclStm::eval` (stm.cpp:182) sends any Global whose
+# initialiser fails `Val::constant()` (val.cpp:63 -- a CGLit or CGSym, i.e. a bare
+# literal) to `Block::initGlobalRef` (block.cpp:142), which holds
+#     static int init_bit; static CGExp *init_var;
+# as C++ FUNCTION-LOCAL STATICS. They are never reset -- not per file, not per Type, not
+# per Function -- so they live as long as the bcc process and every such declaration in
+# the unit takes the next bit of one shared flags dword, a fresh dword being allocated
+# once 32 bits are gone. The bit reaches the instruction stream twice as an immediate:
+#     bits 1..0x40      `83 E0 ib`  AND (3 bytes)   `83 0D disp32 ib` OR (7 bytes)
+#     bits 0x80 and up  `25 id`     AND (5 bytes)   `81 0D disp32 id` OR (10 bytes)
+# so the body's LENGTH depends on its position in the whole program's declaration order.
+# `Global x:T[N]` counts as non-constant too: parser.cpp's parseInitDecl turns the
+# dimension into an ArrayExp, which is a bbArrayNew1D call.
+#
+# WHAT THE PROBE DOES WITH IT. bcc.cpp:47-50 evaluates `_funBlocks` in construction order
+# and `_funBlocks[0]` is the module body, so every module-scope declaration is numbered
+# before any function-scope one whatever line it sits on. Padding module scope with
+# filler declarations of the same shape is therefore enough to walk the counter forward;
+# `init_pad_decls()` emits `ordinal - 1` of them, less however many the probe already
+# emits ahead of the body itself.
+#
+# HOW TO DERIVE THE NUMBER, rather than search for one that passes. Scan NSS5.exe's code
+# sections for `or dword ptr [abs32], <power of two>`; that OR is the guard's second
+# immediate and nothing else in bcc emits the shape. Group the sites by flags dword. Each
+# group is one 32-declaration run, `dat()` hands out dwords in emission order so within a
+# unit the dword ADDRESSES increase in that order, and a group is confirmed full when it
+# carries all 32 distinct bits. The ordinal is 32 * (index of the group) + (bit position).
+# For TScreen.DoProgressBar: bit 0x40000000 in 0x00C6E2AC, the third of the game unit's
+# four dwords (0x00C5A31C and 0x00C65CC0 precede it and both hold 32 distinct bits, and
+# their sites run VA-contiguously into it), so 2 * 32 + 31 = 95.
+#
+# HONEST LIMIT ON WHAT A PROBE CAN CONFIRM. Only `(ordinal - 1) mod 32` reaches the
+# emitted bytes -- the flags dword itself is an absolute address and the oracle masks it.
+# So a MATCH confirms the ordinal modulo 32 and no more; 95 and 127 are indistinguishable
+# here. The absolute value comes from the exe scan above, not from the probe.
+#
+# THIS DOES NOT AFFECT THE ASSEMBLED BUILD, and must not: there the real module body
+# supplies the real count, which is the only number that decides whether the shipped body
+# is right. See docs/reference/whole-program-counters.md.
+GLOBALINIT_PRAGMA = re.compile(r"^[ \t]*'!\s*GlobalInit[ \t]+(\d+)[ \t]*$", re.M)
+
+# Filler declarations are named with a prefix no recovered body would choose, because a
+# collision with a real Global would not fail the build -- it would silently redeclare it.
+INIT_PAD_PREFIX = "__bmx_initpad_"
+
+# `Val::constant()` in one regex: a bare literal. Anything else -- a call, an operator, a
+# `New`, an identifier reference -- is not, and costs a bit. Deliberately narrow: a
+# declaration this cannot parse is treated as costing NOTHING, which is the state of every
+# recovered body today (measured: the whole corpus emits one initialised module Global,
+# `Global g_replay_div:Int = 25`, which is constant), and a body that breaks the
+# assumption fails loudly at the oracle rather than quietly padding wrong.
+INIT_CONST_RX = re.compile(
+    r"^(?:-?\d+(?:\.\d*)?(?:[eE][-+]?\d+)?|-?\.\d+|\$[0-9A-Fa-f]+|%[01]+"
+    r"|\"[^\"]*\"|Null|True|False|Pi)$", re.I)
+
+
+def declares_init_guard(decl):
+    """True if this `Global ...` declaration costs an initGlobalRef bit."""
+    text = decl.strip()
+    if not re.match(r"^Global\s", text, re.I):
+        return False
+    head, sep, init = text.partition("=")
+    if sep:
+        return not INIT_CONST_RX.match(init.strip())
+    # No initialiser. Only a sized array type builds one (`Global x:Int[4]`); a bare
+    # array type (`Global x:Int[]`) defaults to Null, which is constant.
+    return bool(re.search(r"\[\s*[^\]\s]", head))
+
+
+def count_init_guards(text):
+    """How many initGlobalRef bits the `Global` declarations in `text` consume."""
+    return sum(1 for line in text.split("\n") if declares_init_guard(line))
+
+
+def split_global_init(body):
+    """-> (body without the pragma line, declared ordinal or None)"""
+    found = {int(m) for m in GLOBALINIT_PRAGMA.findall(body)}
+    if len(found) > 1:
+        raise ValueError("conflicting '!GlobalInit ordinals: %s" % sorted(found))
+    return GLOBALINIT_PRAGMA.sub("", body), (found.pop() if found else None)
+
+
+def init_pad_decls(ordinal, ahead=0):
+    """Module-scope filler declarations that walk the once-init counter to `ordinal`.
+
+    `ahead` is how many guard-costing declarations the probe already emits before the
+    target body, so the padding does not double-count them.
+    """
+    if ordinal is None:
+        return []
+    n = ordinal - 1 - ahead
+    if n < 0:
+        raise ValueError(
+            "'!GlobalInit %d is unreachable: the probe already emits %d guarded Global "
+            "declaration(s) ahead of the body" % (ordinal, ahead))
+    return ["Global %s%04d:Int[1]" % (INIT_PAD_PREFIX, i) for i in range(n)]
+
 
 # ---------------------------------------------------------------- DLL imports
 # bcc rejects `Import` anywhere but the very top of the file ("'Import' must appear at top
@@ -747,6 +1031,7 @@ def build_source(tname, mname, body, d=None):
     _build_prelude(d)
 
     body, imports_ = split_imports(body)
+    body, ginit = split_global_init(body)
     body, globals_ = split_globals(body)
     body, fdecls = split_field_decls(body)
 
@@ -759,7 +1044,13 @@ def build_source(tname, mname, body, d=None):
     # Globals go after every Type so their declared types are already in scope.
     # bcc resolves module-scope declarations across the whole file, so a method body
     # emitted earlier may still reference them.
-    gtext = "\n".join(merge_globals(globals_))
+    #
+    # The target Method is parsed before the module Functions below it, so only these
+    # module-scope declarations can consume an init bit ahead of it -- see
+    # GLOBALINIT_PRAGMA.
+    gdecls = merge_globals(globals_)
+    gtext = "\n".join(init_pad_decls(ginit, sum(map(declares_init_guard, gdecls)))
+                      + gdecls)
 
     # Merge in any '!Import a bundled module Function needs (e.g. SteamInit's
     # libsteamstub.a) -- see module_imports()'s docstring / module_functions()'s FIX note.
@@ -769,6 +1060,7 @@ def build_source(tname, mname, body, d=None):
                       tail, "",
                       gtext, "",
                       MODFUNC_SEP.join(module_functions()), "",
+                      MODFUNC_SEP.join(thirdparty_functions()), "",
                       "Local __keep:%s = New %s" % (tname, tname),
                       "If __keep = Null Then End"]) + "\n"
 
@@ -1304,6 +1596,7 @@ def build_source_function(name, sig, body, d=None, decl=None):
     d = d or load_data()
     _build_prelude(d)
     body, imports_ = split_imports(body)
+    body, ginit = split_global_init(body)
     body, globals_ = split_globals(body)
     body, _ = split_field_decls(body)      # no target Type here; strip so they are inert
     args, ret = parse_sig(sig)
@@ -1314,14 +1607,18 @@ def build_source_function(name, sig, body, d=None, decl=None):
     # Other recovered module Functions are emitted too, so one can call another. The
     # target itself is skipped -- we are defining it here, and a duplicate declaration
     # would not compile.
-    others = [f for f in module_functions()
+    others = [f for f in (module_functions() + thirdparty_functions())
               if ("Function %s:" % name) not in f and ("Function %s(" % name) not in f]
     # Merge in any '!Import a bundled "other" module Function needs (e.g. SteamInit's
     # libsteamstub.a) -- see module_imports()'s docstring / module_functions()'s FIX note.
     all_imports = list(dict.fromkeys(list(imports_) + module_imports()))
+    # Unlike build_source, the target Function is emitted AFTER `others`, so a
+    # function-scope guarded Global in one of those would also be numbered first.
+    gdecls = merge_globals(globals_)
+    ahead = sum(map(declares_init_guard, gdecls)) + count_init_guards("\n".join(others))
     return "\n".join([_header_with(all_imports),
                       "\n".join(_TYPETEXT[t] for t in _ORDER),
-                      "\n".join(merge_globals(globals_)), "",
+                      "\n".join(init_pad_decls(ginit, ahead) + gdecls), "",
                       MODFUNC_SEP.join(others), "",
                       fn, "",
                       "If AppTitle = \"\" Then End"]) + "\n"

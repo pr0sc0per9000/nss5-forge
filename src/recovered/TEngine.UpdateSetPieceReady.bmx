@@ -14,6 +14,15 @@
 '     jne skips the load of g_training_int03 entirely.
 '   `p.PlayerReady() = 0` is a nested If, not a third And operand -- an And operand would
 '     have to materialise 0/1 with a setcc, and this one compares eax directly.
+' CASE DIRECTION CORRECTED 2026-08-22: 1 call site -> .ToUpper().
+' extracted/runtime_helpers.tsv named 0x004A7410 `_brl_retro_Lower` and 0x004A74E0
+' `_brl_retro_Upper`. Both were wrong and neither address is a brl.retro wrapper:
+' 0x004A7410 is `_bbStringToUpper` and 0x004A74E0 is `_bbStringToLower`. NSS5.exe's
+' own 21-byte retro wrappers at 0x0059C8FD (Lower) and 0x0059C912 (Upper) CALL those
+' two addresses, and a wrapper cannot be the function it calls. The wrong row masked
+' by name, so this body certified with the case conversion running backwards. Full
+' derivation and the discriminating 3x4 matrix: docs/reference/codegen-patterns.md
+' 15.6. Re-verified under NSS5_NO_LEARN=1 on worker trees 380 and 380b.
 	Function UpdateSetPieceReady:Int()
 		'!Global g_setpiecepower:Int
 		'!Global g_matchstate:Int
@@ -62,7 +71,7 @@
 			g_setpiecepower = g_player_int50
 			If g_matchstate = 2 Or g_matchstate = 4 Or g_matchstate = 7
 				If g_matchstate = 2
-					TScreenMessage.Create(0, 0, Lower(GetText("Kick Off")), g_engine_int17, g_engine_font, Null, 1.0, "FFFFFF")
+					TScreenMessage.Create(0, 0, GetText("Kick Off").ToUpper(), g_engine_int17, g_engine_font, Null, 1.0, "FFFFFF")
 				End If
 				PlaySound(g_snd_whistle, g_chan_whistle)
 			End If

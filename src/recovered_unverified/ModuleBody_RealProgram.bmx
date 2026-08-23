@@ -66,7 +66,13 @@
 '    initialisers follow in their real source-order position below. --
 
 ' g_screen_mainmenu_int26 in the auto-named TSV; really the save-data directory root.
-Global g_saveDir:String = Lower(Trim(ReadSettingString(g_appDir + "Settings/Settings.txt", "saveloc")))
+Global g_saveDir:String = Trim(ReadSettingString(g_appDir + "Settings/Settings.txt", "saveloc")).ToUpper()
+' CASE DIRECTION CORRECTED 2026-08-22 (docs/reference/codegen-patterns.md 15.6). At
+' module-body offset +5632 the original calls the brl.retro Trim wrapper 0x0059C8E8 and
+' then, at +5641, 0x004A7410 -- which is _bbStringToUpper, not the _brl_retro_Lower the
+' learned helper table used to name it. So the trimmed setting is UPPERCASED, and the
+' Trim call really is the retro Function while the case call is the String method.
+' This body has no oracle, so this is evidence from the original's own bytes only.
 ' -- NOTE the two globals g_appDir (0x00C6E950, corrected to String in
 '    globals_corrections.tsv) and the literal "Settings/Settings.txt" (0x00C6E970) are the
 '    SAME pair LoadImageChecked/ReadSettingString test as g_pathPrefix/g_dataDir; this

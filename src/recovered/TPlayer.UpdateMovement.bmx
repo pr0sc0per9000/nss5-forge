@@ -72,6 +72,15 @@
 '!Global g_ball_float03:Float
 '!Global g_pitch_int10:Int
 '!Global g_player_tplayer01:TPlayer
+' CASE DIRECTION CORRECTED 2026-08-22: 1 call site -> .ToUpper().
+' extracted/runtime_helpers.tsv named 0x004A7410 `_brl_retro_Lower` and 0x004A74E0
+' `_brl_retro_Upper`. Both were wrong and neither address is a brl.retro wrapper:
+' 0x004A7410 is `_bbStringToUpper` and 0x004A74E0 is `_bbStringToLower`. NSS5.exe's
+' own 21-byte retro wrappers at 0x0059C8FD (Lower) and 0x0059C912 (Upper) CALL those
+' two addresses, and a wrapper cannot be the function it calls. The wrong row masked
+' by name, so this body certified with the case conversion running backwards. Full
+' derivation and the discriminating 3x4 matrix: docs/reference/codegen-patterns.md
+' 15.6. Re-verified under NSS5_NO_LEARN=1 on worker trees 380 and 380b.
 Self.oldx = Self.x
 Self.oldy = Self.y
 Self.oldz = Self.z
@@ -279,7 +288,7 @@ EndIf
 If Self.newstar And g_player_int01 = 8 And Self.bonus = 0 And g_player_tplayer01 <> Null And g_player_tplayer01 = Self
 	If g_ball.controlledby = Self And Dist2D(Self.x, Self.y, 0, 0) < TPitch.YardsToPixels(10.0)
 		Self.bonus = 1
-		TParticle.StarShower(Int(Self.x), Int(Self.y), "+" + Lower(GetText("Team")), "FF00FF")
+		TParticle.StarShower(Int(Self.x), Int(Self.y), "+" + GetText("Team").ToUpper(), "FF00FF")
 		g_profile.CheckAchievement(39)
 		Select g_profile.position
 		Case 3

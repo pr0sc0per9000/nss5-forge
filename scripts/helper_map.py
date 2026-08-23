@@ -115,18 +115,51 @@ def resolve_base(objpath, exepath, syms=None):
     return base if n else None
 
 
-def our_helpers(workdir, exepath):
+def our_helpers(workdir, exepath, objpath=None):
     """symbol -> address in OUR exe, for every runtime symbol this build calls.
 
     Only DISP32 (pc-relative) relocations are used: those are the call/jmp operands.
+
+    `objpath` names the object to read instead of choosing one from `workdir`. An exe
+    linked from MORE THAN ONE object has its relocations split across them, and this
+    function can only see one at a time, so a caller that wants full coverage has to ask
+    once per object and merge -- see check_assembled.py, where the external compilation
+    unit holds every third-party body.
     """
+    if objpath is not None:
+        return _our_helpers_from(objpath, exepath)
     bmxdir = os.path.join(workdir, ".bmx")
     objs = [f for f in os.listdir(bmxdir)] if os.path.isdir(bmxdir) else []
     objs = [os.path.join(bmxdir, f) for f in objs if f.endswith(".o")]
     if not objs:
         return {}, None
-    objpath = max(objs, key=os.path.getsize)
+    # PREFER THE OBJECT THAT BELONGS TO `exepath`, BY NAME.
+    #
+    # "biggest .o in the directory" is right for a harness probe, where the directory
+    # holds exactly one build, and wrong anywhere bmk has run more than once: it drops
+    # intermediates next to the source, so src/assembled/.bmx accumulates an object per
+    # build ever run there. The DEBUG builds (nss5_dbg, nss5_dbgprobe) carry debug
+    # metadata and are half again the size of the release object, so "biggest" is
+    # whichever debug build ran last -- possibly days old and built from other source.
+    #
+    # Nothing errors when that happens. The symbols simply belong to a different image,
+    # so no call operand can be named on our side and every caller reads as a
+    # difference. Measured in check_assembled.py, whose composition gate this feeds:
+    # 52 of 80 sampled bodies reported DIVERGED, 79 of 80 identical once the right
+    # object is used, with no source change in between.
+    #
+    # The preference is by exe stem and falls back to the old behaviour, so a probe
+    # directory (probe.exe / probe.bmx.*.o) is unaffected -- it matches the preferred
+    # rule anyway.
+    _stem = os.path.splitext(os.path.basename(exepath))[0]
+    _mine = [o for o in objs
+             if os.path.basename(o).startswith(_stem + ".bmx") and ".debug." not in o]
+    objpath = max(_mine or objs, key=os.path.getsize)
+    return _our_helpers_from(objpath, exepath)
 
+
+def _our_helpers_from(objpath, exepath):
+    """our_helpers() for one named object. See its docstring."""
     syms = object_symbols(objpath)
     base = resolve_base(objpath, exepath, syms)
     if base is None:
@@ -384,7 +417,25 @@ def orig_functions():
                     "src/recovered_module -- duplicate VA is a corpus defect, resolve it "
                     "there before re-running" % (va, claimed_by[va], fn))
             claimed_by[va] = fn
-            _ORIGFN[va] = fn[:-4]
+            # The FILENAME is not always the DECLARED IDENTIFIER. BlitzMax identifiers
+            # cannot contain a dot, so a file that carries a "Fn_<8 hex digits>." provenance
+            # prefix ahead of a human-readable name (e.g.
+            # "Fn_0058D90B.SyncSteamAchievements.bmx") declares
+            # `Function SyncSteamAchievements...`, NOT `Function
+            # Fn_0058D90B.SyncSteamAchievements...` -- that string is not even a legal
+            # identifier. our_functions() reads the real declared name straight from the
+            # linker symbol (`_bb_SyncSteamAchievements` -> "SyncSteamAchievements"), so
+            # recording the untouched basename here put two DIFFERENT strings on the two
+            # sides of the same VA and compare()'s by-name masking -- which requires
+            # `ofn == ufn` and never falls through to the byte-level proof once both names
+            # resolve -- refused to mask a genuinely identical call every time. Stripping the
+            # prefix here makes this side compute the name the SAME WAY our_functions() does:
+            # the actual compiled identifier, not the filename. Bare "Fn_<8hex>.bmx" files
+            # (no human name yet) are untouched -- there the declared identifier really is
+            # "Fn_<8hex>" (see src/recovered_module/Fn_00595EF3.bmx), so the whole basename
+            # is already correct and the regex below does not match it (no dot).
+            m2 = re.match(r"^Fn_[0-9A-Fa-f]{8}\.(.+)$", fn[:-4])
+            _ORIGFN[va] = m2.group(1) if m2 else fn[:-4]
 
     vt = os.path.join(ROOT, "extracted", "vtable_map.tsv")
     with open(vt, encoding="utf-8", errors="replace") as f:
@@ -527,6 +578,55 @@ def audit_table():
     return t, dupes, singles
 
 
+def audit_module_symbols_in_runtime_range():
+    """C-runtime rows must carry C-runtime symbols. A BlitzMax module symbol is a defect.
+
+    THE SHAPE THIS CATCHES. `bcc` output lives in the `code` section (0x004BA000+); the C
+    runtime is GCC output in `.text` (RT_LO..RT_HI). A BlitzMax module Function therefore
+    CANNOT be at a C-runtime address, so a row like
+
+        0x004a7410  _brl_retro_Lower   205 witnesses
+
+    is wrong by construction, whatever its witness count. That exact row survived for many
+    passes and blessed 41 verified bodies whose case conversion ran backwards: 0x004A7410
+    is `_bbStringToUpper` and 0x004A74E0 is `_bbStringToLower`, and NSS5's own 21-byte
+    retro wrappers at 0x0059C8FD (Lower) and 0x0059C912 (Upper) CALL them -- a wrapper
+    cannot be the function it calls. See docs/reference/codegen-patterns.md 15.6.
+
+    WHY WITNESS COUNTS DO NOT HELP. After the first wrong pairing is learned, every later
+    site that repeats the same wrong source spelling is counted as corroboration. 205
+    witnesses were 205 repetitions of one mistake, so a HIGH count is not evidence of
+    correctness and can be the more dangerous case. This check does not look at counts.
+    """
+    bad = []
+    for va, (sym, n) in load_table().items():
+        if RT_LO <= va < RT_HI and re.match(r"^_+(brl|pub)_", sym):
+            bad.append((va, sym, n))
+    return sorted(bad)
+
+
+def audit_cross_table_symbols():
+    """A symbol claimed BOTH by a runtime-helper row and by a different BRL address.
+
+    Same masking hazard as audit_table()/audit_brl(), but across the two tables, which is
+    where it actually happened: `_brl_retro_Lower` sat on 0x004A7410 in runtime_helpers.tsv
+    while brl_functions.tsv had it in the alias set at 0x0059C8FD. full_table() merges the
+    two, so neither single-table audit reported it.
+    """
+    rt = load_table()
+    brl = brl_table()
+    brl_by_sym = {}
+    for va, s in brl.items():
+        for nm in s.split("|"):
+            brl_by_sym.setdefault(nm, []).append(va)
+    out = []
+    for va, (sym, _n) in rt.items():
+        other = [v for v in brl_by_sym.get(sym, []) if v != va]
+        if other:
+            out.append((va, sym, sorted(other)))
+    return sorted(out)
+
+
 def audit_brl():
     """The same name-collision check, applied to the BRL/PUB name table.
 
@@ -579,6 +679,26 @@ def main():
         print("single-witness entries (weakest evidence): %s"
               % ", ".join("0x%08x" % v for v in singles))
     print()
+    bad = audit_module_symbols_in_runtime_range()
+    if bad:
+        print()
+        print("!! %d C-runtime row(s) carry a BlitzMax MODULE symbol. bcc output lives in"
+              % len(bad))
+        print("!! `code` (0x004BA000+), so a _brl_*/_pub_* name cannot be at a .text")
+        print("!! address. This is wrong by construction -- see codegen-patterns 15.6:")
+        for va, sym, n in bad:
+            print("   0x%08x  %-28s witnesses=%d" % (va, sym, n))
+
+    cross = audit_cross_table_symbols()
+    if cross:
+        print()
+        print("!! %d symbol(s) claimed by a runtime-helper row AND by a different BRL"
+              % len(cross))
+        print("!! address. full_table() merges both tables, so masking can pick either:")
+        for va, sym, other in cross:
+            print("   %-28s runtime 0x%08x vs brl %s"
+                  % (sym, va, ", ".join("0x%08x" % v for v in other)))
+
     single = [va for va, (_s, n) in t.items() if n < 2]
     print("  single-witness (weakest evidence): %d" % len(single))
     for va in sorted(t):

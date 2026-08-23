@@ -46,8 +46,49 @@ the real binary, not by an author's assertion. localise_diff is the only honest
 oracle here: the positional comparator reports ~75% for byte-identical bodies
 whose load address differs.
 
-WHAT IS EXCLUDED FROM THE CORPUS, AND WHY
-==========================================
+NOTHING IS EXCLUDED FROM THE CORPUS
+===================================
+Every body with a parseable VA header counts, in both the numerator and the
+denominator. There is no exclusion list. What there IS is a SHIPPING note --
+VERIFIED_NOT_SHIPPED below -- recording which bodies are deliberately absent
+from src/assembled/, and why. That note changes no number here; it only labels.
+
+This replaces an earlier STEAM_EXCLUDE set that dropped four Steam-linked
+bodies (1,232 bytes) from both numerator and denominator. Its reasoning about
+the PLAYABLE BUILD was correct and is preserved verbatim below. The step it
+took beyond that was not:
+
+    it claimed a body that cannot ship can also never report
+    `byte-identical vs NSS5.exe`, so counting its bytes measures
+    "a wall nobody is meant to climb".
+
+That does not hold, because it confuses two different artifacts. STATUS_DLL_NOT_FOUND
+is a LOADER failure: it happens when a process is EXECUTED. The byte oracle
+never executes anything -- harness.try_method and harness.try_function write a
+probe, build it with `bmk makeapp`, and READ the resulting probe.exe's bytes
+(scripts/harness.py:1223 and :1270-1271 for try_method, :1422 and :1471-1472 for
+try_function). libsteamstub.a is a static archive under extern/steamstub/, so
+the probe links; the DLL is wanted only at run time and run time never arrives.
+So "cannot be in a launchable src/assembled/" and "cannot be shown equal to the
+original's bytes" are independent, and only the first one is true of these four.
+
+Measured, not argued (worker 322, 2026-08-22, NSS5_NO_LEARN=1, two worker trees):
+
+    SteamInit              MATCH 158/158  mode=reloc  reloc_masked=18
+    SyncSteamAchievements  MATCH 124/124  mode=reloc  reloc_masked=8
+
+Both are Steam-linked, both carry the '!Import, and both went through the oracle
+to a clean MATCH. A body cannot both be permanently unverifiable and return
+MATCH twice, so the exclusion's premise is refuted by its own members.
+
+An exclusion that quietly converts "cannot ship" into "cannot count" inflates
+the percentage and is exactly the quiet denominator narrowing this file's other
+guards exist to prevent. Removing it moves 1,232 bytes back into the denominator
+of which only some are matched, so THE HEADLINE PERCENTAGE FALLS. That is the
+correct direction and it is the point.
+
+WHY THOSE BODIES STILL DO NOT SHIP
+===================================
 This reconstruction strips Steam entirely (src/recovered_module/SteamInit.bmx's
 header has the full account: the original calls OpenSteam(212780) against a
 backend that no longer answers, and restoring that call hard-exits the game
@@ -59,28 +100,24 @@ STEAMSTUB.DLL entry in the exe's import table, and src/assembled/ does not
 carry that DLL, so the Windows loader kills the process (STATUS_DLL_NOT_FOUND)
 before any code runs, not just the guarded call inside the body.
 
-A body that can never be present in a working build can also never report
-`byte-identical vs NSS5.exe` and remain playable -- closing it and shipping it
-are mutually exclusive, permanently, by construction, not because the work is
-unfinished. Counting its bytes in the denominator below therefore does not
-measure remaining work; it measures a wall nobody is meant to climb, and it
-understates the real percentage forever. STEAM_EXCLUDE (below) names exactly
-those bodies, with the evidence for each one, and scan() drops them from both
-BYTES and DONE before totals() ever sees them.
+That mechanism is real, well-evidenced and unchanged. It is a statement about
+ONE artifact -- the playable exe -- so it belongs in a shipping note, not in the
+measure. VERIFIED_NOT_SHIPPED carries it, per body, with the same evidence
+STEAM_EXCLUDE recorded and with the skip it claims cross-checked against the
+file that actually performs the skip.
 
-This cuts only one way on purpose. Excluding a body is a claim that it can
-never honestly close, and that claim needs the same evidence a MATCHED claim
-does -- so STEAM_EXCLUDE is short, named file by file, and documents its own
+This cuts only one way on purpose. Naming a body not-shipped is a claim about
+the build, and that claim needs evidence the same way a MATCHED claim does --
+so VERIFIED_NOT_SHIPPED is short, named file by file, and documents its own
 reasoning inline rather than a blanket "anything Steam-flavoured" rule. Two
-bodies that merely CALL an excluded Steam function (TProfile.SaveGame,
-TProfile.LoadSavedGame) are deliberately left OUT of STEAM_EXCLUDE and stay in
-the corpus as ordinary unmatched work; see the comment on STEAM_EXCLUDE for
-why they do not qualify.
+bodies that merely CALL a not-shipped Steam function (TProfile.SaveGame,
+TProfile.LoadSavedGame) are deliberately left OFF it; see the comment on
+VERIFIED_NOT_SHIPPED for why they do not qualify.
 
-Exclusion has to be visible or it becomes exactly the kind of quiet
-narrowing this file exists to prevent. main() prints the excluded body and
-byte counts next to the percentage every time, in every mode; nobody reading
-the report has to already know STEAM_EXCLUDE exists to find them.
+Not shipping has to be visible or the report describes a program nobody can
+build. main() prints the not-shipped bodies and their byte count next to the
+percentage every time, in every mode; nobody reading the report has to already
+know VERIFIED_NOT_SHIPPED exists to find them.
 """
 import os
 import re
@@ -97,124 +134,279 @@ TREES = [
     ("src/recovered_unverified", "unverified"),
 ]
 
-# Bodies permanently excluded from the measured corpus because they cannot be
-# present in a working build, ever, by construction -- see "WHAT IS EXCLUDED
-# FROM THE CORPUS" above for the mechanism (a '!Import ".../libsteamstub.a"
-# pragma puts STEAMSTUB.DLL in the exe's import table; src/assembled/ does not
-# carry that DLL; the Windows loader kills the process before any code runs).
-# Each entry below was opened and read before being added here, not assumed
-# from its filename:
+# Bodies deliberately absent from the SHIPPED build (src/assembled/), because they
+# cannot be present in a launchable one -- see "WHY THOSE BODIES STILL DO NOT SHIP"
+# above for the mechanism (a '!Import ".../libsteamstub.a" pragma puts STEAMSTUB.DLL
+# in the exe's import table; src/assembled/ does not carry that DLL; the Windows
+# loader kills the process before any code runs).
 #
-#   src/recovered_module/SteamInit.bmx
-#     The Steam bootstrap. Its own header states the divergence outright: the
-#     compiled body is a 4-line neutralised stub; the byte-identical original
-#     (158/158, confirmed in the same header) is kept only as a comment and is
-#     never compiled. This file can state "byte-identical vs NSS5.exe" or stay
-#     playable, never both, so it never leaves DONE-eligible and belongs in
-#     neither BYTES nor DONE.
+# THIS LIST CHANGES NO NUMBER. Every body named here is an ordinary corpus member:
+# its bytes are in the denominator, and in the numerator when and only when its own
+# header carries the `byte-identical vs NSS5.exe` marker, exactly like every other
+# body in the tree. The list exists to make the shipping gap VISIBLE, not to move it
+# out of the measure. Whoever reads "99%" is entitled to know which parts of the
+# program that percentage describes are not in the program.
 #
-#   src/recovered_unverified/TProfile.CheckAchievement.bmx
+# "VERIFIED" here qualifies NOT_SHIPPED, and nothing else: each entry's absence from
+# the build is checked, per body, against the file that actually performs the skip
+# (check_not_shipped() below). It makes no claim about byte-matching -- that stays
+# the MATCHED marker's job alone. The report prints each body's live MATCHED state
+# next to its absence, so the two never have to be inferred from one another; the
+# notes below deliberately do not restate it, because a matched/unmatched claim
+# frozen in a comment goes stale the next time somebody closes one of these.
+#
+# Each entry was opened and read before being added here, not assumed from its
+# filename. The value is (mechanism, evidence).
+#
+#   src/recovered_module/SteamInit.bmx  -- SUBSTITUTED, not omitted
+#     The Steam bootstrap, and the one entry that is NOT dropped from the build: it
+#     is compiled, as a 4-line neutralised stub, so callers still link. Its own
+#     header states the divergence outright. The byte-identical original is kept
+#     beside the stub as a comment and is never compiled.
+#     The original body IS verifiable and was verified: MATCH 158/158, mode=reloc,
+#     reloc_masked=18, harness.try_function under NSS5_NO_LEARN=1, worker 322,
+#     re-confirmed on a second tree, 2026-08-22. It is nonetheless counted here as
+#     UNMATCHED, and that is deliberate: the file's compiled body is the stub, its
+#     header does not carry the `byte-identical vs NSS5.exe` marker, and this file
+#     measures what the tree compiles rather than what a probe once proved. Whether
+#     a substituted body may carry the marker is an owner's call and has not been
+#     made; until it is, 158 bytes of proven work sit in the denominator only, which
+#     is the understating direction and therefore the safe one.
+#
+#   src/recovered_unverified/TProfile.CheckAchievement.bmx  -- OMITTED
 #     Carries '!Import ".../libsteamstub.a" and Externs GetSteamAchievement and
-#     SetSteamAchievement directly, itself, in this file. Already named in
-#     assemble.py's UNVERIFIED_SKIP for the identical reason.
+#     SetSteamAchievement directly, itself, in this file. Named in assemble.py's
+#     UNVERIFIED_SKIP, which also records that its Extern block is malformed for
+#     that assembler.
 #
-#   src/recovered_unverified/Fn_0058D987.SteamPostPlayerValue.bmx
+#   src/recovered_unverified/Fn_0058D987.SteamPostPlayerValue.bmx  -- OMITTED
 #     Carries the same '!Import and Externs FindLeaderboard, ReadSteam and
-#     UploadLeaderboardScore. Already named in assemble.py's UNVERIFIED_SKIP.
+#     UploadLeaderboardScore. Named in assemble.py's UNVERIFIED_SKIP.
 #
-#   src/recovered_module/Fn_0058D90B.SyncSteamAchievements.bmx
-#     Carries the same '!Import and Externs SetSteamAchievement. Already named
-#     in harness.py's MODULE_SKIP, whose comment records the measured failure
-#     mode for this exact file: STATUS_DLL_NOT_FOUND, loader kill, no milestone
-#     reached, not even settings read.
+#   src/recovered_module/Fn_0058D90B.SyncSteamAchievements.bmx  -- OMITTED
+#     Carries the same '!Import and Externs SetSteamAchievement. Named in
+#     harness.py's MODULE_SKIP, whose comment records the measured failure mode for
+#     this exact file: STATUS_DLL_NOT_FOUND, loader kill, no milestone reached, not
+#     even settings read. Matched: its header carries the marker, and the claim was
+#     re-verified fresh -- MATCH 124/124, mode=reloc, reloc_masked=8,
+#     harness.try_function under NSS5_NO_LEARN=1, worker 322, two trees, 2026-08-22.
+#
+# SCOPE. This is the STEAM set, not a census of everything assemble.py declines to
+# emit. UNVERIFIED_SKIP also holds bodies skipped for unrelated reasons (a duplicate
+# whose verified twin in src/recovered/ wins the tier contest anyway, a zip helper),
+# and none of those is claimed or denied here. Widening this list to every skipped
+# body is a reasonable thing to want and is not what it currently is.
 #
 # DELIBERATELY NOT ON THIS LIST:
 #
-#   src/recovered_unverified/TProfile.SaveGame.bmx
-#   src/recovered_unverified/TProfile.LoadSavedGame.bmx
-#     Both are ordinary game functions. Read either file: neither carries a
-#     '!Import pragma or Externs a DLL function itself -- the Steam link surface
-#     lives entirely in the CALLEE (SteamPostPlayerValue / SyncSteamAchievements
-#     respectively), which is already excluded above in its own right.
-#     SaveGame's only defect is one omitted 5-byte CALL to its unverified
-#     callee; LoadSavedGame's is one call routed through a local, harmless
-#     '!Raw placeholder while its callee (now itself byte-identical elsewhere)
-#     is not yet promoted into this file. Neither defect is the SteamInit kind
-#     of permanent: SteamPostPlayerValue's own header is explicit that
-#     reproducing its logic verbatim does not crash the game the way OpenSteam
-#     does -- the worst case is a bounded 2-second poll against a dead
-#     leaderboard server, then an ordinary return. So closing either callee
-#     closes these two as well; they are blocked on a sibling function's own
-#     verification, exactly like other near-miss bodies elsewhere in this
-#     corpus that are blocked on THEIR siblings for entirely non-Steam reasons
-#     and are not specially excluded either. Excluding SaveGame/LoadSavedGame
-#     would remove real, currently-incomplete work from the denominator and
-#     overstate progress; counting them as unmatched, which is what they are
-#     today, is the honest and the consistent treatment. Revisit this the day
-#     either blocking callee closes.
-STEAM_EXCLUDE = {
-    "src/recovered_module/SteamInit.bmx",
-    "src/recovered_unverified/TProfile.CheckAchievement.bmx",
-    "src/recovered_unverified/Fn_0058D987.SteamPostPlayerValue.bmx",
-    "src/recovered_module/Fn_0058D90B.SyncSteamAchievements.bmx",
+#   src/recovered/TProfile.LoadSavedGame.bmx  -- and it IS shipped
+#     The caller of SyncSteamAchievements, and now byte-identical itself (936/936,
+#     mode=diff, three trees). It carries no '!Import and Externs no DLL function:
+#     the Steam link surface lives entirely in the CALLEE, which is listed above in
+#     its own right. This file reaches it through a local, harmless '!Raw placeholder
+#     declaration, which is exactly what lets the caller ship with the callee omitted.
+#     Nothing skips it, so it is in src/assembled/ and belongs nowhere on this list.
+#
+#   src/recovered_unverified/TProfile.SaveGame.bmx  -- not shipped, but NOT for the
+#     loader reason this list is about, so deliberately still off it. It carries no
+#     '!Import and Externs no DLL function either; its Steam link surface is likewise
+#     entirely in its callee (SteamPostPlayerValue, listed above). assemble.py's
+#     UNVERIFIED_SKIP does name it, but for a reason of its own: the save format is a
+#     clean break and this project writes its own, so the body is moot for the build
+#     rather than fatal to it. Its only reconstruction defect is one omitted 5-byte
+#     CALL to that unverified callee, and that defect is not the SteamInit kind of
+#     permanent -- SteamPostPlayerValue's own header is explicit that reproducing its
+#     logic verbatim does not crash the game the way OpenSteam does; the worst case is
+#     a bounded 2-second poll against a dead leaderboard server, then an ordinary
+#     return. So closing the callee closes this too. It is blocked on a sibling's
+#     verification, exactly like other near-miss bodies elsewhere in this corpus that
+#     are blocked on THEIR siblings for entirely non-Steam reasons and are not
+#     specially listed either. Counting it as unmatched, which is what it is today, is
+#     the honest and the consistent treatment. Revisit the day the callee closes.
+#     (Under STEAM_EXCLUDE this paragraph argued the same conclusion from the
+#     denominator, since being listed then also meant leaving the measure. That
+#     argument no longer applies -- the list no longer moves bytes -- but the
+#     conclusion is unchanged and now rests only on the build facts above.)
+VERIFIED_NOT_SHIPPED = {
+    "src/recovered_module/SteamInit.bmx": (
+        "SUBSTITUTED",
+        "compiled as a neutralised 4-line stub; original kept as a comment"),
+    "src/recovered_unverified/TProfile.CheckAchievement.bmx": (
+        "OMITTED", "assemble.py UNVERIFIED_SKIP"),
+    "src/recovered_module/Fn_0058D987.SteamPostPlayerValue.bmx": (
+        "OMITTED", "harness.py MODULE_SKIP"),
+    "src/recovered_module/Fn_0058D90B.SyncSteamAchievements.bmx": (
+        "OMITTED", "harness.py MODULE_SKIP"),
 }
 
+# A rule nothing checks is advice, and advice rots (docs/RULES.md opens on exactly
+# this). "This body is not in the shipped build" is a checkable claim, so it is
+# checked: the OMITTED entries must still be named by the skip set that omits them.
+#
+# Reported rather than raised. Under STEAM_EXCLUDE a stale entry silently narrowed
+# the denominator, which had to be fatal; a stale entry here can only mislabel a row
+# that is counted correctly either way, so a loud line in the report is proportionate
+# and does not take progress.py (and CI with it) down over an unrelated refactor of
+# assemble.py. The one case that IS still fatal is a name that resolves to no body at
+# all -- see scan().
+_SKIP_SETS = [("scripts/assemble.py", "UNVERIFIED_SKIP"),
+              ("scripts/harness.py", "MODULE_SKIP")]
+SHIP_CLAIM_UNCHECKED = []
+
+
+def check_not_shipped():
+    """Cross-check every OMITTED entry against the skip set that claims to omit it."""
+    named = set()
+    for relpath, setname in _SKIP_SETS:
+        try:
+            with open(os.path.join(ROOT, relpath), encoding="utf-8",
+                      errors="replace") as f:
+                text = f.read()
+        except OSError:
+            SHIP_CLAIM_UNCHECKED.append(
+                "%s is unreadable, so no %s claim could be checked"
+                % (relpath, setname))
+            continue
+        m = re.search(re.escape(setname) + r"\s*=\s*\{(.*?)\n\}", text, re.S)
+        if not m:
+            SHIP_CLAIM_UNCHECKED.append(
+                "could not find %s in %s -- shipping claims unchecked"
+                % (setname, relpath))
+            continue
+        named |= set(re.findall(r'"([^"]+\.bmx)"', m.group(1)))
+    if not named:
+        return
+    for rel, (mech, _why) in sorted(VERIFIED_NOT_SHIPPED.items()):
+        if mech == "OMITTED" and rel.rsplit("/", 1)[-1] not in named:
+            SHIP_CLAIM_UNCHECKED.append(
+                "%s is listed OMITTED but no skip set names it -- it may in fact "
+                "be in the shipped build" % rel)
+
 VA_LINE = re.compile(r"^'\s*VA\s+(0x[0-9A-Fa-f]+)\s+(\d+)\s+bytes", re.M)
+
+# FALLBACK ONLY, tried when VA_LINE finds nothing. Two real headers spell the same
+# fact slightly differently and were therefore in neither the numerator nor the
+# denominator:
+#     ' VA 0x00592319, 18 bytes                     (comma, not whitespace)
+#     ' ZipFile.getName -- VA 0x0058DD7C, 15 bytes  (comma, and text before VA)
+# Both claim byte-identical and both are correct; they were simply invisible.
+#
+# This is deliberately a SECOND pass rather than a loosening of VA_LINE. The strict
+# form stays authoritative, so no body that parses today can change meaning. The
+# loose form only ever rescues a body that would otherwise be dropped silently --
+# it can add to the corpus, never re-interpret it. That matters because a header's
+# first 40 lines may mention OTHER functions' addresses, and a loose pattern
+# promoted to primary could bind a body to a neighbour's VA.
+VA_LINE_LOOSE = re.compile(r"^'.*?\bVA\s+(0x[0-9A-Fa-f]+)[,\s]\s*(\d+)\s+bytes", re.M)
+
+# Files that legitimately carry no whole-function VA/size line, so the guard must not
+# report them. Kept as a NAMED list with its reason, the same way VERIFIED_NOT_SHIPPED
+# is, because a guard that fires forever on a known-good file trains everyone to ignore
+# it -- and then it is not a guard.
+#
+#   src/recovered_unverified/ModuleBody_RealProgram.bmx
+#     A FRAGMENT, not a function: body offset +5549..+7933 of the module body at
+#     0x004BA034 (7,933 bytes total). Its bytes already belong to the parent, so
+#     giving it a VA/size line of its own would double-count them.
+NOT_A_WHOLE_BODY = {
+    "src/recovered_unverified/ModuleBody_RealProgram.bmx",
+}
 MATCHED = re.compile(r"byte-identical\s+vs\s+NSS5\.exe", re.I)
+
+# Bodies whose header VA line did not parse, populated by scan(). See the long note
+# at the collection site: an unparsed body silently leaves BOTH numerator and
+# denominator, so this must be surfaced, never swallowed.
+UNPARSED = []
 
 
 def scan():
-    """-> (rows, excluded)
+    """-> (rows, not_shipped)
 
     `rows` is the measured corpus: [{tree, file, va, size, matched}], one per
-    recovered body, MINUS everything named in STEAM_EXCLUDE. `excluded` is the
-    same shape, for exactly the bodies STEAM_EXCLUDE removed -- kept and
-    returned rather than just dropped, so callers can report what left the
-    denominator instead of the reader having to trust that nothing did.
+    recovered body. Nothing is removed from it -- there is no exclusion list.
+
+    `not_shipped` is a SUBSET of `rows` (the same dicts, not copies), for the
+    bodies VERIFIED_NOT_SHIPPED names as deliberately absent from src/assembled/.
+    Returned separately only so callers can report the shipping gap; those rows
+    are already in `rows` and already counted in both numerator and denominator.
     """
-    rows, excluded = [], []
-    seen_excluded = set()
+    rows, not_shipped = [], []
+    seen_not_shipped = set()
     for tree, kind in TREES:
         d = os.path.join(ROOT, tree)
         if not os.path.isdir(d):
             continue
-        for fn in sorted(os.listdir(d)):
+        # WALK SUBDIRECTORIES. src/recovered_thirdparty holds its bodies one level
+        # down, under a directory per module (fontmachine/, zipengine/), so a flat
+        # os.listdir() found nothing there -- the tree was declared in TREES, counted
+        # in neither the numerator nor the denominator, and reported no row at all.
+        # That is a silent narrowing of exactly the kind this file's header warns
+        # about, and it inverts the measure: banking a verified third-party body left
+        # the percentage unchanged while banking a near-miss anywhere else lowered it.
+        # `fn` stays the file's name and `tree` its declared tree, so the grouping and
+        # the VERIFIED_NOT_SHIPPED keys are unaffected for the flat trees.
+        names = []
+        for root, _dirs, files in os.walk(d):
+            for f in sorted(files):
+                names.append(os.path.join(root, f))
+        for path in sorted(names):
+            fn = os.path.basename(path)
             if not fn.endswith(".bmx"):
                 continue
-            path = os.path.join(d, fn)
             try:
                 with open(path, encoding="utf-8", errors="replace") as f:
                     head = "".join(next(f, "") for _ in range(40))
             except OSError:
                 continue
-            m = VA_LINE.search(head)
+            m = VA_LINE.search(head) or VA_LINE_LOOSE.search(head)
             if not m:
+                # A BODY WHOSE HEADER DOES NOT PARSE LEAVES THE CORPUS ENTIRELY --
+                # numerator AND denominator -- and the percentage goes UP, because the
+                # work is deleted from the measure rather than done. This is the single
+                # most dangerous failure mode in this file, and it is silent by nature:
+                # nothing is missing from disk, nothing errors, the table just quietly
+                # describes a smaller project than the one that exists.
+                #
+                # Observed for real, twice in one session, from ordinary header edits:
+                #   ' VA 0x0055C09B   orig_len 6249   ...       (says orig_len, not bytes)
+                #   ' VA 0x0055F8E6   Ghidra-authoritative length 2276 bytes   ...
+                # VA_LINE wants `VA 0x... <N> bytes` with only whitespace between, so
+                # both dropped out and the reported total fell by exactly their 8,525
+                # bytes while the percentage rose by 0.7 points.
+                #
+                # So: never drop one quietly. Collect it and make the report say so.
+                # Report the REAL path, not tree + basename: thirdparty bodies live one
+                # level down (fontmachine/, zipengine/), so the composed form names a
+                # file that does not exist and sends the reader hunting for a ghost.
+                rel_u = os.path.relpath(path, ROOT).replace(os.sep, "/")
+                if rel_u not in NOT_A_WHOLE_BODY:
+                    UNPARSED.append(rel_u)
                 continue
             row = {
                 "tree": tree, "kind": kind, "file": fn[:-4],
                 "va": m.group(1).lower(), "size": int(m.group(2)),
                 "matched": bool(MATCHED.search(head)),
             }
-            rel = tree + "/" + fn
-            if rel in STEAM_EXCLUDE:
-                seen_excluded.add(rel)
-                excluded.append(row)
-                continue
             rows.append(row)
+            rel = tree + "/" + fn
+            if rel in VERIFIED_NOT_SHIPPED:
+                seen_not_shipped.add(rel)
+                not_shipped.append(row)
 
-    # STEAM_EXCLUDE is a claim that a specific file exists and is permanently
-    # unmatchable. If a name in it no longer resolves to a body -- moved,
-    # renamed, deleted -- the claim can no longer be checked, and a set that
-    # silently narrows the corpus by fewer files than it says is exactly the
-    # quiet-narrowing failure this whole mechanism exists to prevent. Fail
-    # loudly instead of under-excluding.
-    missing = STEAM_EXCLUDE - seen_excluded
+    # VERIFIED_NOT_SHIPPED is a claim about a specific file. If a name in it no
+    # longer resolves to a body -- moved, renamed, deleted -- the claim can no
+    # longer be checked, and the report goes on describing a shipping gap it can
+    # no longer see. Fail loudly rather than quietly under-reporting. (This guard
+    # predates the rename and is kept as it was; it never touched the denominator
+    # and does not now.)
+    missing = set(VERIFIED_NOT_SHIPPED) - seen_not_shipped
     if missing:
         raise SystemExit(
-            "progress.py: STEAM_EXCLUDE names a file with no VA header found: "
-            "%s -- fix the path or remove the entry, do not ignore this"
+            "progress.py: VERIFIED_NOT_SHIPPED names a file with no VA header "
+            "found: %s -- fix the path or remove the entry, do not ignore this"
             % ", ".join(sorted(missing)))
-    return rows, excluded
+    check_not_shipped()
+    return rows, not_shipped
 
 
 def totals(rows):
@@ -248,10 +440,10 @@ def write_shield(pct, done, total):
     denominator here, not files and not functions, and a reader who cannot see
     that has no way to compare this against any other reconstruction.
 
-    `total` already has STEAM_EXCLUDE's bodies removed (scan() drops them
-    before they ever reach totals()). The badge itself has no room for that
-    footnote; docs/STATUS.md and the plain-text report carry the excluded
-    body/byte counts in full, and this file is where the reasoning lives.
+    `total` is the whole corpus: no body is held back from it. A handful are
+    deliberately absent from the shipped build (VERIFIED_NOT_SHIPPED), which the
+    badge has no room to say; docs/STATUS.md and the plain-text report carry
+    those body/byte counts in full, and this file is where the reasoning lives.
     """
     blob = json.dumps({"schemaVersion": 1, "label": "reconstructed",
                        "message": "%.1f%% (%s/%s bytes)"
@@ -264,11 +456,12 @@ def write_shield(pct, done, total):
 
 
 def main():
-    rows, excluded = scan()
+    rows, not_shipped = scan()
     if not rows:
         raise SystemExit("no bodies with a VA header found -- has the tree moved?")
     done, total, pct = totals(rows)
-    ex_bytes = sum(r["size"] for r in excluded)
+    ns_bytes = sum(r["size"] for r in not_shipped)
+    ns_done = sum(r["size"] for r in not_shipped if r["matched"])
 
     if "--shield" in sys.argv:
         print(write_shield(pct, done, total))
@@ -298,18 +491,52 @@ def main():
     lines.append("")
     lines.append("  %d of %d bytes byte-identical against NSS5.exe." % (done, total))
 
-    # Visible on purpose: a percentage with a narrowed denominator and no note
-    # saying so is a lie by omission, which is the exact failure mode
-    # STEAM_EXCLUDE's own header exists to avoid. These bodies are Steam-linked
-    # and permanently excluded (see STEAM_EXCLUDE in this file for the
-    # per-file evidence); they count toward neither BYTES nor DONE above.
+    # An unparsed header is a body that left the corpus WITHOUT anyone deciding it
+    # should. It is strictly worse than an unmatched body, because unmatched work is
+    # visible in the denominator and this is not: the percentage RISES when a header
+    # breaks. Never let that happen quietly -- shout about it, above the not-shipped
+    # list, because unlike VERIFIED_NOT_SHIPPED nobody chose this, and unlike it this
+    # really does take the body out of both numerator and denominator.
+    if UNPARSED:
+        lines.append("")
+        lines.append("  *** %d BODY FILE(S) HAVE AN UNPARSEABLE HEADER AND ARE IN NEITHER" % len(UNPARSED))
+        lines.append("  *** THE NUMERATOR NOR THE DENOMINATOR. The percentage above is")
+        lines.append("  *** OVERSTATED until these are fixed. VA_LINE wants exactly:")
+        lines.append("  ***     ' VA 0x0055C09B   6249 bytes   ...")
+        lines.append("  *** i.e. the byte count immediately after the VA, then the word")
+        lines.append("  *** 'bytes'. Any extra words in between silently drop the body.")
+        for u in sorted(UNPARSED):
+            lines.append("    %s" % u)
+
+    # Visible on purpose, in every mode. These bodies ARE counted above -- the
+    # percentage is not narrowed for them -- but a reader told "99%" is entitled
+    # to know which of that 99% is not in the program they can build. Printed with
+    # each body's MATCHED state so the two questions stay visibly separate: being
+    # absent from the build says nothing about being byte-identical, and the whole
+    # reason this section replaced an exclusion list is that the old one conflated
+    # them. See VERIFIED_NOT_SHIPPED in this file for the per-body evidence.
     lines.append("")
-    lines.append("  EXCLUDED from the corpus above -- %d bodies, %d bytes, permanently"
-                 % (len(excluded), ex_bytes))
-    lines.append("  Steam-linked (see STEAM_EXCLUDE in scripts/progress.py):")
-    for r in sorted(excluded, key=lambda r: -r["size"]):
-        lines.append("    %-46s %6d bytes  %s  %s"
-                     % (r["file"][:46], r["size"], r["va"], r["tree"]))
+    lines.append("  NOT IN THE SHIPPED BUILD -- %d bodies, %d bytes (%d of them matched)"
+                 % (len(not_shipped), ns_bytes, ns_done))
+    lines.append("  COUNTED in the totals above, like every other body. They are left out")
+    lines.append("  of src/assembled/ because their Steam import would stop the exe loading;")
+    lines.append("  that is a fact about the build, not about whether they can be matched.")
+    lines.append("  (see VERIFIED_NOT_SHIPPED in scripts/progress.py for the evidence)")
+    lines.append("    %-42s %7s %-11s %-8s %s"
+                 % ("BODY", "BYTES", "VA", "MATCHED", "ABSENCE"))
+    for r in sorted(not_shipped, key=lambda r: -r["size"]):
+        mech = VERIFIED_NOT_SHIPPED[r["tree"] + "/" + r["file"] + ".bmx"]
+        lines.append("    %-42s %7d %-11s %-8s %s  (%s)"
+                     % (r["file"][:42], r["size"], r["va"],
+                        "yes" if r["matched"] else "no", mech[0], mech[1]))
+
+    # A shipping claim nobody could check is not evidence. Say so rather than
+    # printing the table as though it had been verified.
+    if SHIP_CLAIM_UNCHECKED:
+        lines.append("")
+        lines.append("  *** THE 'ABSENCE' COLUMN ABOVE IS NOT FULLY VERIFIED:")
+        for w in SHIP_CLAIM_UNCHECKED:
+            lines.append("    %s" % w)
 
     unmatched = sorted((r for r in rows if not r["matched"]),
                        key=lambda r: -r["size"])
@@ -335,9 +562,12 @@ def main():
                     % pct)
             f.write("measured as %d of %d bytes of machine code across %d function bodies.\n\n"
                     % (done, total, len(rows)))
-            f.write("%d bodies (%d bytes) are permanently excluded from that count as "
-                   "Steam-linked; see STEAM_EXCLUDE in `scripts/progress.py` for which "
-                   "ones and why.\n\n" % (len(excluded), ex_bytes))
+            f.write("Nothing is excluded from that count. %d bodies (%d bytes, of which "
+                    "%d are byte-identical) are counted above but are deliberately absent "
+                    "from the shipped `src/assembled/` build, because their Steam import "
+                    "would stop the exe loading; see VERIFIED_NOT_SHIPPED in "
+                    "`scripts/progress.py` for which ones and why.\n\n"
+                    % (len(not_shipped), ns_bytes, ns_done))
             f.write("```\n%s\n```\n\n" % text)
             f.write("Regenerate with:\n\n```bash\npython scripts/progress.py --write-status\n```\n")
         print("\n  wrote %s" % os.path.relpath(out, ROOT))

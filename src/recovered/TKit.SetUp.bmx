@@ -28,33 +28,42 @@
 ' masks a literal's ADDRESS, never its content (codegen-patterns.md 13.2).
 '!Global g_kit_arr01:String[]
 '!Global g_kit_arr02:Int[]
+' CASE DIRECTION CORRECTED 2026-08-22: 26 call sites -> .ToUpper().
+' extracted/runtime_helpers.tsv named 0x004A7410 `_brl_retro_Lower` and 0x004A74E0
+' `_brl_retro_Upper`. Both were wrong and neither address is a brl.retro wrapper:
+' 0x004A7410 is `_bbStringToUpper` and 0x004A74E0 is `_bbStringToLower`. NSS5.exe's
+' own 21-byte retro wrappers at 0x0059C8FD (Lower) and 0x0059C912 (Upper) CALL those
+' two addresses, and a wrapper cannot be the function it calls. The wrong row masked
+' by name, so this body certified with the case conversion running backwards. Full
+' derivation and the discriminating 3x4 matrix: docs/reference/codegen-patterns.md
+' 15.6. Re-verified under NSS5_NO_LEARN=1 on worker trees 380 and 380b.
 	Function SetUp:Int()
-		g_kit_arr01[0] = Lower(ReadSettingString("incbin::Inc/Engine.ini","basemask"))
-		g_kit_arr01[1] = Lower(ReadSettingString("incbin::Inc/Engine.ini","baseshirt1"))
-		g_kit_arr01[2] = Lower(ReadSettingString("incbin::Inc/Engine.ini","baseshirt2"))
-		g_kit_arr01[3] = Lower(ReadSettingString("incbin::Inc/Engine.ini","baseshirt3"))
-		g_kit_arr01[4] = Lower(ReadSettingString("incbin::Inc/Engine.ini","baseshirt4"))
-		g_kit_arr01[5] = Lower(ReadSettingString("incbin::Inc/Engine.ini","baseshirt5"))
-		g_kit_arr01[6] = Lower(ReadSettingString("incbin::Inc/Engine.ini","baseshirt6"))
-		g_kit_arr01[7] = Lower(ReadSettingString("incbin::Inc/Engine.ini","baseshorts1"))
-		g_kit_arr01[8] = Lower(ReadSettingString("incbin::Inc/Engine.ini","baseshorts2"))
-		g_kit_arr01[9] = Lower(ReadSettingString("incbin::Inc/Engine.ini","baseshorts3"))
-		g_kit_arr01[10] = Lower(ReadSettingString("incbin::Inc/Engine.ini","basesocks1"))
-		g_kit_arr01[11] = Lower(ReadSettingString("incbin::Inc/Engine.ini","basesocks2"))
-		g_kit_arr01[12] = Lower(ReadSettingString("incbin::Inc/Engine.ini","baseboots1"))
-		g_kit_arr01[13] = Lower(ReadSettingString("incbin::Inc/Engine.ini","baseboots2"))
-		g_kit_arr01[14] = Lower(ReadSettingString("incbin::Inc/Engine.ini","baseboots3"))
-		g_kit_arr01[15] = Lower(ReadSettingString("incbin::Inc/Engine.ini","basehair1"))
-		g_kit_arr01[16] = Lower(ReadSettingString("incbin::Inc/Engine.ini","basehair2"))
-		g_kit_arr01[17] = Lower(ReadSettingString("incbin::Inc/Engine.ini","basehair3"))
-		g_kit_arr01[18] = Lower(ReadSettingString("incbin::Inc/Engine.ini","baseskin1"))
-		g_kit_arr01[19] = Lower(ReadSettingString("incbin::Inc/Engine.ini","baseskin2"))
-		g_kit_arr01[20] = Lower(ReadSettingString("incbin::Inc/Engine.ini","baseskin3"))
-		g_kit_arr01[21] = Lower(ReadSettingString("incbin::Inc/Engine.ini","baseskin4"))
-		g_kit_arr01[22] = Lower(ReadSettingString("incbin::Inc/Engine.ini","baseskin5"))
-		g_kit_arr01[23] = Lower(ReadSettingString("incbin::Inc/Engine.ini","baseskin6"))
-		g_kit_arr01[24] = Lower(ReadSettingString("incbin::Inc/Engine.ini","basegloves1"))
-		g_kit_arr01[25] = Lower(ReadSettingString("incbin::Inc/Engine.ini","basegloves2"))
+		g_kit_arr01[0] = ReadSettingString("incbin::Inc/Engine.ini","basemask").ToUpper()
+		g_kit_arr01[1] = ReadSettingString("incbin::Inc/Engine.ini","baseshirt1").ToUpper()
+		g_kit_arr01[2] = ReadSettingString("incbin::Inc/Engine.ini","baseshirt2").ToUpper()
+		g_kit_arr01[3] = ReadSettingString("incbin::Inc/Engine.ini","baseshirt3").ToUpper()
+		g_kit_arr01[4] = ReadSettingString("incbin::Inc/Engine.ini","baseshirt4").ToUpper()
+		g_kit_arr01[5] = ReadSettingString("incbin::Inc/Engine.ini","baseshirt5").ToUpper()
+		g_kit_arr01[6] = ReadSettingString("incbin::Inc/Engine.ini","baseshirt6").ToUpper()
+		g_kit_arr01[7] = ReadSettingString("incbin::Inc/Engine.ini","baseshorts1").ToUpper()
+		g_kit_arr01[8] = ReadSettingString("incbin::Inc/Engine.ini","baseshorts2").ToUpper()
+		g_kit_arr01[9] = ReadSettingString("incbin::Inc/Engine.ini","baseshorts3").ToUpper()
+		g_kit_arr01[10] = ReadSettingString("incbin::Inc/Engine.ini","basesocks1").ToUpper()
+		g_kit_arr01[11] = ReadSettingString("incbin::Inc/Engine.ini","basesocks2").ToUpper()
+		g_kit_arr01[12] = ReadSettingString("incbin::Inc/Engine.ini","baseboots1").ToUpper()
+		g_kit_arr01[13] = ReadSettingString("incbin::Inc/Engine.ini","baseboots2").ToUpper()
+		g_kit_arr01[14] = ReadSettingString("incbin::Inc/Engine.ini","baseboots3").ToUpper()
+		g_kit_arr01[15] = ReadSettingString("incbin::Inc/Engine.ini","basehair1").ToUpper()
+		g_kit_arr01[16] = ReadSettingString("incbin::Inc/Engine.ini","basehair2").ToUpper()
+		g_kit_arr01[17] = ReadSettingString("incbin::Inc/Engine.ini","basehair3").ToUpper()
+		g_kit_arr01[18] = ReadSettingString("incbin::Inc/Engine.ini","baseskin1").ToUpper()
+		g_kit_arr01[19] = ReadSettingString("incbin::Inc/Engine.ini","baseskin2").ToUpper()
+		g_kit_arr01[20] = ReadSettingString("incbin::Inc/Engine.ini","baseskin3").ToUpper()
+		g_kit_arr01[21] = ReadSettingString("incbin::Inc/Engine.ini","baseskin4").ToUpper()
+		g_kit_arr01[22] = ReadSettingString("incbin::Inc/Engine.ini","baseskin5").ToUpper()
+		g_kit_arr01[23] = ReadSettingString("incbin::Inc/Engine.ini","baseskin6").ToUpper()
+		g_kit_arr01[24] = ReadSettingString("incbin::Inc/Engine.ini","basegloves1").ToUpper()
+		g_kit_arr01[25] = ReadSettingString("incbin::Inc/Engine.ini","basegloves2").ToUpper()
 		For Local i:Int = 0 To 25
 			Local r:Int
 			Local g:Int

@@ -153,6 +153,15 @@
 '!Global g_reportboss_lbl_coachfame:TLabel
 '!Global g_reportboss_btn_play:TButton
 '!Global g_img_play:TImage
+' CASE DIRECTION CORRECTED 2026-08-22: 5 call sites -> .ToUpper().
+' extracted/runtime_helpers.tsv named 0x004A7410 `_brl_retro_Lower` and 0x004A74E0
+' `_brl_retro_Upper`. Both were wrong and neither address is a brl.retro wrapper:
+' 0x004A7410 is `_bbStringToUpper` and 0x004A74E0 is `_bbStringToLower`. NSS5.exe's
+' own 21-byte retro wrappers at 0x0059C8FD (Lower) and 0x0059C912 (Upper) CALL those
+' two addresses, and a wrapper cannot be the function it calls. The wrong row masked
+' by name, so this body certified with the case conversion running backwards. Full
+' derivation and the discriminating 3x4 matrix: docs/reference/codegen-patterns.md
+' 15.6. Re-verified under NSS5_NO_LEARN=1 on worker trees 380 and 380b.
 TScreen.SetActive("reportboss", "btn_play")
 g_reportboss_btn_play.SetIcon(g_img_play)
 g_reportboss_img = LoadImageChecked("GameMedia\Images\Backgrounds\report_boss.png", -1)
@@ -185,15 +194,15 @@ If g_profile.bossreport.Length <> 0
 	EndIf
 	Local sign:String
 	If g_profile.coachrep_boss >= 0 Then sign = " +" Else sign = " "
-	g_reportboss_lbl_coachboss.SetText(Lower(GetText("Boss")) + sign + String(g_profile.coachrep_boss) + "%", "", -1, -1)
+	g_reportboss_lbl_coachboss.SetText(GetText("Boss").ToUpper() + sign + String(g_profile.coachrep_boss) + "%", "", -1, -1)
 	If g_profile.coachrep_team >= 0 Then sign = " +" Else sign = " "
-	g_reportboss_lbl_coachteam.SetText(Lower(GetText("Team")) + sign + String(g_profile.coachrep_team) + "%", "", -1, -1)
+	g_reportboss_lbl_coachteam.SetText(GetText("Team").ToUpper() + sign + String(g_profile.coachrep_team) + "%", "", -1, -1)
 	If g_profile.coachrep_fans >= 0 Then sign = " +" Else sign = " "
-	g_reportboss_lbl_coachfans.SetText(Lower(GetText("Fans")) + sign + String(g_profile.coachrep_fans) + "%", "", -1, -1)
+	g_reportboss_lbl_coachfans.SetText(GetText("Fans").ToUpper() + sign + String(g_profile.coachrep_fans) + "%", "", -1, -1)
 	If g_profile.coachrep_sponsors >= 0 Then sign = " +" Else sign = " "
-	g_reportboss_lbl_coachsponsors.SetText(Lower(GetText("Sponsors")) + sign + String(g_profile.coachrep_sponsors) + "%", "", -1, -1)
+	g_reportboss_lbl_coachsponsors.SetText(GetText("Sponsors").ToUpper() + sign + String(g_profile.coachrep_sponsors) + "%", "", -1, -1)
 	If g_profile.coachrep_fame >= 0 Then sign = " +" Else sign = " "
-	g_reportboss_lbl_coachfame.SetText(Lower(GetText("Fame")) + sign + String(g_profile.coachrep_fame) + "%", "", -1, -1)
+	g_reportboss_lbl_coachfame.SetText(GetText("Fame").ToUpper() + sign + String(g_profile.coachrep_fame) + "%", "", -1, -1)
 	g_profile.coachrep_boss = 0
 	g_profile.coachrep_team = 0
 	g_profile.coachrep_fans = 0
