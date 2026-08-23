@@ -244,6 +244,24 @@ the classic BlitzMax `Data`/`Read`/`Restore` mechanism (legacy keywords `DefData
 | 0 | `CreateFixtureListLeague` (round-robin) | 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, **28** |
 | 1 | `CreateFixtureListKO` (bracket seeding) | 2, 4, 8, 16, 32 |
 
+The blocks themselves are in `src/recovered_module/SelectFixtureTable.bmx`, read out of the exe.
+A program's whole `DefData` is one flat array; this one runs from `0x00C3A7D4` to its `0`
+terminator at `0x00C58F84` and holds 15,606 `(type-tag, value)` records, every tag `bbIntTypeTag`.
+The values are 1-based team-pool positions in consecutive (home, away) pairs.
+
+Each league table is one double round-robin - `half * (grpsize - 1) * 2` pairs, exactly the count
+`CreateFixtureListLeague` consumes when `rounds = 2` - closed by a single `-1,-1` sentinel.
+`-1` occurs nowhere else, which is what fixes the table boundaries independently of the dispatch
+addresses. Odd team counts round up to an even bracket and park the bye in slot `0`, which is what
+`CreateFixtureListLeague`'s `If home > 0 And away > 0` guard skips. `Table9` through `Table12`
+carry more pairs than a single double round-robin needs; the surplus is never reached, because
+`GetHomeAndAwayTeam` re-points the cursor at the head of the same table the moment it reads the
+sentinel.
+
+The KO tables carry no sentinel and are one first-round bracket each, seeded rather than
+sequential. `KOTable16` is 1v4 5v8 9v12 13v16 2v3 6v7 10v11 14v15, and 4, 8 and 32 are the same
+shape scaled: the top two seeds cannot meet before the final.
+
 Every count from 2 to 26 has a table for league mode - **except 27**, which is skipped entirely.
 This is `Select a0` in real `Case`s (all compares emitted back-to-back before any body, per the
 project's Select-vs-If/ElseIf codegen tell), not an `If/ElseIf` cascade - confirmed directly from
@@ -332,10 +350,10 @@ fire mid-season, out of step with any calendar week, purely because the last tea
 was waiting on happened to arrive.
 
 **A knockout round's bracket is not random beyond the group stage.** Only rounds that land on
-exactly 4, 8, 16 or 32 surviving teams draw from the hand-built pairing tables (their contents are
-not yet read - see Gaps, but their existence at all, rather than a runtime shuffle, strongly
-suggests they encode a real seeding rule, e.g. keeping group-stage group-mates apart in the
-Champions League Round of 16). Every other bracket size - which, per spec 02 §7.4, includes some
+exactly 4, 8, 16 or 32 surviving teams draw from the hand-built pairing tables, and those tables
+are a plain seeded bracket: 1v4 5v8 9v12 13v16 then 2v3 6v7 10v11 14v15 for sixteen, the same
+shape scaled for four, eight and thirty-two. Top and second seed cannot meet before the final.
+Every other bracket size - which, per spec 02 §7.4, includes some
 real "Final" rounds with three surviving teams - pairs strictly by team-pool order: whoever sits
 first and second in the pool meet, third and fourth meet, and so on. There is no shuffle at all for
 those sizes; `PopulateTeamPool`'s own ordering (round-robin distribution, `Clubs.csv` file order,
@@ -343,14 +361,10 @@ or `ShuffleIds` from a *previous* `PromoteToMe` call) is the only source of pair
 
 ## What we do not know yet
 
-* **`SelectFixtureTable`'s table contents.** The function itself is now VERIFIED byte-exact (its
-  own code is nothing but `RestoreData` dispatch - see above), but the ~27 league-mode `DefData`
-  blocks and 4 (or 5) KO-mode ones it points into are static data nobody has read yet. Knowing the
-  actual bytes at e.g. `0x00C58D94` (2-team KO) through `0x00C4C7C4` (23-team league) would let us
-  state the exact round-robin schedule and, more importantly, the exact seeding rule the
-  4/8/16/32 KO tables encode, rather than just "some fixed table exists". Each record is a
-  `(type-tag, value)` `Data` pair (see the resolved `'d'`-tag entry below), so reading a table
-  means walking that format, not raw integers.
+* **Why the 27-team table is missing.** The gap is confirmed from both the code and the data,
+  but nothing explains it, and nothing in the engine prevents a 27-team pool from reaching
+  `SelectFixtureTable`. What a 27-team league actually schedules therefore depends on which
+  table the previous call happened to leave the cursor in.
 * **`TFixture.PlayFixture`'s exact tie-break codegen.** The overall shape (strength clamp, then a
   `diff < 3 And r < 2`-style closeness test feeding into who wins) is confirmed structurally by two
   independent decompile passes, but the precise boolean decomposition is not yet byte-matched - the

@@ -218,9 +218,10 @@ honestly, worst first.
 5. **[ai/goalkeeper.md](ai/goalkeeper.md)** - save/dive/parry are HIGH (fully byte-exact);
    standing position is MEDIUM because `TPlayer.UpdateKeeperPosition` has never been
    byte-verified, only decompiled.
-6. **[career/season-structure.md](career/season-structure.md)** - the actual contents of the
-   fixture-pairing tables (`Fn_004C5280`) were never read, only their existence and call
-   pattern; the 27-team gap in that table is confirmed but unexplained.
+6. **[career/season-structure.md](career/season-structure.md)** - `CreateFixtureListLeague` is
+   the one fixture-path body that is not byte-identical (6 bytes short, one branch-polarity
+   cluster), so the calendar spacing rules it applies are structural rather than proven. The
+   27-team gap in `Fn_004C5280`'s dispatch is confirmed but unexplained.
 7. **[career/transfers-and-contracts.md](career/transfers-and-contracts.md)** - the
    background system that decides *when* a club shows interest
    (`CheckTransferWindow`/`UpdateInterestedClubs`/`SignForNewClub`) is decompile-only; only
