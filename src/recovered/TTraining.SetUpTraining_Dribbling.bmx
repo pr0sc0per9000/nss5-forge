@@ -18,7 +18,14 @@
 ' Global types are assumptions; 0x00C6CFA4/A8/AC carry full retain/release traffic and are
 ' Strings, contradicting globals_final.tsv which calls all three Int (pattern 11.2).
 '   0x00C6CF94 int04  0x00C6CF9C int06  0x00C6CFA4 int08$  0x00C6CFA8 int09$
-'   0x00C6CFAC int10$ 0x00C6CFB8 TLabel  0x00C6CFC8/CC TTrainingZone
+'   0x00C6CFAC int10$ 0x00C6CFB8 TLabel
+' The two zones are g_object811/g_object812, not names local to this file. The store order
+' at 0x0057D539 / 0x0057D58A is 0x00C6CFC8 then 0x00C6CFCC, so 0x00C6CFC8 is the near green
+' zone ("00FF00" at 0xC6E904) and 0x00C6CFCC the far red one ("FF0000" at 0xC725EC). Those
+' are the names TTraining.UpdateDribbling/UpdatePace read the same two slots under, and the
+' reader is what turns the far zone green and completes the drill -- naming them anything
+' else here splits each slot in two and the reader never sees what this function wrote.
+'   0x00C6CFC8 g_object811:TTrainingZone (start)  0x00C6CFCC g_object812:TTrainingZone (end)
 '   0x00C6CFD0 int11  0x00C6CFD4 int12  0x00C6CFF0 int19  0x00C6CFF4 int20
 '   0x00C5D634 g_player_int16 (Int)      0x00C6F028 TProfile
 ' g_training_int04's original data-section value is 1 (read from NSS5.exe at
@@ -33,8 +40,8 @@
 '!Global g_training_int19:Int
 '!Global g_training_int20:Int
 '!Global g_traininglabel_msg:TLabel
-'!Global g_trainingzone_start:TTrainingZone
-'!Global g_trainingzone_end:TTrainingZone
+'!Global g_object811:TTrainingZone
+'!Global g_object812:TTrainingZone
 '!Global g_player_int16:Int
 '!Global g_profile:TProfile
 LogLine("SetUpTraining_Dribbling")
@@ -175,8 +182,8 @@ gap = Int(TPitch.YardsToPixels(gap))
 g_training_int11 = Int(-g_player_int16 + TPitch.YardsToPixels(5.0))
 g_training_int12 = Int(TPitch.YardsToPixels(-20.0))
 If g_training_int19 <> 0
-	g_trainingzone_start = TTrainingZone.Create(g_training_int11, g_training_int12, 2.0, "00FF00", "")
-	g_trainingzone_end = TTrainingZone.Create(g_training_int11 + (g_training_int19 + 1) * gap, g_training_int12, 2.0, "FF0000", "")
+	g_object811 = TTrainingZone.Create(g_training_int11, g_training_int12, 2.0, "00FF00", "")
+	g_object812 = TTrainingZone.Create(g_training_int11 + (g_training_int19 + 1) * gap, g_training_int12, 2.0, "FF0000", "")
 	For Local i:Int = 1 To g_training_int19
 		Local x:Int = g_training_int11 + i * gap
 		Local y:Int = g_training_int12
@@ -195,8 +202,8 @@ If g_training_int19 <> 0
 		TTrainingLine.Create(x, y, cx, cy, "00FF00")
 	Next
 Else
-	g_trainingzone_start = TTrainingZone.Create(g_training_int11, g_training_int12, 2.0, "00FF00", "")
-	g_trainingzone_end = TTrainingZone.Create(g_training_int11 + (g_training_int20 + 1) * gap, g_training_int12, 2.0, "FF0000", "")
+	g_object811 = TTrainingZone.Create(g_training_int11, g_training_int12, 2.0, "00FF00", "")
+	g_object812 = TTrainingZone.Create(g_training_int11 + (g_training_int20 + 1) * gap, g_training_int12, 2.0, "FF0000", "")
 	Local lastx:Int = 0
 	Local lasty:Int = 0
 	For Local i:Int = 1 To g_training_int20

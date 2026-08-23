@@ -5,10 +5,17 @@
 '  reloc_masked=87.  First attempt, no iteration.)
 '
 ' ASSUMPTIONS -- Global NAMES are ours, the declared TYPES are load-bearing.
-'   0x00C67B88 g_offer:TContractOffer  -- globals_final.tsv has it as bare Object.  Its
+'   0x00C67B88 g_co_offer:TContractOffer  -- globals_final.tsv has it as bare Object.  Its
 '     +8 is dereferenced and slot 0x3C (TBase_Team.GetPrimaryColour) called on it, which
 '     is TContractOffer.club:TClub; +0xC/0x14/0x18/0x1C/0x20 are the five money fields and
 '     +0x24/+0x28 newbossrel/negotiationsuccess -- the exact TContractOffer layout.
+'     Do not spell this slot `g_offer`: everywhere else in the corpus that name denotes
+'     0x00C6CC3C, the NEGOTIATE screen's own offer, which only TScreen_Negotiate.SetUpScreen
+'     writes and which is Null until that screen has been opened -- so on a first contract
+'     the whole body would read through Null.  The sole writer of 0x00C67B88 is
+'     TScreen_ContractOffer.SetUpScreen (`mov [0xc67b88],ebx` at 0x00553802) and it calls
+'     the slot g_co_offer, so that is the name here.  g_co_offer and g_offer are two
+'     addresses and must never be merged.
 '   0x00C67B58 g_lbl_clubname:TLabel    0x00C67B5C g_lbl_nation:TLabel
 '   0x00C67B60 g_lbl_league:TLabel      0x00C67B64 g_pb_rel:TProgressBar
 '   0x00C67B68 g_lbl_wage:TLabel        0x00C67B6C g_lbl_goalbonus:TLabel
@@ -34,7 +41,7 @@
 '     `negotiationsuccess` is tested first and the `newbossrel < 40` test is skipped when
 '     it is non-zero.
 ' Body-only format: statements only, parameters are a0, a1, ...
-'!Global g_offer:TContractOffer
+'!Global g_co_offer:TContractOffer
 '!Global g_lbl_clubname:TLabel
 '!Global g_lbl_nation:TLabel
 '!Global g_lbl_league:TLabel
@@ -47,15 +54,15 @@
 '!Global g_lbl_length:TLabel
 '!Global g_btn_accept:TButton
 '!Global g_colour_disabled:String
-Local nat:TNation = TNation.SelectById(g_offer.club.nationid)
-Local comp:TCompetition = TCompetition.SelectById(g_offer.club.leagueid)
-g_lbl_clubname.SetColour(g_offer.club.GetPrimaryColour(), "FFFFFF")
-g_lbl_clubname.SetText(g_offer.club.labelname, "", -1, -1)
+Local nat:TNation = TNation.SelectById(g_co_offer.club.nationid)
+Local comp:TCompetition = TCompetition.SelectById(g_co_offer.club.leagueid)
+g_lbl_clubname.SetColour(g_co_offer.club.GetPrimaryColour(), "FFFFFF")
+g_lbl_clubname.SetText(g_co_offer.club.labelname, "", -1, -1)
 g_lbl_nation.SetText(nat.labelname, "", -1, -1)
-g_lbl_league.SetText(comp.GetStringTeamPosition(g_offer.club.id) + " " + comp.name, "", -1, -1)
-g_pb_rel.SetPercent(g_offer.newbossrel, a0)
+g_lbl_league.SetText(comp.GetStringTeamPosition(g_co_offer.club.id) + " " + comp.name, "", -1, -1)
+g_pb_rel.SetPercent(g_co_offer.newbossrel, a0)
 g_pb_rel.SetColour("", "00FF00")
-If g_offer.newbossrel < 50
+If g_co_offer.newbossrel < 50
 	g_pb_rel.SetColour("", "FF0000")
 End If
 g_lbl_wage.SetColour("888888", "FFFFFF")
@@ -71,13 +78,13 @@ If a1 <> 0
 	g_lbl_cleanbonus.SetColour(g_colour_disabled, "FFFFFF")
 	g_lbl_signingfee.SetColour(g_colour_disabled, "FFFFFF")
 End If
-g_lbl_wage.SetText(FormatMoney(g_offer.wage, 0), "", -1, -1)
-g_lbl_goalbonus.SetText(FormatMoney(g_offer.goalbonus, 0), "", -1, -1)
-g_lbl_assistbonus.SetText(FormatMoney(g_offer.assistbonus, 0), "", -1, -1)
-g_lbl_cleanbonus.SetText(FormatMoney(g_offer.cleanbonus, 0), "", -1, -1)
-g_lbl_signingfee.SetText(FormatMoney(g_offer.signingfee, 0), "", -1, -1)
-g_lbl_length.SetText(g_offer.GetStringLength(), "", -1, -1)
+g_lbl_wage.SetText(FormatMoney(g_co_offer.wage, 0), "", -1, -1)
+g_lbl_goalbonus.SetText(FormatMoney(g_co_offer.goalbonus, 0), "", -1, -1)
+g_lbl_assistbonus.SetText(FormatMoney(g_co_offer.assistbonus, 0), "", -1, -1)
+g_lbl_cleanbonus.SetText(FormatMoney(g_co_offer.cleanbonus, 0), "", -1, -1)
+g_lbl_signingfee.SetText(FormatMoney(g_co_offer.signingfee, 0), "", -1, -1)
+g_lbl_length.SetText(g_co_offer.GetStringLength(), "", -1, -1)
 g_btn_accept.SetAlph(1.0)
-If g_offer.negotiationsuccess Or g_offer.newbossrel < 40
+If g_co_offer.negotiationsuccess Or g_co_offer.newbossrel < 40
 	g_btn_accept.SetAlph(0.5)
 End If
