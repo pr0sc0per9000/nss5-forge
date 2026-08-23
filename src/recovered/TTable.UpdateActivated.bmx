@@ -25,6 +25,9 @@
 '     class table at 0x00C9CC68); 0x00C61720 and 0x00C6171C -> TSound (they are the
 '     first argument of _brl_audio_PlaySound).  Named g_chan_ui / g_snd_move /
 '     g_snd_select here.
+'     g_chan_ui is the same slot the module body allocates as g_Object857, so it is
+'     merged onto that name in extracted/global_alias_overrides.tsv. Split, the
+'     unguarded Playing() calls below ran through a Global boot never allocated.
 '   0x00C7E098 g_table_int05:Int is the scroll-repeat timestamp, 0x00C61CFC
 '     g_table_int02:Int the repeat interval, 0x00C6EFD4 g_player_int50:Int the clock.
 '   0x00C625F0 g_table_int03:Int is the inter-row gap.
