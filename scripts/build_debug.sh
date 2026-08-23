@@ -41,6 +41,14 @@ else
   cp "$SRC" "$DBG"
 fi
 
+# The original reads through pointers that can be Null and gets away with it, because
+# release compiles no check. `-d` compiles the check, so those reads kill the process the
+# player is using to find OUR defects. This rewrites the generated copy only, so release
+# and the corpus never see it; scripts/debug_shims.py carries the site registry and the
+# evidence for each. A registered site that no longer matches exits non-zero here on
+# purpose: a binary that quietly stopped being guarded would be trusted and should not be.
+python "$ROOT/scripts/debug_shims.py" "$DBG" || { echo "debug shims did not apply -- not building"; exit 1; }
+
 echo "compiling (debug) ..."
 # This is expected to fail at the LINK step; the compile output is what we want.
 "$BMX/bin/bmk.exe" makeapp -d -t console -g x86 "$DBG" 2>&1 | grep -vi "^Build Error: Failed to link" | tail -5

@@ -30,6 +30,10 @@ These five are all you need to build and run the project.
 * [`instrument_trace.py`](/scripts/instrument_trace.py): Injects a call tracer into
   the assembled source. Use `--filter` and `--arm`; tracing everything produces ~41M
   records for a 21-second boot.
+* [`debug_shims.py`](/scripts/debug_shims.py): Guards the reads NSS5.exe performs
+  through Null and survives, in the generated debug source only, so a `-d` build can
+  walk past the original's own bugs to reach ours. `--list` prints the registry and
+  the disassembly each entry rests on. `build_debug.sh` runs it; release never does.
 * [`dead_globals.py`](/scripts/dead_globals.py): Every module Global that is read but
   never written, triaged by severity. Approximately the remaining runtime-bug backlog.
 * [`play.py`](/scripts/play.py): The plain launcher, and the home of the
