@@ -82,7 +82,6 @@ address	alias	canonical	evidence
 0x00C67B40	g_object545	g_co_lbl545	writer-store alignment; revives 1 deref sites
 0x00C67B44	g_object546	g_co_lbl546	writer-store alignment; revives 1 deref sites
 0x00C67B48	g_object547	g_co_lbl547	writer-store alignment; revives 1 deref sites
-0x00C6CFCC	g_object812	g_trainingzone_start	writer-store alignment; revives 12 deref sites
 0x00C6675C	g_physio_icon	g_img_playboss	writer-store alignment; revives 0 deref sites
 0x00C65900	g_pr_combo_comp1	g_promo_combo1	writer-store alignment; revives 4 deref sites
 0x00C65904	g_pr_combo_comp2	g_promo_combo2	writer-store alignment; revives 4 deref sites
