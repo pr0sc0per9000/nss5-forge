@@ -1988,3 +1988,19 @@ address	alias	canonical	evidence
 # here at override precedence rather than being edited in place.
 0x00C5B244	g_shootoutstarted	g_ball_int05	CORRECTS A WRONG ROW in the generated global_alias_map.tsv:255, which binds g_shootoutstarted to 0x00C6EFD4 (the MilliSecs match clock). MEASURED: TEngine.UpdateMatchTime+174 is `a144b2c500 mov eax,[0xc5b244]` and +184 compares that against [0xc6efd4] -- two different slots, one comparison. 0x00C5B244 is written by TBall.Kick+2536 and TBall.UpdateMovement+1688, spelled g_ball_int05. With the wrong row the emitted source reads `If g_matchtime > g_matchtime + 2500 Then TEngine.DoShootOut()`, which is never true, so the penalty shootout never starts.
 0x00C68588	g_matchprep_iconboots	g_img_bootboost	CORRECTS A WRONG ROW in the generated global_alias_writers.tsv:57, which binds this slot to g_img_shinpads28. MEASURED: 0x00C68588 loads BootBoost.png; g_img_shinpads28 is 0x00C6859C. Unfixed, the boots-boost icon renders the shinpads icon.
+#
+# ---- 2026-08-22: 0x00C6F088 -- the two names PR #4 did not reach ---------------------
+# The UI/SFX channel slot carried THREE names; PR #4 merged only g_chanclick, so
+# g_chan_ui and g_sfxchannel stayed separate Globals and only g_object857 ever received
+# the boot AllocChannel. Read out of NSS5.exe:
+#   * TTable.UpdateActivated (0x005168E1) calls Playing() through the slot unguarded at
+#     0x00516B1C/B56/BB7/C21 (`a188f0c600 mov eax,[0xc6f088]` / `ff5048 call [eax+0x48]`)
+#     and pushes it as the PlaySound channel at 0x00516B2F/B69/B90/BCA/C34. Names it
+#     g_chan_ui.
+#   * UpdateAudio (0x004BC88C) at 0x004BC8BC-0x004BC8E5 tests [0xc6f088] against
+#     bbNullObject, then calls slot 0x38 with [0xc5d220]/[0xc6fa60] = g_opt_soundfx/100.0.
+#     Names it g_sfxchannel.
+#   * src/module_body/globals.tsv:8 allocates 0x00C6F088 once, as g_Object857 -- the name
+#     the g_chanclick row above already resolves to.
+0x00C6F088	g_chan_ui	g_object857	TTable.UpdateActivated calls Playing() through [0xc6f088] unguarded at 0x00516B1C/B56/BB7/C21 and pushes it as the PlaySound channel at 0x00516B2F/B69/B90/BCA/C34; module body allocates 0x00C6F088 as g_Object857
+0x00C6F088	g_sfxchannel	g_object857	UpdateAudio 0x004BC8BC-0x004BC8E5 tests [0xc6f088] and calls SetVolume (slot 0x38) with g_opt_soundfx/100.0; same slot the module body allocates as g_Object857
