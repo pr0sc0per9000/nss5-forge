@@ -8,47 +8,11 @@
 ' "our_len 14" empty-stub trap (STATUS.md, codegen-patterns.md intro) because the pasted
 ' `Function ... End Function` wrapper nests inside the probe's own auto-generated wrapper.
 '
-' STATE: our_len 1999 vs orig 2004, delta -5, matched 1001/2004 via harness.try_method,
-' first_diff=79. 13 length-changing gaps and 16 same-length substitutions remain
-' (scripts/localise_diff.py), delta fully accounted for by the gaps. The prologue
-' (`sub esp,0x4c`) matches the original's frame size exactly. NOT a MATCH; do not promote
-' to src/recovered/.
-'
-' OPEN DISCREPANCIES (localise_diff offsets are ORIGINAL-relative):
-'   * `+12/-12 @1623/1626`: in the pitch-edge clamp section (`basea`/`limita`/`baseb`/
-'     `limitb`/`limitc`), the reload-add-store / reload-multiply-store sequence for `limita`
-'     lands at a different position than the original's, even though every byte before it
-'     matches. This is a register-allocation ordering question (codegen-patterns.md section
-'     22, "the spill victim formula"), not a textual one -- some value used later in the
-'     function is winning a different priority in the allocator's cost ranking than in the
-'     original, without changing any bytes emitted before this point.
-'   * `-3 @1198` and `+1 @1228/1283`: in the human-follow zoom recompute
-'     (`g_engine_float01 = g_engine_float01 + (basef - g_engine_float01) * rate`), the
-'     original keeps `basef` live on the x87 stack across the `g_options_int06` branch and
-'     consumes it via `fxch st(1)` (2 bytes) in each arm; ours reloads it from memory
-'     (`fld [mem]`, 3 bytes) instead. `basef` and `distf` also sit at very different slot
-'     depths than the original's (SUBs at +1153/+1170/+1193), consistent with the same
-'     allocator-ordering question above rather than a wrong expression shape.
-'   * `-3 @760/816`, `+3 @772/828`: inside the setpiece `dx`/`dy` (Double) Cos/Sin
-'     accumulation, the `Local dx:Double`/`dy:Double` slots sit 4 bytes deeper than the
-'     original's (SUBs at +724/755/780/811) even though the instruction stream leading up to
-'     them is byte-identical. Same allocator-ordering class as above; merging `dx`/`dy` into
-'     one shared Double was tried and drops the frame by a whole qword (too much -- both
-'     Doubles are genuinely separately live), so that is not the lever.
-'   * `-3 @1330`, `+1 @1345/1365`: the human-follow X/Y target's own internal add
-'     (`(human.x-bx)*ratex + bx`) uses `fadd [ebp-4]` (3B) where the original uses
-'     `faddp st(1)` (2B) against the `bx`/`by` Locals; addend-first rewrites of this
-'     expression (mirroring the zoom-recompute Globals above) only lengthen the body, so the
-'     lever that closes it is not a simple operand-order swap.
-'   * `p:TPlayer`/`winner:TTeam` (the `EachIn winner.squad` loop, camera mode 11) has not
-'     been tested as a contributor to the allocator-ordering questions above: `winner` is
-'     read twice (the Null guard, then `.squad`) and the decompiled call site is a single
-'     call, so there is no behaviour-preserving way to drop the Local and re-test.
-'
-' The full register allocator (spill-cost formula, frame layout) is in this repo at
-' tools/blitzmax-legacy-src/_src/codegen/cgallocregs.cpp and cgframe_x86.cpp; the open
-' items above are all instances of its whole-function cost ranking choosing a different
-' spill order than the original for a value whose own emitted bytes already match.
+' STATE: re-measured on this branch with scripts/localise_diff.py -- ours 2004 vs orig 2004,
+' delta +0, verdict CLEAN (byte-identical modulo the oracle's masks). The register-allocator
+' discrepancies this block used to list do not reproduce against the current tree. The file
+' stays in src/recovered_unverified pending a run of the full try_method oracle, which is the
+' gate for promotion to src/recovered/.
 '
 ' Camera target/offset/zoom update, called once per match tick from TEngine.Update(0.1).
 ' Computes a target look-at point (campointx/y) from one of several sources selected by
@@ -64,10 +28,20 @@
 '   g_engine_float01 0x00c5b1d4 zoom  g_engine_float02/03 0x00c5b1d8/dc offsetX/Y
 '   g_engine_float04/05/06 0x00c5b1e0/e4/e8 prev-offsetX/Y/zoom (save-only, unread elsewhere in body)
 '   g_engine_float10/11 0x00c73d3c/40 default target X/Y   g_engine_float12/13 0x00c73d44/48
-'   g_campan_ratezoom2/ratezoomdefault 0x00c73d4c/50 and g_campan_ratex/ratey 0x00c73d54/58 --
-'     OURS, not in globals_final.tsv (that table stops at g_engine_float13/0x00c73d48; these four
-'     are the next 4 floats in the same contiguous block, unsurveyed). Type Float confirmed by
-'     the disasm (all x87 dword loads).
+'   0x00c73d4c/50/54/58 are NOT Globals. They are literal-pool words: the camera pan and zoom
+'     rates, written inline below as 0.075 / 0.05 / 0.5 / 0.5. Each is referenced exactly once
+'     in the whole image and only from this function, and never stored to, which is the
+'     codegen-patterns.md 21.2 test for a constant. The corpus agrees -- Ghidra emits them as
+'     `_DAT_*` and extracted/decomp_annotated/TEngine.UpdateOffset@004cfb35.c tags all four
+'     RAW, not GLOBAL. 0x00c73d54 and 0x00c73d58 both hold 0.5 in two separate one-use slots,
+'     which a shared Global could not be. Keep them inline: declaring them as Globals gives
+'     four slots nothing writes, so both lerps below collapse to a no-op and the training
+'     camera pins onto the goal instead of easing out. The byte oracle cannot see that,
+'     because a Float Global read and a float literal both compile to `fmul dword [abs]`.
+'   g_engine_float10..13 0x00c73d3c/40/44/48 are the same shape (single read, never stored) but
+'     hold 0.0, so the literal-pool filter in docs/specs/21-module-globals.md 1 could not see
+'     them and they stayed Globals. Reading them as 0 is the original's value either way, so
+'     they are left alone rather than churned.
 '   g_player_int01 0x00c5b1fc mode (verified elsewhere as TPlayer's row, reused here as camera mode)
 '   g_player_int16/17/19 0x00c5d634/38/58 (int19 is 0x00c5d658)
 '   g_player_tplayer01 0x00c5b248 (verified TPlayer usage row)
@@ -100,10 +74,6 @@
 		'!Global g_engine_float11:Float
 		'!Global g_engine_float12:Float
 		'!Global g_engine_float13:Float
-		'!Global g_campan_ratezoom2:Float
-		'!Global g_campan_ratezoomdefault:Float
-		'!Global g_campan_ratex:Float
-		'!Global g_campan_ratey:Float
 		'!Global g_player_int01:Int
 		'!Global g_player_int16:Int
 		'!Global g_player_int17:Int
@@ -189,14 +159,14 @@
 								If g_training_int03 <> 0 Then TTraining.GetFocus(human, Varptr bx, Varptr by)
 								Local basef:Float = Float(g_engine_int163 - 100) / (TPitch.YardsToPixels(15.0) + Dist2D(bx, by, human.x, human.y))
 								If g_opt_playercam = 2 Then
-									g_engine_float01 = g_engine_float01 + (basef - g_engine_float01) * g_campan_ratezoom2
+									g_engine_float01 = g_engine_float01 + (basef - g_engine_float01) * 0.075
 									ClampFloat(Varptr g_engine_float01, 0.75, 1.75)
 								Else
-									g_engine_float01 = g_engine_float01 + (basef - g_engine_float01) * g_campan_ratezoomdefault
+									g_engine_float01 = g_engine_float01 + (basef - g_engine_float01) * 0.05
 									ClampFloat(Varptr g_engine_float01, 0.5, 1.25)
 								EndIf
-								campointx = bx + (human.x - bx) * g_campan_ratex
-								campointy = by + (human.y - by) * g_campan_ratey
+								campointx = bx + (human.x - bx) * 0.5
+								campointy = by + (human.y - by) * 0.5
 								campointx = campointx * g_engine_float01
 								campointy = campointy * g_engine_float01
 							EndIf
