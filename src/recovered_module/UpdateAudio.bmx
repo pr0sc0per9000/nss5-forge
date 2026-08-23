@@ -17,7 +17,9 @@
 '
 ' ASSUMPTIONS carried by the declared Global types, all of which are load-bearing:
 '   0x00C6F08C g_musicchannel  :TChannel   -- slot 0x38 = TChannel.SetVolume(f)i
-'   0x00C6F088 g_sfxchannel    :TChannel   -- same slot
+'   0x00C6F088 g_sfxchannel    :TChannel   -- same slot; merged onto g_Object857, the name
+'              the module body allocates, in extracted/global_alias_overrides.tsv. Split,
+'              the SFX volume never reached the channel every UI sound plays on.
 '   0x00C6F090 g_speechchannel :TChannel   -- same slot
 '   0x00C5D224 g_musicvol      :Float      -- globals_final: Float, high, TOptions
 '   0x00C5D220 g_sfxvol        :Float      -- globals_final: Float, high, TOptions
