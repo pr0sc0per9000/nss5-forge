@@ -7,26 +7,34 @@
 '
 ' ASSUMPTIONS
 '  Parameters: a0:TContractOffer, a1/a2 are `()i` function pointers (callbacks).
-'  Module Globals -- NAMES ARE OURS, declared TYPES are load-bearing:
-'    0x00C67B8C Int()          g_co_fn1   -- globals_final says Int; it is a FUNCTION
-'    0x00C67B90 Int()          g_co_fn2      POINTER (`()i`), stored with a bare mov and
+'  Module Globals -- NAMES ARE OURS, declared TYPES are load-bearing.
+'  Keep the address immediately before the name, per CONTRIBUTING: the prose scanners in
+'  build_alias_map.py and find_live_splits.py pair an address only with the identifier that
+'  FOLLOWS it, so a `0x... Type name` block teaches them nothing and a second name on one
+'  of these slots goes unreported.
+'    0x00C67B8C g_co_fn1  :Int()          -- globals_final says Int; it is a FUNCTION
+'    0x00C67B90 g_co_fn2  :Int()             POINTER (`()i`), stored with a bare mov and
 '                                            no refcount traffic, fed from the `()i`
 '                                            parameters.  `Int()` and `Int` emit the same
 '                                            store, so this is a typing choice not a
 '                                            byte-level claim.
-'    0x00C67B88 TContractOffer g_co_offer -- globals_final says Object/low; the store has
+'    0x00C67B88 g_co_offer:TContractOffer -- globals_final says Object/low; the store has
 '                                            full retain/release traffic (inc [ebx+4],
 '                                            dec [eax+4] + bbGCFree) so it IS a reference,
 '                                            and the value comes from the :TContractOffer
-'                                            parameter.
-'    0x00C6F028 TProfile       g_profile  (globals_final construction/high, 3 sites)
-'    0x00C67B80 TButton        g_co_btn561
-'    0x00C67B50 TButton        g_co_btn549
-'    0x00C67B4C TButton        g_co_btn548
-'    0x00C67B14 TScreen        g_co_screen
-'    0x00C67B18 TSound         g_co_snd   (arg1 of _brl_audio_PlaySound)
-'    0x00C6F090 TChannel       g_chan     (arg2 of _brl_audio_PlaySound)
-'    0x00C67B20 TButton        g_co_btn537
+'                                            parameter.  This is the ONLY writer of the
+'                                            slot (`mov [0xc67b88],ebx` at 0x00553802);
+'                                            UpdateOfferDetails, ButtonAccept and
+'                                            ButtonNegotiate are its only readers and all
+'                                            three must spell it the same way.
+'    0x00C6F028 g_profile :TProfile       (globals_final construction/high, 3 sites)
+'    0x00C67B80 g_co_btn561:TButton
+'    0x00C67B50 g_co_btn549:TButton
+'    0x00C67B4C g_co_btn548:TButton
+'    0x00C67B14 g_co_screen:TScreen
+'    0x00C67B18 g_co_snd  :TSound         (arg1 of _brl_audio_PlaySound)
+'    0x00C6F090 g_chan    :TChannel       (arg2 of _brl_audio_PlaySound)
+'    0x00C67B20 g_co_btn537:TButton
 '  Fields:
 '    TProfile +0x1D0 myclub(:TClub), +0x0F0 items([]i), +0x1C8 helppages([]i)
 '      -- array data starts at +0x18, so [items+0x18] is items[0] and
