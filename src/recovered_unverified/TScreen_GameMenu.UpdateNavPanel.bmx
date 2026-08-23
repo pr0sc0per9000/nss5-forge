@@ -79,9 +79,23 @@
 '   * The "(Home) Name" phrase is built UNCONDITIONALLY first and then fully rebuilt as
 '     "(Away) Name" when `isHome = 0` -- the first computation's result is simply discarded.
 '     Original inefficiency, kept as-is (preserve-by-default).
-'   * `TCompetition.SelectById(fx.compid)` is called even when `fx` could be Null (compid then
-'     reads as 0 via BlitzMax's release-build null-deref-returns-0 rule) -- matches the
-'     decompilation, which reads `puVar4[0x10]` with no preceding Null guard.
+'   * BUG (original), preserved: `TCompetition.SelectById(fx.compid)` dereferences `fx` with
+'     no Null guard, on a line whose own next statement tests `fx <> Null` and whose tail
+'     tests `Not fx`. Ground truth, VA 0x0053AD21:
+'         mov  eax,[ebp-0xc]        ; fx, stored at 0x0053ACF7 from GetNextFixture
+'         push dword [eax+0x40]     ; fx.compid -- no cmp against 0x5c9c80 in between
+'         call dword [0xc6160c]     ; = 0x0050A60F TCompetition.SelectById
+'     `fx` IS Null the first time this function runs in a career, and that is reachable
+'     rather than theoretical: TScreen_ContractOffer.ButtonAccept (0x00554297) calls
+'     SignForNewClub first and the accept callback second, so SignForNewClub's
+'     `TScreen_GameMenu.UpdateNavPanel()` at 0x005734B0 runs before TProfile.StartCareer,
+'     and StartCareer is the only route into TCompetition.SetUpCompetitionsAll, which is
+'     the only producer of fixture lists. Retail swallows it: `Null` is `&bbNullObject`
+'     = 0x005C9C80, so `[eax+0x40]` reads 0x005C9CC0 in .data (value 0x004A9C80), no
+'     competition carries that id, and the `If Not fx` branch below writes
+'     "tla_ToBeConfirmed" as intended. A `-d` build throws
+'     "Attempt to access field or method of Null object" here instead.
+'     DO NOT add a Null guard: the original has none and adding one changes the bytes.
 '   * `If comp <> Null` re-guards a value already proven non-Null by the big outer `And` chain
 '     a few lines above -- a genuine redundant check in the original (decompilation confirms:
 '     `if (piVar6 != &DAT_005c9c80)` reappears verbatim at line 121 of the .c).
@@ -129,6 +143,8 @@ Local fx:TFixture = g_profile.GetNextFixture(0)
 Local isHome:Int = 0
 Local isIntl:Int = 0
 Local opp:TBase_Team = g_profile.GetNextOpponent(Varptr isHome, Varptr isIntl)
+' BUG (original), preserved -- see the STRUCTURE note above. `fx` is Null the first time a
+' career reaches here and this reads through it unguarded, exactly as 0x0053AD21 does.
 Local comp:TCompetition = TCompetition.SelectById(fx.compid)
 If fx <> Null And opp <> Null And comp <> Null
 	Local txt:String = "(" + GetText("sla_Home") + ") " + opp.labelname
