@@ -178,6 +178,10 @@ original codebase and from what the tooling can check.
 ## Before opening a pull request
 
 * `python scripts/assemble.py` builds
+* `python scripts/find_name_collisions.py --check` passes. It fails when two bodies use one
+  identifier for two different addresses in NSS5.exe, which makes the assembler emit a
+  single variable for both and silently merges two subsystems' state. A byte match cannot
+  see it, so nothing else will catch it.
 * `python scripts/smoke_boot.py` reaches `MAIN MENU reached` (5s default)
 * if you changed a function body, run `python scripts/progress.py --write-status`
   and commit the regenerated `docs/STATUS.md`. CI fails if it is stale.

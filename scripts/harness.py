@@ -404,7 +404,16 @@ def emit_type(tname, d, target=None, body=None, field_decls=None, bodies=None):
             # Blast radius of this rule over the whole object model is exactly two Types,
             # SZIPCentralFileHeader (+0x26 -> +0x28) and TSnowFlake (+0x21 -> +0x24);
             # every other hole is a genuine one and is padded.
-            _al = min(field_size(bt), 4)
+            # The cap is 8, not 4: bcc aligns a Long/Double field to EIGHT, and a hole
+            # in front of one is therefore padding it would create anyway. zip_fileinfo
+            # is the case that proves it -- tmz_date:tm_zip ends at +0xC and dosDate:Long
+            # starts at +0x10, and the original `New` (0x0058EED0, 95 bytes) zeroes
+            # +0x10..+0x27, the three Longs, and never touches +0xC. Capping at 4 made
+            # that hole look real, added `Field __pad0:Int`, and the extra
+            # `mov [ebx+0xC],0` alone put our New at 134 bytes.
+            # Blast radius of 4 -> 8 over the whole object model is exactly two Types,
+            # zip_fileinfo and TVolSpace; no other hole sits in front of an 8-byte field.
+            _al = min(field_size(bt), 8)
             if (cur + _al - 1) // _al * _al == f["offset"]:
                 cur = f["offset"]
             rem = f["offset"] - cur
@@ -573,6 +582,17 @@ _MODFUNCS = []
 
 
 _MODGLOBALS = []
+# THE THIRD-PARTY SUBSET, kept separately as well as in _MODGLOBALS.
+#
+# assemble.py emits third-party module-level Functions into nss5_external.bmx, a SEPARATE
+# compilation unit that nss5_assembled.bmx pulls in with `Import`. An imported unit cannot
+# see the importer's Globals, so a `'!Global` lifted out of one of those files has to be
+# declared in the EXTERNAL unit or the function using it does not compile at all --
+# "Identifier 'g_zipfilefunc_streams' not found", from zipengine's Fn_0058FB20.
+# _MODGLOBALS alone cannot express that: it is one flat list shared with
+# src/recovered_module/, whose functions DO belong in the main unit. Probe builds keep
+# reading _MODGLOBALS and are unaffected; only assemble.py reads this.
+_TPGLOBALS = []
 _MODIMPORTS = []
 
 
@@ -659,6 +679,7 @@ def thirdparty_functions():
             _MODIMPORTS.extend(imps)
             text, decls = split_globals(text)
             _MODGLOBALS.extend(decls)
+            _TPGLOBALS.extend(decls)
             lines = [l for l in text.split("\n") if not l.lstrip().startswith("'")]
             body = "\n".join(lines).strip()
             if body:

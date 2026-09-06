@@ -30,6 +30,27 @@
 Print "[boot] module body entered (EXERCISE tail)"
 
 g_dataDir = AppDir + "/"
+
+' Same save-root resolution as src/module_body/tail.bmx, and it has to stay the same:
+' a rig that reads a different Options.ini from the one the game reads reports on a
+' configuration no player has. See tail.bmx for the evidence behind CSIDL_PERSONAL.
+' The two tails are alternates, so only one of these Extern blocks is ever compiled.
+' The declaration is flush left inside the block on purpose: scripts/assemble.py's
+' count_placed() counts every tab-indented `Function` in the emitted file as a Type
+' member with a body, and an Extern prototype indented like one makes the placed-vs-
+' present body counts disagree, which aborts the assembly.
+Extern "win32"
+Function SHGetFolderPathW:Int(hwndOwner:Int, nFolder:Int, hToken:Int, dwFlags:Int, pszPath:Short Ptr)
+End Extern
+
+Function UserDocumentsDir:String()
+	Local buf:Short[520]
+	If SHGetFolderPathW(0, 5, 0, 0, Varptr buf[0]) = 0
+		Local d:String = String.FromWString(Varptr buf[0])
+		If d.length > 0 Then Return d
+	EndIf
+	Return CurrentDir()
+End Function
 ' CASE DIRECTION CORRECTED 2026-08-22: module-body offset +5632 calls the brl.retro
 ' Trim wrapper (0x0059C8E8) and +5641 calls 0x004A7410, which is _bbStringToUpper,
 ' not the _brl_retro_Lower the learned helper table used to name it. See
@@ -39,7 +60,7 @@ If Right(g_savedir, 1) <> "/" And Right(g_savedir, 1) <> "\"
 	g_savedir = g_savedir + "/"
 EndIf
 If g_savedir.length < 3
-	g_savedir = CurrentDir() + "/New Star Soccer 5/"
+	g_savedir = UserDocumentsDir() + "/New Star Soccer 5/"
 EndIf
 ' INSTALL prefix (0x00C6E950), not the save root -- see the long note in tail.bmx.
 ' TLocale.SetUp reads this slot for GameMedia/Languages/Languages.csv and hard-exits if

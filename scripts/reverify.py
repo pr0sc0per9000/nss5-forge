@@ -406,7 +406,271 @@ def run_pending(only, reports):
     return 0
 
 
+# ------------------------------------------------------------------------ --tree
+# THE OTHER THREE TREES progress.py COUNTS.
+#
+# --shard above walks src/recovered only, and it skips any file whose base carries no
+# dot. That leaves three of progress.py's four TREES unreachable by the re-verify:
+# src/recovered_module (89 bodies, 64 of them module-level Functions with no Type),
+# src/recovered_thirdparty (112 bodies, one directory down per module) and
+# src/recovered_unverified (64). A `byte-identical vs NSS5.exe` marker in those trees
+# was never re-checked by anything.
+#
+# This is the SAME oracle, not a second one. A Type method still goes through
+# body_of() + harness.try_method. A module-level Function has no reflection record, so
+# bytematch cannot find it by name at all; harness.try_function is the route that
+# exists for them, and check_literals.module_header / module_body are the
+# already-reviewed readers for the `VA 0x.. N bytes sig (f,f,i)f` header and for the
+# de-indented interior. Reused rather than rewritten -- a private copy of module_body
+# is exactly how the wrapped/body-only trap gets reintroduced.
+FUNC_DECL = re.compile(r"^[ \t]*Function[ \t]+([A-Za-z_]\w*)[ \t]*:?[ \t]*([^(\n]*)\(([^)]*)\)",
+                       re.M)
+VA_ANY = re.compile(r"VA\s+0x([0-9A-Fa-f]{6,8})")
+SIG_ANY = re.compile(r"\bsig\s+(\([^)]*\)\S*)")
+RET_ATOM = {"Int": "i", "Byte": "b", "Short": "s", "Long": "l", "Float": "f",
+            "Double": "d", "String": "$", "Byte Ptr": "z"}
+
+# A dotted file name whose Type has no reflection record is not a Type method at all --
+# it is a module Function named `Fn_<VA>.<OurName>`, and bytematch cannot find it by
+# name. EConstBlend / eDrawCharStatus are the other shape: real Types with no row in
+# extracted/class_tables.tsv, where find_method reads a bogus slot and throws out of
+# struct.unpack_from. Both are documented IN THE BODIES THEMSELVES as verified through
+# try_function, and both are recognised here by the exception try_method reports --
+# never by guessing from the file name.
+FN_ROUTE = ("unknown type", "unpack_from requires a buffer")
+
+
+def uncommented(text):
+    """The file with plain comment lines removed ('! pragmas kept) -- the same text
+    check_literals.module_body works on. A header that DISCUSSES `Function DebugStop()`
+    (LoadImageChecked.bmx does, at length) must not be read as the body's own
+    declaration."""
+    return "\n".join(l for l in text.split("\n")
+                     if (not l.lstrip().startswith("'")) or l.lstrip().startswith("'!"))
+
+
+def fn_decl(text, want):
+    """-> (name, return-atom, decl) off the file's OWN `Function Name:Ret(params)` line.
+
+    THE FILE'S DECLARATION IS THE AUTHORITY FOR THE PARAMETER LIST, not the header sig.
+    harness.build_source_function regenerates parameters positionally from the
+    reflection signature, and that grammar cannot spell `String Var`: InsertString
+    (`($ Var,$,i)i`) and NextField (`($ Var,$)$`) crash the sig parser outright, and
+    ParseColourHex (`($,*i,*i,*i)i`) builds with `Int Ptr` where the body was written
+    against `Int Var` and fails with "Unable to convert from 'Int' to 'Int Ptr'". All
+    three read exactly like broken bodies and none of them is. `decl` is the override
+    harness provides for this case (harness.py:1589); the declared names are renamed to
+    a0.. so the list still lines up with the rename module_body applies to the body.
+
+    The name comes from the declaration too, because a file called
+    `Fn_00505FDB.ClampDouble.bmx` declares `Function ClampDouble:Int(...)` -- and the
+    name has to match for build_source_function to leave the target out of the OTHER
+    module functions it bundles, or bcc reports a duplicate identifier.
+    """
+    m = target_decl(text, want)
+    if not m:
+        return (None, None, None)
+    name, ret, params = m.group(1), m.group(2).strip(), m.group(3)
+    atom = RET_ATOM.get(ret or "Int") or (":" + ret)
+    parts = [q.strip() for q in params.split(",") if q.strip()]
+    decl = ", ".join("a%d:%s" % (i, (q.split(":", 1)[1].strip() if ":" in q else "Int"))
+                     for i, q in enumerate(parts))
+    return (name, atom, decl)
+
+
+def fn_blocks(text):
+    """[(name, first_interior_line, end_line)] for each TOP-LEVEL Function in the file.
+
+    One file in the corpus declares two: src/recovered_module/LoadImageChecked.bmx holds
+    MissingArtImage() -- an INVENTED helper, part of the boot shim -- ahead of
+    LoadImageChecked itself. Taking the first declaration verifies the wrong function
+    (its bytes get compared against LoadImageChecked's VA) and taking module_body's
+    span swallows both. Neither result says anything about the body under test, so the
+    file has to be split before either question can be asked.
+    """
+    lines = uncommented(text).split("\n")
+    blocks, depth, start, name = [], 0, None, None
+    for i, l in enumerate(lines):
+        s = l.strip()
+        if FUNC_DECL.match(l):
+            depth += 1
+            if depth == 1:
+                start, name = i + 1, FUNC_DECL.match(l).group(1)
+        elif s.lower().startswith("end function"):
+            depth -= 1
+            if depth == 0 and start is not None:
+                blocks.append((name, start, i))
+                start = None
+    return blocks
+
+
+def target_decl(text, want):
+    """The `Function` declaration this FILE is about -- matched by name, not by order."""
+    for m in FUNC_DECL.finditer(uncommented(text)):
+        if m.group(1) == want:
+            return m
+    return FUNC_DECL.search(uncommented(text))
+
+
+def split_file_body(text, want):
+    """-> (body, None) for the ordinary one-Function file, or (body, siblings) when the
+    file also defines helpers of its own. A sibling is handed to the probe as a '!Raw
+    pragma, which is how harness already emits a not-yet-promoted callee alongside a
+    body (see reverify.body_of's note on TProfile.LoadSavedGame)."""
+    blocks = fn_blocks(text)
+    if len(blocks) < 2:
+        return (with_pragmas(text), None)
+    lines = uncommented(text).split("\n")
+    body, raw = None, []
+    for name, a, b in blocks:
+        if name == want:
+            body = "\n".join(lines[a:b])
+        else:
+            raw += ["'!Raw " + l.strip() for l in lines[a - 1:b + 1]]
+    if body is None:
+        return (with_pragmas(text), None)
+    hoist = [l.lstrip() for l in text.split("\n") if l.lstrip().startswith("'!")]
+    return ("\n".join(hoist + raw) + "\n" + body, raw)
+
+
+def with_pragmas(text):
+    """check_literals.module_body(text), plus any '! pragma the wrapper hid from it.
+
+    module_body peels everything BEFORE the `Function` line, and a WRAPPED module
+    Function normally writes its pragmas above that line:
+
+        '!Global g_profile_int43:Int
+        Function SyncSteamAchievements:Int()
+
+    so the Globals are discarded with the wrapper and the probe dies with
+    "Identifier 'g_profile_int43' not found" -- a build failure that reads exactly like a
+    broken body. Same hoist reverify.body_of already performs for the try_method side.
+    """
+    interior = CL_module_body(text)
+    hoist = [l.lstrip() for l in text.split("\n")
+             if l.lstrip().startswith("'!") and l.strip() not in interior]
+    return ("\n".join(hoist) + "\n" + interior) if hoist else interior
+
+
+def CL_module_body(text):
+    import check_literals as CL
+    return CL.module_body(text)
+
+
+def report(r, why=""):
+    """A harness result dict -> the (status, detail) pair the TSV rows carry."""
+    st = r.get("status")
+    detail = "%s/%s" % (r.get("matched"), r.get("orig_len"))
+    if r.get("first_diff") is not None:
+        detail += " first_diff=+%s" % r["first_diff"]
+    if st != "MATCH":
+        detail += " | " + str(r.get("error") or r.get("message")
+                              or r.get("mode") or "")[:200]
+    if why:
+        detail += "  [%s]" % why
+    return (st, detail)
+
+
+def as_function(path, text, why):
+    """The try_function route, for a module-level Function and for the two thirdparty
+    root Types whose own headers record that they were verified this way."""
+    import check_literals as CL
+    va, _size, sig = CL.module_header(text)
+    if not sig:
+        # `sig ()i` on its own header line (Fn_0058D987.SteamPostPlayerValue) or after
+        # other text on the VA line (Rotr) -- module_header's regex wants the whole
+        # `VA 0x.. N bytes sig ..` run contiguous and finds neither.
+        ms = SIG_ANY.search(text)
+        sig = ms.group(1) if ms else None
+    if va is None:
+        # Not every header spells `VA 0x.. N bytes sig ..` in that order -- Rotr.bmx
+        # writes `VA 0x0058D072   34 bytes   KIND=Function, no Self.   sig (i,i)i` and
+        # GetInterceptPoint puts the signature on the next line. The VA alone is enough
+        # once the declaration supplies the shape.
+        mv = VA_ANY.search(text)
+        va = int(mv.group(1), 16) if mv else None
+    if va is None:
+        return ("NO_VA", "no parsable `VA 0x..` in the header")
+    want = os.path.basename(path)[:-4].split(".")[-1]
+    name, atom, decl = fn_decl(text, want)
+    if name is None:
+        # No Function line of its own: a wrapped Method (EConstBlend.Delete) verified
+        # through the VA route. Name it after the file and unwrap with body_of.
+        if not sig:
+            return ("NO_SIG", "no header sig and no Function declaration")
+        name = os.path.basename(path)[:-4].replace(".", "_")
+        return report(H.try_function(name, sig, body_of(text), va), why)
+    # The RETURN TYPE comes from the declaration too, not from the header sig.
+    # module_header's regex takes the sig as one \S+ token, so `sig ($ Var,$,i)i`
+    # (InsertString) and `sig ($ Var,$)$` (NextField) are truncated at the space to
+    # `($`, and parse_sig then walks off the end of the string with
+    # "IndexError: string index out of range" -- a correct body reported as an error in
+    # the checker. With `decl` supplying the parameters, the sig is needed for the
+    # return type alone, and the declaration states that unambiguously.
+    body, _raw = split_file_body(text, name)
+    return report(H.try_function(name, "()" + atom, body, va, decl=decl), why)
+
+
+def verify_path(path):
+    """-> (status, detail) for one body, whichever shape it is."""
+    text = open(path, encoding="utf-8", errors="replace").read()
+    base = os.path.basename(path)[:-4]
+    if "." not in base:
+        return as_function(path, text, "")
+    tname, mname = base.split(".", 1)
+    try:
+        r = H.try_method(tname, mname, body_of(text))
+    except Exception as exc:                                          # noqa: BLE001
+        if any(k in str(exc) for k in FN_ROUTE):
+            return as_function(path, text, "try_function VA route")
+        raise
+    if r.get("status") == "ERROR" and any(k in str(r.get("message") or "")
+                                          for k in FN_ROUTE):
+        return as_function(path, text, "try_function VA route")
+    return report(r)
+
+
+def tree_files(d):
+    """Every .bmx under d, recursively -- thirdparty keeps its bodies one level down."""
+    out = []
+    for root, _dirs, files in os.walk(d):
+        for f in sorted(files):
+            if f.endswith(".bmx"):
+                out.append(os.path.join(root, f))
+    return sorted(out)
+
+
+def run_tree(d, spec, out):
+    """--tree DIR [--shard i/n]: the rows --shard writes, for any tree."""
+    files = tree_files(d)
+    if spec:
+        idx, n = (int(x) for x in spec.split("/", 1))
+        files = files[idx::n]
+    t0 = time.time()
+    fh = open(out, "w", encoding="utf-8") if out else sys.stdout
+    try:
+        fh.write("#tree %s  %s  %d files  worker=%s\n"
+                 % (d, spec or "all", len(files), os.environ.get("NSS5_WORKER")))
+        for path in files:
+            try:
+                st, detail = verify_path(path)
+            except Exception as exc:                                   # noqa: BLE001
+                st = "ERROR"
+                detail = str(exc)[:200].replace("\t", " ").replace("\n", " ")
+            fh.write("%s\t%s\t%s\t%.0f\n"
+                     % (os.path.relpath(path, ROOT).replace(os.sep, "/"),
+                        st, detail, os.path.getmtime(path)))
+            fh.flush()
+    finally:
+        if out:
+            fh.close()
+    print("tree %s done %d files %.0fs" % (d, len(files), time.time() - t0))
+    return 0
+
+
 def main():
+    if "--tree" in sys.argv:
+        return run_tree(argval("--tree"), argval("--shard"), argval("--out"))
     # The two borrowed modes, dispatched before pick() sees argv. Neither re-implements
     # anything: --shard runs this file's own body_of/try_method over files[i::n], and
     # --pending runs the same byte oracle over the trees that have not matched yet.

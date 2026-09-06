@@ -24,7 +24,17 @@
 '   0x00C6F088 -> TChannel (slot 0x48 = TChannel.Playing, resolved against the BRL
 '     class table at 0x00C9CC68); 0x00C61720 and 0x00C6171C -> TSound (they are the
 '     first argument of _brl_audio_PlaySound).  Named g_chan_ui / g_snd_move /
-'     g_snd_select here.
+'     g_snd_click here.
+'     Which TSound is which comes from TScreen.SetUp @0x00510174, which stores
+'     LoadSound("GameMedia/Sounds/Click.ogg") into 0x00C6171C at 0x00510240 and
+'     LoadSound("GameMedia/Sounds/Select.ogg") into 0x00C61720 at 0x0051026D. So the
+'     Case 5 activation sound read at 0x00516B96 is Click.ogg, and the Case 1/2/3/4
+'     scroll sound read at 0x00516B35/B6F/BD0/C3A is Select.ogg. Click.ogg is the
+'     commit sound and Select.ogg the movement blip, which is the opposite of what
+'     the two asset names suggest read in isolation. The name g_snd_click on
+'     0x00C6171C follows the asset that slot holds, and leaves the name claimed by
+'     one address so extracted/global_alias_overrides.tsv can merge g_sndclick
+'     onto it.
 '     g_chan_ui is the same slot the module body allocates as g_Object857, so it is
 '     merged onto that name in extracted/global_alias_overrides.tsv. Split, the
 '     unguarded Playing() calls below ran through a Global boot never allocated.
@@ -49,7 +59,7 @@
 '!Global g_table_int05:Int
 '!Global g_player_int50:Int
 '!Global g_snd_move:TSound
-'!Global g_snd_select:TSound
+'!Global g_snd_click:TSound
 '!Global g_chan_ui:TChannel
 
 	Method UpdateActivated()
@@ -93,7 +103,7 @@
 				End If
 				Self.ScrollDown()
 			Case 5
-				PlaySound(g_snd_select, g_chan_ui)
+				PlaySound(g_snd_click, g_chan_ui)
 				Self.SelectCurrentItem()
 			Case 3
 				If g_chan_ui.Playing() = 0

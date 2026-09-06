@@ -8,7 +8,7 @@
 '
 ' assumes module globals:
 '   Global g_stable_panel:TPanel      ' 0x00c6dee4  (SetText is TGadget slot 0x64)
-'   Global g_stable_racenum:Int       ' 0x00c6df64
+'   Global g_stable_racecount:Int     ' 0x00c6df64
 '   Global g_stable_int04:Int         ' 0x00c6df6c
 '   Global g_stable_int05:Int         ' 0x00c6df70
 '   Global g_stable_button:TButton    ' 0x00c6debc  (SetIcon 0x90, CreateToolTip 0x80)
@@ -30,19 +30,25 @@
 ' an If/Else would have emitted the jmp alone.
 
 	Function SetUpNextRace:Int()
-		'!Global g_stable_racenum:Int
+		' 0x00C6DF64, measured: 0x00588585 `830564dfc60001 add dword ptr [0xc6df64],1`,
+' 0x0058858C `833d64dfc60006 cmp dword ptr [0xc6df64],6` and 0x005885CE
+' `ff3564dfc600 push dword ptr [0xc6df64]` into the panel caption. THorse.Render,
+' TScreen_Stable.FinishRace and TScreen_Stable.Update use the g_stable_racenum spelling
+' for the DIFFERENT slot 0x00C6DF6C, which TScreen_Stable.RefreshRunners calls
+' g_stable_selectedrunner, so this counter shared a variable with theirs.
+		'!Global g_stable_racecount:Int
 		'!Global g_stable_panel:TPanel
 		'!Global g_stable_int04:Int
 		'!Global g_stable_int05:Int
 		'!Global g_stable_button:TButton
 		'!Global g_stable_icon:TImage
 		LogLine("SetUpNextRace")
-		g_stable_racenum :+ 1
-		If g_stable_racenum > 6
+		g_stable_racecount :+ 1
+		If g_stable_racecount > 6
 			TScreen.DoMessage(GetText("CMESSAGE_NOMORERACES"),0,0)
 			Return 0
 		EndIf
-		g_stable_panel.SetText(GetText("stable_Race") + " " + g_stable_racenum + " / 6","",-1,-1)
+		g_stable_panel.SetText(GetText("stable_Race") + " " + g_stable_racecount + " / 6","",-1,-1)
 		g_stable_int04 = 0
 		g_stable_int05 = 1
 		THorse.SelectRunners(6)

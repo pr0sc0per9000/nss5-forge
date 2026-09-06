@@ -31,6 +31,26 @@ Guarded dereferences are excluded: if the same body tests `If g_x` / `If g_x <> 
 drown the report in false ones -- a missed bug costs a click, a false one costs a wrong
 "fix" to a body that was right.
 
+AN ARGUMENT IS A DEREFERENCE TOO
+--------------------------------
+`PlaySound(g_x, chan)` writes no dot and no bracket, so the syntactic scan above cannot see
+it -- yet brl.mod/audio.mod/audio.bmx:224 is `Function PlaySound:TChannel( sound:TSound,
+channel:TChannel=Null ) Return sound.Play( channel )`, a method call straight through
+argument 1. Every slot on 0x00C6C550 (the casino win chime, read by six bodies under five
+names) and 0x00C6F0D4 (the shop purchase chime) faults exactly there, and every one of them
+reads as clean to a scan that only matches `g_x.`.
+
+So the second pass reads the CALLEE. `deref_arg_table()` parses every Function and Method
+in the BlitzMax module sources and in the assembled game source, and records an argument
+position when that parameter's own name appears as `p.` or `p[` inside the body. A dead
+Global passed at such a position is reported; passed anywhere else it is not.
+
+Deriving the table rather than listing callees by hand is what keeps the report honest in
+both directions. PlaySound's argument 2 is the same syntax as its argument 1, but `channel`
+is only handed on to `Play`, whose signature defaults it to Null -- so a never-written
+TChannel there is correct code, and it is the parse of the callee, not an allowlist someone
+has to maintain, that separates the two.
+
 WHAT IT CANNOT SEE
 ------------------
 Nulls that arise at RUNTIME -- an object created but left Null because its creator hit an
@@ -50,6 +70,95 @@ TREES = [os.path.join(ROOT, "src", "recovered"),
          os.path.join(ROOT, "src", "recovered_unverified")]
 
 NUMERIC = {"int", "float", "double", "byte", "short", "long", "string"}
+
+# Callee bodies for the BRL/PUB functions the game links. They are not part of the
+# reconstruction, so the only place PlaySound's `Return sound.Play( channel )` can be read
+# is the BlitzMax distribution setup.py downloads.
+BMX_MODULES = os.path.join(ROOT, "tools", "blitzmax-legacy-src", "mod")
+
+# A parameter typed as one of these cannot be a Null dereference.
+SCALAR_PARAM = NUMERIC | {"$", "%", "#", "!", ""}
+
+_FUNC = re.compile(r"^\s*Function\s+(\w+)\s*:?\s*[\w\[\]$%#!.]*\s*\(([^)]*)\)", re.I)
+_METH = re.compile(r"^\s*Method\s+(\w+)\s*:?\s*[\w\[\]$%#!.]*\s*\(([^)]*)\)", re.I)
+_ENDF = re.compile(r"^\s*End\s*Function", re.I)
+_ENDM = re.compile(r"^\s*End\s*Method", re.I)
+_CALL = re.compile(r"\b([A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*)\s*\(([^()]*)\)")
+
+
+def _split_top(s):
+    """Split an argument or parameter list on commas that are not inside brackets."""
+    out, depth, cur = [], 0, ""
+    for ch in s:
+        if ch in "([":
+            depth += 1
+        elif ch in ")]":
+            depth -= 1
+        if ch == "," and depth == 0:
+            out.append(cur)
+            cur = ""
+        else:
+            cur += ch
+    if cur.strip():
+        out.append(cur)
+    return [p.strip() for p in out]
+
+
+def _scan_callees(text, table):
+    """Record (callee -> {1-based positions}) for every parameter the body dereferences."""
+    lines = text.split("\n")
+    i = 0
+    while i < len(lines):
+        fm, mm = _FUNC.match(lines[i]), _METH.match(lines[i])
+        if not (fm or mm):
+            i += 1
+            continue
+        m = fm or mm
+        closer = _ENDF if fm else _ENDM
+        body, j = [], i + 1
+        while j < len(lines) and not closer.match(lines[j]):
+            if _FUNC.match(lines[j]) or _METH.match(lines[j]):
+                break
+            body.append(lines[j])
+            j += 1
+        btxt = "\n".join(l for l in body if not l.lstrip().startswith("'"))
+        for idx, p in enumerate(_split_top(m.group(2))):
+            pm = re.match(r"(\w+)\s*(?::\s*([\w\[\]$%#!.]+))?", p)
+            if not pm:
+                continue
+            if (pm.group(2) or "").split("[")[0].lower() in SCALAR_PARAM:
+                continue
+            if re.search(r"\b%s\s*(\.|\[)" % re.escape(pm.group(1)), btxt, re.I):
+                table.setdefault(m.group(1).lower(), set()).add(idx + 1)
+        i = j if j > i else i + 1
+
+
+def deref_arg_table():
+    """-> {callee name lower: {argument positions whose parameter the body dereferences}}.
+
+    Read out of the callee sources, never listed by hand. An allowlist would have to be
+    right about PlaySound's two arguments separately -- argument 1 is `sound.Play(...)` and
+    faults, argument 2 is handed to a parameter that defaults to Null and does not -- and
+    keeping such a list correct across brl.mod is the kind of maintenance that silently
+    stops happening.
+    """
+    table = {}
+    if os.path.isdir(BMX_MODULES):
+        for dirpath, _dirnames, filenames in os.walk(BMX_MODULES):
+            if os.sep + "doc" in dirpath or os.sep + "tests" in dirpath:
+                continue
+            for fn in filenames:
+                if not fn.endswith(".bmx"):
+                    continue
+                try:
+                    text = open(os.path.join(dirpath, fn), encoding="utf-8",
+                                errors="replace").read()
+                except OSError:
+                    continue
+                _scan_callees(text, table)
+    if os.path.exists(SRC):
+        _scan_callees(open(SRC, encoding="utf-8-sig", errors="replace").read(), table)
+    return table
 
 
 def dead_globals():
@@ -96,8 +205,9 @@ def main():
     by_screen = "--by-screen" in sys.argv
     handlers_only = "--handlers" in sys.argv
     dead = dead_globals()
+    deref_args = deref_arg_table()
 
-    hits = []
+    hits, arg_hits = [], []
     for tree in TREES:
         if not os.path.isdir(tree):
             continue
@@ -121,15 +231,40 @@ def main():
                     if g not in dead or g in guarded:
                         continue
                     hits.append((fn[:-4], i, g, dead[g], line.strip()[:90]))
+                for m in _CALL.finditer(line):
+                    callee, argstr = m.group(1), m.group(2)
+                    if not argstr.strip():
+                        continue
+                    positions = deref_args.get(callee.split(".")[-1].lower(), ())
+                    for idx, a in enumerate(_split_top(argstr)):
+                        g = a.strip().lower()
+                        if not re.fullmatch(r"g_\w+", g):
+                            continue
+                        if g not in dead or g in guarded or (idx + 1) not in positions:
+                            continue
+                        arg_hits.append((fn[:-4], i, g, dead[g], callee, idx + 1))
 
     if handlers_only:
         hits = [h for h in hits if re.search(r"\.(Button|Combo|Do|Click)\w*$", h[0])]
+        arg_hits = [h for h in arg_hits
+                    if re.search(r"\.(Button|Combo|Do|Click)\w*$", h[0])]
 
     print("PREDICTED CRASH SITES -- deref of a Global the program never writes")
     print("  dead object/array Globals : %d" % len(dead))
     print("  unguarded deref sites     : %d  across %d bodies"
           % (len(hits), len({h[0] for h in hits})))
+    print("  dereferenced as an argument: %d  across %d bodies"
+          % (len(arg_hits), len({h[0] for h in arg_hits})))
     print()
+
+    if arg_hits:
+        print("DEREFERENCED THROUGH A CALL ARGUMENT")
+        print("  the callee's own body does `p.` or `p[` on this parameter, so the Null")
+        print("  reaches a method call and faults there rather than at the line below.")
+        for fn, ln, g, ty, callee, pos in sorted(arg_hits):
+            print("   %-44s:%-4d %-26s %-10s %s arg %d"
+                  % (fn, ln, g, ty, callee, pos))
+        print()
 
     if by_screen:
         groups = collections.defaultdict(list)

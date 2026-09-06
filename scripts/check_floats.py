@@ -201,7 +201,7 @@ def main():
 
     inv = C.load_inventory()
     brl = C.load_brl()
-    uni = C.load_universe(inv, brl)
+    uni, _owner = C.load_universe(inv, brl)
     rec = C.load_recovered()
 
     globals_addrs = load_globals_final()

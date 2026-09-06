@@ -9,14 +9,18 @@
 ' TProfile + 0x1C8 is helppages:Int[]; +0x4C is element 13 (data starts at +0x18).
 ' Literals read out of the exe: "casino", "", "btn_casino".
 ' Module Globals declared by this body (names are ours; the TYPES are load-bearing):
-'   Global g_screen:TScreen     (0x00C66724)
+'   Global g_screen_gamemenu:TScreen     (0x00C66724)
+'     The GAME MENU screen, whose construction site is TScreen_GameMenu.CreateScreen
+'     (TScreen_GameMenu.CreateScreen.bmx:20). Entering the casino sets the active gadget
+'     on the game menu behind it. Spelled g_screen it shared one emitted variable with
+'     five other screens' slots and this call landed on the data-editor screen.
 '   Global g_profile:TProfile   (0x00C6F028)
 	Function SetUpScreen:Int()
-		'!Global g_screen:TScreen
+		'!Global g_screen_gamemenu:TScreen
 		'!Global g_profile:TProfile
 		TScreen.SetActive("casino", "")
 		PlayTrack(6)
-		g_screen.SetActiveGadget("btn_casino")
+		g_screen_gamemenu.SetActiveGadget("btn_casino")
 		TScreen_GameMenu.UpdateTitlePanel()
 		If g_profile.helppages[13] = 0 Then
 			TScreen.Tutorial()

@@ -4,7 +4,7 @@
 ' (832/832, original length from Ghidra's inventory; verified under NSS5_NO_LEARN=1)
 '
 ' ASSUMPTIONS -- Global NAMES are ours, the declared TYPES are load-bearing.
-'   0x00C6E298 g_horses:TList             (already TList in TScreen_Stable.RefreshRunners)
+'   0x00C6E298 g_runners:TList             (already TList in TScreen_Stable.RefreshRunners)
 '   0x00C6DF68 g_stable_stake:Int   0x00C6DF6C g_stable_racenum:Int
 '   0x00C6DF70 g_stable_state:Int         (all three bare dword traffic, no refcounting)
 '   0x00C6F028 g_contractoffer_tplayer:TProfile -- slots 0xfc UpdateBank, 0x150 CheckAchievement
@@ -29,7 +29,12 @@
 '     (codegen-patterns 16.2, measured for String and holding for Int too).
 '   * both string literals read out of NSS5.exe with harness.read_string.
 ' Body-only format: statements only, parameters are a0, a1, ...
-'!Global g_horses:TList
+' 0x00C6E298 is the RACE RUNNERS list, not the master horse list. THorse.SelectRunners
+' declares both in one body -- g_horses for 0x00C6E294 (the list it enumerates and
+' sorts) and g_runners for 0x00C6E298 (the list it Clears and AddLasts into) -- so the
+' two are provably different slots, and the module body creates them separately. Spelled
+' g_runners here, this body's slot shared the emitted variable of the master list.
+'!Global g_runners:TList
 '!Global g_stable_stake:Int
 '!Global g_stable_racenum:Int
 '!Global g_stable_state:Int
@@ -43,7 +48,7 @@
 '!Global g_stable_panStake:TPanel
 '!Global g_stable_btnStartRace:TButton
 '!Global g_img_nextrace:TImage
-For Local h:THorse = EachIn g_horses
+For Local h:THorse = EachIn g_runners
 	If h.raceposition = 1 And g_stable_racenum = h.racenum
 		Local w:Int = g_stable_stake * h.betprice
 		g_profile.UpdateBank(w)
@@ -84,7 +89,7 @@ g_stable_panStake.Show()
 g_stable_btnStartRace.SetIcon(g_img_nextrace)
 g_stable_btnStartRace.CreateToolTip(GetText("tt_NextRace"))
 PauseChannel(g_chan_race)
-For Local h:THorse = EachIn g_horses
+For Local h:THorse = EachIn g_runners
 	h.PostRaceUpdate(h.raceposition)
 Next
 RefreshTableOwned()

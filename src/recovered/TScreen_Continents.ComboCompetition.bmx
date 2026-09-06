@@ -8,7 +8,13 @@
 '      0x00C67220 g_continents_competition:TCompetition
 '      0x00C67224 g_continents_mode:Int
 '      0x00C59310 g_continents_sortmode:Int       0x00C59A48 g_club_sortmode:Int
-'      0x00C596F4 g_nation_sortmode:Int
+'      0x00C596F4 g_nation_sortby:Int
+'        The nation/competition sort-key selector TNation.Compare reads. Measured, the
+'        store below is 0x00547E13 `c705f496c50002000000 mov dword ptr [0xc596f4],2`.
+'        g_nation_sortmode is TClub.GetFixtureList's and TNation.GetFixtureList's name
+'        for 0x00C59E44, the FIXTURE sort key TFixture.Compare reads and those two
+'        bodies set to 17, so one variable carried both keys and each subsystem's sort
+'        order was decided by whichever ran last.
 '    The three "sortmode" Globals are the Compare-mode selectors the following
 '    TList.Sort() reads; all three are plain dword stores of 2 (no refcount) = Int.
 '  * The club/nation branch is a SELECT, not If/ElseIf: at 0x00547D9E the subject is
@@ -27,7 +33,7 @@
 '!Global g_continents_competition:TCompetition
 '!Global g_continents_mode:Int
 '!Global g_continents_sortmode:Int
-'!Global g_nation_sortmode:Int
+'!Global g_nation_sortby:Int
 '!Global g_club_sortmode:Int
 
 Function ComboCompetition:Int()
@@ -52,7 +58,7 @@ Function ComboCompetition:Int()
 			Next
 			g_continents_sortmode = 2
 			g_club_sortmode = 2
-			g_nation_sortmode = 2
+			g_nation_sortby = 2
 			lst.Sort()
 			For Local t:TBase_Team = EachIn lst
 				g_combo_competition.AddItem(t.labelname, "BBBBBB", "FFFFFF", t.id)

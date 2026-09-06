@@ -8,8 +8,8 @@
 ' float immediates from the image: 0x43340000=180.0, 0x438c0000=280.0,
 '   0x43320000=178.0, 0x43e50000=458.0, 0x40800000=4.0.
 ' module Globals assumed by this body (names ours, types load-bearing):
-'   Global g_kits_img1:TImage    ' 0x00c6f34c
-'   Global g_kits_img2:TImage    ' 0x00c6f3b0
+'   Global g_object872:TImage    ' 0x00c6f34c  MessageBg.png, loaded by the module body
+'   Global g_object873:TImage    ' 0x00c6f3b0  MessageLine.png, loaded by the module body
 '   Global g_screen_int21:Int    ' 0x00c6efdc
 	Function Draw:Int()
 		'!Global g_object872:TImage

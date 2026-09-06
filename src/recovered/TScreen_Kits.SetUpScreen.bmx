@@ -1,16 +1,42 @@
-' TScreen_Kits.SetUpScreen -- NOT VERIFIED (verify against the shared assembled binary
-' VA 0x0054989d   1260 bytes   vtable slot 0x34   sig (:TFixture,()i,()i)i
-' byte-identical vs NSS5.exe (1260/1260, original length from Ghidra's inventory)
-' before moving to src/recovered/), but a private-harness probe (scripts/harness.py
-' try_method, isolated build, not the shared src/assembled tree) now reports
-' status=MATCH mode=reloc matched=1260/1260 total=1260 (105 relocations masked, which
-' is expected -- the probe links at different addresses than NSS5.exe/the shared
-' assembled binary; every non-relocation byte, including the parameter register
-' assignment, agrees exactly).
-' VA 0x0054989D   orig length 1260 bytes (Ghidra-authoritative)
-' KIND=Function (:TFixture,()i,()i)i, slot 0x34.
+' TScreen_Kits.SetUpScreen -- byte-identical vs NSS5.exe
+' VA 0x0054989D   1260 bytes (Ghidra-authoritative)   vtable slot 0x34
+' KIND=Function (:TFixture,()i,()i)i
 '
-' THIS PASS (byte-fidelity refinement from status/score, 8.0% -> harness MATCH):
+' VERIFIED 2026-08-23, three checks, NSS5_NO_LEARN=1 in the environment for all three:
+'   1. PER-FUNCTION ORACLE. harness.try_method("TScreen_Kits","SetUpScreen", body) ->
+'      status=MATCH mode=reloc matched=1260 total=1260 reloc_masked=105
+'      orig_len=1260 our_len=1260 orig_len_from=ghidra orig_va=0x0054989D.
+'   2. COMPOSITION, which is what the previous header asked for and did not have.
+'      scripts/assemble.py rebuilt src/assembled/nss5_assembled.exe in an isolated
+'      worktree, then scripts/check_assembled.py's comparator (harness.compare, the
+'      assembled-side symbol tables, learn=None) over this VA:
+'          identical modulo reloc : 1     DIVERGED after assembly : 0
+'      i.e. the body survives the whole-program facts -- vtable slot order, Global
+'      types, Type declaration order -- unchanged. check_assembled.py's own target
+'      list is drawn from coverage.load_recovered(), which scans src/recovered* only,
+'      so this VA had to be fed in explicitly; the comparator and its inputs are
+'      otherwise untouched.
+'   3. LITERAL CONTENT, which a byte MATCH does NOT certify (the oracle masks the
+'      BBString address a literal reaches the code as -- the kit-style names "STRIPES",
+'      "SPLIT", "DIAGONALSPLIT", "SEGMENTS", "CHEQUERED" are exactly the kind of thing
+'      that would compare equal while being wrong). scripts/check_literals.py --files
+'      <this file> -> OK, 0 mismatches, against the exe's own decoded BBStrings.
+'
+'   mode=reloc, not exact, is the expected verdict: our image links at different
+'   addresses than NSS5.exe, so every Global/string/class-table operand is a
+'   relocation. Every non-relocation byte agrees.
+'
+' PROMOTED to src/recovered/ in this pass. Promotion moves the body's position in the
+' emitted source, and Type declaration order is a whole-program property, so it was
+' re-verified AFTER the move, not before: assemble.py rebuilt, then check_assembled.py
+' over this VA (identical modulo reloc, 0 diverged) and over its own standard 80-body
+' sample (9 exact / 71 reloc / 0 diverged / 0 unlocatable).
+'
+' CAVEAT THAT THE ORACLE CANNOT COVER (docs/specs/21-module-globals.md 8.1): relocation
+' masking means a Global reference compares equal whatever slot it names. A MATCH here
+' is a proof about the emitted code, not about which slot each name resolves to.
+'
+' HOW THE BODY GOT HERE (earlier pass, retained for the reasoning trail):
 ' localise_diff.py (scripts/localise_diff.py, run against a private probe build so no
 ' shared state was touched) isolated the ENTIRE -32 byte delta to three real shape
 ' defects, not to an unfixable register quirk as the previous pass's header concluded:

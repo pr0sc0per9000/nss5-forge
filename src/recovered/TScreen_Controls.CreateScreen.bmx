@@ -9,7 +9,12 @@
 '     0x00C640D0 g_img_keys:TImage      0x00C640C4 g_screen_controls:TScreen
 '     0x00C640D4 g_pan_simple:TPanel    0x00C640D8 g_pan_advanced:TPanel
 '     0x00C6EFDC g_screenwidth:Int      0x00C6EFE0 g_screenheight:Int
-'     0x00C6F254 g_img_back:TImage      0x00C6F274 g_img_tick:TImage
+'     0x00C6F254 g_img_back:TImage      0x00C6F274 g_img_play:TImage
+'       0x00C6F274 is the corpus-wide accept/proceed icon: ten other bodies name it
+'       g_img_play, including TScreen_Options.CreateScreen, which builds the identically
+'       named "tick" button on the sibling screen with it. Spelled g_img_tick here it
+'       collided with TScreen_Stable.RefreshRunners' name for 0x00C6DEAC, so neither
+'       spelling could be merged onto a writer and this button's icon stayed Null.
 '     0x00C6E91C g_col_key:String  -- globals_final.tsv calls this Int; it is pushed in a
 '                `$` parameter slot of CreateButton/CreateLabel, so per codegen-patterns
 '                11.2 the code wins over the table.  It is the highlight colour used for
@@ -56,7 +61,7 @@
 '!Global g_screenheight:Int
 '!Global g_col_key:String
 '!Global g_img_back:TImage
-'!Global g_img_tick:TImage
+'!Global g_img_play:TImage
 ' CASE DIRECTION CORRECTED 2026-08-22: 9 call sites -> .ToUpper().
 ' extracted/runtime_helpers.tsv named 0x004A7410 `_brl_retro_Lower` and 0x004A74E0
 ' `_brl_retro_Upper`. Both were wrong and neither address is a brl.retro wrapper:
@@ -76,7 +81,7 @@
 		g_screen_controls.AddGadget(TButton.CreateButton("pan_title", GetText("Edit Controls"), 0, 0, 800, 60, 0, 4, "EEEEEE", "FFFFFF", Null, Null, 1.0, 0, ""))
 		g_screen_controls.AddGadget(TPanel.CreatePanel("navpanel", "", 0, g_screenheight - 60, g_screenwidth, 60, "FFFFFF", "FFFFFF", 3, 1.0, 0, 0, 0))
 		g_screen_controls.AddGadget(TButton.CreateButton("back", "", 10, g_screenheight - 50, 120, 40, 1, 2, "FFFFFF", "FFFFFF", g_img_back, ButtonBack, 1.0, 1, ""))
-		g_screen_controls.AddGadget(TButton.CreateButton("tick", "", 670, g_screenheight - 50, 120, 40, 1, 2, "FFFFFF", "FFFFFF", g_img_tick, ButtonTick, 1.0, 1, ""))
+		g_screen_controls.AddGadget(TButton.CreateButton("tick", "", 670, g_screenheight - 50, 120, 40, 1, 2, "FFFFFF", "FFFFFF", g_img_play, ButtonTick, 1.0, 1, ""))
 		g_screen_controls.AddGadget(TPanel.CreatePanel("pan_Controls", "", 10, 70, 290, 460, "FFFFFF", "FFFFFF", 3, 0.8, 1, 0, 0))
 		Local w:Int = 130
 		Local h:Int = 30

@@ -34,7 +34,7 @@
 '     -- each is `Int(ReadSettingFloat(...))`; the names are the Engine.ini keys, which are
 '        real content read out of the exe, not invented.
 '   0x00C5D660 g_netliney:Int  0x00C5D674 g_dugouty:Int
-'   0x00C5D66C g_pitchhalfwidth  0x00C5D670 g_pitchheight
+'   0x00C5D66C g_stadiumhalfwidth  0x00C5D670 g_pitchheight
 '   0x00C5D664 g_pitchwidth      0x00C5D668 g_stadiumheight                :Int
 '     -- all six are plain dword stores with no refcount traffic (patterns 10.7/11.2).
 '
@@ -91,7 +91,14 @@
 '!Global g_dugouty:Int
 '!Global g_stadiumimg:TImage[]
 '!Global g_stadiumgimg:TImage[]
-'!Global g_pitchhalfwidth:Int
+' 0x00C5D66C is half the STADIUM IMAGE's width, stored at 0x004E5B2D
+' `a36cd6c500 mov dword ptr [0xc5d66c], eax` from ImageWidth(g_stadiumimg[0]) * 0.5.
+' g_pitchhalfwidth is TBall.CheckSideLines', TEngine.SetUpSetPiece's and
+' TTeam.UpdatePlayerDestinations' name for the DIFFERENT slot 0x00C5D634, the sideline
+' Engine.ini supplies, so this store was the only writer those three readers had and
+' they used 290 (StadiumTop.png is 580 wide) where the original uses 450: throw-ins were
+' given 160 pixels inside the touchline and corners were placed at the wrong x.
+'!Global g_stadiumhalfwidth:Int
 '!Global g_pitchheight:Int
 '!Global g_pitchwidth:Int
 '!Global g_stadiumheight:Int
@@ -187,9 +194,9 @@
 		SetImageHandle(g_stadiumgimg[3], ImageWidth(g_stadiumgimg[3])-1, 0)
 		SetImageHandle(g_stadiumgimg[4], ImageWidth(g_stadiumgimg[4])-1, ImageHeight(g_stadiumgimg[4])-1)
 		SetImageHandle(g_stadiumgimg[5], ImageWidth(g_stadiumgimg[5])-1, 0)
-		g_pitchhalfwidth = Int(ImageWidth(g_stadiumimg[0]) * 0.5)
+		g_stadiumhalfwidth = Int(ImageWidth(g_stadiumimg[0]) * 0.5)
 		g_pitchheight = Int(ImageHeight(g_stadiumimg[0]) * 0.5)
-		g_pitchwidth = g_pitchhalfwidth * 2
+		g_pitchwidth = g_stadiumhalfwidth * 2
 		g_stadiumheight = Int(g_pitchheight * 1.5)
 		Local fanfile:String = "EngineMedia/Match/Pitch/Fans.png"
 		Local kit:TKit = TKit.CreateKit(TKitStrings.CreateKitStrings("000000", "FFFFFF", "0000C0", "000000", "PLAIN"), fanfile)

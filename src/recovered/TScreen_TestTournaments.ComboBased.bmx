@@ -8,7 +8,13 @@
 '         0x00C66444  g_combo_level       :TCombo   (globals_final: construction, 1 site)
 '         0x00C66448  g_combo_locale      :TCombo
 '         0x00C6644C  g_combo_based       :TCombo
-'         0x00C66450  g_combo_competition :TCombo
+'         0x00C66450  g_tt_cmb_comp :TCombo
+'           This screen's own competition combo, built by
+'           TScreen_TestTournaments.CreateScreen:162 under that name. The
+'           g_combo_competition spelling is TScreen_Continents' name for 0x00C671E8,
+'           and extracted/global_alias_overrides.tsv:198 merges it onto
+'           g_continents_combo, so these four statements drove the CONTINENTS screen's
+'           team combo.
 '         0x00C6099C  g_competitions      :TList    (globals_final says only "Object";
 '                                                    typed TList here because the body
 '                                                    calls slot 0x8C ObjectEnumerator on
@@ -40,11 +46,11 @@
 '!Global g_combo_level:TCombo
 '!Global g_combo_locale:TCombo
 '!Global g_combo_based:TCombo
-'!Global g_combo_competition:TCombo
+'!Global g_tt_cmb_comp:TCombo
 '!Global g_competitions:TList
 	Function ComboBased()
 		LogLine("ComboBased")
-		g_combo_competition.ClearItems()
+		g_tt_cmb_comp.ClearItems()
 		Local lvl:Int = g_combo_level.GetSelectedItem() - 1
 		Local loc:Int = -1
 		Local basedid:Int = -1
@@ -68,7 +74,7 @@
 			If lvl <> comp.level Then Continue
 			If loc <> comp.locale Then Continue
 			If basedid <> comp.based Then Continue
-			g_combo_competition.AddItem(comp.labelname, "BBBBBB", "FFFFFF", comp.id)
+			g_tt_cmb_comp.AddItem(comp.labelname, "BBBBBB", "FFFFFF", comp.id)
 		Next
 		TScreen_TestTournaments.ComboCompetition()
 	End Function

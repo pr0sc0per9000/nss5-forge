@@ -78,40 +78,45 @@
 ' starts accumulating slots from the backpanel row onward.
 '
 ' STATEMENT-ORDER QUIRK (byte-confirmed, not tidied): for the Save row, `y :+ h + 10` sits
-' BETWEEN `g_btn_test = TButton.CreateButton(...)` and `g_screen.AddGadget(g_btn_test)` --
+' BETWEEN `g_btn_test = TButton.CreateButton(...)` and `g_screen_editmenu.AddGadget(g_btn_test)` --
 ' not after both. Same class of quirk already documented in TScreen_MainMenu.CreateScreen's
 ' header ("`y :+ 30` happens BETWEEN creating a load panel and AddGadget-ing it").
 '
 ' Return 0 matches the original's explicit `return 0` (sig ()i).
 '
-'!Global g_screen:TScreen
+' 0x00C64D18, the data-editor screen and its construction site. The g_screen spelling was
+' shared with five other screens' slots -- create account, game menu, test menu, options
+' and the paused match -- so all six were one emitted variable, and because this body is
+' the one CreateAllScreens calls, that variable held the data editor for the whole of a
+' normal session and every other screen's read landed here.
+'!Global g_screen_editmenu:TScreen
 '!Global g_btn_test:TButton
 '!Global g_btn_savemobile:TButton
 '!Global g_screen_int21:Int
-g_screen = TScreen.CreateScreen("editmenu", Null, Null, Null)
-g_screen.AddGadget(TButton.CreateButton("pan_title", GetText("Data Editor"), 0, 0, 800, 40, 0, 3, "EEEEEE", "FFFFFF", Null, Null, 1.0, 0, ""))
-g_screen.AddGadget(TButton.CreateButton("quit", GetText("Quit"), 690, 10, 100, 20, 1, 2, "FF0000", "000000", Null, ButtonQuit, 1.0, 1, ""))
-g_screen.AddGadget(TButton.CreateButton("editmenu_footer", "New Star Games 2010", 0, 560, 800, 20, 0, 2, "EEEEEE", "FFFFFF", Null, Null, 1.0, 0, ""))
+g_screen_editmenu = TScreen.CreateScreen("editmenu", Null, Null, Null)
+g_screen_editmenu.AddGadget(TButton.CreateButton("pan_title", GetText("Data Editor"), 0, 0, 800, 40, 0, 3, "EEEEEE", "FFFFFF", Null, Null, 1.0, 0, ""))
+g_screen_editmenu.AddGadget(TButton.CreateButton("quit", GetText("Quit"), 690, 10, 100, 20, 1, 2, "FF0000", "000000", Null, ButtonQuit, 1.0, 1, ""))
+g_screen_editmenu.AddGadget(TButton.CreateButton("editmenu_footer", "New Star Games 2010", 0, 560, 800, 20, 0, 2, "EEEEEE", "FFFFFF", Null, Null, 1.0, 0, ""))
 Local w:Int = 200
 Local h:Int = 40
 Local xleft:Int = g_screen_int21 / 2 - 120 - w / 2
 Local xright:Int = g_screen_int21 / 2 + 120 - w / 2
 Local y:Int = 190
 Local col:String = "FFFFFF"
-g_screen.AddGadget(TPanel.CreatePanel("backpanel", "", xleft - 10, y - 10, w * 2 + 60, (h + 10) * 4 + 10, "FFFFFF", "FFFFFF", 3, 0.8, 1, 0, 0))
-g_screen.AddGadget(TButton.CreateButton("editmenu_continents", GetText("Continents"), xleft, y, w, h, 1, 3, col, "FFFFFF", Null, ButtonContinents, 1.0, 1, ""))
-g_screen.AddGadget(TButton.CreateButton("editmenu_nations", GetText("Nations"), xright, y, w, h, 1, 3, col, "FFFFFF", Null, ButtonNations, 1.0, 1, ""))
+g_screen_editmenu.AddGadget(TPanel.CreatePanel("backpanel", "", xleft - 10, y - 10, w * 2 + 60, (h + 10) * 4 + 10, "FFFFFF", "FFFFFF", 3, 0.8, 1, 0, 0))
+g_screen_editmenu.AddGadget(TButton.CreateButton("editmenu_continents", GetText("Continents"), xleft, y, w, h, 1, 3, col, "FFFFFF", Null, ButtonContinents, 1.0, 1, ""))
+g_screen_editmenu.AddGadget(TButton.CreateButton("editmenu_nations", GetText("Nations"), xright, y, w, h, 1, 3, col, "FFFFFF", Null, ButtonNations, 1.0, 1, ""))
 y :+ h + 10
-g_screen.AddGadget(TButton.CreateButton("editmenu_clubs", GetText("Clubs"), xleft, y, w, h, 1, 3, col, "FFFFFF", Null, TScreen_Clubs.SetUpScreen, 1.0, 1, ""))
-g_screen.AddGadget(TButton.CreateButton("editmenu_competitions", GetText("Competitions"), xright, y, w, h, 1, 3, col, "FFFFFF", Null, TScreen_Competitions.SetUpScreen, 1.0, 1, ""))
+g_screen_editmenu.AddGadget(TButton.CreateButton("editmenu_clubs", GetText("Clubs"), xleft, y, w, h, 1, 3, col, "FFFFFF", Null, TScreen_Clubs.SetUpScreen, 1.0, 1, ""))
+g_screen_editmenu.AddGadget(TButton.CreateButton("editmenu_competitions", GetText("Competitions"), xright, y, w, h, 1, 3, col, "FFFFFF", Null, TScreen_Competitions.SetUpScreen, 1.0, 1, ""))
 y :+ h + 10
-g_screen.AddGadget(TButton.CreateButton("editmenu_promotions", GetText("Promotions"), xleft, y, w, h, 1, 3, col, "FFFFFF", Null, TScreen_Promotions.SetUpScreen, 1.0, 1, ""))
-g_screen.AddGadget(TButton.CreateButton("editmenu_continentalcomps", GetText("Continental Comps"), xright, y, w, h, 1, 3, col, "FFFFFF", Null, TScreen_ContinentalComps.SetUpScreen, 1.0, 1, ""))
+g_screen_editmenu.AddGadget(TButton.CreateButton("editmenu_promotions", GetText("Promotions"), xleft, y, w, h, 1, 3, col, "FFFFFF", Null, TScreen_Promotions.SetUpScreen, 1.0, 1, ""))
+g_screen_editmenu.AddGadget(TButton.CreateButton("editmenu_continentalcomps", GetText("Continental Comps"), xright, y, w, h, 1, 3, col, "FFFFFF", Null, TScreen_ContinentalComps.SetUpScreen, 1.0, 1, ""))
 y :+ h + 10
-g_screen.AddGadget(TButton.CreateButton("editmenu_testdata", GetText("Test Data"), xleft, y, w, h, 1, 3, "FF8800", "FFFFFF", Null, ButtonTestData, 1.0, 1, ""))
+g_screen_editmenu.AddGadget(TButton.CreateButton("editmenu_testdata", GetText("Test Data"), xleft, y, w, h, 1, 3, "FF8800", "FFFFFF", Null, ButtonTestData, 1.0, 1, ""))
 g_btn_test = TButton.CreateButton("editmenu_save", GetText("Save"), xright, y, w, h, 1, 3, "FF0000", "FFFFFF", Null, ButtonSave, 1.0, 1, "")
 y :+ h + 10
-g_screen.AddGadget(g_btn_test)
+g_screen_editmenu.AddGadget(g_btn_test)
 g_btn_savemobile = TButton.CreateButton("editmenu_savemobile", "Save For Mobile", xright, y, w, h, 1, 3, "FF0000", "FFFFFF", Null, ButtonSaveMobile, 1.0, 1, "")
-g_screen.AddGadget(g_btn_savemobile)
+g_screen_editmenu.AddGadget(g_btn_savemobile)
 Return 0

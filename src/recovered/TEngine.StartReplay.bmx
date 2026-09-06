@@ -9,7 +9,7 @@
 ' CODEGEN NOTE -- `If f.frametime > g_replayMax` is 411 bytes; `If g_replayMax < f.frametime`
 ' is 412. The original emits 39 /r (cmp mem,reg), which per section 10.1 puts the MEMORY
 ' operand first in source order.
-' g_engineFloat (0x00C5B1D4) and g_optionsFloat (0x00C5D23C) -- two DISTINCT
+' g_engine_zoom (0x00C5B1D4) and g_enginefloat (0x00C5D23C) -- two DISTINCT
 ' addresses, 4 bytes apart -- both read 2.0 in NSS5.exe's data section (independently
 ' confirmed, not a copy-paste). g_engineFloat is the same address as g_engine_float01 in
 ' TEngine.Render.bmx/EndReplay.bmx and g_engine_zoom in TEngine.SetUpReplay.bmx. See
@@ -17,8 +17,17 @@
 	Function StartReplay()
 		'!Global g_balls:TList
 		'!Global g_trainingMode:Int
-		'!Global g_engineFloat:Float = 2.0
-		'!Global g_optionsFloat:Float = 2.0
+		' BOTH NAMES HERE STOOD FOR THE OTHER BODY'S SLOT. The store below is 0x004D4829
+' `d9053cd2c500 fld dword ptr [0xc5d23c]` then 0x004D482F
+' `d91dd4b1c500 fstp dword ptr [0xc5b1d4]`, so 0x00C5B1D4 is the DESTINATION and
+' 0x00C5D23C the source. TEngine.CheckReplayInput spells 0x00C5D23C g_enginefloat and
+' 0x00C5B1D4 g_engine_zoom (it decrements 0x00C5B1D4 by 0.25 at 0x004D4CF5 and clamps it
+' through `lea eax,[0xc5b1d4]`), which is the other way round from the spelling used
+' here: one identifier, two slots, in a single-statement assignment. Emitted, the whole
+' statement ran backwards and starting a replay overwrote the saved replay-zoom option
+' with the live camera zoom, which TOptions.SaveOptions then persisted to Options.ini.
+		'!Global g_engine_zoom:Float = 2.0
+		'!Global g_enginefloat:Float = 2.0
 		'!Global g_replayFlag:Int
 		'!Global g_replayMin:Int
 		'!Global g_replayMax:Int
@@ -26,7 +35,7 @@
 		'!Global g_engineState:Int
 		If Not g_balls Then Return 0
 		If g_trainingMode > 0 Then Return 0
-		g_engineFloat = g_optionsFloat
+		g_engine_zoom = g_enginefloat
 		FlushAllInput()
 		g_replayFlag = 0
 		g_replayMin = -1

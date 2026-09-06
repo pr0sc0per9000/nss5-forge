@@ -119,7 +119,7 @@ ASM = os.path.join(ASMDIR, "nss5_assembled.exe")
 def targets():
     inv = C.load_inventory()
     brl = C.load_brl()
-    uni = C.load_universe(inv, brl)
+    uni, _owner = C.load_universe(inv, brl)
     rec = C.load_recovered()
     out = []
     for va, (_path, ok) in sorted(rec.items()):

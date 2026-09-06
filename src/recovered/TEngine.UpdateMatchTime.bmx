@@ -24,7 +24,7 @@
 '   g_statestarted 0x00C5B254 g_matchtimer 0x00C6EFD4   g_shootoutstarted 0x00C5B244
 '   g_homeTeam:TTeam 0x00C5B218  g_possessionhome 0x00C5B25C  g_possessionaway 0x00C5B260
 '   g_half 0x00C5B208  g_minutes 0x00C5B210  g_lastminutetick 0x00C5B214
-'   g_halflength 0x00C5B20C  g_matchspeed 0x00C5D230
+'   g_halflength 0x00C5B20C  g_opt_matchlength 0x00C5D230
 	Function UpdateMatchTime:Int()
 		'!Global g_intraining:Int
 		'!Global g_matchstate:Int
@@ -39,7 +39,12 @@
 		'!Global g_minutes:Int
 		'!Global g_lastminutetick:Int
 		'!Global g_halflength:Int
-		'!Global g_matchspeed:Int
+		' 0x00C5D230, the match-LENGTH option, measured at 0x004D41F6
+' `0faf0530d2c500 imul eax, dword ptr [0xc5d230]`. g_matchspeed is TEngine.MatchLoop's
+' name for the neighbouring 0x00C5D234, the match-SPEED option, so the two options were
+' one emitted variable and the tick length below was computed from speed (30) instead of
+' length (3): ten times too long, so the match clock crawled and never reached half time.
+		'!Global g_opt_matchlength:Int
 		If g_intraining <> 0 Then Return 0
 		Local b:TBall = TBall.GetActiveBall()
 		If g_matchstate = 8 Then
@@ -62,7 +67,7 @@
 		Else
 			g_possessionaway = g_possessionaway + 0.01
 		End If
-		Local tick:Int = (g_halflength * 60 * g_matchspeed) / 90
+		Local tick:Int = (g_halflength * 60 * g_opt_matchlength) / 90
 		If g_matchtimer > g_lastminutetick + tick Then
 			g_lastminutetick = g_matchtimer
 			g_minutes :+ 1

@@ -1,12 +1,38 @@
 ' LoadSoundChecked  -- module-level Function (no Type)
 ' VA 0x004bc564   256 bytes   sig ($,i):TSound
-' byte-identical vs NSS5.exe (256/256, original length from Ghidra's inventory, mode=reloc)
+' NOT byte-identical AS COMPILED, and deliberately so: this file carries a BOOT SHIM.
+' Measured, harness.try_function under NSS5_NO_LEARN=1, against the body this file
+' actually compiles:
+'     MISMATCH   our_len=253  orig_len=256  first_diff=+6
+'
+' THE ORIGINAL BODY IS RECONSTRUCTED AND PROVEN. Restore the two DebugStops -- and note
+' the branches are NOT symmetric, which is what the length turns on:
+'     "cannot see sound" branch  ->  DebugStop  then  Return Null
+'     "could not be loaded"      ->  DebugStop  (falls through to Return snd)
+' changing nothing else, and the same oracle reports
+'     MATCH  256/256  mode=reloc  reloc_masked=25
+'
+' So the 256 bytes are recovered work and the shipped build declines to use them. Counted
+' by scripts/progress.py under VERIFIED_ORIGINAL_SUBSTITUTED: out of the headline (which
+' measures what the tree compiles) and into the separately-labelled reconstruction figure.
+'
+' ############################################################################
+' # DELIBERATE DIVERGENCE FROM THE ORIGINAL -- BOOT SHIM.                    #
+' # Both DebugStops are removed. Restore the two branches above to get the   #
+' # original behaviour back. This file is in src/recovered_module/, which    #
+' # scripts/reverify.py does not walk -- scripts/reverify_module.py does,    #
+' # and it is what caught this marker.                                       #
+' ############################################################################
 '
 ' NAME AND GLOBAL NAMES ARE OURS. Third member of the asset-loader family, alongside
 ' LoadImageChecked (0x004BC372) and LoadAnimImageChecked (0x004BC664): same path
 ' resolution, same "incbin" bypass, same four-message logging shape, differing only in the
 ' literals and the loader called.
-'!Global g_pathPrefix:String
+' The first guard operand is the SAVE root 0x00C6E9A8, not a second install root:
+' 0x004BC586 pushes it, and the install root 0x00C6E950 is the second operand.
+' src/recovered_module/LoadImageChecked.bmx carries the full evidence and the reason the
+' g_pathPrefix spelling silently tested the install root twice.
+'!Global g_userpath:String
 '!Global g_dataDir:String
 ' 0x005B9660 IDENTIFIED: brl.blitz DebugStop, NOT GCCollect. Spelling it GCCollect reaches
 '   MATCH only because the harness LEARNS the operand from this very body -- circular. With
@@ -34,7 +60,7 @@
 	Function LoadSoundChecked:TSound(a0:String, a1:Int)
 		Local snd:TSound
 		If Not a0.Contains("incbin")
-			If Not a0.Contains(g_pathPrefix) And Not a0.Contains(g_dataDir)
+			If Not a0.Contains(g_userpath) And Not a0.Contains(g_dataDir)
 				a0 = g_dataDir + a0
 			End If
 			If FileType(a0) = 1

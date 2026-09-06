@@ -87,8 +87,44 @@
 '   7. pan_nav is not a stored Global; pan_health's width is `790 - x`.
 ' Build/verify: NSS5_NO_LEARN=1, harness.try_method('TScreen_MatchPrep','CreateScreen', body)
 ' with body = scripts/reverify.py:body_of() applied to this file.
+' NAMES CHANGED 2026-08-23 (codegen unaffected -- re-verified MATCH under NSS5_NO_LEARN=1).
+' Eight Globals here were spelled with names that OTHER screens use for DIFFERENT slots,
+' which is the NAME COLLISION case globals_type_overrides.tsv's header warns about:
+'     was            is                          this screen's slot   the other claimant
+'     g_prg_pace     g_matchprep_prgpace         0x00C685D0           TScreen_Abilities 0x00C66A78
+'     g_prg_dribbling g_matchprep_prgdribbling   0x00C685D4           TScreen_Abilities 0x00C66A7C
+'     g_prg_tackling g_matchprep_prgtackling     0x00C685D8           TScreen_Abilities 0x00C66A80
+'     g_prg_passing  g_matchprep_prgpassing      0x00C685DC           TScreen_Abilities 0x00C66A84
+'     g_prg_shooting g_matchprep_prgshooting     0x00C685E0           TScreen_Abilities 0x00C66A88
+'     g_prg_heading  g_matchprep_prgheading      0x00C685E4           TScreen_Abilities 0x00C66A8C
+'     g_prg_flair    g_matchprep_prgflair        0x00C685E8           TScreen_Abilities 0x00C66A90
+'     g_lbl_cash     g_matchprep_lblcash         0x00C685BC           TScreen_GameMenu  0x00C66788
+' Sharing a name merges two unrelated slots into one variable, so this CreateScreen was
+' overwriting the Abilities bars and the Game Menu bank label, while its OWN readers in
+' TScreen_MatchPrep.SetUpScreen -- g_matchprep_bartackling, g_matchprep_barheading and
+' g_matchprep_lblmoney -- were left with no writer at all and stayed Null. SetUpScreen's
+' first statement dereferences the last of those, which is the "Attempt to access field or
+' method of Null object" on entering Match Preparation. The eight renamed writers are joined
+' to SetUpScreen's reader names by rows in extracted/global_alias_overrides.tsv, which carry
+' the store addresses and the full derivation.
+'
+' SUPERSEDED (2026-08-29, routed-leftovers pass): four further writes in this body were found
+' to clobber slots other screens own, and are renamed here too --
+'   g_pan_title     -> g_matchprep_pantitle      0x00C685B8 (store 0x0055C45B); 0x00C66768 is
+'                      GameMenu's, read by 20 other screens
+'   g_btn_play      -> g_matchprep_btnplay       0x00C685C8 (store 0x0055C741); 0x00C66798 is
+'                      GameMenu/Home + TProfile.SetPlayButtonIcon
+'   g_pan_abilities -> g_matchprep_panabilities  0x00C685CC (store 0x0055C9B9); 0x00C66A74 is
+'                      TScreen_Abilities
+'   g_prg_energy    -> g_matchprep_prgenergy     0x00C68628 (store 0x0055D6F2); 0x00C66790 is
+'                      Home's title-bar energy gauge
+' CreateAllScreens runs this body (88) after GameMenu(74)/Home(79)/Abilities(82) and before
+' WebPage(94)/Interview(103)/Stable(104), so every clobber reached each later screen.
+' btnplay and prgenergy are also read by this screen's SetUpScreen (as g_matchprep_btnplay
+' and g_matchprep_barenergy); global_alias_overrides.tsv rows 2052-2053 join them. The other
+' two slots are private to this body and needed no row.
 '!Global g_screen_matchprep:TScreen
-'!Global g_pan_abilities:TPanel
+'!Global g_matchprep_panabilities:TPanel
 '!Global g_pan_health:TPanel
 '!Global g_img_star:TImage
 '!Global g_img_drugsboost:TImage
@@ -110,13 +146,13 @@
 '!Global g_skinpath:String
 '!Global g_screenwidth:Int
 '!Global g_screenheight:Int
-'!Global g_prg_pace:TProgressBar
-'!Global g_prg_flair:TProgressBar
-'!Global g_prg_tackling:TProgressBar
-'!Global g_prg_dribbling:TProgressBar
-'!Global g_prg_passing:TProgressBar
-'!Global g_prg_shooting:TProgressBar
-'!Global g_prg_heading:TProgressBar
+'!Global g_matchprep_prgpace:TProgressBar
+'!Global g_matchprep_prgflair:TProgressBar
+'!Global g_matchprep_prgtackling:TProgressBar
+'!Global g_matchprep_prgdribbling:TProgressBar
+'!Global g_matchprep_prgpassing:TProgressBar
+'!Global g_matchprep_prgshooting:TProgressBar
+'!Global g_matchprep_prgheading:TProgressBar
 '!Global g_btn_drugs:TButton
 '!Global g_btn_booze:TButton
 '!Global g_btn_shinpads:TButton
@@ -129,10 +165,10 @@
 '!Global g_prg_boots:TProgressBar
 '!Global g_prg_injury:TProgressBar
 '!Global g_prg_nrg:TProgressBar
-'!Global g_prg_energy:TProgressBar
-'!Global g_pan_title:TPanel
-'!Global g_lbl_cash:TLabel
-'!Global g_btn_play:TButton
+'!Global g_matchprep_prgenergy:TProgressBar
+'!Global g_matchprep_pantitle:TPanel
+'!Global g_matchprep_lblcash:TLabel
+'!Global g_matchprep_btnplay:TButton
 '!Global g_lbl_Selection:TLabel
 '!Global g_lbl_Status:TLabel
 	Function CreateScreen()
@@ -152,17 +188,17 @@
 			g_img_arrowr = LoadImageChecked(g_mediapath + "ArrowR.png", -1)
 			g_img_eye = LoadImageChecked(g_mediapath + "Eye.png", -1)
 		End If
-		g_pan_title = TPanel.CreatePanel("pan_title", GetText("Match Preparation"), 0, 0, g_screenwidth, 60, "FFFFFF", "FFFFFF", 4, 1.0, 0, 0, 1)
-		g_screen_matchprep.AddGadget(g_pan_title)
-		g_pan_title.AddChild(TLabel.CreateLabel("lbl_bank", GetText("Bank"), g_screenwidth - 160, 10, 100, 20, 2, "FFFFFF", "FFFFFF", 1.0, 2, 0, 1, 1, Null, 1, 0, 0, 0, "", 0))
-		g_lbl_cash = TLabel.CreateLabel("lbl_cash", "", g_screenwidth - 160, 30, 100, 20, 2, "888888", "FFFFFF", 1.0, 3, 0, 1, 1, Null, 1, 0, 0, 0, "", 0)
-		g_pan_title.AddChild(g_lbl_cash)
-		g_pan_title.AddChild(TButton.CreateButton("btn_help", "", g_screenwidth - 50, 10, 40, 40, 1, 2, "FFFFFF", "FFFFFF", g_img_helpicon, TScreen.ButtonHelp, 1.0, 1, ""))
+		g_matchprep_pantitle = TPanel.CreatePanel("pan_title", GetText("Match Preparation"), 0, 0, g_screenwidth, 60, "FFFFFF", "FFFFFF", 4, 1.0, 0, 0, 1)
+		g_screen_matchprep.AddGadget(g_matchprep_pantitle)
+		g_matchprep_pantitle.AddChild(TLabel.CreateLabel("lbl_bank", GetText("Bank"), g_screenwidth - 160, 10, 100, 20, 2, "FFFFFF", "FFFFFF", 1.0, 2, 0, 1, 1, Null, 1, 0, 0, 0, "", 0))
+		g_matchprep_lblcash = TLabel.CreateLabel("lbl_cash", "", g_screenwidth - 160, 30, 100, 20, 2, "888888", "FFFFFF", 1.0, 3, 0, 1, 1, Null, 1, 0, 0, 0, "", 0)
+		g_matchprep_pantitle.AddChild(g_matchprep_lblcash)
+		g_matchprep_pantitle.AddChild(TButton.CreateButton("btn_help", "", g_screenwidth - 50, 10, 40, 40, 1, 2, "FFFFFF", "FFFFFF", g_img_helpicon, TScreen.ButtonHelp, 1.0, 1, ""))
 		g_screen_matchprep.AddGadget(TPanel.CreatePanel("pan_nav", "", 0, g_screenheight - 60, g_screenwidth, 60, "FFFFFF", "FFFFFF", 3, 1.0, 0, 0, 0))
 		g_screen_matchprep.AddGadget(TButton.CreateButton("btn_quit", "", 10, g_screenheight - 50, 120, 40, 1, 2, "FFFFFF", "FFFFFF", g_img_backicon, TScreen_WorldMap.SetUpScreen, 1.0, 1, GetText("tt_Back")))
 		g_screen_matchprep.AddGadget(TButton.CreateButton("btn_skip", GetText("Skip Match"), 300, g_screenheight - 50, 200, 40, 1, 3, "FFFFFF", "FFFFFF", g_img_arrowr, TScreen_MatchPrep.ButtonSkipMatch, 1.0, 1, ""))
-		g_btn_play = TButton.CreateButton("btn_play", "", g_screenwidth - 130, g_screenheight - 50, 120, 40, 1, 3, "FFFFFF", "FFFFFF", g_img_playicon, TScreen_MatchPrep.ButtonPlay, 1.0, 1, GetText("tt_Proceed"))
-		g_screen_matchprep.AddGadget(g_btn_play)
+		g_matchprep_btnplay = TButton.CreateButton("btn_play", "", g_screenwidth - 130, g_screenheight - 50, 120, 40, 1, 3, "FFFFFF", "FFFFFF", g_img_playicon, TScreen_MatchPrep.ButtonPlay, 1.0, 1, GetText("tt_Proceed"))
+		g_screen_matchprep.AddGadget(g_matchprep_btnplay)
 		Local x:Int = 10
 		Local y:Int = 70
 		Local h:Int = 50
@@ -178,37 +214,37 @@
 		h = 40
 		w = 100
 		Local wnum2:Int = 265
-		g_pan_abilities = TPanel.CreatePanel("pan_abilities", GetText("Abilities"), x, y, w + wnum2 + 20, h, "FFFFFF", "FFFFFF", 3, 0.8, 1, 360, 0)
+		g_matchprep_panabilities = TPanel.CreatePanel("pan_abilities", GetText("Abilities"), x, y, w + wnum2 + 20, h, "FFFFFF", "FFFFFF", 3, 0.8, 1, 360, 0)
 		y :+ h + 10
 		x :+ 10
-		g_screen_matchprep.AddGadget(g_pan_abilities)
-		g_pan_abilities.AddChild(TLabel.CreateLabel("lbl_Pace", GetText("Pace"), x, y, w, h, 3, "FFFFFF", "FFFFFF", 1.0, 4, 1, 0, 1, Null, 1, 0, 0, 0, "", 0))
-		g_prg_pace = TProgressBar.CreateProgressBar("prg_Pace", "", x + w, y, wnum2, h, 3, "FFFFFF", SkillColour(1), "FFFFFF", 0.8, 5, g_img_star)
+		g_screen_matchprep.AddGadget(g_matchprep_panabilities)
+		g_matchprep_panabilities.AddChild(TLabel.CreateLabel("lbl_Pace", GetText("Pace"), x, y, w, h, 3, "FFFFFF", "FFFFFF", 1.0, 4, 1, 0, 1, Null, 1, 0, 0, 0, "", 0))
+		g_matchprep_prgpace = TProgressBar.CreateProgressBar("prg_Pace", "", x + w, y, wnum2, h, 3, "FFFFFF", SkillColour(1), "FFFFFF", 0.8, 5, g_img_star)
 		y :+ h + 10
-		g_pan_abilities.AddChild(g_prg_pace)
-		g_pan_abilities.AddChild(TLabel.CreateLabel("lbl_Flair", GetText("Flair"), x, y, w, h, 3, "FFFFFF", "FFFFFF", 1.0, 4, 1, 0, 1, Null, 1, 0, 0, 0, "", 0))
-		g_prg_flair = TProgressBar.CreateProgressBar("prg_Flair", "", x + w, y, wnum2, h, 3, "FFFFFF", SkillColour(7), "FFFFFF", 0.8, 5, g_img_star)
+		g_matchprep_panabilities.AddChild(g_matchprep_prgpace)
+		g_matchprep_panabilities.AddChild(TLabel.CreateLabel("lbl_Flair", GetText("Flair"), x, y, w, h, 3, "FFFFFF", "FFFFFF", 1.0, 4, 1, 0, 1, Null, 1, 0, 0, 0, "", 0))
+		g_matchprep_prgflair = TProgressBar.CreateProgressBar("prg_Flair", "", x + w, y, wnum2, h, 3, "FFFFFF", SkillColour(7), "FFFFFF", 0.8, 5, g_img_star)
 		y :+ h + 10
-		g_pan_abilities.AddChild(g_prg_flair)
-		g_pan_abilities.AddChild(TLabel.CreateLabel("lbl_Tackling", GetText("Tackling"), x, y, w, h, 3, "FFFFFF", "FFFFFF", 1.0, 4, 1, 0, 1, Null, 1, 0, 0, 0, "", 0))
-		g_prg_tackling = TProgressBar.CreateProgressBar("prg_Tackling", "", x + w, y, wnum2, h, 3, "FFFFFF", SkillColour(3), "FFFFFF", 0.8, 5, g_img_star)
+		g_matchprep_panabilities.AddChild(g_matchprep_prgflair)
+		g_matchprep_panabilities.AddChild(TLabel.CreateLabel("lbl_Tackling", GetText("Tackling"), x, y, w, h, 3, "FFFFFF", "FFFFFF", 1.0, 4, 1, 0, 1, Null, 1, 0, 0, 0, "", 0))
+		g_matchprep_prgtackling = TProgressBar.CreateProgressBar("prg_Tackling", "", x + w, y, wnum2, h, 3, "FFFFFF", SkillColour(3), "FFFFFF", 0.8, 5, g_img_star)
 		y :+ h + 10
-		g_pan_abilities.AddChild(g_prg_tackling)
-		g_pan_abilities.AddChild(TLabel.CreateLabel("lbl_Dribbling", GetText("Dribbling"), x, y, w, h, 3, "FFFFFF", "FFFFFF", 1.0, 4, 1, 0, 1, Null, 1, 0, 0, 0, "", 0))
-		g_prg_dribbling = TProgressBar.CreateProgressBar("prg_Dribbling", "", x + w, y, wnum2, h, 3, "FFFFFF", SkillColour(2), "FFFFFF", 0.8, 5, g_img_star)
+		g_matchprep_panabilities.AddChild(g_matchprep_prgtackling)
+		g_matchprep_panabilities.AddChild(TLabel.CreateLabel("lbl_Dribbling", GetText("Dribbling"), x, y, w, h, 3, "FFFFFF", "FFFFFF", 1.0, 4, 1, 0, 1, Null, 1, 0, 0, 0, "", 0))
+		g_matchprep_prgdribbling = TProgressBar.CreateProgressBar("prg_Dribbling", "", x + w, y, wnum2, h, 3, "FFFFFF", SkillColour(2), "FFFFFF", 0.8, 5, g_img_star)
 		y :+ h + 10
-		g_pan_abilities.AddChild(g_prg_dribbling)
-		g_pan_abilities.AddChild(TLabel.CreateLabel("lbl_Passing", GetText("Passing"), x, y, w, h, 3, "FFFFFF", "FFFFFF", 1.0, 4, 1, 0, 1, Null, 1, 0, 0, 0, "", 0))
-		g_prg_passing = TProgressBar.CreateProgressBar("prg_Passing", "", x + w, y, wnum2, h, 3, "FFFFFF", SkillColour(4), "FFFFFF", 0.8, 5, g_img_star)
+		g_matchprep_panabilities.AddChild(g_matchprep_prgdribbling)
+		g_matchprep_panabilities.AddChild(TLabel.CreateLabel("lbl_Passing", GetText("Passing"), x, y, w, h, 3, "FFFFFF", "FFFFFF", 1.0, 4, 1, 0, 1, Null, 1, 0, 0, 0, "", 0))
+		g_matchprep_prgpassing = TProgressBar.CreateProgressBar("prg_Passing", "", x + w, y, wnum2, h, 3, "FFFFFF", SkillColour(4), "FFFFFF", 0.8, 5, g_img_star)
 		y :+ h + 10
-		g_pan_abilities.AddChild(g_prg_passing)
-		g_pan_abilities.AddChild(TLabel.CreateLabel("lbl_Shooting", GetText("Shooting"), x, y, w, h, 3, "FFFFFF", "FFFFFF", 1.0, 4, 1, 0, 1, Null, 1, 0, 0, 0, "", 0))
-		g_prg_shooting = TProgressBar.CreateProgressBar("prg_Shooting", "", x + w, y, wnum2, h, 3, "FFFFFF", SkillColour(6), "FFFFFF", 0.8, 5, g_img_star)
+		g_matchprep_panabilities.AddChild(g_matchprep_prgpassing)
+		g_matchprep_panabilities.AddChild(TLabel.CreateLabel("lbl_Shooting", GetText("Shooting"), x, y, w, h, 3, "FFFFFF", "FFFFFF", 1.0, 4, 1, 0, 1, Null, 1, 0, 0, 0, "", 0))
+		g_matchprep_prgshooting = TProgressBar.CreateProgressBar("prg_Shooting", "", x + w, y, wnum2, h, 3, "FFFFFF", SkillColour(6), "FFFFFF", 0.8, 5, g_img_star)
 		y :+ h + 10
-		g_pan_abilities.AddChild(g_prg_shooting)
-		g_pan_abilities.AddChild(TLabel.CreateLabel("lbl_Heading", GetText("Heading"), x, y, w, h, 3, "FFFFFF", "FFFFFF", 1.0, 4, 1, 0, 1, Null, 1, 0, 0, 0, "", 0))
-		g_prg_heading = TProgressBar.CreateProgressBar("prg_Heading", "", x + w, y, wnum2, h, 3, "FFFFFF", SkillColour(5), "FFFFFF", 0.8, 5, g_img_star)
-		g_pan_abilities.AddChild(g_prg_heading)
+		g_matchprep_panabilities.AddChild(g_matchprep_prgshooting)
+		g_matchprep_panabilities.AddChild(TLabel.CreateLabel("lbl_Heading", GetText("Heading"), x, y, w, h, 3, "FFFFFF", "FFFFFF", 1.0, 4, 1, 0, 1, Null, 1, 0, 0, 0, "", 0))
+		g_matchprep_prgheading = TProgressBar.CreateProgressBar("prg_Heading", "", x + w, y, wnum2, h, 3, "FFFFFF", SkillColour(5), "FFFFFF", 0.8, 5, g_img_star)
+		g_matchprep_panabilities.AddChild(g_matchprep_prgheading)
 		x = 405
 		y = 130
 		g_pan_health = TPanel.CreatePanel("pan_health", GetText("Kit Bag"), x, y, 790 - x, h, "FFFFFF", "FFFFFF", 3, 0.8, 1, 360, 0)
@@ -247,9 +283,9 @@
 		g_prg_nrg = TProgressBar.CreateProgressBar("prg_NRG", "NRG", x + wnum3 + 10, y, w, h, 3, "FFFFFF", "38FF24", "FFFFFF", 0.8, 1, Null)
 		y :+ h + 10
 		g_pan_health.AddChild(g_prg_nrg)
-		g_prg_energy = TProgressBar.CreateProgressBar("prg_Energy", "", x, y, wnum3 + w + 10, h, 3, "FFFFFF", "00FF00", "FFFFFF", 0.8, 1, Null)
-		g_pan_health.AddChild(g_prg_energy)
-		g_screen_matchprep.lHelp.AddLast(THelpBox.Create(g_prg_pace, 0, 0, 0, 0, GetText("CHELP_ABILITIES"), 1, 2))
+		g_matchprep_prgenergy = TProgressBar.CreateProgressBar("prg_Energy", "", x, y, wnum3 + w + 10, h, 3, "FFFFFF", "00FF00", "FFFFFF", 0.8, 1, Null)
+		g_pan_health.AddChild(g_matchprep_prgenergy)
+		g_screen_matchprep.lHelp.AddLast(THelpBox.Create(g_matchprep_prgpace, 0, 0, 0, 0, GetText("CHELP_ABILITIES"), 1, 2))
 		g_screen_matchprep.lHelp.AddLast(THelpBox.Create(g_btn_drugs, 0, 0, 0, 0, GetText("CHELP_ENHANCERS"), 1, 2))
 		g_screen_matchprep.lHelp.AddLast(THelpBox.Create(g_btn_booze, 0, 0, 0, 0, GetText("CHELP_BOOZE"), 1, 2))
 		g_screen_matchprep.lHelp.AddLast(THelpBox.Create(g_btn_shinpads, 0, 0, 0, 0, GetText("CHELP_SHINPADS"), 1, 2))

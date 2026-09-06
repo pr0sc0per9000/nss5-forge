@@ -92,34 +92,40 @@ address	alias	canonical	evidence
 0x00C62D9C	g_combo_arrow	g_comboimg	TCombo.CreateCombo.bmx:8 and TCombo.Draw.bmx:16, both 0x00C62D9C; only g_comboimg is ever written
 #
 #	---- 0x00C6171C / 0x00C61720 : the two UI sounds -------------------------------------
-#	RESOLVED. An earlier pass left these split on the grounds that "the only consequence is
-#	whether the click sound plays". That was wrong, and the game proved it: TScreen.
-#	CheckInput's Case 5 runs `PlaySound(g_sndclick, ...)` BEFORE `g_activegadget.fHit()`,
-#	and g_sndclick is read there and written NOWHERE in the corpus. So it was Null, and
-#	PlaySound(Null, chan) faulted -- an access violation on EVERY click, the moment mouse
-#	input started working. A split is not automatically cosmetic just because the value it
-#	loses is; what matters is what dereferences it.
+#	TScreen.SetUp writes both slots; five other bodies only read them. Split, each reader
+#	name is a Global nothing ever writes, and TScreen.CheckInput's Case 5 runs
+#	`PlaySound(g_sndclick, ...)` BEFORE `g_activegadget.fHit()`, so PlaySound(Null, chan)
+#	faults: an access violation on every click. A split is not cosmetic just because the
+#	value it loses is; what matters is what dereferences it.
 #
-#	Resolution, by elimination rather than by guessing which sound is nicer:
-#	  * g_snd_select appears under THAT SAME NAME in both TScreen.SetUp (which loads
-#	    Sounds/Select.ogg into it) and TTable.UpdateActivated. So that name is already
-#	    unified across the corpus and needs no merge.
-#	  * TTable.UpdateActivated.bmx:25-27 pins the two TSound slots in order --
-#	    "0x00C61720 and 0x00C6171C -> TSound ... Named g_chan_ui / g_snd_move /
-#	    g_snd_select here" -- giving 0x00C61720 = g_snd_move, 0x00C6171C = g_snd_select.
-#	  * TScreen.CheckInput.bmx:5 pins its own g_sndclick pragma to 0x00C6171C.
-#	    0x00C6171C is g_snd_select, therefore g_sndclick IS g_snd_select.
-#	  * TScreen.SetUp writes exactly two TSounds (g_snd_click = Click.ogg,
-#	    g_snd_select = Select.ogg) and there are exactly two UI TSound slots. With
-#	    g_snd_select taken by 0x00C6171C, g_snd_click can only be 0x00C61720 -- which
-#	    TTable calls g_snd_move.
+#	Which slot holds which sound is read out of the machine code, not out of a body
+#	header. TScreen.SetUp @0x00510174 makes two LoadSound calls and stores each result to
+#	an absolute address:
+#	    0x0051021B  push 0xc7d8ac / call 0x4bc564  ->  0x00510240  mov [0xc6171c], ebx
+#	    0x00510248  push 0xc7d8ec / call 0x4bc564  ->  0x0051026D  mov [0xc61720], ebx
+#	The two pushed pointers are BBStrings in .data, and they read:
+#	    0xc7d8ac = "GameMedia/Sounds/Click.ogg"   0xc7d8ec = "GameMedia/Sounds/Select.ogg"
+#	So 0x00C6171C holds Click.ogg and 0x00C61720 holds Select.ogg. The canonical name for
+#	each slot is the one naming the asset that slot actually holds.
 #
-#	The result is also behaviourally sensible, which is a check on the reasoning rather
-#	than the reason for it: moving between items plays Click.ogg (g_snd_move, 4 call sites
-#	in TTable, all movement), and activating something plays Select.ogg (g_snd_select, in
-#	TTable's activation branch and in CheckInput's gadget-hit branch).
-0x00C6171C	g_sndclick	g_snd_select	TScreen.CheckInput.bmx:5 pins it to 0x00C6171C; TTable.UpdateActivated.bmx:25-27 names 0x00C6171C g_snd_select
-0x00C61720	g_snd_move	g_snd_click	by elimination: g_snd_select holds 0x00C6171C, so SetUp's other TSound (Click.ogg) is 0x00C61720, which TTable calls g_snd_move
+#	Scanning .text for absolute references to the pair finds 17, in six bodies, and those
+#	are the whole of the original's UI sound mapping:
+#	    Click.ogg  0x00C6171C  TScreen.CheckInput     @0x00511503  gadget/button press
+#	                           TInputBox.Update       @0x00515B63  input box commit
+#	                           TTable.UpdateActivated @0x00516B96  Case 5, row activation
+#	                           TCombo.Update          @0x0051874C  Case 5, item chosen
+#	    Select.ogg 0x00C61720  TScreen.MoveSelection  @0x00511ECA  keyboard/joystick nav
+#	                           TTable.UpdateActivated @0x00516B35 +B6F +BD0 +C3A  Cases 1-4
+#	                           TCombo.Update          @0x00518635 +670 +6AB +705  Cases 1-4
+#	Click.ogg is the commit sound and Select.ogg is the movement blip, which is the
+#	opposite of what the two names suggest read in isolation. That is why the identity of
+#	these two slots has to come from the LoadSound stores and not from a name tally.
+#
+#	TTable.UpdateActivated's header records both addresses correctly. It spells 0x00C6171C
+#	g_snd_click, so each name here is claimed by exactly one address and both rows below
+#	merge cleanly.
+0x00C6171C	g_sndclick	g_snd_click	TScreen.SetUp @0x00510240 stores LoadSound("GameMedia/Sounds/Click.ogg") into 0x00C6171C; TScreen.CheckInput.bmx:5 pins g_sndclick to 0x00C6171C
+0x00C61720	g_snd_move	g_snd_select	TScreen.SetUp @0x0051026D stores LoadSound("GameMedia/Sounds/Select.ogg") into 0x00C61720; TTable.UpdateActivated.bmx and TCombo.Update.bmx both name 0x00C61720 g_snd_move
 #
 #	==== THE OPTIONS SCREEN ================================================================
 #	Reported symptoms, all one defect: "difficulty buttons do nothing", "sound FX buttons
@@ -193,7 +199,24 @@ address	alias	canonical	evidence
 #	        the address is the match-state Int and g_myprofile is prose noise near it)
 0x00C677B0	g_myteam	g_playerteam	DEAD->LIVE: read 11x, written nowhere; g_playerteam shares 0x00C677B0 and is written
 0x00C677B0	g_team	g_playerteam	DEAD->LIVE: read 4x, same slot 0x00C677B0
-0x00C66790	g_bar_energy	g_prg_achievements	DEAD->LIVE: read 10x, same slot 0x00C66790, both TProgressBar
+#
+#	---- 0x00C66790 : the game menu title bar's energy bar, and why it has NO row -------
+#	g_bar_energy is dead in the corpus as build_alias_map.py finds it, and the obvious
+#	repair -- point it at g_prg_achievements, the name TScreen_GameMenu.CreateScreen used
+#	for the same slot -- is the merge build_alias_map.py refused, and it was right to.
+#	g_prg_achievements is claimed by TWO addresses: 0x00C66790 (this screen's energy bar)
+#	and 0x00C669A8 (TScreen_Home's achievements bar, built by TScreen_Home.CreateScreen
+#	and driven by TScreen_Home.SetUpScreen:120). CreateAllScreens builds Home after the
+#	game menu, so a by-name merge hands the whole title bar's energy readout to the
+#	achievements bar: UpdateTitlePanel's SetPercent/SetText land on the wrong gadget and
+#	the title bar's own bar keeps CreateProgressBar's parting SetPercent(1.0, 1). An empty
+#	caption makes TProgressBar.Draw print Int(livepercent) + "%", so the title bar reads a
+#	steady "1%" energy on a brand new career. Merging is worse than the split it fixes,
+#	exactly as this file's header warns.
+#	TScreen_GameMenu.CreateScreen spells its construction site g_bar_energy instead, which
+#	matches both readers (UpdateTitlePanel, UpdateMatchRefresh) and leaves 0x00C669A8 as
+#	the sole owner of g_prg_achievements. One name per slot on both sides, no row needed.
+#
 0x00C6CF98	g_training_int05	g_training_state	DEAD->LIVE: read 6x, same slot 0x00C6CF98
 0x00C671E8	g_combo_competition	g_continents_combo	DEAD->LIVE: read 4x, same slot 0x00C671E8
 0x00C6F3B0	g_sbbar2	g_kits_img2	DEAD->LIVE: read 4x, same slot 0x00C6F3B0
@@ -1691,6 +1714,40 @@ address	alias	canonical	evidence
 0x00C5B364	g_engine_snd	g_snd_crowdgoal	TScreen_Formation.ButtonPlay's PlaySound is `push dword ptr [0xc5b348]` at 0x0054D482 then `push dword ptr [0xc5b364]` (ff3564b3c500) at 0x0054D488 then `call 0x59b25e`; cdecl right-to-left makes the SECOND push argument 1, the TSound -- so g_engine_snd is 0x00C5B364 and not the channel at 0x00C5B348. TEngine.SetUp (VA 0x004CD9C3) is the sole writer, `mov dword ptr [0xc5b364], ebx` (891d64b3c500) at 0x004CE0F6 behind the guard loads at 0x004CE0BA and 0x004CE0E3, and TEngine.SetUp.bmx:44 maps `0x00C5B364 crowdgoal 0x00C5B368 crowdoh 0x00C5B36C crowdboo` onto its pragmas g_snd_crowdgoal / g_snd_crowdoh / g_snd_crowdboo; the emitted line is `If Not g_snd_crowdgoal Then g_snd_crowdgoal = LoadSoundChecked("EngineMedia/Match/Sounds/CrowdGoal.ogg", 0)`. The other readers of 0x00C5B364 are TEngine.GoalScored (0x004D3A29, 0x004D3B1F), TEngine.DoHalfEnds (0x004D4486, 0x004D45E6) and TEngine.DoShootOut (0x004D777D), which is what a crowd-goal sample is for. 9 dword references. g_engine_snd occurs in one body; both TSound.
 0x00C6C550	g_slot_snd_win	g_slotwin	TSlotMachine.DoPrize (VA 0x005784EF, byte-identical) plays the win sample with `push dword ptr [0xc6f090]` (the channel) then `push dword ptr [0xc6c550]` (ff3550c5c600) at 0x005785D0 then `call 0x59b25e`, so argument 1 -- the TSound -- is 0x00C6C550. TSlotMachine.SetUp (VA 0x005781B1) is the only writer: `mov dword ptr [0xc6c550], ebx` (891d50c5c600) at 0x00578240, after the guard loads at 0x005781B5 and 0x0057822D, and its source spells the slot g_slotwin (emitted `g_slotwin = LoadSoundChecked(... "GameMedia/Sounds/Casino/SlotsWin.ogg", 0)`); TSlotMachine.SetUp.bmx:12 states `0x00C6C550 g_slotwin :TSound` outright. 9 dword references. g_slot_snd_win occurs in one body; both TSound.
 0x00C6C550	g_sound_success	g_slotwin	The same slot as the row above, reached from a different screen. TScreen_Interview.Success (VA 0x0057BD61) opens `push dword ptr [0xc6f090]` at 0x0057BD64 then `push dword ptr [0xc6c550]` (ff3550c5c600) at 0x0057BD6A then `call 0x59b25e` -- argument 1 of PlaySound, hence the TSound, is 0x00C6C550, which TSlotMachine.SetUp writes as g_slotwin at 0x00578240. The same generic win chime is pushed by TScreen_Pairs.Success (0x00579665), TScreen_Negotiate.Update (0x0057A917), TScreen_Negotiate.Success (0x0057AA75) and TScreen_Interview.ButtonAddText (0x0057B710), consistent with a single shipped sample. g_sound_success occurs in one body; both TSound.
+#
+#	---- 0x00C6C550 continued : the remaining readers of the shared win chime ----------
+#	The two rows above name two of the six readers of this slot. A whole-file scan of
+#	NSS5.exe for the dword 50c5c600 finds exactly 9 occurrences, all in section `code`,
+#	and they are the complete population of the slot:
+#	  * 0x00578240  891d50c5c600  mov dword ptr [0xc6c550], ebx   -- the ONLY writer.
+#	  * 0x005781B5 and 0x0057822D  a150c5c600  mov eax, dword ptr [0xc6c550] -- the two
+#	    halves of that same store's refcount idiom, inside TSlotMachine.SetUp.
+#	  * six  ff3550c5c600  push dword ptr [0xc6c550], each preceded by ff3590f0c600
+#	    (push the channel) and followed by call 0x59b25e = PlaySound. cdecl pushes
+#	    right to left, so the LAST push is argument 1: the TSound is 0x00C6C550.
+#	ebx at the store comes from call 0x4bc564 (LoadSoundChecked) at 0x00578220, whose
+#	argument was built at 0x0057820C from `push 0xc91170` -- and the BBString object at
+#	0xc91170 reads "GameMedia/Sounds/Casino/SlotsWin.ogg" (length 36 at +8, UTF-16 at
+#	+0xC). Asset and slot are pinned to each other by the machine code, not inferred.
+#	The six push sites and the name each recovered body spells them with:
+#	  0x005785D0  TSlotMachine.DoPrize              g_slot_snd_win   (row above)
+#	  0x00579665  TScreen_Pairs.Success             g_pairs_snd
+#	  0x0057A917  TScreen_Negotiate.Update          g_object770
+#	  0x0057AA75  TScreen_Negotiate.Success         g_snd_negotiate
+#	  0x0057B710  TScreen_Interview.ButtonAddText   g_object770
+#	  0x0057BD6A  TScreen_Interview.Success         g_sound_success  (row above)
+#	g_snd_negotiate is the one reader no table merges, so TScreen_Negotiate.Success ran
+#	`PlaySound(Null, chan)` and PlaySound dereferences argument 1 to call Play() on it:
+#	a method call through Null, which faults, on the contract-negotiation success path.
+#	g_pairs_snd and g_object770 already reach g_slotwin, but only through a two-table
+#	chain (global_alias_unified.tsv:538 and global_alias_adjudicated.tsv:32/190) whose
+#	survival depends on g_pairs_snd holding equal rank as alias and as canonical. Any
+#	later row naming g_pairs_snd canonical at override precedence would delete that edge
+#	and split three readers back off the slot. These rows state the merge at the highest
+#	precedence directly, so the binding no longer rests on a rank tie.
+0x00C6C550	g_pairs_snd	g_slotwin	TScreen_Pairs.Success (VA 0x00579658) pushes the channel at 0x0057965F then `push dword ptr [0xc6c550]` (ff3550c5c600) at 0x00579665 then `call 0x59b25e`, so argument 1 of PlaySound is 0x00C6C550, the slot TSlotMachine.SetUp fills with SlotsWin.ogg at 0x00578240. Restates global_alias_unified.tsv:538 / global_alias_adjudicated.tsv:32 at override precedence so the edge cannot be de-aliased by a later row.
+0x00C6C550	g_object770	g_slotwin	The same slot, read under one name by two screens. TScreen_Negotiate.Update (VA 0x0057A7E8) pushes it at 0x0057A917 and TScreen_Interview.ButtonAddText (VA 0x0057B640) at 0x0057B710, both as `push dword ptr [0xc6c550]` immediately before `call 0x59b25e`. Neither body's other TSound is this slot: ButtonAddText's g_object727 is 0x00C6B850, the casino error chime. Replaces the chain through global_alias_adjudicated.tsv:190, which routed g_object770 to g_slotwin only via g_pairs_snd.
+0x00C6C550	g_snd_negotiate	g_slotwin	TScreen_Negotiate.Success (VA 0x0057AA30) pushes `dword ptr [0xc6f090]` at 0x0057AA6F then `dword ptr [0xc6c550]` (ff3550c5c600) at 0x0057AA75 then `call 0x59b25e`, so its TSound argument is 0x00C6C550. No table merged the name, so the build emitted a second Global that nothing writes and the success path called PlaySound(Null, chan); PlaySound invokes Play() on argument 1, which faults rather than returning quietly.
 0x00C6B850	g_sound_fail	g_casino_snderror	TScreen_Pairs.Fail (VA 0x005797C8, byte-identical 122/122) opens `push dword ptr [0xc6f090]` at 0x005797CB then `push dword ptr [0xc6b850]` (ff3550b8c600) at 0x005797D1 then `call 0x59b25e`, so the TSound argument is 0x00C6B850. The sole writer is TScreen_Casino.CreateScreen (VA 0x005737EB), `mov dword ptr [0xc6b850], ebx` (891d50b8c600) at 0x00573A57 after the guard load at 0x00573A44; TScreen_Casino.CreateScreen.bmx:42 states `0x00C6B850 g_casino_sndError:TSound (LoadSoundChecked return; TrainingError.ogg)` and the emitted line is `g_casino_sndError = LoadSoundChecked("EngineMedia/Match/Sounds/TrainingError.ogg", 0)`. The other readers -- TRoulette.GetResult (0x005759A7), TScreen_BlackJack.Lose (0x00576B80), TScreen_Negotiate.Fail (0x0057AB47), TScreen_Interview.Fail (0x0057BE2D) -- are all failure paths, which fits one shared error sample. 8 dword references. CANONICAL NOTE: g_casino_snderror is an alias in global_alias_map.tsv:202 and global_alias_unified.tsv:501 (-> g_snd_lose) but is already the canonical at higher precedence in global_alias_writers.tsv:117 and global_alias_adjudicated.tsv:33, so assemble.py's de-alias pass already deletes those two lower edges; g_snd_lose has 0 references in the emitted build and g_casino_snderror 6. Both TSound; g_sound_fail occurs in one body.
 0x00C6C828	g_pairs_id	g_pairs_mode	TScreen_Pairs.Success (VA 0x00579658) passes the slot to TProfile.UpdateRelationship as `push dword ptr [0xc6c828]` (ff3528c8c600) at 0x00579685 -- the second of the two pushes before `call dword ptr [eax+0xc0]`, hence argument 1 -- and switches on it again at 0x005796A7 (`mov edx, dword ptr [0xc6c828]`). Its source spells both g_pairs_id. Exactly 4 dword references to 0x00C6C828 exist and the only store is TScreen_Pairs.SetUpScreen's `mov dword ptr [0xc6c828], ebx` (891d28c8c600) at 0x00578F78, whose pragma reads `'!Global g_pairs_mode:Int  ' 0x00C6C828` and whose emitted line is `g_pairs_mode = a0`; SetUpScreen also reads it back at 0x00578FA0. The merge is forced by that 1-writer/3-reader census. One declaring body each, no overlap; both Int. Cost of the split: the relationship the mini-game improves is always person id 0, and the follow-up Select always takes its first arm.
 0x00C59E44	g_nation_int05	g_sortmode	TFixture.Compare (VA 0x004C5150) dispatches on the fixture sort mode with `mov eax, dword ptr [0xc59e44]` (a1449ec500) at 0x004C5169, spelled g_nation_int05 in its body. Exactly 4 dword references to 0x00C59E44 exist and the other three are the same store, `mov dword ptr [0xc59e44], 0x11` (c705449ec50011000000): TNation.GetFixtureList at 0x004BFA85, TClub.GetFixtureList at 0x004C1B76 and TCompetition.SortFixtureList at 0x0050EA15. TNation.GetFixtureList.bmx:7 names it `g_nation_sortmode:Int (bare dword store of 17, no refcount traffic -> Int)` and TCompetition.SortFixtureList.bmx:4 names it g_sortmode; g_sortmode is the head that survives in the emitted build (3 references, including `g_sortmode = 5`) while g_nation_sortmode has 0. One declaring body for the alias; both Int. Cost of the split: TFixture.Compare sorts by mode 0 whatever the caller asked for.
@@ -2012,3 +2069,229 @@ address	alias	canonical	evidence
 #     the g_chanclick row above already resolves to.
 0x00C6F088	g_chan_ui	g_object857	TTable.UpdateActivated calls Playing() through [0xc6f088] unguarded at 0x00516B1C/B56/BB7/C21 and pushes it as the PlaySound channel at 0x00516B2F/B69/B90/BCA/C34; module body allocates 0x00C6F088 as g_Object857
 0x00C6F088	g_sfxchannel	g_object857	UpdateAudio 0x004BC8BC-0x004BC8E5 tests [0xc6f088] and calls SetVolume (slot 0x38) with g_opt_soundfx/100.0; same slot the module body allocates as g_Object857
+#
+# ---- 0x00C6F0D4 : the purchase/win sound the two shop screens could not reach ---------
+# Same shape as 0x00C6F088 above, one slot along, and this one is FATAL in a -d build.
+# The slot carries THREE names. The adjudicated table merged g_snd_win into g_object860,
+# so the casino and stable readers work; g_sound was never adjudicated, so the two shop
+# buy handlers read a Global that nothing on earth assigns.
+# Read out of NSS5.exe:
+#   * The module body loads it once, at 0x004BBB62-0x004BBB77: `push 0 / push 0xc6f094 /
+#     call 0x4bc564` (LoadSoundChecked) then `a3d4f0c600 mov [0xc6f0d4],eax` and
+#     `or [0xc6e2ac],0x4000`. That flag word and bit are exactly the ones
+#     extracted/module_emission_order.tsv:213 records for g_Object860, and the string is
+#     GameMedia/Sounds/Cash.ogg.
+#   * TScreen_Shop.ButtonBuy (0x005424DE) pushes the slot as PlaySound argument 1 at
+#     0x00542A8B `ff35d4f0c600 push [0xc6f0d4]`, right after 0x00542A85
+#     `ff3590f0c600 push [0xc6f090]` (argument 2, the channel, already merged into
+#     g_object859). TScreen_BootShop.ButtonBuy (0x00543CDC) does the same.
+#     extracted/global_address_map.tsv:2397 grades g_sound CERTAIN at this address,
+#     unanimous over both bodies, type TSound -- neither of build_alias_map.py's two
+#     refusal grounds applies, it simply never proposed the pair.
+# Unfixed, PlaySound(g_sound, ...) is PlaySound(Null, ...) and BlitzMax calls Play()
+# through it: retail swallows it, `-d` faults, and buying anything in either shop kills
+# the process. Not a shim candidate -- retail's slot is loaded, so there is no unguarded
+# Null read here to reproduce.
+0x00C6F0D4	g_sound	g_object860	module body stores LoadSoundChecked("GameMedia/Sounds/Cash.ogg") to [0xc6f0d4] at 0x004BBB72 with the 0x4000 bit of 0x00C6E2AC that module_emission_order.tsv:213 gives g_Object860; TScreen_Shop.ButtonBuy pushes [0xc6f0d4] as PlaySound arg 1 at 0x00542A8B, TScreen_BootShop.ButtonBuy likewise; global_address_map.tsv:2397 grades g_sound CERTAIN/TSound at this address
+#	PAIRS MINIGAME -- the memory-match screen is frozen on its opening "memorise" frame.
+#	Two slots of TScreen_Pairs' four-word state block ended up split, and one of the two
+#	splits also mis-binds its name onto the global MilliSecs clock, which is the same
+#	single-statement `X = Y` transposition class as the g_tr_screen / g_shootoutstarted
+#	rows above: bcc emits the RHS load before the LHS store, so an order-based solver
+#	pairs the FIRST name in the statement with the FIRST address the code touches.
+#
+#	MEASURED, TScreen_Pairs.Update (VA 0x00579419), all three guards:
+#	  0x00579435  8b15d4efc600  mov edx,[0xc6efd4]     <- the clock
+#	  0x0057943B  a134c8c600    mov eax,[0xc6c834]     <- the pairs timestamp
+#	  0x00579440  05d0070000    add eax,0x7d0          (2000)
+#	  0x00579445  39c2 / 0f9fc0 cmp edx,eax / setg     = g_matchtime > g_pairs_time + 2000
+#	and the same shape at 0x00579484 (+0x3e8) and 0x005794D3 (+0x4b0). TWO DIFFERENT
+#	SLOTS in one comparison. The write-back is 0x0057945C a1d4efc600 mov eax,[0xc6efd4]
+#	/ 0x00579461 a334c8c600 mov [0xc6c834],eax = `g_pairs_time = g_matchtime`: the clock
+#	is the SOURCE, 0x00C6C834 the DESTINATION. global_alias_unified.tsv:658 puts
+#	g_pairs_time on 0x00C6EFD4 and so folds it into g_matchtime, and the emitted guard
+#	became `If g_pairs_clicked = -2 And g_matchtime > g_matchtime + 2000` -- never true.
+#	TScreen_Pairs.SetUpScreen leaves the state word at -2, Update can never advance it,
+#	so UpdateFaces takes its `g_pairs_clicked = -2` branch forever and every one of the
+#	16 cards draws p.front: the whole grid sits face up, the club-coloured card backs
+#	(GameMedia/Images/Casino/Pairs/BG_1..5.png, loaded into p.back) are never drawn, and
+#	ClickCard's opening `If g_pairs_clicked < 0 Then Return 0` swallows every click.
+#	ResetButtonPositions also leaves all 16 buttons alive=0 and only NewButtonPositions
+#	(reached from state -1) revives them, so the cards are not merely inert, they are
+#	disabled. One split, all three reported symptoms.
+#
+#	Canonical is g_pairs_int05 deliberately, per the g_now block above: it is the alias
+#	of no row in any of the five tables, whereas g_pairs_time is unified.tsv's alias, so
+#	naming g_pairs_int05 here raises rank['=g_pairs_int05'] without deleting any edge.
+#	SetUpScreen 0x00578FC3/C8 and ClickCard 0x00579330/35 both spell the same slot
+#	g_pairs_int05 with the identical `mov eax,[0xc6efd4] / mov [0xc6c834],eax` pair.
+0x00C6C834	g_pairs_time	g_pairs_int05	The attempt timestamp of the pairs minigame, 0x00C6C834 -- NOT the MilliSecs clock. Update reads [0xc6c834] as the addend of all three `clock > stamp + N` guards (0x0057943B, 0x0057948A, 0x005794D9) while the clock 0x00C6EFD4 is the other operand of the very same cmp, and writes it back at 0x00579461 / 0x005794B0 with the clock as the source. Supersedes global_alias_unified.tsv:658, which binds g_pairs_time to 0x00C6EFD4 and thereby folds it into g_matchtime; the emitted comparison then reads `g_matchtime > g_matchtime + 2000` and the minigame's state machine can never leave its opening -2 state. Both sides Int. g_pairs_int05 is SetUpScreen's and ClickCard's spelling of the identical store target and is an alias in no table, so it is a safe canonical head.
+0x00C6C830	g_pairs_int04	g_pairs_tries	How many pairs have been turned over this game. SetUpScreen zeroes the slot at 0x00578FB9 `c70530c8c60000000000 mov dword ptr [0xc6c830],0` and Update increments the same slot at 0x005794F4 `830530c8c60001 add dword ptr [0xc6c830],1` before testing `ElseIf g_pairs_tries = 2 Then Fail()`. Exactly one slot, two spellings, and no table merges them: SetUpScreen's reset lands on g_pairs_int04 and Update's counter on g_pairs_tries, so the counter is never cleared between games. After the first losing game of a career it stays >= 2 and every later pairs game fails on its first mismatch. Both sides Int; neither name is an alias anywhere, canonical is the descriptive one.
+#
+#	MATCH PREPARATION -- the screen crashes on entry with "Attempt to access field or
+#	method of Null object", and the cause is a NAME COLLISION, not a missing merge.
+#	TScreen_MatchPrep.CreateScreen (VA 0x0055C09B) spelled eight of its widgets with
+#	names that TScreen_Abilities and TScreen_GameMenu already use for DIFFERENT slots:
+#	     MatchPrep            Abilities / GameMenu
+#	     0x00C685D0 pace      0x00C66A78 g_prg_pace
+#	     0x00C685D4 dribbling 0x00C66A7C g_prg_dribbling
+#	     0x00C685D8 tackling  0x00C66A80 g_prg_tackling
+#	     0x00C685DC passing   0x00C66A84 g_prg_passing
+#	     0x00C685E0 shooting  0x00C66A88 g_prg_shooting
+#	     0x00C685E4 heading   0x00C66A8C g_prg_heading
+#	     0x00C685E8 flair     0x00C66A90 g_prg_flair
+#	     0x00C685BC lbl_cash  0x00C66788 g_lbl_cash  (TScreen_GameMenu.CreateScreen:168)
+#	(Abilities' block is listed in TScreen_Abilities.CreateScreen.bmx:30-31; GameMenu's
+#	in TScreen_GameMenu.CreateScreen.bmx:42.) Two consequences, both observed:
+#	  * build_alias_map.py refuses a merge whose canonical is claimed by more than one
+#	    address, so g_matchprep_bartackling (0x00C685D8), g_matchprep_barheading
+#	    (0x00C685E4) and g_matchprep_lblmoney (0x00C685BC) got NO writer and stayed Null.
+#	    status/debugruns/20260823-203858/globals.tsv:736,737,739 shows all three Null at
+#	    fault time, and SetUpScreen's very first statement, 0x0055D920 `8b1dbc85c600 mov
+#	    ebx,[0xc685bc]` followed by `call [eax+0x64]` (TGadget.SetText), is the faulting
+#	    instruction -- which is why every local in that frame still reads 0.
+#	  * the five that DID merge (global_alias_writers.tsv) merged onto ABILITIES' names,
+#	    so MatchPrep.CreateScreen overwrote g_prg_pace/dribbling/passing/shooting/flair
+#	    with its own bars and TScreen_Abilities.SetUpScreen has been calling SetPercent
+#	    on the Match Prep bars ever since, leaving the Abilities screen's own bars stuck.
+#	The repair is in the source, not here: CreateScreen now spells its seven ability bars
+#	g_matchprep_prg<skill> and its cash label g_matchprep_lblcash, so MatchPrep's slots
+#	carry names no other screen claims and Abilities/GameMenu keep g_prg_*/g_lbl_cash for
+#	their own. These rows join each renamed WRITER to the name SetUpScreen already READS
+#	at the same address. Naming g_matchprep_bar<skill> canonical here also raises its rank
+#	to override precedence, which deletes global_alias_writers.tsv's wrong outgoing edge
+#	to g_prg_<skill> -- the same de-alias mechanism the g_now block above documents.
+#	g_prg_energy at CreateScreen:250 is left alone deliberately: it collides with
+#	TScreen_Home.CreateScreen the same way and is being adjudicated separately.
+0x00C685D0	g_matchprep_prgpace	g_matchprep_barpace	CreateScreen's writer for MatchPrep's pace bar, stored at 0x0055CA9D `8935d085c600 mov [0xc685d0],esi`; SetUpScreen reads the same slot as g_matchprep_barpace. Supersedes global_alias_writers.tsv, which sent that reader to g_prg_pace -- Abilities' bar at 0x00C66A78.
+0x00C685D4	g_matchprep_prgdribbling	g_matchprep_bardribbling	Writer stored at 0x0055CD3D `8935d485c600 mov [0xc685d4],esi`. Supersedes global_alias_writers.tsv's edge to g_prg_dribbling, which is Abilities' 0x00C66A7C.
+0x00C685D8	g_matchprep_prgtackling	g_matchprep_bartackling	Writer stored at 0x0055CC5D `8935d885c600 mov [0xc685d8],esi`. No table merged this pair, because g_prg_tackling is claimed by Abilities' 0x00C66A80 as well; the reader was left Null (globals.tsv:737) and SetPercent on it faults.
+0x00C685DC	g_matchprep_prgpassing	g_matchprep_barpassing	Writer stored at 0x0055CE1D `8935dc85c600 mov [0xc685dc],esi`. Supersedes global_alias_writers.tsv's edge to g_prg_passing, which is Abilities' 0x00C66A84.
+0x00C685E0	g_matchprep_prgshooting	g_matchprep_barshooting	Writer stored at 0x0055CEFD `8935e085c600 mov [0xc685e0],esi`. Supersedes global_alias_writers.tsv's edge to g_prg_shooting, which is Abilities' 0x00C66A88.
+0x00C685E4	g_matchprep_prgheading	g_matchprep_barheading	Writer stored at 0x0055CFDD `891de485c600 mov [0xc685e4],ebx`. No table merged this pair, because g_prg_heading is claimed by Abilities' 0x00C66A8C as well; the reader was left Null (globals.tsv:736).
+0x00C685E8	g_matchprep_prgflair	g_matchprep_barflair	Writer stored at 0x0055CB7D `8935e885c600 mov [0xc685e8],esi`. Supersedes global_alias_writers.tsv's edge to g_prg_flair, which is Abilities' 0x00C66A90.
+0x00C685BC	g_matchprep_lblcash	g_matchprep_lblmoney	The Match Prep bank label. CreateScreen stores it at 0x0055C548 `891dbc85c600 mov [0xc685bc],ebx`, immediately after `push 0xc85864` = the literal "lbl_cash" read out of NSS5.exe, so the address is not inferred. SetUpScreen's first statement loads the same slot at 0x0055D920 and calls SetText through it; with no writer the slot was Null and the screen faulted on entry. g_lbl_cash could not be the canonical: TScreen_GameMenu.CreateScreen.bmx:168 uses that name for 0x00C66788.
+#	=== NAME-COLLISION PASS (one identifier over two binary slots) -- 6 rows =========
+#	Both rows exist because the body that still spells the slot g_screen is owned by
+#	another lane in flight, so the slot is bound here rather than in that file. Once
+#	TScreen_Options.ButtonMatchLength.bmx spells 0x00C63CE8 g_screen_options directly,
+#	the first row becomes a no-op and can go.
+#	g_screen was one emitted variable standing for SIX screens' TScreen slots:
+#	  0x00C64434 create account   0x00C64D18 data editor   0x00C66724 game menu
+#	  0x00C6635C test menu        0x00C63CE8 options       0x00C6764C paused match
+#	Only two of the six bodies assigned it and only one of those two,
+#	TScreen_EditMenu.CreateScreen, is called from CreateAllScreens, so for the whole of
+#	a normal session that variable held the DATA EDITOR screen and every other screen's
+#	read landed on it. The five other bodies now name their own slot; this row covers
+#	the sixth.
+0x00C63CE8	g_screen	g_screen_options	TScreen_Options.ButtonMatchLength (0x00520E27) reads the options screen at 0x00520E86 `a1e83cc600 mov eax,[0xc63ce8]` and calls GetGadgetByName("options_matchlength7") through it; TScreen_Options.CreateScreen builds that slot and names it g_screen_options. Every other body that spelled a TScreen slot g_screen has been renamed to the slot's own name, so this alias is unambiguous.
+#	The kit screen's two painted-kit images. TScreen_Kits.RefreshKits stored them under
+#	the module body's names for MessageBg.png and MessageLine.png, so refreshing the kit
+#	screen replaced the message-box background and separator with kit textures. The
+#	pragmas now say g_kits_imgKit1/g_kits_imgKit2. The pairing that body's own
+#	ASSUMPTIONS block records is 0x00C674EC/0x00C674F0; the g_kits_img1/img2 spelling
+#	it used is already bound to 0x00C6F34C/0x00C6F3B0 by the block at line 828 above,
+#	whose prose says RefreshKits is the only writer of THOSE slots. It is not: it
+#	writes 0x00C674EC/0x00C674F0. These rows merge TScreen_Kits.ButtonQuit's
+#	spelling of the SAME slot so its Null-clear reaches the images again.
+0x00C674EC	g_kits_a	g_kits_imgkit1	TScreen_Kits.ButtonQuit stores Null into 0x00C674EC at 0x0054A7BF `891dec74c600 mov [0xc674ec],ebx` with ebx = 0x005C9C80 (bbNullObject); TScreen_Kits.RefreshKits writes the same slot at 0x00549E40 `8935ec74c600 mov [0xc674ec],esi` straight from LoadImage, and its header records 0x00C674EC g_kits_img1. Both sides TImage.
+0x00C674F0	g_kits_b	g_kits_imgkit2	Companion to the row above: 0x0054A7E0 `891df074c600 mov [0xc674f0],ebx` clears the slot TScreen_Kits.RefreshKits fills at 0x00549E69 `891df074c600 mov [0xc674f0],ebx` from LoadImage; header records 0x00C674F0 g_kits_img2. Both sides TImage.
+#
+#	Two rows the name-collision pass needs on top of the block above.
+#	g_playerteam: 0x00C677B0 has 29 references in the assembled program and NO writer,
+#	because the body that writes it, TScreen_Formation.SetUpScreen, spells it g_formteam
+#	(stores at 0x0054BA82, 0x0054BADA, 0x0054BB09, 0x0054BB59, 0x0054BB88, 0x0054BB90) and
+#	that body's own header already records `0x00C677B0 -> g_formteam:TTeam`. Both sides
+#	TTeam; the generator never connected them only because g_formteam came back AMBIGUOUS.
+0x00C677B0	g_formteam	g_playerteam	TScreen_Formation.SetUpScreen is the only writer of 0x00C677B0 and spells it g_formteam; eight bodies dereference the slot under the name g_playerteam, which extracted/global_alias_overrides.tsv:194-195 already made the canonical for g_myteam and g_team. Same slot, same type, no co-occurrence: the two names never appear in one body.
+#	g_pitchhalfwidth: TPitch.SetUp now spells its own slot 0x00C5D66C g_stadiumhalfwidth,
+#	which leaves the three bodies that mean 0x00C5D634 by that name without a writer. This
+#	row sends them to the slot's canonical, the one Engine.ini's `sideline` is read into.
+#	(g_pitchhalfheight is a poor name for a half-WIDTH; it is the established canonical for
+#	0x00C5D634 and renaming it is a separate job.)
+0x00C5D634	g_pitchhalfwidth	g_pitchhalfheight	0x00C5D634 is Engine.ini's `sideline`, read into the slot in the module body; TBall.CheckSideLines (0x004CA934 `a134d6c500 mov eax,[0xc5d634]`), TEngine.SetUpSetPiece and TTeam.UpdatePlayerDestinations all touch 0x00C5D634 and never 0x00C5D66C. build_alias_map refused this merge as `AMBIGUOUS: name maps to 2 addresses` (global_alias_map_skipped.tsv:14) purely because TPitch.SetUp used the same spelling for 0x00C5D66C; that spelling is gone, so the ambiguity is gone with it.
+#	0x00C6E298, the stable's race-runners list, was THREE emitted variables: g_horses in
+#	seven bodies (renamed to g_runners), g_runners in the module body and
+#	THorse.SelectRunners, and g_horselist2 in THorse.New's guarded creation. This row folds
+#	the third onto the one the module body populates. extracted/global_alias_unified.tsv:630
+#	-632 point g_object851, g_runners and g_stable_racelist AT g_horselist2, so this row
+#	reverses that head and the chain collapses on the populated name instead of the guard's.
+0x00C6E298	g_horselist2	g_runners	THorse.New creates the list with `If Not <0x00C6E298> Then CreateList()` while the module body creates it unconditionally under g_runners and THorse.SelectRunners is the only body that Clears and AddLasts it. Both TList. THorse.New declares 0x00C6E294 g_allhorses in the same body, so the two are provably different slots and this merge cannot fuse them.
+#	=== TScreen_MatchPrep.CreateScreen : four more one-name-two-slots collisions ==========
+#	CreateAllScreens.bmx:88 runs TScreen_MatchPrep.CreateScreen after GameMenu (74), Shop
+#	(75), MyContract (78), Home (79) and Abilities (82) and before WebPage (94),
+#	ReportPhysio (95), ReportBoss (96), Casino (97), BlackJack, Roulette, Slots, Pairs,
+#	Negotiate, Interview (103) and Stable (104). It STORES all four of the slots below, so
+#	whatever it builds is what every later screen ends up holding.
+#	  g_pan_title      0x00C685B8  vs  0x00C66768, GameMenu's shared title bar, read by 20
+#	                                  other screens -- they all showed "Match Preparation"
+#	  g_btn_play       0x00C685C8  vs  0x00C66798, GameMenu's play button, which
+#	                                  TProfile.SetPlayButtonIcon drives
+#	  g_pan_abilities  0x00C685CC  vs  0x00C66A74, TScreen_Abilities' panel
+#	  g_prg_energy     0x00C68628  vs  0x00C66790, the title-bar energy gauge TScreen_Home
+#	                                  attaches its help box to
+#	MEASURED, all four stores inside VA 0x0055C09B:
+#	  0x0055C45B 891db885c600 mov [0xc685b8],ebx | 0x0055C741 891dc885c600 mov [0xc685c8],ebx
+#	  0x0055C9B9 8935cc85c600 mov [0xc685cc],esi | 0x0055D6F2 891d2886c600 mov [0xc68628],ebx
+#	A dword search of the whole `code` section finds 0x00C685B8 in 6 places and 0x00C685CC
+#	in 17, every one of them inside CreateScreen itself, so those two are private to the
+#	body and the rename there needs no row here. The other two are read by
+#	TScreen_MatchPrep.SetUpScreen (0x00C685C8 at +339/+376/+1142/+1179/+1544/+1581/+2121/
+#	+2158 = its 8 g_matchprep_btnplay sites; 0x00C68628 at +188/+214 = its 2
+#	g_matchprep_barenergy sites) and need the two rows below.
+#
+#	ROW 1 is a RETRACTION, not a merge. global_alias_writers.tsv:55 (generated) reads
+#	`0x00C685C8 g_matchprep_btnplay g_btn_play` -- correct when it was written, because the
+#	only writer of the slot then spelled it g_btn_play, but wrong now that CreateScreen
+#	spells the writer g_matchprep_btnplay too. Left alone it would rewrite BOTH bodies back
+#	to g_btn_play and re-fuse the slot with GameMenu's, making the source rename a no-op.
+#	The generated table is not hand-edited (its own header says GENERATED); instead this
+#	row re-states the address's canonical at override precedence. assemble.global_alias_map
+#	then (a) raises rank["=g_matchprep_btnplay"] to the override tier, which is > the
+#	writers tier, so the writers edge is dropped, and (b) drops this row itself at the
+#	closing `k != v` filter. Verified: with this row present the map leaves
+#	g_matchprep_btnplay unaliased and g_playbutton -> g_btn_play (0x00C66798) untouched.
+#	link_dead_to_writers.py would not re-emit :55 on a regenerate either -- it only links
+#	names that are DEAD, and g_matchprep_btnplay now has a writer of its own name.
+0x00C685C8	g_matchprep_btnplay	g_matchprep_btnplay	RETRACTS the generated global_alias_writers.tsv:55. 0x00C685C8 is stored once in NSS5.exe, at 0x0055C741 `891dc885c600 mov [0xc685c8],ebx` inside TScreen_MatchPrep.CreateScreen, and read 8 times in TScreen_MatchPrep.SetUpScreen; nothing else in the `code` section contains the dword. Both bodies now spell it g_matchprep_btnplay, the name global_address_adjudicated.tsv:183 already binds to this address, so the slot needs no alias at all. g_btn_play stays the canonical of 0x00C66798 (TScreen_GameMenu.CreateScreen's store at 0x0053AA7F, read by TScreen_Home.CreateScreen and TProfile.SetPlayButtonIcon), which is what the retracted row was fusing this slot with.
+0x00C68628	g_matchprep_prgenergy	g_matchprep_barenergy	CreateScreen's writer for MatchPrep's energy bar, stored at 0x0055D6F2 `891d2886c600 mov [0xc68628],ebx` -- the last Global store in the body, matching prg_Energy being the last gadget built. SetUpScreen reads the same slot twice (0x0055D9BF, 0x0055D9D8) and spells it g_matchprep_barenergy, which global_address_adjudicated.tsv:170 binds to 0x00C68628. Supersedes global_alias_adjudicated.tsv:22, which sent that reader name to g_prg_energy -- TScreen_Home's 0x00C66790, the title-bar energy gauge. Naming g_matchprep_barenergy canonical at override precedence also drops that row's edge; the fix-pairs-minigame lane's g_matchprep_prg<skill> -> g_matchprep_bar<skill> rows for 0x00C685D0/D4/D8/DC/E0/E4/E8 use the same mechanism against the same generated tables, and neither set of rows touches an address the other does.
+#
+#	=== 0x00C5B208 / 0x00C5B210 / 0x00C5B214 : half number, minute counter, minute tick =====
+#	ONE IDENTIFIER OVER TWO SLOTS, and it is the match clock. The name g_engine_half stood
+#	for the half number (0x00C5B208) in three bodies AND, through the generated row
+#	global_alias_map.tsv:16 `0x00C5B208 g_minutes g_engine_half`, for the MINUTE COUNTER
+#	(0x00C5B210) in TEngine.UpdateMatchTime. That row is wrong twice over: wrong address and
+#	wrong merge.
+#	WHICH SLOT IS WHICH, from the machine code alone:
+#	  0x00C5B208 is the HALF NUMBER. TEngine.SetUpMatch seeds it 1/2/3/4 (0x004CE94B/95E/971/
+#	  984 `mov [0xc5b208],<n>`), TEngine.DoHalfEnds advances it with four `add [0xc5b208],1`
+#	  (0x004D4381/43F4/44E1/4554), TEngine.MatchOver compares it to 3 and 5.
+#	  0x00C5B210 is the MINUTE COUNTER. TEngine.UpdateMatchTime does `add [0xc5b210],1`
+#	  (0x004D421E) then `cmp [0xc5b210],0x2d/0x5a/0x69/0x78` = 45/90/105/120 (0x004D42E4/42F5/
+#	  4306/4317), each followed by `call [0xc5babc]` = DoHalfEnds; DoHalfEnds sets it to the
+#	  same four constants (0x004D4377/43EA/44D7/454A).
+#	  0x00C5B214 is the MINUTE-TICK TIMESTAMP, and it is touched by exactly two instructions
+#	  in the whole executable, both in UpdateMatchTime: 0x004D4200 `mov edx,[0xc5b214]` and
+#	  0x004D4219 `mov [0xc5b214],eax` -- the source's `If g_matchtimer > g_lastminutetick +
+#	  tick Then g_lastminutetick = g_matchtimer`.
+#	CO-OCCURRENCE SETTLES IT WITHOUT ANY HEADER. TEngine.UpdateMatchTime (byte-identical, VA
+#	0x004D4087) uses g_half, g_minutes AND g_lastminutetick in one body, so those are three
+#	different slots by construction -- and its `Select g_half / Case 1..4 / If g_minutes >
+#	45|90|105|120 Then DoHalfEnds()` is exactly the 0x00C5B208 load at +579 followed by the
+#	four 0x00C5B210 compares.
+#	WHAT IT COST. The writers of 0x00C5B208 (SetUpMatch, DoHalfEnds) both spell it
+#	g_engine_int18, so the emitted variable `g_engine_half` had NO writer of its own and the
+#	only thing touching it was UpdateMatchTime's `g_minutes :+ 1`. TEngine.MatchOver
+#	(g_engine_state), TEngine.SkipMatchTime, TEngine.SkipTime and
+#	TPlayer.ValidateAnimDirection all read `g_engine_half` -- so `g_engine_half = 5`,
+#	`Mod 2 + 1`, `= 3 Or = 4` and MatchOver's `= 3` / `= 5` were all reading the MINUTE COUNT.
+#	The three rows below are one repair and have to land together: row 1 moves the minute
+#	counter to its own slot's canonical, row 2 stops g_lastminutetick following it there
+#	(without it, fixing row 1 would fuse the counter and its timestamp inside one body), and
+#	row 3 gives the four orphaned readers the writers' variable back (without it, fixing
+#	row 1 alone leaves g_engine_half with no writer at all, reading 0 forever).
+#	No co-occurrence blocks any of them: no body uses both g_engine_half and g_engine_int18,
+#	and g_minutes and g_lastminutetick each appear in one body only.
+0x00C5B210	g_minutes	g_engine_flag20	The minute counter. TEngine.UpdateMatchTime is the only body that spells it g_minutes and its statements pin it: `g_minutes :+ 1` is 0x004D421E `830510b2c50001 add [0xc5b210],1` and the four `If g_minutes > 45|90|105|120` are 0x004D42E4/42F5/4306/4317 `cmp [0xc5b210],0x2d|0x5a|0x69|0x78`. SUPERSEDES global_alias_map.tsv:16, which files this name at 0x00C5B208 and merges it into g_engine_half -- the HALF NUMBER, which the same body separately calls g_half, so the two provably cannot be one slot. g_engine_flag20 is the established canonical of 0x00C5B210 (global_address_map.tsv:675; global_alias_unified.tsv:38-43 send g_engine_clock, g_engine_int20, g_enginetick, g_matchminute, g_noprogress and g_playtimearg to it), and TEngine.SetUpMatch/DoHalfEnds/TPlayer.GetTunnelPosition all spell that slot g_engine_int20.
+0x00C5B214	g_lastminutetick	g_lastminutetick	RETRACTION, not a merge -- 0x00C5B214 is its own slot and needs no alias. The whole executable touches it twice, both inside TEngine.UpdateMatchTime: 0x004D4200 `8b1514b2c500 mov edx,[0xc5b214]` and 0x004D4219 `a314b2c500 mov [0xc5b214],eax`, which is `If g_matchtimer > g_lastminutetick + tick Then g_lastminutetick = g_matchtimer`. The generated global_alias_map.tsv:18 files the name at 0x00C5B210 and merges it into g_engine_int20, which global_alias_unified.tsv:39 then chains onto g_engine_flag20 -- so the timestamp shares storage with the minute counter it is compared against, in the one body that uses both. This row re-states the address's canonical at override precedence: assemble.global_alias_map raises rank["=g_lastminutetick"] to the override tier, which is above the map tier that made it an alias, and then drops the row itself at the closing `k != v` filter, leaving the name unaliased. Same mechanism as the g_matchprep_btnplay retraction above.
+0x00C5B208	g_engine_half	g_engine_int18	DEAD->LIVE. Every store to 0x00C5B208 in NSS5.exe is in TEngine.SetUpMatch (0x004CE94B/95E/971/984, the four `mov [0xc5b208],1|2|3|4` seeds) or TEngine.DoHalfEnds (0x004D4381/43F4/44E1/4554, four `add [0xc5b208],1`), and BOTH bodies spell it g_engine_int18 -- as do TEngine.GoalScored, TTeam.GetShootingDirection, TPlayer.GetShootingDirection and TPlayer.GetTunnelPosition, whose header states `g_engine_int18 = 0x00C5B208` outright. The three bodies that spell the same slot g_engine_half (TEngine.SkipMatchTime +63 `cmp [0xc5b208],5` and +2007, TEngine.SkipTime +357, TPlayer.ValidateAnimDirection +329/+348) only read it, and so does TEngine.MatchOver via g_engine_state (+55/+91/+160/+212/+279/+315/+558, `cmp [0xc5b208],3` and `,5`), which global_alias_unified.tsv:37 already merges into g_engine_half and which therefore follows this row onto g_engine_int18. global_address_map.tsv has g_engine_int18 CERTAIN at this address (:716, forced in 2 bodies, unanimous) against g_engine_half STRONG from one body (:696), so the writers' name is also the better-grounded one. No body declares both names.

@@ -10,7 +10,7 @@
 '                                                TContractOffer to agree with the already
 '                                                verified TScreen_Negotiate.Success /
 '                                                .ButtonAccept / .UpdateInstrucs)
-'    0x00C6B850 TSound         g_snd_fail       (arg1 of _brl_audio_PlaySound)
+'    0x00C6B850 TSound         g_casino_sndError (arg1 of _brl_audio_PlaySound)
 '    0x00C6F090 TChannel       g_chan_negotiate (arg2 of _brl_audio_PlaySound)
 '    0x00C5B1C8 TBitmapFont    g_bigfont        (globals_final: construction/medium)
 '    0x00C6EFE4 Int            g_screen_w
@@ -34,7 +34,12 @@
 '  `sub ebx,eax / mov [esi+0x24],ebx` -- i.e. the plain `a = a - b` form, not `:-`.
 	'!Global g_neg_stage:Int
 	'!Global g_neg_offer:TContractOffer
-	'!Global g_snd_fail:TSound
+	' 0x00C6B850 is loaded by TScreen_Casino.CreateScreen as
+' g_casino_sndError = LoadSoundChecked("EngineMedia/Match/Sounds/TrainingError.ogg", 0).
+' g_snd_fail is TTraining.Fail's name for the DIFFERENT slot 0x00C5DF40, and
+' extracted/global_alias_writers.tsv sends that spelling to g_player_oofsnd, so this
+' PlaySound was handed the match oof sample instead.
+'!Global g_casino_sndError:TSound
 	'!Global g_chan_negotiate:TChannel
 	'!Global g_bigfont:TBitmapFont
 	'!Global g_screen_w:Int
@@ -46,7 +51,7 @@
 		g_neg_offer.newbossrel = g_neg_offer.newbossrel - Rand(10, 20)
 		TScreen_ContractOffer.UpdateOfferDetails(0, 0)
 		UpdateInstrucs()
-		PlaySound(g_snd_fail, g_chan_negotiate)
+		PlaySound(g_casino_sndError, g_chan_negotiate)
 		TScreenMessage.Create(g_screen_w / 2, g_screen_h / 2, GetText("Fail!"), 1000, g_bigfont, Null, 1.0, "FFFFFF")
 		g_neg_okbutton.SetIcon(g_img_negcross)
 		g_neg_okbutton.Show()

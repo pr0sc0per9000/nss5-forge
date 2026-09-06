@@ -81,7 +81,7 @@ STATUS = os.path.join(ROOT, "status")
 # of range: TOptions.LoadOptions bounds-checks with `If g_opt_screen >= g_gfxmodes.Count()`
 # and falls back to FindRes800600(), so an out-of-range value makes the game resolve 800x600
 # against its own mode list on any machine.
-FORCE = {"window": "1"}
+FORCE = {"window": "1", "music": "0", "soundfx": "0"}
 SCREEN_RESOLVE = "99"
 
 
