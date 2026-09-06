@@ -3,7 +3,7 @@
 ' KIND=Function, SIG ()i, slot 0x40
 ' ASSUMPTIONS
 '  * Globals (names ours; only the declared TYPE is load-bearing):
-'      0x00C671E4 g_combo_group:TCombo      0x00C671E0 g_combo_continent:TCombo
+'      0x00C671E4 g_combo_group:TCombo      0x00C671E0 g_continents_cmbContinent:TCombo
 '      0x00C671CC g_table_league:TTable     0x00C671D4 g_table_02:TTable
 '      0x00C671D8 g_table_03:TTable         0x00C67204 g_continents_int04:Int
 '      0x00C67224 g_continents_mode:Int     0x00C6F028 g_profile:TProfile
@@ -17,7 +17,10 @@
 '  * ComboCompetition() is a sibling static through this Type's own class table.
 
 '!Global g_combo_group:TCombo
-'!Global g_combo_continent:TCombo
+' 0x00C671E0 is this screen's continent combo; TScreen_Continents.CreateScreen builds it
+' and names it g_continents_cmbContinent. g_combo_continent is TScreen_Leagues' name for
+' 0x00C66F30, so the two screens' combos shared one emitted variable.
+'!Global g_continents_cmbContinent:TCombo
 '!Global g_table_league:TTable
 '!Global g_table_02:TTable
 '!Global g_table_03:TTable
@@ -32,7 +35,7 @@ Function ComboContinent:Int()
 	g_table_03.Hide()
 	g_table_02.Hide()
 	Local yr:Int = g_profile.date.GetYear() + 6
-	Local contid:Int = g_combo_continent.GetSelectedItemId()
+	Local contid:Int = g_continents_cmbContinent.GetSelectedItemId()
 	TCompetition.SortListBy(26, 1)
 	For Local c:TCompetition = EachIn g_competitions
 		If c.level = g_continents_mode And c.startyear < yr And c.lfixturelist.IsEmpty() = 0

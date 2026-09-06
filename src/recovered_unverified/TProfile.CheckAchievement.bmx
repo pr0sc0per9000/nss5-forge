@@ -134,7 +134,34 @@
 '   0x00c6f3b8  g_profile_int43:Int    Steam-enabled flag; unresolved elsewhere, kept
 '   0x00c61724  g_screen_mousex:Float  both confirmed via byte-verified
 '   0x00c61728  g_screen_mousey:Float  TGadget.UpdateToolTip.bmx, which touches both
-'   0x00c6efe0  g_screen_width:Int     STRONG; NOT the same address as g_screen_w/0x00c6efe4
+'   0x00c6efe0  g_screen_int22:Int     the 800x600 design canvas's HEIGHT. CORRECTED this
+'                                      pass: this body said g_screen_width, taking it from
+'                                      global_address_map.tsv:2238 `g_screen_width
+'                                      0x00C6EFE0 CERTAIN`. That row and its partner :2155
+'                                      (`g_screen_height 0x00C6EFDC`) are the pair the wrong
+'                                      way round. MEASURED: NSS5.exe's .data holds
+'                                      0x00C6EFDC = 0x320 = 800 and 0x00C6EFE0 = 0x258 = 600,
+'                                      and a dword search of the `code` section finds NO
+'                                      store to either (143 and 127 references, all reads) --
+'                                      they are static initialisers. The slots that ARE
+'                                      written are 0x00C6EFE4/E8, twice each, both stores in
+'                                      SetUpGraphics (0x00506A5D): `mov [0xc6efe4],eax` /
+'                                      `mov [0xc6efe8],eax` from the TGraphicsMode object's
+'                                      +8/+0xc, then the 800x600 floor at 0x00506B3A
+'                                      `mov [0xc6efe4],0x320` / 0x00506B44
+'                                      `mov [0xc6efe8],0x258`. So 800 is a WIDTH and
+'                                      0x00C6EFDC is the width half; g_screen_width cannot
+'                                      be 0x00C6EFE0. The alias tables are already right --
+'                                      global_alias_map.tsv:260-265 make 0x00C6EFDC
+'                                      g_screen_int21 and 0x00C6EFE0 g_screen_int22, and
+'                                      global_alias_overrides.tsv:569-570 restate both by
+'                                      hand -- so the old spelling here would have been
+'                                      rewritten to g_screen_int21 and this body would read
+'                                      800 where the original reads 600. Latent only because
+'                                      assemble.py's UNVERIFIED_SKIP keeps this file out of
+'                                      the build (src/generated/types_skeleton.bmx:5117 ships
+'                                      an empty CheckAchievement); wrong at every resolution
+'                                      the moment it is promoted.
 '   0x00c5b1fc  g_player_int01:Int     hand-verified, globals_corrections.tsv; 42 bodies
 '   0x00c6efe8  g_engine_int163:Int    byte-verified TBall.Kick.bmx uses this name for this
 '                                      address in this exact CreateAlert idiom
@@ -149,10 +176,10 @@
 '   is the implicit narrowing bcc inserts for `Local x:Int = <float expr>` -- no Int() cast
 '   in the source, and adding one changes the bytes.
 ' Y'S OPERAND ORDER IS LOAD-BEARING and is kept from the previous pass: at 0x0056d0d5 the
-'   original does `fld [g_screen_mousey]` FIRST, spills g_screen_width to [ebp-4], `fild`s
+'   original does `fld [g_screen_mousey]` FIRST, spills g_screen_int22 to [ebp-4], `fild`s
 '   it second and combines with `faddp st(1)`. That pair only appears with the Float
-'   operand written first; `g_screen_width + g_screen_mousey - 118.0` collapses to a single
-'   `fadd` and loses 2 bytes overall. Hence `g_screen_mousey + g_screen_width - 118.0`.
+'   operand written first; `g_screen_int22 + g_screen_mousey - 118.0` collapses to a single
+'   `fadd` and loses 2 bytes overall. Hence `g_screen_mousey + g_screen_int22 - 118.0`.
 '   The `sub esp,4` in the prologue exists solely for that one spill slot.
 ' TScreenMessage.CreateAlert(i,i,$,i,$,$,:TImage,i,i,i,i,i)i is TScreenMessage slot 0x48
 '   (class table 0x00c6b27c); `add esp,0x30` after the call confirms 12 arguments. Ghidra
@@ -172,7 +199,7 @@
 '!Global g_iconpath:String
 '!Global g_profile_int43:Int
 '!Global g_screen_mousex:Float
-'!Global g_screen_width:Int
+'!Global g_screen_int22:Int
 '!Global g_screen_mousey:Float
 '!Global g_player_int01:Int
 '!Global g_engine_int163:Int
@@ -196,7 +223,7 @@
 	EndIf
 	achievements[a0-1] = date.sdate
 	Local x:Int = g_screen_mousex + 10.0
-	Local y:Int = g_screen_mousey + g_screen_width - 118.0
+	Local y:Int = g_screen_mousey + g_screen_int22 - 118.0
 	If g_player_int01 <> 0
 		x = 10
 		y = g_engine_int163 - 60

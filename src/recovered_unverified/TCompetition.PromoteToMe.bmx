@@ -1,15 +1,36 @@
-' NOT VERIFIED -- MISMATCH, mode=len. VA 0x0050F841  orig_len=1076  ours=1089 (delta +13,
+' TCompetition.PromoteToMe
 ' VA 0x0050f841   1076 bytes   vtable slot 0x128   sig (:TTableData,:TCompetition)i
-' byte-identical vs NSS5.exe (1076/1076, mode=reloc, 5 relocations masked, original length
-' from Ghidra's inventory)
-' pre-this-pass; not yet re-scored).
+' byte-identical vs NSS5.exe
 ' KIND=Method, sig (:TTableData,:TCompetition)i, vtable slot 0x128.
+'
+' STATE: VERIFIED. harness.try_method('TCompetition','PromoteToMe', body) with
+' NSS5_NO_LEARN=1 reports  STATUS MATCH  matched=1076  total=1076  our_len=1076
+' orig_len=1076  mode=reloc.  Run twice on 2026-08-23 in worktree nss5-wt/cam
+' (NSS5_WORKER=417), same verdict both times. The marker above is EARNED by that run, not by
+' the bulk header pass of commit 122bd86.
+'
+' NOTE: status/score/TCompetition.PromoteToMe.txt is STALE -- it records MISMATCH mode=len,
+' 278/1062 (26.2%), ours 1062, delta -14, first difference at byte 80. That record predates
+' the PASS N+2 fixes described below and does not reproduce. The old header also carried a
+' contradictory 'ours=1089 (delta +13)' line from an even earlier pass; both numbers are
+' historical, and the two of them disagreeing with each other is why neither should have been
+' left standing. Believe the oracle run above.
+'
+' The 'FIRST DIFFERENCE: byte 80' discussion further down is likewise historical -- kept
+' because its reasoning (a cross-module call-target operand plus a downstream jmp
+' displacement, neither a source-level defect) is still the right way to read that class of
+' report, not because the difference still exists.
+'
+' The file is left in src/recovered_unverified/ only because moving it is out of this lane's
+' scope; it now passes the try_method gate for promotion to src/recovered/.
 ' Started from -113 (naive translation), driven down to +13
 ' (98.8% of the length gap closed) across ~8 iterations with localise_diff.py. Every
 ' semantic field/slot binding below is CONFIRMED against the annotated decompile
 ' (extracted/decomp_annotated/TCompetition.PromoteToMe@0050f841.c) -- what remains is
 ' PURELY shape/codegen, not meaning.
 '
+' The two PASS notes below are the recovery history, in order. PASS N+2 is the one that
+' closed the body; read PASS N+1 as superseded.
 ' PASS N+1 (this edit, no fresh build available -- see notes at GAP 1 below for why this is
 ' evidence-driven rather than speculative): re-examined GAP 1, the Case 0 "find a less-full
 ' pool" loop, against two byte-identical siblings of the SAME Type that iterate the SAME
@@ -58,6 +79,8 @@
 '   0x3c=AddItemLeagueContinuation(:TTableData)i, 0x40=AddTableDataItem(:TTableData)i,
 '   0x58=ShuffleIds()i; TList 0x70=Count()i.
 
+' HISTORICAL (superseded by PASS N+2 below, which closed the body to MATCH 1076/1076).
+' None of the three gaps described here is outstanding; kept for the reasoning only.
 ' THREE REMAINING GAPS, all localised. GAP 1
 ' has an evidence-driven fix applied this pass (see PASS N+1 note above); GAP 2 and GAP 3
 ' are left as documented, with a re-assessment note on each.

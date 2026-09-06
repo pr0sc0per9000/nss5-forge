@@ -1,15 +1,15 @@
 # Horse racing
 
-> **Source:** `THorse.Update` @ 0x0058abcc (VERIFIED) · `TScreen_Stable.DoRace` @ 0x00588a89 (VERIFIED) · `TScreen_Stable.Update` @ 0x00588c99 (READ) · `TScreen_Stable.FinishRace` @ 0x0058946f (VERIFIED) · `THorse.SelectRunners` @ 0x0058b226 (VERIFIED) · `THorse.SetRaceOdds` @ 0x0058b40d (VERIFIED) · `THorse.ResetRands` @ 0x0058b4ea (VERIFIED) · `THorse.Compare` @ 0x0058b55b (VERIFIED) · `THorse.PostRaceUpdate` @ 0x0058b0dc (VERIFIED) · `THorse.GetValue` @ 0x0058aa59 (VERIFIED) · `THorse.DoHealthUpdate` @ 0x0058b9da (VERIFIED) · `THorse.Create` @ 0x0058a36b (VERIFIED) · `TScreen_Stable.SetUpNextRace` @ 0x00588574 (VERIFIED) · `TScreen_Stable.ButtonRaceHorse` @ 0x00589eb4 (VERIFIED) · `TScreen_Stable.ButtonHorse` @ 0x005887fe (VERIFIED) · `TScreen_Stable.SetStake` @ 0x00588687 (VERIFIED) · `TScreen_Stable.LoadData` @ 0x00587c3a (VERIFIED) · `TScreen_Stable.SetUpHorsesForSale` @ 0x00588370 (VERIFIED) · `TScreen_Stable.ButtonBuyHorse` @ 0x0058993b (VERIFIED) · `TScreen_Stable.ButtonSellHorse` @ 0x00589c6e (VERIFIED) · `TScreen_Stable.ButtonTreatHorse` @ 0x00589d61 (VERIFIED) · `TProfile.Bet` @ 0x0056b780 (VERIFIED) · `TProfile.GetStableSize` @ 0x0056b974 (VERIFIED) · `TProfile.UpdateHealth` @ 0x0056b98b (VERIFIED)
-> **Confidence:** MEDIUM
-> **Last checked:** 2026-08-15
+> **Source:** `THorse.Update` @ 0x0058abcc (VERIFIED) · `TScreen_Stable.DoRace` @ 0x00588a89 (VERIFIED) · `TScreen_Stable.Update` @ 0x00588c99 (VERIFIED) · `TScreen_Stable.FinishRace` @ 0x0058946f (VERIFIED) · `THorse.SelectRunners` @ 0x0058b226 (VERIFIED) · `THorse.SetRaceOdds` @ 0x0058b40d (VERIFIED) · `THorse.ResetRands` @ 0x0058b4ea (VERIFIED) · `THorse.Compare` @ 0x0058b55b (VERIFIED) · `THorse.PostRaceUpdate` @ 0x0058b0dc (VERIFIED) · `THorse.GetValue` @ 0x0058aa59 (VERIFIED) · `THorse.DoHealthUpdate` @ 0x0058b9da (VERIFIED) · `THorse.Create` @ 0x0058a36b (VERIFIED) · `TScreen_Stable.SetUpNextRace` @ 0x00588574 (VERIFIED) · `TScreen_Stable.ButtonRaceHorse` @ 0x00589eb4 (VERIFIED) · `TScreen_Stable.ButtonHorse` @ 0x005887fe (VERIFIED) · `TScreen_Stable.SetStake` @ 0x00588687 (VERIFIED) · `TScreen_Stable.LoadData` @ 0x00587c3a (VERIFIED) · `TScreen_Stable.SetUpHorsesForSale` @ 0x00588370 (VERIFIED) · `TScreen_Stable.ButtonBuyHorse` @ 0x0058993b (VERIFIED) · `TScreen_Stable.ButtonSellHorse` @ 0x00589c6e (VERIFIED) · `TScreen_Stable.ButtonTreatHorse` @ 0x00589d61 (VERIFIED) · `TProfile.Bet` @ 0x0056b780 (VERIFIED) · `TProfile.GetStableSize` @ 0x0056b974 (VERIFIED) · `TProfile.UpdateHealth` @ 0x0056b98b (VERIFIED)
+> **Confidence:** HIGH
+> **Last checked:** 2026-08-23
 
 Horse racing is the game's side-gambling minigame: buy a horse, keep it fit, enter it in
-races, and bet cash on every race whether you own a runner or not. Almost every rule below
-comes from byte-exact bodies. The one genuinely load-bearing exception is the function that
-actually notices a horse has crossed the finish line and ends the race
-(`TScreen_Stable.Update`) - it exists only as an unverified Ghidra decompile, so the
-finish-line mechanics are marked accordingly below and the confidence line reflects that.
+races, and bet cash on every race whether you own a runner or not. Every rule below now
+comes from a byte-exact body, including the one that used to be the gap: the per-frame race
+tick `TScreen_Stable.Update`, which is what notices a horse has crossed the finish line and
+ends the race. It was byte-matched on 2026-08-23, so the finish-line numbers here are
+proven rather than read off a decompile.
 
 ## What happens, in plain English
 
@@ -74,7 +74,7 @@ The speed ceiling narrows the pack early in the race and lets it fan out near th
 this is what manufactures a photo finish instead of the field just spreading out linearly
 the whole way round:
 
-| Segment (distance to finish line, x = 11552.0*) | `ClampFloat(xvel, min, max)` |
+| Segment (distance to finish line, x = 11552.0) | `ClampFloat(xvel, min, max)` |
 |---|---|
 | 0-73 units from the line (`x > 11479`) | 9.0 - 15.0 |
 | 73-1993 units (`x > 9559`) | 9.0 - 14.5 |
@@ -83,27 +83,67 @@ the whole way round:
 | 5,833-7,753 units (`x > 3799`) | 10.5 - 13.0 |
 | more than 7,753 units out (everything else) | 11.0 - 12.5 |
 
-*The finish line's x-value (11552.0) is read from the unverified `TScreen_Stable.Update`
-decompile (READ, not byte-matched) - treat it as trustworthy but not proven. The seven
-segment thresholds above it (11479 down to −41) ARE byte-exact, from `THorse.Update`, and
-sit consistently just inside that finish line, which cross-checks the reading.
+The finish line's x-value (11552.0) is byte-exact, from `TScreen_Stable.Update`'s own
+literal pool at 0x00C93B54. The seven segment thresholds above it (11479 down to -41) are
+byte-exact too, from `THorse.Update`, and sit consistently just inside that finish line.
 
 **Start position** (`TScreen_Stable.DoRace`, VERIFIED): every horse's starting speed is
 `xvel = strength * energy * 0.0015`, and its starting x is `5500.0 - xvel * 30.0` - so a
 horse that would start faster is placed further back at the gate, a built-in stagger rather
 than a flying start advantage.
 
-### Finish-line detection and race end - `TScreen_Stable.Update` (READ only)
+### Finish-line detection and race end - `TScreen_Stable.Update` (VERIFIED)
 
-Every step, the 6 runners are re-sorted by current x (leader first) and walked in that
-order. A horse is assigned its finishing position (1st, 2nd, 3rd…) the moment its x passes
-11552.0 **and** it doesn't have a position yet - so positions are handed out in strict
-x-order, first horse to cross gets 1st, and so on. The race only actually ends
-(`TScreen_Stable.FinishRace` is called) once **every** runner has crossed the line - the
-camera keeps rolling to show the also-rans finish even after 1st place is decided. The
-frame the winner is first detected, the game grabs a "photo finish" screenshot, plays a
-sound, and shows a win/lose message for about **2.5 seconds** (2,500 ms, timed off the
-game's millisecond clock) before the display resumes.
+This runs once per frame and does nothing at all unless the stable screen is in one of two
+states: **2 = a race is running**, **3 = a race has just been won and the photo-finish
+freeze is on screen**. Any other state returns immediately.
+
+**State 3 - the photo-finish freeze.** The screen sits frozen until the game's millisecond
+clock has advanced **2,500 ms** past the moment the winner was detected. When it has, the
+state goes back to 2 and the clock is *wound back* to the freeze timestamp, so the pause
+costs the race no simulated time. The race then resumes and the remaining runners keep
+going.
+
+**State 2 - one simulation step.** In order:
+
+1. **Camera.** The scroll position remembers its previous value and then chases the leading
+   horse. The camera target is `Int(-leader.x - 256.0 + screenwidth / 1.2)`. If the camera
+   is behind that target it **snaps** to it instantly, so the leader can never run off the
+   right of the screen; if it is ahead of the target it **eases back by 25% of the gap per
+   frame** - but only while it is still to the right of the hard left stop at
+   `-11520.0 + screenwidth / 1.5`.
+2. **`THorse.UpdateAllRunners()`** - every runner takes the movement step documented above.
+3. **Sort the runners leader-first.** The horse sort-mode Global is set to **7** and the
+   runner list is sorted; mode 7 in `THorse.Compare` is "descending by x", so after this the
+   list is in track order with the leader at the head.
+4. **Walk the sorted list**, counting a rank 1, 2, 3... as it goes:
+   * **Photo finish.** The first time this walk sees a horse whose `raceposition` is already
+     1 - the winner from an earlier frame - *and* no snapshot has been taken yet, the game
+     grabs the 800x600 screen into a pixmap, converts it to **greyscale**, keeps that as the
+     freeze image, plays the flash sound, moves to state 3 and stamps the freeze timestamp.
+     On the same frame it puts a message in the middle of the screen: if the winning horse's
+     runner slot equals the slot you bet on, `bet_YouWon` plus `stake x odds`; otherwise,
+     and only if you placed a bet at all, `bet_YouLost` plus your stake.
+   * **Finishing positions.** A horse whose x has passed **11552.0** and which has no
+     position yet is given the current rank. Because the list was just sorted by x, ranks
+     come out in strict track order: first past the post is 1st, and so on.
+   * **Race over?** Any horse still short of 11552.0 clears the "everyone home" flag.
+5. **Volume and end.** If every runner is home, the race channel's volume is dropped by
+   0.01 while it is still above zero; the channel volume is written every frame either way;
+   and then `TScreen_Stable.FinishRace()` runs, which pays out and returns the screen to
+   state 0.
+
+Two details worth having straight, because both are easy to "tidy" into something the
+original does not do:
+
+* **The winner's message fires on the frame *after* the win, not the frame of the win.**
+  The snapshot branch tests `raceposition = 1`, and `raceposition` is only assigned later in
+  the same walk. So the frame that assigns 1st place just assigns it; the next frame's walk
+  finds it and does the freeze, the sound and the message.
+* **The volume fade-out never actually fades.** The same frame that sets the "everyone home"
+  flag also calls `FinishRace`, which sets the state to 0 - after which this function
+  returns immediately forever. So the -0.01 step executes exactly once, and the audible end
+  of the race is `FinishRace`'s `PauseChannel`, not a fade.
 
 ### Odds - `THorse.SetRaceOdds`
 
@@ -217,25 +257,29 @@ linearly, so waiting to treat a badly neglected horse literally costs more, not 
 
 ## What we do not know yet
 
-- **`TScreen_Stable.Update` @ 0x00588c99 is not byte-matched.** Everything about *how the
-  finish line is detected and how the race actually ends* - the 11552.0 finish x, the
-  x-descending sort that hands out finishing positions, the photo-finish freeze, the 2.5
-  second pause - comes from an unverified Ghidra decompile, not a proven body. It reads
-  cleanly and cross-checks against the verified segment thresholds in `THorse.Update`, but
-  it has not been reconstructed and byte-matched into `src/nss5`. This is the single
-  biggest gap in this document; verifying it would upgrade nearly every claim in the "Race
-  physics" and "Finish-line detection" sections from READ to VERIFIED.
+- **The scroll position's previous value is the camera's inter-frame smoothing.** This is
+  now answered rather than open. `TScreen_Stable.Update` writes last frame's camera x into
+  0x00C6DF54, and `TScreen_Stable.Draw` reads that same address back (under its own recovered
+  name) to blend the two positions before drawing:
+  `startx * alpha + prev_startx * (1.0 - alpha)`, and the result is what the runners are
+  actually rendered against. So the camera the player sees is an interpolation between the
+  previous and current simulation positions, not the raw simulated value - standard
+  render-time smoothing. Two caveats: `Draw` itself is still a near-miss rather than a proven
+  body, so the blend is READ and not VERIFIED; and the interpolation alpha is a Global shared
+  with unrelated code, so what actually sets it per frame is not yet established.
+  (`Update` itself is no longer a gap: byte-matched 2026-08-23 at 1072/1072.)
 - **`TScreen_Stable.Draw` @ 0x005890c9** is also unread (a near-miss sits in
   `src/recovered_unverified/TScreen_Stable.Draw.bmx`, not yet proven). It almost certainly
   only concerns rendering - the jockey sprites, track background, camera scroll - and is
   unlikely to change any of the numbers above, but that is an assumption, not a finding.
-  A rebalance-minded reader who wants the actual on-screen visual pacing (camera speed,
-  track distance in pixels, animation frame rate) needs this function.
-  `TScreen_Stable.Update`'s decompile does show a camera-follow float
-  (`g_screen_stable_float02`) tracking the leading horse's x, and a channel volume fade tied
-  to the same state - neither is included above because neither changes race outcomes.
+  A rebalance-minded reader who wants the actual on-screen visual pacing (track distance in
+  pixels, animation frame rate) needs this function; the camera rule itself is now proven
+  and is written out in the finish-line section above.
 - **`THorse.GetStringracenum`'s "Win"/"Place" text makes no sense against the `racenum`
-  field as used elsewhere.** `THorse.SelectRunners` numbers the 6 runners 1 through 6 in
+  field as used elsewhere.** `TScreen_Stable.Update` settles half of the puzzle: it compares
+  `h.racenum` against the Global the "bet on runner N" buttons write, so at race time
+  `racenum` really is the runner's 1-6 slot and the player's bet is stored as a slot number
+  with 0 meaning "no bet placed". That still leaves `GetStringracenum` unreachable. `THorse.SelectRunners` numbers the 6 runners 1 through 6 in
   `racenum`, but `GetStringracenum` only returns text for `racenum = 0` ("Win") or
   `racenum = 1` ("Place"), falling through to an empty string for every other value - 
   meaning in practice only the very first-selected runner could ever show "Place", and no

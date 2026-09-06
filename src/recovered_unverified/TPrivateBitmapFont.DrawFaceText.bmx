@@ -141,6 +141,62 @@
 '    (a diagnostic, not a verification, and nothing was changed on disk) takes the same
 '    build to MATCH, mode=reloc, 666/666. Fix that before attacking the allocator again.
 '
+' 8. THE MIRROR VARIANT WAS BUILT AND MEASURED, 2026-08-23. It is REFUTED as a fix, and
+'    it is the last of the candidate semantics -- there is nothing further to try here.
+'    spill-tie-x87-precision.md section 6 conjectured that the bcc.exe which built
+'    NSS5.exe gave `cost` and `min` the OPPOSITE treatment from ours: cost ROUNDED to
+'    float32, min kept UNROUNDED at x87 extended precision, so a later tied candidate
+'    wins iff the quotient rounds DOWN -- the exact complement of our build's rule. That
+'    variant had never been built. It has now been, gated behind WALLOC_MIRROR in a
+'    private worker copy of cgallocregs.cpp, written explicitly rather than left to the
+'    host compiler:
+'        volatile float _c32=cost;                       // the compared value, rounded
+'        long double costx=(long double)t->usage
+'            /((long double)t->degree*(long double)t->block_count);
+'        if( (long double)_c32 < minx ){ node=t; minx=costx; }   // incumbent UNROUNDED
+'    Assigning costx and not _c32 to the incumbent is the whole point; assigning _c32
+'    degenerates to float32-on-both-sides, which is WALLOC_FP32 and already refuted.
+'
+'    GATE OFF IS A PROVEN CONTROL. The rebuilt bcc with WALLOC_MIRROR unset reproduces the
+'    shipped compiler's codegen on every body measured: 12/12 small matched bodies
+'    (14..1,395 bytes), 16/16 of the largest matched bodies (5,021..16,301), and all three
+'    Draw*Text residuals at their exact documented lengths, first_diff and matched counts.
+'
+'    ON THE THREE TRACKED SPILL SLOTS THE MIRROR IS RIGHT, AND EXACTLY AS PREDICTED --
+'    7 of 9, scoring Shadow 3/3, Border 3/3, Face 1/3, which is what the analytic grid in
+'    scratch/spill-semantics-grid.md predicted before the build. The grid's open question,
+'    whether the pick-2 cost denominators shift on the mirror's own trajectory, is now
+'    measured and the answer is NO: the WALLOC_SPILLCAND degrees at pick 2 are 42/72/89
+'    under both gates, unchanged, because the three tied values all interfere with one
+'    another and decDegree therefore decrements the survivors equally whichever is
+'    removed. DrawFaceText's pick 2 is consequently NOT reachable by any rule whose
+'    deciding quantity is a float32 rounding direction: 11/2088 (Border) and 11/2759
+'    (Face) present the same two candidates in the same order and BOTH round UP in
+'    float32, so any such rule must answer them the same way, and the original answers
+'    them differently. Only the binary64 direction separates them. An exhaustive search
+'    over 400 semantics -- every pair of values built from the quotient by composing at
+'    most two roundings drawn from {float32, binary64, x87-extended, exact}, both
+'    comparison operators, both list orders -- scores 0 at 9/9 and tops out at exactly the
+'    mirror's 7/9. See scripts/probes/spilltie_semantics.py and spilltie_exhaustive.py.
+'
+'    AND IT IS STILL A NET LOSS, for a reason the arithmetic could not have shown. The
+'    mirror does not only move the tie among these three values; it moves every other tie
+'    in the program the same way. Measured, same tree, one env var apart:
+'        12/12 small matched bodies hold under both gates.
+'        16/16 of the largest matched bodies hold with the gate OFF; only 10/16 with it
+'        ON. Broken: TScreen_Stats.UpdateStatTable, TPlayer.RecordPlayerStats,
+'        TEngine.RenderScoreboard, TScreen_Controls.CreateScreen, TPitch.SetUp,
+'        TPlayer.CheckBallContact -- five of them the same bodies WALLOC_FP32 broke.
+'    Closing at most one body while breaking six of the sixteen that matter most is the
+'    same verdict allocator-knob-sweep.md's scoring rule returns for WALLOC_FP32. THE
+'    SHIPPED COMPILER STAYS. The patched compiler was reverted and the worker slot's
+'    bcc.exe restored to the shipped binary, md5 confirmed, build intermediates removed.
+'
+'    FOR THIS BODY SPECIFICALLY: the mirror fixes exactly one of the three tracked slots
+'    (the ebp bytes at +110 and +403 become the original's; +78, +126, +386 and +1404 do
+'    not), which is the predicted 1/3, and it additionally rotates the double temporaries
+'    at -0x20 and -0x10. Differing ebp bytes go from 6 (gate OFF) to 12 (gate ON).
+'
 ' CONSEQUENCE FOR walloc_report.py. Its usage/degree/block_count readings are sound, but
 ' WALLOC_TRACE=1 changes the compilation it is reporting on: the trace's own `cerr << cost`
 ' rounds the spill cost to float32 and can therefore flip a tie. Read the numbers, do not

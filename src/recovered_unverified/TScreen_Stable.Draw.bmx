@@ -23,8 +23,16 @@
 '      g_screen_stable_int05 (0x00C6DF70) was already the RIGHT name -- confirmed the
 '      canonical pick in extracted/global_alias_unified.tsv (g_stable_int05 and
 '      g_stable_state both alias INTO it). g_Object845..849/g_screen_stable_arr03/
-'      g_screen_stable_float03 are untouched elsewhere in the corpus (grepped clean), so
-'      kept as-is -- deliberately NOT reusing g_stable_obj845:Object (DoRace's name for
+'      g_screen_stable_arr03 are untouched elsewhere in the corpus (grepped clean), so
+'      kept as-is.
+'      STALE AS OF 2026-08-23: g_screen_stable_float03 (0x00C6DF54) is NO LONGER unique to
+'      this body. TScreen_Stable.Update was byte-matched at 1072/1072 that day and it WRITES
+'      that address, as `g_stable_startxprev`, with last frame's camera scroll x. So this
+'      body's `g_stable_startx*t + g_screen_stable_float03*(1.0-t)` is a camera interpolation
+'      between the previous and current frame positions, and the two names are a LIVE SPLIT
+'      on one address (both sides written/read, invisible to the dead-Global pass). Whoever
+'      proves this body should unify the pair rather than keep both names.
+'      Kept as-is here only because renaming an unverified body would invalidate its score. -- deliberately NOT reusing g_stable_obj845:Object (DoRace's name for
 '      0x00C6DF28) for g_Object845, because that Global is declared :Object there and this
 '      body needs :TImage for the DrawImage() call; reusing the name would have let
 '      merge_globals()'s first-wins dedup silently hand this body the wrong static type.

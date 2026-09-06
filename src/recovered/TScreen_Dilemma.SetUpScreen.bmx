@@ -16,7 +16,12 @@
 '                                              assigned only from the ten LoadImageChecked
 '                                              results below, so TImage)
 '     0x00C68068 -> g_dil_img2:TImage         (same)
-'     0x00C6806C -> g_img_boss:TImage         '     0x00C68070 -> g_img_training:TImage      |
+'     0x00C6806C -> g_img_boss:TImage         '     0x00C68070 -> g_dilemma_img_training:TImage |
+'       0x00C68070 is this screen's own full-size training artwork, loaded by
+'       TScreen_Dilemma.CreateScreen as g_dilemma_img_training. The g_img_training
+'       spelling is TScreen_Abilities.CreateScreen's name for 0x00C66A6C, the 28-pixel
+'       training icon on the abilities rows, so the two slots shared one variable and
+'       the dilemma drew that icon stretched across 400x440.
 '     0x00C68074 -> g_img_fans:TImage          |  loaded by TScreen_Dilemma.CreateScreen
 '     0x00C68078 -> g_img_bowling:TImage       |  (0x00556929) with LoadImageChecked from
 '     0x00C6807C -> g_img_golf:TImage          |  GameMedia\Images\Relationships\*.png,
@@ -59,7 +64,7 @@
 '!Global g_dil_img1:TImage
 '!Global g_dil_img2:TImage
 '!Global g_img_boss:TImage
-'!Global g_img_training:TImage
+'!Global g_dilemma_img_training:TImage
 '!Global g_img_fans:TImage
 '!Global g_img_bowling:TImage
 '!Global g_img_golf:TImage
@@ -94,7 +99,7 @@ Case 1
 	Case 1
 		g_dil_img1 = g_img_boss
 	Case 2
-		g_dil_img1 = g_img_training
+		g_dil_img1 = g_dilemma_img_training
 	End Select
 Case 2
 	g_dil_prg1.SetPercent(g_profile.relationteam,1)
@@ -106,7 +111,7 @@ Case 2
 	Case 2
 		g_dil_img1 = g_img_golf
 	Case 3
-		g_dil_img1 = g_img_training
+		g_dil_img1 = g_dilemma_img_training
 	End Select
 Case 3
 	g_dil_prg1.SetPercent(g_profile.relationfans,1)
@@ -159,7 +164,7 @@ Repeat
 		Case 1
 			g_dil_img2 = g_img_boss
 		Case 2
-			g_dil_img2 = g_img_training
+			g_dil_img2 = g_dilemma_img_training
 		End Select
 	Case 2
 		g_dil_prg2.SetPercent(g_profile.relationteam,1)
@@ -171,7 +176,7 @@ Repeat
 		Case 2
 			g_dil_img2 = g_img_golf
 		Case 3
-			g_dil_img2 = g_img_training
+			g_dil_img2 = g_dilemma_img_training
 		End Select
 	Case 3
 		g_dil_prg2.SetPercent(g_profile.relationfans,1)

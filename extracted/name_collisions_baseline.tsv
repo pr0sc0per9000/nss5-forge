@@ -1,0 +1,21 @@
+# Known one-name-two-slots collisions, the backlog find_name_collisions.py --check tolerates.
+# A row is a defect not yet fixed, or one of the few shapes the detector still misreads (a refcount
+# assignment `a = b` puts the RHS first in both the code and the ordered pairing, so the two
+# names can swap). Neither is a decision that the row is acceptable.
+# Remove the row when the name is split; never add one to silence a new collision.
+# 2026-08-29, fix-routed-leftovers: g_btn_play (0x00C66798 / 0x00C685C8) and g_prg_energy
+# (0x00C66790 / 0x00C68628) REMOVED -- TScreen_MatchPrep.CreateScreen now spells its own two
+# slots g_matchprep_btnplay and g_matchprep_prgenergy, the names its own SetUpScreen already
+# reads them by, and extracted/global_alias_overrides.tsv carries the two rows that stop the
+# generated tables sending those names back to the colliding ones. Measured with
+# find_name_collisions.py before and after the change: 30 -> 28 collisions found, exactly
+# those two gone (plus g_training_state, which the detector stops misreading once the
+# 0x00C5B208 alias rows land), and NOTHING added.
+name	slots	bodies
+g_img_boot	0x00C66730,0x00C66938	0x00C66730=TScreen_GameMenu.CreateScreen | 0x00C66938=TScreen_Home.CreateScreen
+g_img_money	0x00C66738,0x00C6693C	0x00C66738=TScreen_GameMenu.CreateScreen | 0x00C6693C=TScreen_Home.CreateScreen
+g_img_relationships	0x00C66734,0x00C66934	0x00C66734=TScreen_GameMenu.CreateScreen | 0x00C66934=TScreen_Home.CreateScreen
+g_img_star	0x00C66940,0x00C66A70	0x00C66940=TScreen_Home.CreateScreen | 0x00C66A70=TScreen_Abilities.CreateScreen
+g_pan_lifestyle	0x00C66998,0x00C6815C	0x00C66998=TScreen_Home.CreateScreen | 0x00C6815C=TScreen_Finances.CreateScreen
+g_prg_achievements	0x00C66790,0x00C669A8	0x00C66790=TScreen_GameMenu.CreateScreen | 0x00C669A8=TScreen_Home.CreateScreen,TScreen_Home.SetUpScreen
+g_screen_mainmenu_int03	0x00C639FC,0x00C6E900	0x00C639FC=TScreen_Options.ResetScreen | 0x00C6E900=TScreen_MainMenu.UpdateVersionInfo

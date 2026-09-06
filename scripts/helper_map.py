@@ -213,6 +213,102 @@ def save_table(t):
 _BRL = None
 BRL_TABLE = os.path.join(ROOT, "extracted", "brl_functions.tsv")
 
+# ALIAS-SET ADDITIONS -- names brl_functions.tsv's generator DROPPED, not names it got
+# wrong. A row in that file is the SET of archive symbols whose bytes are identical to the
+# original's once relocations are excluded, and compare() rule (a) treats a call whose name
+# is outside the set as a call to the WRONG helper. So a set that is merely INCOMPLETE
+# turns a correct body into a confident MISMATCH, and there is no way to distinguish the
+# two from inside the oracle.
+#
+# 0x005B9674 IS brl.blitz's DebugLog. Its 27 bytes in NSS5.exe are
+#   55 89 E5 8B 45 08 50 FF 15 <ptr> 83 C4 04 B8 00 00 00 00 EB 00 89 EC 5D C3
+# which is byte-for-byte the `_brl_blitz_DebugLog` member of
+# tools/blitzmax-legacy-src/mod/brl.mod/blitz.mod/blitz.release.win32.x86.a, whose single
+# relocation sits at +9 -- the `FF 15` operand, `OnDebugLog message` in blitz.bmx:175. The
+# address is also exactly where blitz.bmx's source order puts it: RuntimeError at
+# 0x005B963C (36 bytes, byte-proven) then DebugStop at 0x005B9660 (20 bytes,
+# brl_functions_inferred.tsv) then DebugLog. The pointer it calls, 0x005C7BD4, holds a
+# one-byte `ret` -- an unhooked debug callback -- and nothing else in the image reads it.
+# brl_functions.tsv instead lists only two maxgui.localization symbols that share the same
+# 27 bytes, from a module this exe does not link.
+#
+# INDEPENDENTLY RE-DERIVED 2026-08-23, because a body must never inherit the table row
+# that masks its own call operand. Three checks, none of which use the body under test:
+#   * SOURCE ORDER. tools/blitzmax-legacy-src/mod/brl.mod/blitz.mod/blitz.bmx declares
+#     RuntimeError at line 159, DebugStop at 167, DebugLog at 175. The image lays them out
+#     in exactly that order and contiguously: 0x005B963C (RuntimeError, already byte-proven
+#     in brl_functions.tsv), 0x005B9660 (DebugStop), 0x005B9674. No fourth function fits
+#     between them.
+#   * THE HOOK PAIR. blitz.bmx:86-87 declares `Global OnDebugStop()` and
+#     `Global OnDebugLog(message$)` adjacently. 0x005B9660 calls dword[0x005C7BD8] with no
+#     argument; 0x005B9674 calls dword[0x005C7BD4] with one. Both slots hold 0x004A45C0,
+#     which is a single `ret` -- the unhooked default -- so the pair is OnDebugStop /
+#     OnDebugLog and the one-argument half is DebugLog.
+#   * THE COLLISION IS A SINGLETON. localization.release.win32.x86.a contributes exactly
+#     ONE row to the whole of brl_functions.tsv, this one. A genuinely linked module does
+#     not contribute a single function; blitz.release.win32.x86.a, which this exe really
+#     does link, contributes ten. SetLocalizationLanguage/SetLocalizationMode are
+#     one-argument forwards through a function pointer, i.e. the same 27 bytes by
+#     coincidence of shape.
+# Effect on this lane, measured both ways: TZipFileList.ScanCentralHeader is MATCH 385/385
+# (19 slots masked) with this row and MISMATCH 328/385 (17 masked) without it. It is the
+# ONLY body in the lane that depends on it -- the other nine match identically either way.
+#
+# WHY THE GENERATOR MISSED IT (scripts/name_brl.py, archive_functions):
+#   `objdump -r` prints relocations SECTION BY SECTION and every section restarts its
+#   offsets at zero, but the harvest keys them by ARCHIVE MEMBER only. .data/.rdata offsets
+#   therefore land in the same namespace as .text's. DebugLog has one relocation; the
+#   merged set gives it five (0, 4, 8, 9, 12), masking bytes 0-15, leaving 11 informative
+#   bytes against main()'s floor of max(MIN_LEN, len//2) = 13, so the symbol is discarded
+#   as "too weak" before it can claim the address.
+#
+#   Keying the harvest by (member, section) fixes the relocation sets exactly -- DebugLog
+#   then reports [9], DebugStop [5], RuntimeError [9, 18]. It is NOT applied here, because
+#   regenerating the table with that fix alone also ADDS 171 addresses and REMOVES 46, and
+#   two of the additions are wrong in a way that matters: 0x0058DBF3 (ZipFile.New, a
+#   byte-verified body in src/recovered_thirdparty/zipengine) becomes
+#   `__brl_map_TKeyValue_New` and 0x0058DD4D (ZipFile.setName) becomes
+#   `__brl_stream_TStreamWrapper_SetStream`. The over-masking was doing second duty as the
+#   suppressor of weak short-`New` matches, so the section fix needs a compensating guard
+#   and it moves coverage.py's denominator by 171 addresses. That is a decision about the
+#   headline number, not a zipengine repair, so it is written down rather than taken.
+#
+# Merged into the set, never replacing it, and applied only where the generator produced
+# no name for this address of its own. Measured against the current tables: the four
+# addresses brl_functions_inferred.tsv shares with brl_functions.tsv already have their
+# inferred name inside the generated alias set, so this changes nothing except 0x005B9674.
+# 0x004A8D60 IS _bbMemAlloc, and the proof is its already-named partner. The body adds
+# 0x14 to the requested size, calls malloc (0x004B4510), 16-byte-aligns the result and
+# stores the RAW malloc pointer at [aligned-4], retrying once after a collect (0x004A8980)
+# if malloc fails. 0x004A8DA0 is _bbMemFree in extracted/runtime_helpers.tsv and, per
+# extracted/brl_functions_inferred.tsv, reads the dword at [p-4] and frees THAT -- so the
+# only allocator that free can be paired with is this one. Its other 13 call sites are all
+# allocation sites (_bbStringToCString, brl.bank's CreateBank/ResizeBank). This is
+# structural proof, not the oracle learning from the body under test: TZipEStream.Seek is
+# 147/147 with everything but this one operand already agreeing, which is precisely the
+# situation NSS5_NO_LEARN exists to stop a body from resolving for itself.
+BRL_ALIAS_ADDITIONS = {
+    0x005b9674: "_brl_blitz_DebugLog",
+    0x004a8d60: "_bbMemAlloc",
+}
+
+
+def _merge_alias(table, va, sym):
+    """Add `sym` to va's alias set, or create it. Never drops a name already there.
+
+    brl_functions.tsv rows are SETS of byte-identical candidates and masking accepts any
+    member, so an independently-derived name for the same address belongs in the set
+    alongside the generator's. setdefault() was silently discarding it, which is only
+    harmless while the generator's set already contains the right answer.
+    """
+    cur = table.get(va)
+    if cur is None:
+        table[va] = sym
+        return
+    parts = cur.split("|")
+    if sym not in parts:
+        table[va] = "|".join(sorted(parts + [sym]))
+
 
 def brl_table():
     """orig_va -> symbol, for BRL/PUB module functions inside NSS5.exe.
@@ -248,7 +344,7 @@ def brl_table():
                 p = line.rstrip("\n").split("\t")
                 if len(p) >= 2 and p[0].startswith("0x"):
                     try:
-                        _BRL.setdefault(int(p[0], 16), p[1])
+                        _merge_alias(_BRL, int(p[0], 16), p[1])
                     except ValueError:
                         pass
 
@@ -315,6 +411,9 @@ def brl_table():
                         _BRL.setdefault(int(p[0], 16), "_" + p[1])
                     except ValueError:
                         pass
+
+    for va, sym in BRL_ALIAS_ADDITIONS.items():
+        _merge_alias(_BRL, va, sym)
     return _BRL
 
 
@@ -375,18 +474,53 @@ def orig_functions():
     # known only from the header written when they are verified. Without this a body that
     # calls e.g. LogLine has an E8 whose original target cannot be named, so the operand
     # never masks and the body is reported bad when it is correct.
-    md = os.path.join(ROOT, "src", "recovered_module")
-    if os.path.isdir(md):
-        # SORTED, DELIBERATELY. os.listdir() makes no ordering promise, so an unsorted
-        # scan combined with last-write-wins turns a second claim on the same VA into a
-        # coin flip that can land differently between two runs of the identical tree.
-        # claimed_by tracks which file first named each VA so a second, different file
-        # claiming it is a detectable COLLISION rather than a silent overwrite -- see the
-        # raise below for what happens when that collision is not caught.
-        claimed_by = {}
-        for fn in sorted(os.listdir(md)):
-            if not fn.endswith(".bmx"):
-                continue
+    # Recovered module-level Functions. They have no reflection record, so their VA is
+    # known only from the header written when they are verified. Without this a body that
+    # calls e.g. LogLine has an E8 whose original target cannot be named, so the operand
+    # never masks and the body is reported bad when it is correct.
+    #
+    # BOTH verified trees are scanned. src/recovered_thirdparty/ was missed for a long
+    # time and that is a real defect, not a nicety: fontmachine's four module-level
+    # helpers (0x00592A13, 0x00592A37, 0x00592B79, 0x00592B87) live there, every glyph the
+    # game draws goes through the first two, and with no row for them the E8 operand into
+    # them has no original-side name, cannot mask, and the calling body is reported
+    # MISMATCH when it is correct. Measured on TPrivateBitmapFont.DrawShadowText:
+    # MISMATCH first_diff=369 without these rows, and the call operands adjudicate clean
+    # with them. Recorded as section 8 of docs/reference/spill-tie-x87-precision.md and
+    # section 5.1 of docs/reference/fontmachine-drawtext-disposition.md.
+    #
+    # Of the 111 VA headers under src/recovered_thirdparty/, 104 name a VA that
+    # extracted/vtable_map.tsv already names, and all 104 agree with it, so scanning that
+    # tree adds exactly seven rows and contradicts nothing: the four fontmachine helpers
+    # above plus EConstBlend.Delete, EConstBlend.GetCurrent and eDrawCharStatus.Delete,
+    # three root-Type bodies that have no class-table row to be found through.
+    #
+    # src/recovered_unverified/ is deliberately NOT scanned. A VA header there has not
+    # been through the oracle, and letting an unverified body name the ORIGINAL side of a
+    # comparison is exactly the bootstrap NSS5_NO_LEARN=1 exists to prevent.
+    #
+    # claimed_by tracks which file first named each VA so a second, different file
+    # claiming it is a detectable COLLISION rather than a silent overwrite -- see the
+    # raise below for what happens when that collision is not caught. It spans BOTH trees:
+    # the same VA reconstructed under two names is the same corpus defect whether the two
+    # files sit in one directory or two.
+    claimed_by = {}
+    for sub in ("recovered_module", "recovered_thirdparty"):
+        md = os.path.join(ROOT, "src", sub)
+        if not os.path.isdir(md):
+            continue
+        # SORTED, DELIBERATELY, at both levels. os.walk() and os.listdir() make no
+        # ordering promise, so an unsorted scan combined with last-write-wins turns a
+        # second claim on the same VA into a coin flip that can land differently between
+        # two runs of the identical tree. recovered_module is flat; recovered_thirdparty
+        # is one directory per third-party module, so this walks rather than lists.
+        found = []
+        for dirpath, dirnames, filenames in os.walk(md):
+            dirnames.sort()
+            for fn in sorted(filenames):
+                if fn.endswith(".bmx"):
+                    found.append((fn, os.path.join(dirpath, fn)))
+        for fn, path in found:
             # READ THE WHOLE FILE. A bounded read (`.read(400)`) silently truncates the
             # header of any file with a long preamble: LoadImageChecked,
             # LoadAnimImageChecked, LoadPixmapChecked and LoadSoundChecked each carry an
@@ -395,7 +529,7 @@ def orig_functions():
             # body when the body is correct. Measured on TScreen.UpdateOffset: 500/500
             # bytes, one four-byte diff at the LoadImageChecked call operand, and MATCH
             # once the VA is seen. The regex is anchored on `VA 0x` either way.
-            head = open(os.path.join(md, fn), encoding="utf-8", errors="replace").read()
+            head = open(path, encoding="utf-8", errors="replace").read()
             m = re.search(r"^'\s*VA\s+0x([0-9a-fA-F]+)", head, re.M)
             if not m:
                 continue
@@ -404,7 +538,7 @@ def orig_functions():
                 # Two files reconstructing the SAME original address under two DIFFERENT
                 # names is a corpus defect, not an ordering question -- there is no correct
                 # way to pick a winner here, only an arbitrary one. Left unchecked, whichever
-                # file os.listdir() happens to return last silently becomes the name every
+                # file the scan happens to return last silently becomes the name every
                 # caller's compare() masking sees for this VA, and the loser's callers then
                 # compare their call operand against the WRONG name; compare()'s (a0) name
                 # check treats "both present but unequal" as a genuine difference and breaks
@@ -413,8 +547,8 @@ def orig_functions():
                 # MISMATCH 3808/5081. Raising here, at table-build time, stops that before any
                 # body is scored against a table that cannot be trusted.
                 raise RuntimeError(
-                    "orig_functions(): VA 0x%08x is claimed by both %s and %s in "
-                    "src/recovered_module -- duplicate VA is a corpus defect, resolve it "
+                    "orig_functions(): VA 0x%08x is claimed by both %s and %s under "
+                    "src/ -- duplicate VA is a corpus defect, resolve it "
                     "there before re-running" % (va, claimed_by[va], fn))
             claimed_by[va] = fn
             # The FILENAME is not always the DECLARED IDENTIFIER. BlitzMax identifiers
@@ -434,6 +568,10 @@ def orig_functions():
             # (no human name yet) are untouched -- there the declared identifier really is
             # "Fn_<8hex>" (see src/recovered_module/Fn_00595EF3.bmx), so the whole basename
             # is already correct and the regex below does not match it (no dot).
+            #
+            # A third-party Type's Method or Type Function file is named the same way and
+            # lands on the same string our_functions() derives from `__bb_Type_Method`, so
+            # the 104 rows that overlap vtable_map.tsv agree with it byte for byte.
             m2 = re.match(r"^Fn_[0-9A-Fa-f]{8}\.(.+)$", fn[:-4])
             _ORIGFN[va] = m2.group(1) if m2 else fn[:-4]
 

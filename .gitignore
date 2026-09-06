@@ -89,6 +89,11 @@ New Star Soccer 5/
 !/extracted/global_address_adjudicated.tsv
 !/extracted/globals_type_overrides.tsv
 !/extracted/globals_corrections.tsv
+#   The one-name-two-slots backlog scripts/find_name_collisions.py --check ratchets
+#   against. Not a build input, so it is absent from setup.py's BUILD_INPUTS and
+#   assemble.py's _REQUIRED_INPUTS; it is tracked because a gate whose baseline is not
+#   in the repository passes vacuously for everyone but the author.
+!/extracted/name_collisions_baseline.tsv
 
 #   RESOLVED -- produced once by the analysis tools from inputs that are NOT in the
 #   repository (the Ghidra decompilation under extracted/decomp, ~72 MB, and

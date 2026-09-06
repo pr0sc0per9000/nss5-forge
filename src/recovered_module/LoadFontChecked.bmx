@@ -9,12 +9,16 @@
 ' font: " / "Cannot see font: " / "Font loaded" / "Font could not be loaded: "). Called (at
 ' least) 4 times from TScreen.SetUpFonts, which is the only caller Ghidra records
 ' (function_inventory.tsv called_by_count=1).
-'!Global g_pathPrefix:String
+' The first guard operand is the SAVE root 0x00C6E9A8, not a second install root:
+' 0x004BC799 pushes it, and the install root 0x00C6E950 is the second operand.
+' src/recovered_module/LoadImageChecked.bmx carries the full evidence and the reason the
+' g_pathPrefix spelling silently tested the install root twice.
+'!Global g_userpath:String
 '!Global g_dataDir:String
 	Function LoadFontChecked:TImageFont(a0:String, a1:Int, a2:Int)
 		Local fnt:TImageFont
 		If Not a0.Contains("incbin")
-			If Not a0.Contains(g_pathPrefix) And Not a0.Contains(g_dataDir)
+			If Not a0.Contains(g_userpath) And Not a0.Contains(g_dataDir)
 				a0 = g_dataDir + a0
 			End If
 			If FileType(a0) = 1

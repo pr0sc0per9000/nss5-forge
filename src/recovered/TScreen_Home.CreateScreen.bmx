@@ -8,18 +8,56 @@
 ' only as an absolute address and the byte oracle masks those, so both spellings
 ' verify byte-perfectly. Renaming is byte-neutral; scripts/reverify.py confirms it.
 ' See scripts/unify_globals.py for the rest of this defect class.
+'
+' GLOBALS RENAMED (2026-08-23): seven more slots, same defect class, in THIS file only.
+'   0x00C66934 g_img_home_relationships   0x00C66938 g_img_home_boot
+'   0x00C6693C g_img_home_money           0x00C66940 g_img_home_star
+'   0x00C66990 g_prg_home_skills          0x00C66998 g_pan_home_lifestyle
+'   0x00C669A8 g_prg_home_achievements
+' Each was spelled with a name another screen uses for a DIFFERENT slot. Evidence and
+' the two player-visible failures are under THE SEVEN NAME COLLISIONS below.
 ' TScreen_Home.CreateScreen
 ' VA 0x0053BA31   4273 bytes   mode=reloc   byte-identical vs NSS5.exe
 ' (4273/4273, original length from Ghidra's inventory, reloc_masked=412; re-verified with
 '  NSS5_NO_LEARN=1 so no call operand was masked by a name this run taught the table)
 ' KIND=Function (static, no implicit Self), SIG ()i, class-table slot 0x30
 '
+' THE SEVEN NAME COLLISIONS (2026-08-23)
+' Each of the seven was spelled with a name another screen uses for a DIFFERENT slot, so
+' the assembler emitted one variable where NSS5.exe has two and the two screens shared
+' storage. Two of the seven were visible on the home screen of a new career:
+'   * g_img_relationships. TScreen_GameMenu.CreateScreen calls 0x00C66734 by that name and
+'     runs first, so by the time this Function's `If Not g_img_relationships` guard is
+'     reached the shared variable is already loaded and the guard skips the WHOLE icon
+'     block. All eight home icons stayed Null, btn_Achievements was built with a Null
+'     :TImage and drew nothing. btn_Skills, btn_Happiness and btn_Lifestyle still drew
+'     because boot/relationships/money are shared with the game-menu slots the guard had
+'     just filled, which is why only the star was missing and the defect read as an
+'     image-loading problem rather than a naming one. The state dump of the run in
+'     status/debugruns/20260823-202801 names the four Home-only icons as the tell: contract,
+'     finances, shirt and star52 were all Null while boot, money and relationships were not.
+'   * g_prg_achievements. TScreen_GameMenu.CreateScreen calls 0x00C66790 by that name, and
+'     extracted/global_alias_overrides.tsv merges g_bar_energy onto it, so the ENERGY gauge
+'     updater TScreen_GameMenu.UpdateTitlePanel drove this screen's achievements bar:
+'     SetPercent(g_profile.energy) plus SetText(Int(energy) + "%") painted a literal 100%
+'     over a stat that was 0. Home's CreateScreen runs after the game menu's, so the shared
+'     variable ended up holding THIS bar and the real energy gauge stopped updating.
+'   The other five are the same fault without a symptom yet: g_img_boot and g_img_money are
+'   the game menu's 22-pixel icons standing in for this screen's 28-pixel ones, g_img_star
+'   is TScreen_Abilities' Star52.png, g_prg_skills is TScreen_Abilities' prg_Skills (which
+'   is created later, so this screen's skills bar kept CreateProgressBar's 1.0 default and
+'   reported 1% no matter what the player's rating was), and g_pan_home_lifestyle is
+'   TScreen_Finances' 0x00C6815C.
+' Renaming is byte-neutral for the same reason the g_mediapath note gives above: a Global
+' reaches the compiled code only as an absolute address, which the oracle masks.
+' scripts/workflow/find_name_collisions.py lists the rest of this defect class.
+'
 ' ASSUMPTIONS
 '   Module Globals (addresses are fact, NAMES are ours -- module Globals have no debug record).
 '   Every one below is typed from its construction site in globals_final.tsv unless noted:
 '     0x00C66930 -> g_screen_home:TScreen        (construction site = TScreen.CreateScreen)
-'     0x00C66934 -> g_img_relationships:TImage   0x00C66938 -> g_img_boot:TImage
-'     0x00C6693C -> g_img_money:TImage           0x00C66940 -> g_img_star:TImage
+'     0x00C66934 -> g_img_home_relationships:TImage   0x00C66938 -> g_img_home_boot:TImage
+'     0x00C6693C -> g_img_home_money:TImage           0x00C66940 -> g_img_home_star:TImage
 '     0x00C66944 -> g_img_shirt:TImage           0x00C66948 -> g_img_finances:TImage
 '     0x00C6694C -> g_img_contract:TImage        0x00C66950 -> g_img_star52:TImage
 '         (globals_final.tsv types these eight only as "Object, usage"; TImage is from the
@@ -34,10 +72,10 @@
 '          in creation order, which is why the three AddChild calls look permuted)
 '     0x00C66980 g_pan_happiness:TPanel   0x00C66984 g_prg_happiness:TProgressBar
 '     0x00C66988 g_btn_happiness:TButton  0x00C6698C g_pan_skills:TPanel
-'     0x00C66990 g_prg_skills:TProgressBar 0x00C66994 g_btn_skills:TButton
-'     0x00C66998 g_pan_lifestyle:TPanel   0x00C6699C g_prg_lifestyle:TProgressBar
+'     0x00C66990 g_prg_home_skills:TProgressBar 0x00C66994 g_btn_skills:TButton
+'     0x00C66998 g_pan_home_lifestyle:TPanel   0x00C6699C g_prg_lifestyle:TProgressBar
 '     0x00C669A0 g_btn_lifestyle:TButton  0x00C669A4 g_pan_achievements:TPanel
-'     0x00C669A8 g_prg_achievements:TProgressBar 0x00C669AC g_btn_achievements:TButton
+'     0x00C669A8 g_prg_home_achievements:TProgressBar 0x00C669AC g_btn_achievements:TButton
 '   Gadgets built by OTHER screens and only referenced here (Types from construction sites;
 '   the names are guesses at their role):
 '     0x00C66768 g_pan_stable:TPanel   0x00C667B0 g_pan_money:TPanel
@@ -98,10 +136,10 @@
 '     0x005C7D40 are the two zero-length BBStrings, i.e. "" (bcc picks a different empty-string
 '     constant depending on the argument slot; the source is "" either way).
 '!Global g_screen_home:TScreen
-'!Global g_img_relationships:TImage
-'!Global g_img_boot:TImage
-'!Global g_img_money:TImage
-'!Global g_img_star:TImage
+'!Global g_img_home_relationships:TImage
+'!Global g_img_home_boot:TImage
+'!Global g_img_home_money:TImage
+'!Global g_img_home_star:TImage
 '!Global g_img_shirt:TImage
 '!Global g_img_finances:TImage
 '!Global g_img_contract:TImage
@@ -121,13 +159,13 @@
 '!Global g_prg_happiness:TProgressBar
 '!Global g_btn_happiness:TButton
 '!Global g_pan_skills:TPanel
-'!Global g_prg_skills:TProgressBar
+'!Global g_prg_home_skills:TProgressBar
 '!Global g_btn_skills:TButton
-'!Global g_pan_lifestyle:TPanel
+'!Global g_pan_home_lifestyle:TPanel
 '!Global g_prg_lifestyle:TProgressBar
 '!Global g_btn_lifestyle:TButton
 '!Global g_pan_achievements:TPanel
-'!Global g_prg_achievements:TProgressBar
+'!Global g_prg_home_achievements:TProgressBar
 '!Global g_btn_achievements:TButton
 '!Global g_pan_stable:TPanel
 '!Global g_pan_money:TPanel
@@ -144,11 +182,11 @@
 '!Global g_screenh:Int
 	Function CreateScreen()
 		g_screen_home = TScreen.CreateScreen("home", Null, Null, Null)
-		If Not g_img_relationships
-			g_img_relationships = LoadImageChecked(g_iconpath + "Relationships.png", -1)
-			g_img_boot = LoadImageChecked(g_iconpath + "Boot28.png", -1)
-			g_img_money = LoadImageChecked(g_iconpath + "Money.png", -1)
-			g_img_star = LoadImageChecked(g_iconpath + "Star.png", -1)
+		If Not g_img_home_relationships
+			g_img_home_relationships = LoadImageChecked(g_iconpath + "Relationships.png", -1)
+			g_img_home_boot = LoadImageChecked(g_iconpath + "Boot28.png", -1)
+			g_img_home_money = LoadImageChecked(g_iconpath + "Money.png", -1)
+			g_img_home_star = LoadImageChecked(g_iconpath + "Star.png", -1)
 			g_img_shirt = LoadImageChecked(g_iconpath + "Shirt.png", -1)
 			g_img_finances = LoadImageChecked(g_iconpath + "Finances.png", -1)
 			g_img_contract = LoadImageChecked(g_iconpath + "Contract.png", -1)
@@ -207,7 +245,7 @@
 		x :+ 10
 		g_screen_home.AddGadget(g_pan_happiness)
 		g_prg_happiness = TProgressBar.CreateProgressBar("prg_Happiness", "", x, y, wbar, h, 3, "FFFFFF", "00FF00", "FFFFFF", 0.8, 1, Null)
-		g_btn_happiness = TButton.CreateButton("btn_Happiness", "", x + wbar + 10, y, wcol, h, 1, 2, "FFFFFF", "FFFFFF", g_img_relationships, ButtonHappiness, 1.0, 1, GetText("tt_Happiness"))
+		g_btn_happiness = TButton.CreateButton("btn_Happiness", "", x + wbar + 10, y, wcol, h, 1, 2, "FFFFFF", "FFFFFF", g_img_home_relationships, ButtonHappiness, 1.0, 1, GetText("tt_Happiness"))
 		g_pan_happiness.AddChild(g_prg_happiness)
 		g_pan_happiness.AddChild(g_btn_happiness)
 		x = g_screenw / 2 + 5
@@ -216,29 +254,29 @@
 		y :+ 40
 		x :+ 10
 		g_screen_home.AddGadget(g_pan_skills)
-		g_prg_skills = TProgressBar.CreateProgressBar("prg_Skills", "", x, y, wbar, h, 3, "FFFFFF", "00FF00", "FFFFFF", 0.8, 1, Null)
-		g_btn_skills = TButton.CreateButton("btn_Skills", "", x + wbar + 10, y, wcol, h, 1, 2, "FFFFFF", "FFFFFF", g_img_boot, TScreen_Abilities.SetUpScreen, 1.0, 1, GetText("tt_Training"))
-		g_pan_skills.AddChild(g_prg_skills)
+		g_prg_home_skills = TProgressBar.CreateProgressBar("prg_Skills", "", x, y, wbar, h, 3, "FFFFFF", "00FF00", "FFFFFF", 0.8, 1, Null)
+		g_btn_skills = TButton.CreateButton("btn_Skills", "", x + wbar + 10, y, wcol, h, 1, 2, "FFFFFF", "FFFFFF", g_img_home_boot, TScreen_Abilities.SetUpScreen, 1.0, 1, GetText("tt_Training"))
+		g_pan_skills.AddChild(g_prg_home_skills)
 		g_pan_skills.AddChild(g_btn_skills)
 		x = 10
 		y :+ 70
-		g_pan_lifestyle = TPanel.CreatePanel("pan_Lifestyle", GetText("Lifestyle"), x, y, w, 30, "FFFFFF", "FFFFFF", 3, 0.8, 1, 70, 0)
+		g_pan_home_lifestyle = TPanel.CreatePanel("pan_Lifestyle", GetText("Lifestyle"), x, y, w, 30, "FFFFFF", "FFFFFF", 3, 0.8, 1, 70, 0)
 		y :+ 40
 		x :+ 10
-		g_screen_home.AddGadget(g_pan_lifestyle)
+		g_screen_home.AddGadget(g_pan_home_lifestyle)
 		g_prg_lifestyle = TProgressBar.CreateProgressBar("prg_Lifestyle", "", x, y, wbar, h, 3, "FFFFFF", "00FF00", "FFFFFF", 0.8, 1, Null)
-		g_btn_lifestyle = TButton.CreateButton("btn_Lifestyle", "", x + wbar + 10, y, wcol, h, 1, 2, "FFFFFF", "FFFFFF", g_img_money, TScreen_Shop.SetUpScreen, 1.0, 1, GetText("tt_Shop"))
-		g_pan_lifestyle.AddChild(g_prg_lifestyle)
-		g_pan_lifestyle.AddChild(g_btn_lifestyle)
+		g_btn_lifestyle = TButton.CreateButton("btn_Lifestyle", "", x + wbar + 10, y, wcol, h, 1, 2, "FFFFFF", "FFFFFF", g_img_home_money, TScreen_Shop.SetUpScreen, 1.0, 1, GetText("tt_Shop"))
+		g_pan_home_lifestyle.AddChild(g_prg_lifestyle)
+		g_pan_home_lifestyle.AddChild(g_btn_lifestyle)
 		x = g_screenw / 2 + 5
 		y :- 40
 		g_pan_achievements = TPanel.CreatePanel("pan_Achievements", GetText("Achievements"), x, y, w, 30, "FFFFFF", "FFFFFF", 3, 0.8, 1, 70, 0)
 		y :+ 40
 		x :+ 10
 		g_screen_home.AddGadget(g_pan_achievements)
-		g_prg_achievements = TProgressBar.CreateProgressBar("prg_Achievements", "", x, y, wbar, h, 3, "FFFFFF", "00FF00", "FFFFFF", 0.8, 1, Null)
-		g_btn_achievements = TButton.CreateButton("btn_Achievements", "", x + wbar + 10, y, wcol, h, 1, 2, "FFFFFF", "FFFFFF", g_img_star, TScreen_Achievements.SetUpScreen, 1.0, 1, GetText("tt_Achievements"))
-		g_pan_achievements.AddChild(g_prg_achievements)
+		g_prg_home_achievements = TProgressBar.CreateProgressBar("prg_Achievements", "", x, y, wbar, h, 3, "FFFFFF", "00FF00", "FFFFFF", 0.8, 1, Null)
+		g_btn_achievements = TButton.CreateButton("btn_Achievements", "", x + wbar + 10, y, wcol, h, 1, 2, "FFFFFF", "FFFFFF", g_img_home_star, TScreen_Achievements.SetUpScreen, 1.0, 1, GetText("tt_Achievements"))
+		g_pan_achievements.AddChild(g_prg_home_achievements)
 		g_pan_achievements.AddChild(g_btn_achievements)
 		g_screen_home.lHelp.AddLast(THelpBox.Create(g_lbl_bank, 0, 0, 0, 0, GetText("CHELP_BANK"), 1, 2))
 		g_screen_home.lHelp.AddLast(THelpBox.Create(g_prg_energy, 0, 0, 0, 0, GetText("CHELP_ENERGY"), 1, 2))

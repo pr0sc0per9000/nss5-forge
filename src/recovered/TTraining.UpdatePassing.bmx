@@ -3,7 +3,7 @@
 ' KIND=Function (static, no implicit Self), SIG ()i, class-table slot 0x74
 '
 ' ASSUMPTIONS  (module Global names are ours; the declared TYPES are load-bearing)
-'   0x00C6CFFC g_training_state:Int     (bare dword, compared to -1 and stored 0)
+'   0x00C6CFFC g_tr_count:Int           (bare dword, compared to -1 and stored 0)
 '   0x00C6EFD4 g_ticks:Int              (the millisecond clock; globals_final says TScreen
 '                                        with a flagged conflict -- bare dword, so Int)
 '   0x00C92920 g_training_dist:Float    (loaded with fld, stored to a Float local)
@@ -20,14 +20,20 @@
 ' MEASURED SHAPE: the -1 guard is a real early Return 0 (mov eax,0 / jmp epilogue).
 ' `d` is a Float Local that never gets a stack slot -- it stays on the x87 stack, which is
 ' what makes `If d > maxd` come out as fld/fxch/fucom/setbe.
-'!Global g_training_state:Int
+' 0x00C6CFFC, measured at 0x00580C4D `833dfccfc600ff cmp dword ptr [0xc6cffc], -1` and
+' 0x00580C56 `c705fccfc60000000000 mov dword ptr [0xc6cffc], 0`. g_training_state is
+' TTraining.Success', TTraining.SetUpTraining's and TEngine.SkipTime's name for the
+' DIFFERENT slot 0x00C6CF98, which only ever holds 0, 1 or 2, so the -1 test below could
+' never fire and the passing drill's out-of-attempts arm was dead code.
+' TTraining.UpdateFlair writes the byte-identical idiom as g_tr_count.
+'!Global g_tr_count:Int
 '!Global g_ticks:Int
 '!Global g_training_dist:Float
 '!Global g_trainobjs:TList
 '!Global g_training_setpiecex:Int
 '!Global g_training_setpiecey:Int
-If g_training_state = -1
-	g_training_state = 0
+If g_tr_count = -1
+	g_tr_count = 0
 	Fail()
 	Return 0
 End If

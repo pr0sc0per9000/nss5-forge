@@ -84,10 +84,63 @@ g_version = "1.15"
 ' retail game resolves GameMedia/ and Settings/ against.
 g_dataDir = AppDir + "/"
 
+' ---- the user's Documents directory -------------------------------------------
+' The fallback save root below resolves through this, because that is what the
+' original resolves it through. Module-body offset +5644 calls 0x0059812E, a
+' three-instruction niladic wrapper: it loads the cached volume-driver singleton from
+' Global 0x00C9ABC0 and calls vtable slot 0x50 on it. extracted/vtable_map.tsv rows
+' 2709 and 2743 name slot 0x50 on that class GetUserDocumentsDir()$, and the
+' implementation at 0x00598923 forwards to slot 0x5c with nFolder = 5, i.e. Win32
+' CSIDL_PERSONAL. The sibling at 0x005988DE passes 0x28 (CSIDL_PROFILE) and is
+' GetUserHomeDir, which is the cross-check that the numbering really is CSIDL's.
+' The literal it is concatenated with, at 0x00C6E9CC, reads "/New Star Soccer 5/".
+'
+' The Type that supplies it (TVolume / TWinVolume, class tables at 0x00C9AB68 and
+' 0x00C9AE88) is third-party: it is in NSS5.exe's linked image but in none of the
+' BlitzMax modules this toolchain ships, so the call cannot be reproduced by name.
+' SHGetFolderPathW(CSIDL_PERSONAL) is what that method is, so it is called directly.
+' Measured on this machine it returns the account's Documents directory -- the
+' location MAINTAINERS.md, scripts/play.py and scripts/smoke_boot.py all already
+' document as the one the game reads, and where a retail install keeps its
+' Options.ini, its saves and its replays.
+'
+' shell32 is already linked: BRL.System's win32 half carries `Import "-lshell32"`.
+' The declaration is flush left inside the block on purpose: scripts/assemble.py's
+' count_placed() counts every tab-indented `Function` in the emitted file as a Type
+' member with a body, and an Extern prototype indented like one makes the placed-vs-
+' present body counts disagree, which aborts the assembly.
+Extern "win32"
+Function SHGetFolderPathW:Int(hwndOwner:Int, nFolder:Int, hToken:Int, dwFlags:Int, pszPath:Short Ptr)
+End Extern
+
+Function UserDocumentsDir:String()
+	' MAX_PATH wide characters with room to spare; SHGetFolderPathW writes at most MAX_PATH.
+	Local buf:Short[520]
+	If SHGetFolderPathW(0, 5, 0, 0, Varptr buf[0]) = 0
+		Local d:String = String.FromWString(Varptr buf[0])
+		If d.length > 0 Then Return d
+	EndIf
+	' Only reachable if the shell call fails, which on Windows means there is no
+	' per-user profile to find. Keeping the settings next to the exe at least leaves
+	' the reader and the writer the same answer, which is the property that matters.
+	Return CurrentDir()
+End Function
+
 ' ---- save directory -----------------------------------------------------------
 ' Retail Settings.txt ships `saveloc=0`, so ReadSettingString returns "0", which
 ' is 1 character and trips the Length < 3 fallback below. The configured-path
 ' branch is therefore dead for a stock install, but preserved.
+'
+' THE FALLBACK IS NOT AN ARBITRARY CHOICE AND MUST NOT BE MADE ONE. This Global is
+' the single root under which Settings/Options.ini, Save/ and Replays/ all live, so
+' every option the player sets and every career they save is addressed relative to
+' it. Resolve it against anything that moves with the build -- the executable's own
+' directory, the process working directory (which BlitzMax's startup sets to the
+' executable's directory anyway, so the two are the same answer) -- and the settings
+' file moves with the build: one build's TOptions.SaveOptions writes a file the next
+' build's TOptions.LoadOptions never looks at, and the player watches every option
+' they set snap back. Documents is fixed for the life of the account, which is why
+' the original uses it and why a retail install's settings are found there.
 Print "[boot] reading saveloc"
 ' CASE DIRECTION CORRECTED 2026-08-22: module-body offset +5632 calls the brl.retro
 ' Trim wrapper (0x0059C8E8) and +5641 calls 0x004A7410, which is _bbStringToUpper,
@@ -98,20 +151,25 @@ If Right(g_savedir, 1) <> "/" And Right(g_savedir, 1) <> "\"
 	g_savedir = g_savedir + "/"
 EndIf
 If g_savedir.length < 3
-	g_savedir = CurrentDir() + "/New Star Soccer 5/"
+	g_savedir = UserDocumentsDir() + "/New Star Soccer 5/"
 EndIf
+Print "[boot] save root: " + g_savedir
 
-' g_pathPrefix (0x00C6E9A8) is the OTHER half of the pair the asset loaders test:
-' LoadImageChecked does `If Not a0.Contains(g_pathPrefix) And Not a0.Contains(g_dataDir)
-' Then a0 = g_dataDir + a0`, i.e. "if this path is under neither the save root nor
-' the install root, make it install-relative". The auto-generated tables name this
-' slot g_screen_mainmenu_int26 and type it Int; ModuleBody_RealProgram.bmx's header
-' records that it is really the save-data root, which is what it is set to here.
-' If g_pathPrefix and g_savedir turn out to be the same slot under two recovered
-' names (the same latent hazard as g_inpname), assigning both the same value is
-' correct either way.
-' g_pathPrefix must not be assigned from g_savedir: that is a real latent bug, not a
-' cosmetic one.
+' g_pathPrefix is one recovered name over two original Globals, and reading it as one
+' is what makes the pair below look like a contradiction. The path guard the asset
+' loaders and the settings readers share is
+'     If Not a0.Contains(<save root>) And Not a0.Contains(<install root>)
+'         a0 = <install root> + a0
+' i.e. "if this path is under neither the save root nor the install root, make it
+' install-relative". LoadImageChecked pushes 0x00C6E9A8 (save root) first and
+' 0x00C6E950 (install root) second at 0x004BC394/0x004BC3B1; ReadSettingFloat pushes
+' the same two in the opposite order at 0x004BBFE0/0x004BBFFD. The corpus spells
+' 0x00C6E9A8 g_userpath in TOptions' own bodies and g_pathPrefix in the loaders, and
+' spells 0x00C6E950 g_pathPrefix in THorse.Create and TCard.CreateCard -- so the name
+' covers both slots and extracted/global_alias_map.tsv row 249 sends it to 0x00C6E950.
+' src/recovered_module/ReadSettingFloat.bmx and ReadSettingString.bmx therefore name
+' their save-root operand g_userpath, after the address, so the settings guard has a
+' save-root arm; the assignment below keeps the install-root meaning for the name.
 '
 ' 0x00C6E950 is the INSTALL-path prefix, not the save root. Three names for it and 103
 ' references in the assembled program: g_pathPrefix (THorse.Create.bmx:21 "the same slot
@@ -130,7 +188,7 @@ EndIf
 ' file before drawing a frame. The automated screen sweep hit exactly that and stopped
 ' after two lines.
 '
-' 0x00C6E9A8 (g_dataDir) is set to the same install root just above, which is what makes
+' So g_pathPrefix carries the install root, which is what makes
 ' LoadImageChecked/LoadSoundChecked resolve GameMedia/... correctly. The SAVE root stays in
 ' g_savedir and is used only for Save/, Replays/ and Settings/ under the user's directory.
 g_pathPrefix = g_dataDir
@@ -349,13 +407,33 @@ g_col_key = "00FF00"
 ' through a Global. Pointing it at the real Function restores the intended behaviour.
 g_opt_refresh = TScreen_Options.RefreshButtons
 
+' RESOLVED -- g_league_setround was never a Global at all. 0x00C671A4 is bcc's class table
+' for TScreen_Leagues (base 0x00C67154) at slot 0x50, and the .data image holds 0x00545C5D
+' there, the VA of TScreen_Leagues.SetUpLeagueFixtures. Its neighbours in the same table are
+' this Type's own Functions (0x54 ButtonFixturesFirst, 0x58 ButtonFixturesLeft, 0x5C
+' ButtonRound, 0x60 ButtonFixturesRight, 0x64 ButtonFixturesLast). ButtonRound.bmx modelled
+' `call dword ptr [0xc671a4]` as a function-pointer Global while its five byte-identical
+' siblings wrote the direct call, so the assembled build called through an unassigned
+' function value and the Leagues screen faulted the moment ButtonCompetitions opened it.
+' ButtonRound.bmx now writes SetUpLeagueFixtures(...) and still verifies 108/108.
+'
 ' STILL DEAD, deliberately not guessed at (scripts/find_dead_globals.py finds them):
-'   g_league_setround:Int(a:Int)  called from TScreen_Leagues.ButtonRound  -- no
-'       TScreen_Leagues.SetRound exists in the corpus to point it at.
-'   g_kits_quitfn:Int()           called from TScreen_Kits.ButtonQuit
 '   g_fnaccept / g_fnnegotiate / freject
 ' Each still throws on call. Assigning them a no-op would silence the crash while silently
 ' doing nothing, which is worse than a loud failure -- it would hide the missing body.
+'
+' g_kits_quitfn WAS LISTED HERE AND IS NOT DEAD. Removed this pass. It is an ordinary
+' function-pointer Global with a writer and a reader at one address, and the two halves
+' were merged at extracted/global_alias_overrides.tsv:1135. MEASURED: 0x00C674BC appears
+' twice in the whole `code` section -- 0x005498BA `891dbc74c600 mov [0xc674bc],ebx` in
+' TScreen_Kits.SetUpScreen, which is `g_kits_okfunc = a1` storing that Function's own a1
+' parameter (ebx loaded from [ebp+0xc] at 0x005498A6), and 0x0054A7E6
+' `ff15bc74c600 call dword ptr [0xc674bc]` in TScreen_Kits.ButtonQuit, which is
+' `g_kits_quitfn()`. Same slot, one write, one call. Its sibling g_kits_fn is the same
+' shape at 0x00C674C0 (store 0x005498C0 from a2; read 0x0054A6A2 `push [0xc674c0]` as
+' TEngine.SetUpMatch's 4th argument) and was merged in the same pair of rows. Neither
+' needs a module-body assignment: whoever opens the kit screen supplies the callback,
+' exactly as the original does. There is nothing here to guess at.
 
 ' ---- go ------------------------------------------------------------------------
 ' Never returns in normal play: GameMain is an infinite fixed-timestep loop that

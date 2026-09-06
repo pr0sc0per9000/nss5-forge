@@ -40,11 +40,19 @@ Bytes track the actual remaining work.
 
 WHAT COUNTS AS MATCHED
 ======================
-A body is MATCHED when its header states `byte-identical vs NSS5.exe`. That
-claim is produced by scripts/bytematch.py and scripts/localise_diff.py against
-the real binary, not by an author's assertion. localise_diff is the only honest
-oracle here: the positional comparator reports ~75% for byte-identical bodies
-whose load address differs.
+A body is MATCHED when its header states `byte-identical vs NSS5.exe` AND its
+own status block does not retract that. The rule, and the evidence for every
+part of it, is in scripts/claim.py -- one reader, shared with coverage.py, so
+the two measures cannot drift into two different definitions of the same word.
+The claim is produced by scripts/bytematch.py and scripts/localise_diff.py
+against the real binary, not by an author's assertion. localise_diff is the only
+honest oracle here: the positional comparator reports ~75% for byte-identical
+bodies whose load address differs.
+
+This file used to apply the first half of that rule and not the second, and
+counted ten bodies whose own line 1 reads `-- NOT VERIFIED`. See claim.py.
+A body whose header says both things is reported under CONTRADICTED HEADERS
+below and counted as UNMATCHED until somebody re-runs the oracle on it.
 
 NOTHING IS EXCLUDED FROM THE CORPUS
 ===================================
@@ -125,6 +133,9 @@ import sys
 import json
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import claim as K                                              # noqa: E402
 
 # Trees holding reconstructed function bodies, and whether they are verified.
 TREES = [
@@ -239,6 +250,103 @@ VERIFIED_NOT_SHIPPED = {
         "OMITTED", "harness.py MODULE_SKIP"),
 }
 
+#
+#   src/recovered_module/LoadImageChecked.bmx  --  251 bytes at 0x004BC372
+#     A BOOT SHIM, not a Steam problem. Both failure paths return a visible magenta
+#     placeholder instead of `Return Null` / `DebugStop`, because a Null TImage propagates
+#     into MidHandleImage/DrawImage/ImageWidth at essentially every call site and one absent
+#     PNG killed the whole boot. As compiled it is 253 bytes against the original's 251
+#     (MISMATCH, first_diff=+6). Restore the two branches and delete MissingArtImage() and
+#     it is MATCH 251/251, mode=reloc, reloc_masked=24.
+#
+#   src/recovered_module/LoadAnimImageChecked.bmx  --  271 bytes at 0x004BC664
+#     The same shim, in the most-called module Function in the program. As compiled it is
+#     272 bytes against 271 (MISMATCH, first_diff=+22). The original's two branches are NOT
+#     symmetric -- "cannot see" carries DebugStop AND an explicit Return Null, "could not
+#     load" carries DebugStop alone and falls through -- and with that restored it is
+#     MATCH 271/271, mode=reloc, reloc_masked=25.
+#
+# Both of these previously carried the `byte-identical vs NSS5.exe` marker while compiling
+# the shim, so their bytes sat in the numerator for a body the oracle rejects. Taking the
+# marker off drops the headline by 522 bytes. That is the correct direction and it is the
+# point: the headline is what the tree COMPILES, and what these two compile is not the
+# original. The work itself is not lost, it is reported below instead.
+# OF THOSE, THE ONES THAT CAN NEVER BE RESTORED.
+#
+# "Largest bodies not yet byte-identical" is a WORK LIST -- it answers "what is left to
+# do". A body whose original is proven and which is substituted only until some other
+# defect is fixed still belongs on it: the three Load*Checked boot shims are there because
+# a Null TImage propagates into MidHandleImage at essentially every call site while the
+# module-Global aliasing defect stands, and the day that is fixed the originals go back and
+# the bodies match. That is real remaining work and hiding it would be dishonest.
+#
+# SteamInit is not that. Its original opens a connection to Steam AppID 212780 and calls
+# `End` when the connection fails; Steam's 2011 backend for this AppID is gone, so
+# restoring it is an unconditional hard-exit before the first frame, forever. No amount of
+# work in this repository changes that. Listing it as "not yet byte-identical" describes a
+# task nobody can ever complete, which makes the work list wrong.
+#
+# It stays in the totals, in the denominator, and in the substituted table above with its
+# oracle evidence. It comes out of the WORK LIST only.
+SUBSTITUTION_IS_PERMANENT = {
+    "src/recovered_module/SteamInit.bmx",
+}
+
+VERIFIED_ORIGINAL_SUBSTITUTED = {
+    "src/recovered_module/SteamInit.bmx": (
+        158,
+        "harness.try_function NSS5_NO_LEARN=1 -> MATCH 158/158 mode=reloc reloc_masked=18"),
+    "src/recovered_module/LoadImageChecked.bmx": (
+        251,
+        "harness.try_function NSS5_NO_LEARN=1 -> MATCH 251/251 mode=reloc reloc_masked=24"),
+    "src/recovered_module/LoadAnimImageChecked.bmx": (
+        271,
+        "harness.try_function NSS5_NO_LEARN=1 -> MATCH 271/271 mode=reloc reloc_masked=25"),
+    "src/recovered_module/LoadSoundChecked.bmx": (
+        256,
+        "harness.try_function NSS5_NO_LEARN=1 -> MATCH 256/256 mode=reloc reloc_masked=25"),
+}
+
+# Guards, because an entry above that has gone stale would OVERSTATE the second figure, and
+# overstating is the one direction this file refuses everywhere else.
+SUBSTITUTED_UNCHECKED = []
+
+
+def check_substituted(rows):
+    """Every entry must name a real corpus body that is CURRENTLY UNMATCHED and that says
+    in its own header that it diverges.
+
+    Currently-unmatched is the load-bearing check. If someone later banks the marker on one
+    of these files, its bytes enter the numerator on their own, and adding them again here
+    would count them twice -- silently, and in the flattering direction."""
+    index = {r["tree"] + "/" + r["file"] + ".bmx": r for r in rows}
+    for rel, (nbytes, _ev) in sorted(VERIFIED_ORIGINAL_SUBSTITUTED.items()):
+        r = index.get(rel)
+        if r is None:
+            SUBSTITUTED_UNCHECKED.append(
+                "%s is named as a substituted body but is not in the corpus" % rel)
+            continue
+        if r["matched"]:
+            SUBSTITUTED_UNCHECKED.append(
+                "%s is named as substituted but already counts as matched -- its bytes "
+                "would be counted twice" % rel)
+        if r["size"] != nbytes:
+            SUBSTITUTED_UNCHECKED.append(
+                "%s is recorded as %d bytes here and %d bytes in its VA header"
+                % (rel, nbytes, r["size"]))
+        try:
+            with open(os.path.join(ROOT, rel), encoding="utf-8", errors="replace") as f:
+                head = f.read(4000)
+        except OSError:
+            SUBSTITUTED_UNCHECKED.append("%s is unreadable" % rel)
+            continue
+        up = head.upper()
+        if "DIVERGENCE" not in up and "BOOT SHIM" not in up:
+            SUBSTITUTED_UNCHECKED.append(
+                "%s does not declare a divergence in its own header, so the substitution "
+                "claim rests on this file alone" % rel)
+
+
 # A rule nothing checks is advice, and advice rots (docs/RULES.md opens on exactly
 # this). "This body is not in the shipped build" is a checkable claim, so it is
 # checked: the OMITTED entries must still be named by the skip set that omits them.
@@ -282,22 +390,23 @@ def check_not_shipped():
                 "%s is listed OMITTED but no skip set names it -- it may in fact "
                 "be in the shipped build" % rel)
 
-VA_LINE = re.compile(r"^'\s*VA\s+(0x[0-9A-Fa-f]+)\s+(\d+)\s+bytes", re.M)
-
-# FALLBACK ONLY, tried when VA_LINE finds nothing. Two real headers spell the same
-# fact slightly differently and were therefore in neither the numerator nor the
-# denominator:
-#     ' VA 0x00592319, 18 bytes                     (comma, not whitespace)
-#     ' ZipFile.getName -- VA 0x0058DD7C, 15 bytes  (comma, and text before VA)
-# Both claim byte-identical and both are correct; they were simply invisible.
+# THE HEADER PARSER AND THE MATCHED TEST BOTH LIVE IN scripts/claim.py NOW, shared
+# with coverage.py. Two readers for one fact is two facts: this file used to accept
+# `byte-identical vs NSS5.exe` anywhere in the first 40 lines with NO negative test,
+# and coverage.py used to apply a negative test but a looser claim vocabulary. They
+# disagreed about 13 bodies. Ten of those were bodies in src/recovered_unverified/
+# whose OWN LINE 1 says `-- NOT VERIFIED`, and which carry a bare
+# `' byte-identical vs NSS5.exe` inserted above the VA line by a bulk header pass;
+# every one is contradicted by its own status/score/<body>.txt record. This file
+# counted all ten as matched, 10,670 bytes of them. It no longer does, and the
+# headline falls accordingly. claim.py's docstring carries the full evidence.
 #
-# This is deliberately a SECOND pass rather than a loosening of VA_LINE. The strict
-# form stays authoritative, so no body that parses today can change meaning. The
-# loose form only ever rescues a body that would otherwise be dropped silently --
-# it can add to the corpus, never re-interpret it. That matters because a header's
-# first 40 lines may mention OTHER functions' addresses, and a loose pattern
-# promoted to primary could bind a body to a neighbour's VA.
-VA_LINE_LOOSE = re.compile(r"^'.*?\bVA\s+(0x[0-9A-Fa-f]+)[,\s]\s*(\d+)\s+bytes", re.M)
+# The VA parser is unchanged in behaviour: strict form authoritative, loose form as a
+# rescue-only second pass. It now reads the LEADING COMMENT BLOCK rather than the
+# first 40 raw lines; measured over the corpus both find the same 1,973 VA headers.
+VA_LINE = K.VA_LINE
+VA_LINE_LOOSE = K.VA_LINE_LOOSE
+MATCHED = K.MATCHED
 
 # Files that legitimately carry no whole-function VA/size line, so the guard must not
 # report them. Kept as a NAMED list with its reason, the same way VERIFIED_NOT_SHIPPED
@@ -311,7 +420,6 @@ VA_LINE_LOOSE = re.compile(r"^'.*?\bVA\s+(0x[0-9A-Fa-f]+)[,\s]\s*(\d+)\s+bytes",
 NOT_A_WHOLE_BODY = {
     "src/recovered_unverified/ModuleBody_RealProgram.bmx",
 }
-MATCHED = re.compile(r"byte-identical\s+vs\s+NSS5\.exe", re.I)
 
 # Bodies whose header VA line did not parse, populated by scan(). See the long note
 # at the collection site: an unparsed body silently leaves BOTH numerator and
@@ -355,7 +463,7 @@ def scan():
                 continue
             try:
                 with open(path, encoding="utf-8", errors="replace") as f:
-                    head = "".join(next(f, "") for _ in range(40))
+                    head = K.header(f.read())
             except OSError:
                 continue
             m = VA_LINE.search(head) or VA_LINE_LOOSE.search(head)
@@ -385,7 +493,9 @@ def scan():
             row = {
                 "tree": tree, "kind": kind, "file": fn[:-4],
                 "va": m.group(1).lower(), "size": int(m.group(2)),
-                "matched": bool(MATCHED.search(head)),
+                "matched": K.is_matched(head),
+                "claimed": bool(MATCHED.search(head)),
+                "retracted": K.negatives(head),
             }
             rows.append(row)
             rel = tree + "/" + fn
@@ -406,6 +516,7 @@ def scan():
             "found: %s -- fix the path or remove the entry, do not ignore this"
             % ", ".join(sorted(missing)))
     check_not_shipped()
+    check_substituted(rows)
     return rows, not_shipped
 
 
@@ -491,6 +602,38 @@ def main():
     lines.append("")
     lines.append("  %d of %d bytes byte-identical against NSS5.exe." % (done, total))
 
+    # THE SECOND FIGURE, and it answers a different question from the one above.
+    #
+    # The headline measures what the tree COMPILES. Exactly one body in the corpus compiles
+    # something other than the original on purpose, because compiling the original would
+    # stop the game reaching its first frame -- SteamInit, whose retail body calls `End`
+    # when Steam's long-dead backend does not answer. Its original IS reconstructed and the
+    # oracle says so; the build simply declines to use it.
+    #
+    # So "how much of NSS5 have we reconstructed" and "how much of what we compile is
+    # byte-identical" are genuinely different questions with genuinely different answers,
+    # and the honest thing is to print both rather than to pick the flattering one and call
+    # it the number. The first figure is never adjusted. This one is labelled, itemised, and
+    # names every body it counts, so nobody can quote it without also quoting what it means.
+    if VERIFIED_ORIGINAL_SUBSTITUTED and not SUBSTITUTED_UNCHECKED:
+        sub_bytes = sum(n for n, _e in VERIFIED_ORIGINAL_SUBSTITUTED.values())
+        sub_done = done + sub_bytes
+        sub_pct = (100.0 * sub_done / total) if total else 0.0
+        lines.append("")
+        lines.append("  RECONSTRUCTED, counting bodies whose original is proven byte-identical")
+        lines.append("  but whose compiled form is deliberately substituted so the game runs:")
+        lines.append("      %d of %d bytes = %.1f%%" % (sub_done, total, sub_pct))
+        for rel, (nbytes, ev) in sorted(VERIFIED_ORIGINAL_SUBSTITUTED.items()):
+            lines.append("    %-44s %7d  %s" % (rel.rsplit("/", 1)[-1], nbytes, ev))
+        lines.append("  These bytes are NOT in the headline above and must not be added to it:")
+        lines.append("  the headline measures what src/assembled/ compiles, and for these bodies")
+        lines.append("  that is the substitute, which the oracle correctly rejects.")
+    if SUBSTITUTED_UNCHECKED:
+        lines.append("")
+        lines.append("  *** THE SUBSTITUTED-ORIGINAL FIGURE IS WITHHELD, its guards failed:")
+        for w in SUBSTITUTED_UNCHECKED:
+            lines.append("    %s" % w)
+
     # An unparsed header is a body that left the corpus WITHOUT anyone deciding it
     # should. It is strictly worse than an unmatched body, because unmatched work is
     # visible in the denominator and this is not: the percentage RISES when a header
@@ -507,6 +650,41 @@ def main():
         lines.append("  *** 'bytes'. Any extra words in between silently drop the body.")
         for u in sorted(UNPARSED):
             lines.append("    %s" % u)
+
+    # An unparsed header is a body that left the corpus WITHOUT anyone deciding it
+    # should. It is strictly worse than an unmatched body, because unmatched work is
+    # visible in the denominator and this is not: the percentage RISES when a header
+    # breaks. Never let that happen quietly -- shout about it, above the not-shipped
+    # list, because unlike VERIFIED_NOT_SHIPPED nobody chose this, and unlike it this
+    # really does take the body out of both numerator and denominator.
+    if UNPARSED:
+        lines.append("")
+        lines.append("  *** %d BODY FILE(S) HAVE AN UNPARSEABLE HEADER AND ARE IN NEITHER" % len(UNPARSED))
+        lines.append("  *** THE NUMERATOR NOR THE DENOMINATOR. The percentage above is")
+        lines.append("  *** OVERSTATED until these are fixed. VA_LINE wants exactly:")
+        lines.append("  ***     ' VA 0x0055C09B   6249 bytes   ...")
+        lines.append("  *** i.e. the byte count immediately after the VA, then the word")
+        lines.append("  *** 'bytes'. Any extra words in between silently drop the body.")
+        for u in sorted(UNPARSED):
+            lines.append("    %s" % u)
+
+    # A header that claims byte-equality AND retracts it in the same status block is
+    # not a measurement, it is two measurements. Counting it either way without saying
+    # so hides a defect in the corpus behind a number. These are counted as UNMATCHED
+    # -- the safe direction -- and named here so the contradiction gets resolved by the
+    # oracle rather than by whichever regex ran last.
+    contra = [r for r in rows if r["claimed"] and r["retracted"]]
+    if contra:
+        cb = sum(r["size"] for r in contra)
+        lines.append("")
+        lines.append("  CONTRADICTED HEADERS -- %d bodies, %d bytes, COUNTED AS UNMATCHED"
+                     % (len(contra), cb))
+        lines.append("  Each carries `byte-identical vs NSS5.exe` and also retracts it in")
+        lines.append("  its own status block. Re-run the oracle (NSS5_NO_LEARN=1) and make")
+        lines.append("  the header say one thing; until then this is the safe reading.")
+        for r in sorted(contra, key=lambda r: -r["size"]):
+            lines.append("    %-46s %6d  %s" % (r["file"][:46], r["size"],
+                                                r["retracted"][0][:60]))
 
     # Visible on purpose, in every mode. These bodies ARE counted above -- the
     # percentage is not narrowed for them -- but a reader told "99%" is entitled
@@ -538,7 +716,9 @@ def main():
         for w in SHIP_CLAIM_UNCHECKED:
             lines.append("    %s" % w)
 
-    unmatched = sorted((r for r in rows if not r["matched"]),
+    unmatched = sorted((r for r in rows if not r["matched"]
+                        and (r["tree"] + "/" + r["file"] + ".bmx")
+                        not in SUBSTITUTION_IS_PERMANENT),
                        key=lambda r: -r["size"])
     if unmatched:
         lines.append("")
@@ -547,6 +727,13 @@ def main():
             lines.append("    %-46s %6d bytes  %s" % (r["file"][:46], r["size"], r["va"]))
         if len(unmatched) > 15:
             lines.append("    ... and %d more" % (len(unmatched) - 15))
+        gone = [r for r in rows if not r["matched"]
+                and (r["tree"] + "/" + r["file"] + ".bmx") in SUBSTITUTION_IS_PERMANENT]
+        if gone:
+            lines.append("  (not listed: %s -- proven byte-identical and permanently"
+                         % ", ".join(sorted(r["file"] for r in gone)))
+            lines.append("   substituted, so not work anyone can finish. Still counted"
+                         " in the totals above.)")
 
     text = "\n".join(lines)
     print(text)

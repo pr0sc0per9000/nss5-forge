@@ -32,7 +32,7 @@
 '   Global g_profile:TProfile        ' 0x00c6f028 (construction, high)
 '   Global g_stable_bet:Int          ' 0x00c6df68
 '   Global g_stable_startx:Float     ' 0x00c6df4c
-'   Global g_horses:TList            ' 0x00c6e298 -- table says only "Object, usage,
+'   Global g_runners:TList            ' 0x00c6e298 -- table says only "Object, usage,
 '                                    '   low"; slot 0x8c (ObjectEnumerator) is used
 '                                    '   and the members downcast to THorse.
 '   Global g_jockeyimages:TImage[]   ' 0x00c6e2b8 -- table says Object[]; elements are
@@ -54,7 +54,12 @@
 '!Global g_profile:TProfile
 '!Global g_stable_bet:Int
 '!Global g_stable_startx:Float
-'!Global g_horses:TList
+' 0x00C6E298 is the RACE RUNNERS list, not the master horse list. THorse.SelectRunners
+' declares both in one body -- g_horses for 0x00C6E294 (the list it enumerates and
+' sorts) and g_runners for 0x00C6E298 (the list it Clears and AddLasts into) -- so the
+' two are provably different slots, and the module body creates them separately. Spelled
+' g_runners here, this body's slot shared the emitted variable of the master list.
+'!Global g_runners:TList
 '!Global g_jockeyimages:TImage[]
 '!Global g_stable_arr04:Float[]
 '!Global g_stable_state:Int
@@ -73,7 +78,7 @@ TScreen_GameMenu.UpdateTitlePanel()
 g_stable_startx = 5500.0
 Local yy:Int = 280
 Local n:Int = 0
-For Local h:THorse = EachIn g_horses
+For Local h:THorse = EachIn g_runners
 	h.xvel = h.strength * h.energy * 0.0015
 	h.yvel = 0
 	h.x = g_stable_startx - h.xvel * 30.0

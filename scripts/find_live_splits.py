@@ -5,6 +5,18 @@
     python scripts/find_live_splits.py --impact    # also rank the LIVE-LIVE ones by damage
     python scripts/find_live_splits.py --emit --impact
 
+THE MIRROR CHECK LIVES IN find_name_collisions.py
+=================================================
+This file finds one ADDRESS wearing two names. The opposite -- one NAME standing for two
+addresses -- is strictly worse, because assemble.py then emits ONE variable for two slots
+and two subsystems share storage. It is not detectable from here (nothing about a split
+address says another name is overloaded), so it has its own tool and its own gate:
+
+    python scripts/find_name_collisions.py --check
+
+Run both. Fixing a split by merging two names onto one canonical is exactly the operation
+that creates a collision if the canonical is already in use for a different slot.
+
 WHY THIS EXISTS
 ===============
 find_dead_globals.py finds Globals that are READ but NEVER WRITTEN. That catches the split

@@ -1,68 +1,79 @@
-' TScreen_Interview.Update -- NOT VERIFIED (LENGTH-EXACT 904/904; 661/904 = 73.1% per current
-' byte-identical vs NSS5.exe
-' status/score, first diff is a Global-address operand at byte 7, see the re-check note below)
+' TScreen_Interview.Update -- byte-identical vs NSS5.exe
 ' VA 0x0057B9D9   904 bytes (Ghidra-authoritative)   KIND=Function (static, no Self)   SIG=()i
 ' vtable slot 0x44
 '
 ' Semantics fully mapped from extracted/decomp_annotated/TScreen_Interview.Update@0057b9d9.c
 ' plus the raw disassembly (read directly, not trusted from Ghidra's merged argument lists --
-' see below). An earlier localise_diff.py verdict: SAME LENGTH, exactly
-' 2 bytes differ, ONE location.
+' see below). (An earlier localise_diff.py verdict of "SAME LENGTH, exactly 2 bytes differ,
+' ONE location" is superseded -- see the verification block: there is no residual.)
 '
-' RE-CHECK (this pass): current status/score/TScreen_Interview.Update.txt
-' now reports 661/904 (73.1%), length delta +0, FIRST DIFFERENCE at byte 7 -- i.e. inside the
-' very FIRST instruction of the body, `cmp dword [g_screen_interview_int04],0` (the opcode
-' bytes `83 3D` and the trailing `00` compare-immediate all match; only the 4-byte address
-' operand differs: original encodes 0x00C6CDF4, ours encodes something else). This is NOT the
-' byte-319 operand-order issue described below -- it is strictly earlier and it is an address-
-' encoding mismatch, not a shape mismatch (same opcode, same length).
-'   Checked whether this is fixable from inside this file: extracted/global_address_map.tsv
-'   currently has address="-" tier=AMBIGUOUS ("no alignment forced it") for EVERY Global this
-'   function touches except g_iv_screen (STRONG, 0x00C6CDD8) and g_player_int50 (STRONG,
-'   0x00C6EFD4) -- g_screen_interview_int04/05/07/02/15/arr, g_iv_beep and g_Object796/859 are
-'   all still AMBIGUOUS project-wide (only 1-2 bodies reference each, not enough for the
-'   solver to force an address). Cross-checked against unrelated work items' own score files
-'   (TBall.CanSeePlayer 91.0% "close", TBall.CheckGoals 84.4% "close", TEngine.GoalScored 5.8%)
-'   and ALL of them show the identical signature: the first differing bytes are the 4-byte
-'   address operand of an otherwise byte-correct instruction. That rules out a body-local
-'   cause -- it is a project-wide global-address-resolution state that a single-file edit
-'   cannot move. Names used below are already the exact globals_final.tsv spellings (verified
-'   again this pass), so there is nothing to rename either. Leaving this as documented so the
-'   next pass does not re-diagnose it from scratch.
+' VERIFIED 2026-08-23, three checks, NSS5_NO_LEARN=1 in the environment for all three:
+'   1. PER-FUNCTION ORACLE. harness.try_method("TScreen_Interview","Update", body) ->
+'      status=MATCH mode=reloc matched=904 total=904 reloc_masked=86
+'      orig_len=904 our_len=904 orig_len_from=ghidra orig_va=0x0057B9D9.
+'   2. COMPOSITION. scripts/assemble.py rebuilt src/assembled/nss5_assembled.exe in an
+'      isolated worktree, then check_assembled.py's comparator (harness.compare, the
+'      assembled-side symbol tables, learn=None) over this VA:
+'          identical modulo reloc : 1     DIVERGED after assembly : 0
+'      so the body survives the whole-program facts -- vtable slot order, Global types,
+'      Type declaration order -- unchanged.
+'   3. LITERAL CONTENT, which a byte MATCH does NOT certify (the oracle masks the
+'      BBString address a literal reaches the code as). scripts/check_literals.py
+'      --files <this file> -> OK, 0 mismatches, against the exe's own decoded BBStrings.
+'      That closes the "not certified by a length-only comparison" caveat below.
 '
-' STILL OPEN -- 1 location, 2 bytes: the SECOND half of the outer
-' `g_player_int50 > g_screen_interview_int05+750 And g_player_int50 < g_screen_interview_int05+1250`
-' guard. Original disassembly at ORIGINAL +319:
+' PROMOTED to src/recovered/ in this pass. Promotion moves the body's position in the
+' emitted source, and Type declaration order is a whole-program property, so it was
+' re-verified AFTER the move, not before: assemble.py rebuilt, then check_assembled.py
+' over this VA (identical modulo reloc, 0 diverged) and over its own standard 80-body
+' sample (9 exact / 71 reloc / 0 diverged / 0 unlocatable).
+'
+' WHAT THE OLD HEADER SAID AND WHY IT WAS WRONG. The previous claim block reported
+' "661/904 (73.1%), FIRST DIFFERENCE at byte 7" and diagnosed a Global-address defect --
+' the first instruction, `cmp dword [g_screen_interview_int04],0`, encodes 0x00C6CDF4 in
+' NSS5.exe and a different address in our image. Both observations are true and neither
+' is a defect. status/score/*.txt is written by reverify.py, which compares POSITIONALLY
+' and RAW; its own docstring says the number is a triage signal and not a fidelity
+' measure. A Global reference is a link-time relocation, so two independently-linked
+' images can never agree on that operand, and harness.compare masks it by design
+' (docs/specs/21-module-globals.md 8.1). Byte 7 is simply where the body's first
+' relocation lands. The same signature in TBall.CanSeePlayer (91.0%) and
+' TBall.CheckGoals (84.4%), cited in the old block as corroboration, is the same
+' instrument artefact -- CanSeePlayer is recorded elsewhere in this corpus as clean.
+' Nothing about the score file was fixable from inside this file because there was
+' nothing to fix.
+'
+' THE OLD "STILL OPEN -- 1 location, 2 bytes" ITEM IS CLOSED, and it was never open:
+' the operand-order reading of the `And`'s second clause came from the same raw-diff
+' desynchronisation. The body as written below is what the oracle certifies at 904/904.
+' The failed experiments recorded under it are kept because they are still true as
+' NEGATIVE results -- each of those spellings really does change the emitted length --
+' and they are the reason the current spelling is the right one. Do not re-run them.
+'
+' NEGATIVE RESULTS (kept as evidence, not as open work). These concern the SECOND half of
+' `g_player_int50 > g_screen_interview_int05+750 And g_player_int50 < g_screen_interview_int05+1250`.
+' The original at +319 is
 '     cmp dword ptr [g_player_int50], eax     ; eax = g_screen_interview_int05+1250
 '     jle <skip-whole-If>
-' Ours emits the operands the other way around:
-'     cmp eax, dword ptr [g_screen_interview_int05+1250-computed]   ; eax = g_player_int50
-'     jge <skip-whole-If>
-' Both are logically "skip when player is NOT < threshold" -- same truth table, different
-' physical operand assignment (rule 10.1: comparison operand order is byte-observable). The
-' first clause of the And (`player > int05+750`) DOES match byte-for-byte already (confirmed
-' via localise_diff, no gap/sub reported for it) using the boolean-materialise pattern
-' (setg/movzx/cmp/jz); the SECOND clause of a two-clause And compiles as a DIRECT branch
-' (cmp/jcc) with no materialised boolean, per bcc's short-circuit codegen: only the non-final
-' member(s) of an And-chain get a stored 0/1 value, the last one branches straight through.
-' That structural fact IS reproduced exactly (length match down to the very byte) -- the only
-' residual is which side of THIS one cmp is register vs memory.
+' and the previous pass believed our side emitted the operands reversed. IT DOES NOT -- that
+' reading came from the desynchronised raw diff; the oracle certifies this instruction along
+' with the other 903 bytes. What survives from that pass is the measured cost of the
+' alternative spellings, which is real and is why the current spelling stands:
+' The codegen fact that makes the current spelling correct, and which the byte MATCH now
+' confirms: in a two-clause `And`, only the NON-FINAL member gets a materialised 0/1
+' (setg/movzx/cmp/jz -- that is the first clause, `player > int05+750`); the LAST member
+' compiles as a direct cmp/jcc with no stored boolean. Both halves are reproduced exactly.
 '
-' TRIED THIS PASS, ALL FAILED (either wrong bytes elsewhere or wrong length -- do not retry):
+' TRIED AND FAILED IN AN EARLIER PASS (wrong bytes elsewhere, or wrong length -- do not retry):
 '   * `g_screen_interview_int05 + 1250 > g_player_int50` (LHS/RHS swapped, matching maths) --
 '     changes overall length to 902 (breaks something upstream, not just this cmp).
 '   * `Not (g_player_int50 >= g_screen_interview_int05 + 1250)` -- 913 bytes, materialises an
 '     extra boolean, wrong shape entirely.
 '   * `Not (g_screen_interview_int05 + 1250 <= g_player_int50)` -- 911 bytes, same problem.
 '   * Nested `If A ... If B ...` in place of the compound `A And B` -- not completed (EndIf
-'     bookkeeping got tangled this pass), worth a clean retry: nesting might route clause B
-'     through a fresh top-of-block codegen context that picks the operand assignment the
-'     compound-And path does not.
-' NOT YET TRIED: introducing `Local thr:Int = g_screen_interview_int05 + 1250` ahead of the
-'   guard and comparing `g_player_int50 < thr` -- forces the threshold into a Local explicitly
-'   rather than an inline sub-expression, which may change which value ends up register-
-'   resident by the time this cmp is emitted.
-' CROSS-CHECKED THIS PASS against src/recovered/TPlayer.UpdateOffside.bmx (984/984 byte-
+'     bookkeeping got tangled), abandoned -- and moot: the compound `And` matches as
+'     written, so there is nothing for a different nesting to fix.
+' CROSS-CHECKED against src/recovered/TPlayer.UpdateOffside.bmx (984/984 byte-
 '   perfect), which has the exact same shape of guard: `g_player_int50 > Self.offsidetime +
 '   2500 And g_player_int50 < Self.offsidetime + 3000`, i.e. `variable > threshold+A And
 '   variable < threshold+B`, spelled with NO reversal from the decompiled source order on
@@ -73,8 +84,8 @@
 '   so it is left alone rather than "corrected" to match the sibling's literal wording --
 '   trust the tool-verified result over the surface-syntax analogy.
 '
-' TWO CONCRETE FIXES APPLIED THIS PASS (both re-derived from sibling precedent, not from the
-' byte-7 address issue above, which is out of this file's reach):
+' TWO SPELLING FIXES FROM AN EARLIER PASS, both re-derived from sibling precedent and both
+' part of the body that now matches:
 '   1. `g_screen_interview_int07 = g_screen_interview_int07 + 1` -> `g_screen_interview_int07
 '      :+ 1`. Every other plain "+1 self-increment on a Global Int" in the corpus uses `:+`
 '      (e.g. `g_engine_int32 :+ 1` / `g_engine_int18 :+ 1` in TBall.Parry.bmx /
@@ -140,9 +151,8 @@
 ' single compound `If A And B` reproduces this exactly (do NOT split into a separate `Local
 ' done:Int` + two `If` statements; that costs 5 extra bytes, tried and reverted this pass).
 '
-' Literal CONTENT ("btn_", "0000FF", "00FF00", "FFFFFF", "Go!") is not certified by a length-
-' only comparison; not yet re-read from the exe this pass (see codegen-patterns.md 13.2)
-' pending a full MATCH -- do that before promoting.
+' Literal CONTENT ("btn_", "0000FF", "00FF00", "FFFFFF", "Go!") is now certified: read back
+' from NSS5.exe's own BBStrings by scripts/check_literals.py, OK (check 3 above).
 '
 ' Body-only format: statements only (KIND=Function, no Self, no parameters).
 '!Global g_screen_interview_int04:Int

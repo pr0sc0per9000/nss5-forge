@@ -9,7 +9,11 @@
 '                                           at the call site, so TTeam -- trust the code)
 '   g_awayteam       = 0x00C5B21C  TTeam
 '   g_bgimage        = 0x00C61714  TImage  (stored into TScreen.bg at +0x10)
-'   g_curscreen      = 0x00C6764C  TScreen
+'   g_screen_matchpaused = 0x00C6764C  TScreen
+'     This screen's own TScreen, the name TScreen_MatchPaused.CreateScreen gives its
+'     construction site. g_curscreen is the corpus's name for 0x00C61700, the ACTIVE
+'     screen pointer that TScreen.SetActive maintains and twenty bodies read, so the
+'     two slots shared one variable.
 '
 ' NOTE: Ghidra prints `if (DAT_00c6cf90 < 1)` with the skip-time branch first; the real
 ' `cmp dword [g],0 / jle` is `If g > 0` with the QUIT branch first (codegen-patterns 10.1).
@@ -19,17 +23,17 @@
 		'!Global g_hometeam:TTeam
 		'!Global g_awayteam:TTeam
 		'!Global g_bgimage:TImage
-		'!Global g_curscreen:TScreen
+		'!Global g_screen_matchpaused:TScreen
 		If g_training_int03 > 0
 			If TScreen.DoMessage(GetText("CMESSAGE_QUIT"),1,0)
-				g_curscreen.bg = g_bgimage
+				g_screen_matchpaused.bg = g_bgimage
 				TEngine.SkipMatchTime()
 			EndIf
 		Else
 			Local key:String = "CMESSAGE_SKIPTIMEEND"
 			If g_hometeam.newstarselno = 11 Or g_awayteam.newstarselno = 11 Then key = "CMESSAGE_SKIPTIMESUB"
 			If TScreen.DoMessage(GetText(key),1,0)
-				g_curscreen.bg = g_bgimage
+				g_screen_matchpaused.bg = g_bgimage
 				TEngine.SkipMatchTime()
 			EndIf
 		EndIf

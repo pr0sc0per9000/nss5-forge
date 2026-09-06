@@ -1,3 +1,14 @@
+' GLOBALS RENAMED (2026-08-23): 0x00C66990 -> g_prg_home_skills and 0x00C669A8 ->
+' g_prg_home_achievements, matching TScreen_Home.CreateScreen.bmx, whose header carries the
+' evidence. Both spellings were shared with a DIFFERENT slot in another screen, so the two
+' SetPercent calls below landed on a bar this screen does not own: skills reached
+' TScreen_Abilities' prg_Skills and achievements was being overpainted by the game menu's
+' energy gauge. The Global is byte-invisible either way, so the body is untouched.
+'
+' `g_prg_achievements.SetPercent(g_profile.GetAchievements(), 1)` looks like a count fed
+' into a percentage and is not: TProfile.achievements is Int[100], one slot per achievement,
+' so GetAchievements' count of the non-zero slots IS the percentage. There is no missing
+' conversion here and none should be added.
 ' TScreen_Home.SetUpScreen
 ' VA 0x0053CAE2   848 bytes   mode=reloc   byte-identical vs NSS5.exe
 ' (848/848, original length from Ghidra's inventory, reloc_masked=56; verified with
@@ -24,9 +35,9 @@
 '     0x00C6696C -> g_lbl_value2:TLabel         (0x00C66968 = lbl_value1, likewise untouched)
 '     0x00C66970 -> g_prg_fame:TProgressBar
 '     0x00C66984 -> g_prg_happiness:TProgressBar
-'     0x00C66990 -> g_prg_skills:TProgressBar
+'     0x00C66990 -> g_prg_home_skills:TProgressBar
 '     0x00C6699C -> g_prg_lifestyle:TProgressBar
-'     0x00C669A8 -> g_prg_achievements:TProgressBar
+'     0x00C669A8 -> g_prg_home_achievements:TProgressBar
 '   TProfile field offsets (extracted/object_model.json): date +0x10 (:TMyDate),
 '   onloanfrom +0x148 (Int), myclub +0x1D0 (:TClub). TClub extends TBase_Team: id +0xC,
 '   labelname +0x1C are inherited TBase_Team fields; nationid +0x64, leagueid +0x68 are
@@ -91,9 +102,9 @@
 '!Global g_lbl_value2:TLabel
 '!Global g_prg_fame:TProgressBar
 '!Global g_prg_happiness:TProgressBar
-'!Global g_prg_skills:TProgressBar
+'!Global g_prg_home_skills:TProgressBar
 '!Global g_prg_lifestyle:TProgressBar
-'!Global g_prg_achievements:TProgressBar
+'!Global g_prg_home_achievements:TProgressBar
 	Function SetUpScreen:Int()
 		TScreen.SetActive("home", "")
 		PlayTrack(2)
@@ -113,10 +124,10 @@
 		g_prg_fame.SetPercent(g_profile.GetFame(), 1)
 		g_prg_happiness.SetPercent(g_profile.GetHappiness(), 1)
 		g_prg_happiness.SetColour("", ColourGreen(g_profile.GetHappiness()))
-		g_prg_skills.SetPercent(g_profile.GetSkillRating(), 1)
-		g_prg_skills.SetColour("", ColourGreen(g_profile.GetSkillRating()))
+		g_prg_home_skills.SetPercent(g_profile.GetSkillRating(), 1)
+		g_prg_home_skills.SetColour("", ColourGreen(g_profile.GetSkillRating()))
 		g_prg_lifestyle.SetPercent(g_profile.GetLifestyle(), 1)
 		g_prg_lifestyle.SetColour("", ColourGreen(g_profile.GetLifestyle()))
-		g_prg_achievements.SetPercent(g_profile.GetAchievements(), 1)
-		g_prg_achievements.SetColour("", ColourGreen(g_profile.GetAchievements()))
+		g_prg_home_achievements.SetPercent(g_profile.GetAchievements(), 1)
+		g_prg_home_achievements.SetColour("", ColourGreen(g_profile.GetAchievements()))
 	End Function

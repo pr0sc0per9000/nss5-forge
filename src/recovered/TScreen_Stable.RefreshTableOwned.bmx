@@ -2,7 +2,7 @@
 ' VA 0x00589a7b   381 bytes   mode=reloc   byte-identical vs NSS5.exe
 ' KIND=Function, SIG ()i, class-table slot 0x78   (reloc_masked=18)
 ' ASSUMPTIONS
-'   '!Global g_stable_table:TTable  -- 0x00C6DEC8. globals_final flags a CONFLICT
+'   '!Global g_stable_tblOwned:TTable  -- 0x00C6DEC8. globals_final flags a CONFLICT
 '     (TLabel=1; TTable=1). The slots decide it: 0xD4=GetSelectedItem, 0x9C=ClearItems,
 '     0x94=AddItem([]$,$,$), 0xDC=SelectItemByRow(i) are all TTable's.
 '   '!Global g_horses:TList  -- 0x00C6E294, typed Object by usage. Slot 0x88 = TList.Sort
@@ -19,21 +19,26 @@
 '   * `If Not g_horses Then Return 0` is a genuine early return (3f/10.9); the If-block
 '     form is 15 bytes shorter and wrong.
 	Function RefreshTableOwned:Int()
-		'!Global g_stable_table:TTable
+		' 0x00C6DEC8 is the OWNED-horses table, built by TScreen_Stable.CreateScreen:182 as
+' TTable.CreateTable("tbl_Owned", ...) under the name g_stable_tblOwned.
+' TScreen_Stable.RefreshTableForSale uses the g_stable_table spelling for the DIFFERENT
+' slot 0x00C6DEDC, the for-sale table, so the two were one emitted variable with no
+' writer at all: both refreshes ran against Null.
+		'!Global g_stable_tblOwned:TTable
 		'!Global g_horses:TList
 		'!Global g_stable_int26:Int
-		Local sel:Int = g_stable_table.GetSelectedItem()
+		Local sel:Int = g_stable_tblOwned.GetSelectedItem()
 		If sel < 0
 			sel = 0
 		EndIf
-		g_stable_table.ClearItems()
+		g_stable_tblOwned.ClearItems()
 		If Not g_horses Then Return 0
 		g_stable_int26 = 30
 		g_horses.Sort(0)
 		For Local h:THorse = EachIn g_horses
 			If h.owned = 1
-				g_stable_table.AddItem([h.name, h.GetStringEnergy(), h.GetStringHealth(), h.GetStringForm(), FormatMoney(h.prize, 1)], "", "")
+				g_stable_tblOwned.AddItem([h.name, h.GetStringEnergy(), h.GetStringHealth(), h.GetStringForm(), FormatMoney(h.prize, 1)], "", "")
 			EndIf
 		Next
-		g_stable_table.SelectItemByRow(sel)
+		g_stable_tblOwned.SelectItemByRow(sel)
 	End Function

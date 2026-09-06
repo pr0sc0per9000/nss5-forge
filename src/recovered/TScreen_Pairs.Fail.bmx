@@ -24,11 +24,16 @@
 
 	Function Fail:Int()
 		'!Global g_sound_fail:TSound
-		'!Global g_channel_sfx:TChannel
+		' 0x00C6F090, the casino/UI channel, pushed at 0x005797CB
+' `ff3590f0c600 push dword ptr [0xc6f090]`; this body contains no reference in the
+' 0x00C5B330-0x00C5B380 band. g_channel_sfx is TDummy.CheckHit's name for 0x00C5B344,
+' the match sfx channel, which is Null outside a match, so the fail sample was played on
+' a freshly allocated channel and stopped cutting off the other casino sounds.
+		'!Global g_chan_sfx:TChannel
 		'!Global g_font_main:TBitmapFont
 		'!Global g_screen_w:Int
 		'!Global g_screen_h:Int
-		PlaySound(g_sound_fail, g_channel_sfx)
+		PlaySound(g_sound_fail, g_chan_sfx)
 		TScreenMessage.Create(g_screen_w / 2, g_screen_h / 2, GetText("Fail!"), 1000, g_font_main, Null, 1.0, "FFFFFF")
 		TScreen_Relationships.SetUpScreen(1)
 	End Function

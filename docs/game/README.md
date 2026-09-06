@@ -174,6 +174,7 @@ complete section in the tree.
 | Document | Covers | State |
 |---|---|---|
 | [ui/screen-flow.md](ui/screen-flow.md) | Every screen, the navigation graph, and what each button does | **Written** (MEDIUM) - ~97 navigation edges extracted mechanically from verified button bodies; clicks route through a raw `fHit` function pointer, not virtual dispatch; a live developer cheat is still in the shipped binary |
+| [ui/flag-buttons.md](ui/flag-buttons.md) | How a flat nation flag is turned into a rounded, shaded button at load time | **Written** (HIGH) - byte-exact `TNation.ButtonizeFlag`; a -50..+49 per-row brightness ramp plus a fixed 6x6 corner alpha mask, applied to the flag image in place |
 
 ### Existing material elsewhere
 

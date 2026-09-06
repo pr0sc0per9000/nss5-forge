@@ -5,7 +5,17 @@
 '
 ' Two modes: with no stream it GENERATES random horses from Horse.ini; with a stream it
 ' parses a saved CSV.  Global names are ours; the types are load-bearing:
-'   0x00C6E950 g_datapath:String   0x00C6E294/0x00C6E298 TGadget (only slot 0x34 Update)
+'   0x00C6E950 g_datapath:String   0x00C6E294/0x00C6E298 TList (slot 0x34 = TList.Clear)
+'
+' THE TWO LIST SLOTS ARE THE HORSE ROSTER, and their TYPE is what makes this body do
+' anything at all. Slot 0x34 is Clear on TList and Update on TGadget, so `call
+' [eax+0x34]` assembles the same either way and the byte oracle cannot tell them
+' apart. THorse.New settles it by writing both slots: `If Not g_allhorses Then
+' g_allhorses = CreateList()` at 0x00C6E294 and the same for g_horselist2 at
+' 0x00C6E298, then g_allhorses.AddLast(Self) for every horse it makes. Eight names
+' across the corpus resolve to these two addresses and every other one of them says
+' TList. Clearing the roster before regenerating it is also the only reading under
+' which the rest of this function is not building a duplicate set of horses.
 '
 ' THE ARRAY LITERAL IS LOAD-BEARING.  Written as `New Int[5]` + five `st[n] = Rand(6)`
 ' statements this comes out 1192 bytes: the original carries an extra `mov esi,ebx` at
@@ -15,11 +25,11 @@
 ' `If ln = "//" Then Exit` -- a 5-byte `jmp` to the loop end, NOT `Return 0` (which would
 ' also have to emit `mov eax,0`).
 '!Global g_datapath:String
-'!Global g_stable_tbl01:TGadget
-'!Global g_stable_tbl02:TGadget
+'!Global g_allhorses:TList
+'!Global g_horselist2:TList
 LogLine("LoadHorseData")
-If g_stable_tbl01 <> Null Then g_stable_tbl01.Update()
-If g_stable_tbl02 <> Null Then g_stable_tbl02.Update()
+If g_allhorses <> Null Then g_allhorses.Clear()
+If g_horselist2 <> Null Then g_horselist2.Clear()
 If Not a0
 	a0 = ReadFile(g_datapath + "GameMedia\Data\Horse.ini")
 	Local n:Int = 0

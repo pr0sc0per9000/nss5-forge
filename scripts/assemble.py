@@ -77,20 +77,14 @@ UNVERIFIED = os.path.join(ROOT, "src", "recovered_unverified")
 # blocked body cannot take the whole program down with it; each is left as the empty stub
 # an unrecovered function gets.
 #
-# ZipFile.getFileInfoByName.bmx calls getEntryByName on the zip container Type, and no
-# such method exists, so it fails with "Compile Error: Identifier 'getEntryByName' not
-# found". That is a body defect, not a tooling gap: TZipFileList's full member set IS in
-# the reflection data (extracted/vtable_map.tsv lines 2783-2791, extracted/object_model.json),
-# harness.py emits it as a real stub with the correct slots, and the container method this
-# body wants is findFile($):SZipFileEntry at slot 0x3c (VA 0x0058EA90).
-#
-# Its two siblings carried the same invented-name defect (getCount / getEntry for the real
-# getFileCount @0x34 / getFileInfo @0x38) plus headers blaming a nonexistent missing
-# TZipFileList placeholder. Corrected and byte-verified 2026-08-22, so they are now in
-# src/recovered/ and are no longer listed here.
+# The three ZipFile delegates that used to be listed here are gone: all of them invented a
+# callee name on the zip container Type (getCount / getEntry / getEntryByName) where the
+# real TZipFileList methods are getFileCount @0x34, getFileInfo @0x38 and findFile @0x3c.
+# TZipFileList's full member set was always in the reflection data
+# (extracted/vtable_map.tsv lines 2783-2791, extracted/object_model.json) and harness.py
+# always emitted it as a real stub with the correct slots; the headers blaming a missing
+# placeholder were wrong. All three are byte-verified and now live in the recovered trees.
 UNVERIFIED_SKIP = {
-    "ZipFile.getFileInfoByName.bmx",
-
     # --- Steam. Excluded because this reconstruction strips Steam entirely, not because
     # they are broken. Each carries '!Import ".../libsteamstub.a" plus a '!Raw Extern block,
     # and those pragmas are collected from the FILE, not from whichever body wins the tier
@@ -111,8 +105,31 @@ UNVERIFIED_SKIP = {
                                               # at src/recovered/TLocale.SetUp.bmx and wins
                                               # the tier contest anyway. Listing it here
                                               # keeps its Steam pragmas out too.
-    "TProfile.SaveGame.bmx",                  # Also moot under the clean-break save format
-                                              # (this project writes its own).
+    # TProfile.SaveGame.bmx WAS LISTED HERE AND IS NOT ANY MORE.
+    # It was skipped for two stated reasons, and both were wrong by the time they were
+    # written:
+    #   1. "assembling this body would leave an undefined reference" to
+    #      SteamPostPlayerValue, which harness.MODULE_SKIP keeps out of the build. It does
+    #      not. The file carries its own
+    #          '!Raw Function SteamPostPlayerValue:Int()
+    #          '!Raw End Function
+    #      and the raw-pragma path a few dozen lines below emits that verbatim into the
+    #      assembled program -- exactly as it already does for the identical
+    #      SyncSteamAchievements placeholder in src/recovered/TProfile.LoadSavedGame.bmx,
+    #      which has been in every build for months (grep the emitted source: `Function
+    #      SyncSteamAchievements()` is there). No Import is involved: the file declares no
+    #      '!Import, so no Steam link surface comes with it, and the empty placeholder also
+    #      removes the up-to-2s leaderboard stall the real callee would add to every save.
+    #   2. "moot under the clean-break save format (this project writes its own)". Nothing
+    #      ever wrote one. src/behaviour/ was empty and TProfile.SaveGame assembled to
+    #      `Method SaveGame:Int(a0:String) / End Method` -- an empty stub -- while its six
+    #      callers (TProfile.StartCareer, TProfile.FixturePlayed, TScreen_GameMenu.ButtonQuit,
+    #      TScreen_Options.ButtonTick, TScreen_SeasonReview.ButtonPlay and
+    #      TScreen_WorldMap.SetUpScreen's pre-travel autosave) all called it and got nothing.
+    #      That is the whole "saving does not save, and no career appears in the load list"
+    #      defect: no .sav was ever written, so TScreen_MainMenu.UpdateLoadTable's scan of
+    #      g_userpath + "Save/" found an empty directory. The clean break is now real and
+    #      lives in src/behaviour/Zip{Writer,Reader}.* -- see those files.
     "TProfile.CheckAchievement.bmx",          # Steam. The other two reasons this entry
                                               # used to give are both FIXED and no longer
                                               # true (2026-08-22): the Extern block is
@@ -202,6 +219,20 @@ MODBODY_IMPORTS = [
     "BRL.PNGLoader",      # every GameMedia image is a .png
     "BRL.OggLoader",      # every sound and all six music tracks are .ogg
     "BRL.FreeTypeFont",   # the two Incbin'd TTFs
+]
+
+# Modules the ORIGINAL did not import, that this reconstruction does. Kept separate from
+# MODBODY_IMPORTS so that list stays a faithful record of the original's own 15.
+#
+# PUB.ZLib: the original reached zlib through minizip, which is C linked into NSS5.exe and
+# cannot be reconstructed as BlitzMax (see src/behaviour/ZipReader.OpenZip.bmx). A genuine
+# retail save is a ZipCrypto-encrypted, DEFLATED zip entry -- measured:
+#     flag=0x0001 method=8 csize=985503 usize=8439894
+# so without an inflate the reconstruction can write and read its own saves and still not
+# open a single save a player already owns. src/behaviour/ZipReader.ExtractFile.bmx uses
+# this module's uncompress(); ZipCrypto itself is BlitzMax in that same file.
+RECON_IMPORTS = [
+    "PUB.ZLib",
 ]
 
 
@@ -695,8 +726,27 @@ def load_recovered():
         # placeholder. Without this guard a lower tier would silently displace a higher one,
         # which is the worst available failure mode: the build looks fine and quietly runs
         # unverified or fake code in place of a byte-exact body.
+        #
+        # ...BUT A HIGHER TIER ONLY OUTRANKS A LOWER ONE WHEN IT ACTUALLY HAS A BODY.
+        # The note two paragraphs up already states the intended rule -- "A file here that
+        # is 100% comments contributes nothing and stays an empty stub" -- and until this
+        # guard was qualified the code did the opposite: a research note was inserted with
+        # body "" and then BLOCKED every lower tier, so the pair emitted an empty stub that
+        # nothing could fill. Measured across the whole corpus, exactly two pairs are
+        # affected, both of them 100%-comment files in src/recovered_unverified/ that exist
+        # to record why the original cannot be reconstructed at all:
+        #     TZipEStream.find_file.bmx  -- "THIS FILE IS DELIBERATELY 100% COMMENTS"
+        #     TZipEStream.Eof.bmx        -- same, and it documents Pos and Read too
+        # Both are minizip C entry points with no BlitzMax equivalent, so no reconstruction
+        # will ever land there; meanwhile they were silently vetoing the src/behaviour/
+        # bodies that make the zip layer -- and therefore the whole save/load feature --
+        # work. Those two notes are worth keeping, so the guard is corrected instead.
+        # The incumbent's prose is carried forward, because the prose-declaration scanner
+        # reads Global types out of it and an empty body is no reason to lose that.
         if _dir in (UNVERIFIED, BEHAVIOUR, PLACEHOLDER) and (tname, mname) in out:
-            continue
+            if out[(tname, mname)][0].strip():
+                continue
+            comments = "\n".join(c for c in (out[(tname, mname)][2], comments) if c)
         out[(tname, mname)] = (body.rstrip(), gdecls, comments, fn)
     return out, dupes
 
@@ -1333,11 +1383,27 @@ def main():
     # Module Functions carry their own '!Global pragmas, which harness.merge_globals folds
     # in for a single-body probe. The assembled program needs them for the same reason.
     H.module_functions()                      # populates H._MODGLOBALS
+    # ... and so does this, which ALSO populates H._TPGLOBALS. It has to run here rather
+    # than where tpfns is built further down, or the third-party functions' pragmas are
+    # lifted after this loop has already read the list and are silently dropped.
+    H.thirdparty_functions()
+    # Names declared by a THIRD-PARTY module Function go to the external unit instead --
+    # see tp_gtext below. Emitting them here as well would put the same identifier in both
+    # compilation units, so they are held out of gtypes entirely.
+    tp_names = set()
+    for g in H._TPGLOBALS:
+        mm = re.match(GLOBAL_DECL_RX, g.strip())
+        if mm:
+            nm = mm.group(1).lower()
+            tp_names.add(alias.get(nm, nm))
     for g in H._MODGLOBALS:
         mm = re.match(GLOBAL_DECL_RX, g.strip())
         if mm:
             nm = mm.group(1).lower()
-            gtypes[alias.get(nm, nm)].add(mm.group(2))
+            nm = alias.get(nm, nm)
+            if nm in tp_names:
+                continue
+            gtypes[nm].add(mm.group(2))
 
     # The module body's own Globals. The tail ASSIGNS these; nothing declares them,
     # because no recovered Type method or module Function happens to touch them.
@@ -1687,6 +1753,34 @@ def main():
     # text layer cannot even be compiled, let alone run.
     tpfns = "\n".join(H.thirdparty_functions())
 
+    # The Globals those functions declare, emitted HERE and not in the main unit. The
+    # external unit is Imported by nss5_assembled.bmx, and an imported unit cannot see the
+    # importer's Globals, so a declaration left in the main file is invisible to the code
+    # that needs it. zipengine's Fn_0058FB20 is the case: it declares
+    # `'!Global g_zipfilefunc_streams:TMap` and calls .Insert on it, and with the
+    # declaration in the wrong unit the build fails outright with
+    # "Identifier 'g_zipfilefunc_streams' not found". Deduplicated by name, and typed from
+    # the pragma verbatim, because nothing else in the program declares these.
+    tp_seen, tp_lines = set(), []
+    for g in H._TPGLOBALS:
+        mm = re.match(GLOBAL_DECL_RX, g.strip())
+        if not mm:
+            # A '!Raw pragma rather than a '!Global one: emit it verbatim, same as the
+            # main unit does, since that is exactly what Raw means.
+            if g.strip() and g.strip() not in tp_seen:
+                tp_seen.add(g.strip())
+                tp_lines.append(g.strip())
+            continue
+        nm = alias.get(mm.group(1).lower(), mm.group(1).lower())
+        if nm in tp_seen:
+            continue
+        tp_seen.add(nm)
+        tp_lines.append("Global %s:%s" % (nm, mm.group(2)))
+    tp_gtext = "\n".join(
+        (["' Globals declared by the third-party module Functions below. They live in this",
+          "' unit, not the main one, because an Imported unit cannot see the importer's",
+          "' Globals -- see assemble.py's note at this site."] + tp_lines) if tp_lines else [])
+
     # H._HEADER[0] is SuperStrict + the BRL Imports + `Type X / End Type` placeholders for
     # names referenced in a signature but absent from the reflection table. The
     # placeholders are declarations too, so they belong with the external unit; the main
@@ -1737,8 +1831,49 @@ def main():
     if add_mb:
         keep = keep + ["' Modules the module body itself needs (the original's 15 Imports)"] + \
             ["Import " + m for m in add_mb]
+    # Modules THIS RECONSTRUCTION needs and the original did not, kept in their own list so
+    # MODBODY_IMPORTS above stays an honest record of the original's 15.
+    have_all = {l.split(None, 1)[1].strip().lower() for l in keep if l.startswith("Import ")}
+    add_rc = [m for m in RECON_IMPORTS if m.lower() not in have_all]
+    if add_rc:
+        keep = keep + ["' Modules this reconstruction needs that the original did not "
+                       "(see assemble.py's RECON_IMPORTS)"] + \
+            ["Import " + m for m in add_rc]
 
     ext_head = "\n".join(keep + [""] + ph)
+
+    # ---- the zipengine module body's one surviving top-level statement ------------------
+    #
+    # A BlitzMax TStreamFactory subclass registers ITSELF, from TStreamFactory.New(), into
+    # the chain BRL.Stream walks in OpenStream(). Constructing one and throwing the handle
+    # away is the whole registration, and the zipengine module's own module body does
+    # exactly that -- read off the original at 0x0058DBB2 and recorded in
+    # src/recovered_unverified/Fn_0058DACC.ZipEngineModuleInit.bmx:
+    #     push 0x00C9590C ; call _bbObjectNew ; add esp,4     -> New TZipEngineStreamFactory
+    #     (result DISCARDED; the next instruction reloads eax from elsewhere)
+    # That file's own note says why it matters: "It is why `ReadFile("zip::...")` works at
+    # all."
+    #
+    # This assembler has no module body for an imported third-party module, so that
+    # statement had nowhere to go and was simply absent. The consequence was total and
+    # silent: with no factory in the chain, OpenStream never recognises the "zipe" protocol,
+    # so EVERY `ReadStream("zipe::" + ...)` in the game returned Null --
+    # TProfile.LoadSavedGame, TScreen_MainMenu.UpdateLoadTable and TReplay.LoadReplayFile
+    # alike. UpdateLoadTable reads a Null there as a corrupt file and offers to delete the
+    # save. Emitting it here puts it in the same place BlitzMax puts it: an imported unit's
+    # module body runs before the importer's, so the factory is registered before any game
+    # code can ask for a url.
+    zipe_init = "\n".join([
+        "' The zipengine module body's own top-level statement, reproduced. See",
+        "' assemble.py's note at this site and",
+        "' src/recovered_unverified/Fn_0058DACC.ZipEngineModuleInit.bmx.",
+        "' A TStreamFactory subclass registers itself from TStreamFactory.New(), so",
+        "' constructing one and discarding it IS the registration -- without it the",
+        "' \"zipe\" protocol is unknown to OpenStream and every save, replay and load",
+        "' url resolves to Null.",
+        "New TZipEngineStreamFactory",
+    ]) if any(re.match(r"\s*Type\s+TZipEngineStreamFactory\b", l)
+              for c in side_chunks for l in c.split("\n")) else ""
 
     os.makedirs(OUT_DIR, exist_ok=True)
     ext = "\n".join([
@@ -1747,7 +1882,7 @@ def main():
         "' NSS5.exe's reflection table because they are in the linked image, not because",
         "' the main module declares them. Kept in a separate compilation unit so they do",
         "' not enter the main module's Type-registration sequence.",
-        ext_head, "\n".join(side_chunks), "", tpfns, ""])
+        ext_head, "\n".join(side_chunks), "", tp_gtext, "", tpfns, "", zipe_init, ""])
     # Rewrite aliased Global references in the emitted bodies. The declarations above are
     # already canonical (gtypes was keyed through the map), so this only touches uses.
     ext, ext_renames = apply_alias_map(ext, alias)

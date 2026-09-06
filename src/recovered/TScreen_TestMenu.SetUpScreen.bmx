@@ -7,7 +7,9 @@
 '              shows as a double deref in the decompilation.
 '              String literals read out of NSS5.exe at 0x00c850b8 / 0x00c85194.
 	Function SetUpScreen:Int()
-		'!Global g_screen:TScreen
+		' 0x00C6635C, this screen's own TScreen; TScreen_TestMenu.CreateScreen.bmx:8 names it
+' g_screen_testmenu. The g_screen spelling was shared with five other screens' slots.
+'!Global g_screen_testmenu:TScreen
 		TScreen.SetActive("testmenu","")
-		g_screen.SetActiveGadget("testmenu_newgame")
+		g_screen_testmenu.SetActiveGadget("testmenu_newgame")
 	End Function

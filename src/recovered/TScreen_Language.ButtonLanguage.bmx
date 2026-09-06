@@ -20,7 +20,12 @@
 		'!Global g_langname:String
 		'!Global g_lang_int05:Int
 		'!Global g_mainmenu_str:String
-		'!Global g_screen:TScreen
+		' 0x00C63CE8 = the OPTIONS screen, measured at 0x0051C045 `a1e83cc600 mov eax,[0xc63ce8]`
+' and named g_screen_options by TScreen_Options.CreateScreen. Choosing a language returns
+' to the screen the language screen was entered from, which is Options. The g_screen
+' spelling was shared with five other screens' slots, so this SetActive re-activated the
+' data-editor screen instead.
+'!Global g_screen_options:TScreen
 		g_langname = TGadget.GetActiveGadgetName()
 		LogLine("ButtonLanguage:" + g_langname)
 		TOptions.SaveOptions()
@@ -28,7 +33,7 @@
 		TScreen.SetUpFonts(g_langname)
 		TScreen.ResetScreens()
 		If g_lang_int05 <> 0
-			TScreen.SetActive(g_screen.name, "")
+			TScreen.SetActive(g_screen_options.name, "")
 			TScreen_Options.RefreshButtons()
 			g_mainmenu_str = "0"
 			TScreen_MainMenu.UpdateVersionInfo()

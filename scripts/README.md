@@ -65,6 +65,20 @@ The reconstruction is judged by whether it compiles to the same bytes as
   tooling is built on. Rarely run directly.
 * [`coverage.py`](/scripts/coverage.py): The canonical coverage number. Quote this
   rather than counting by hand.
+* [`claim.py`](/scripts/claim.py): The one reader of a body's byte-identical
+  claim. Every measure imports it, so one rule produces the headline percentage.
+* [`reconcile_claims.py`](/scripts/reconcile_claims.py): Sets what the oracle says
+  about a body against what its own header claims. Run it once `reverify.py` has
+  written a tree's verdicts.
+* [`reverify_module.py`](/scripts/reverify_module.py): The oracle over
+  `src/recovered_module/`, whose module-level Functions have no Type and so are
+  invisible to `reverify.py`. `--shard i/n` splits the work.
+* [`compare_module_body.py`](/scripts/compare_module_body.py): Byte-compares
+  `__bb_main`, the compiler-synthesised function holding every top-level statement
+  of the main source file, together with the register that calls it.
+* [`build_module_functions.py`](/scripts/build_module_functions.py): Derives
+  `extracted/module_functions.tsv`, the module-level half of the universe
+  `coverage.py` counts against. The other half is the vtable map.
 
 ## Correctness checks
 
@@ -113,6 +127,11 @@ in the project and most of the tooling addresses it.
 * [`find_live_splits.py`](/scripts/find_live_splits.py): One address, two names,
   both written. Invisible to the above. `--impact` ranks by which subsystem is
   actually broken.
+* [`find_name_collisions.py`](/scripts/find_name_collisions.py): One identifier,
+  two addresses. The mirror of `find_live_splits.py`, and the worse half:
+  `assemble.py` rewrites by name across the whole corpus, so two slots collapse
+  into one variable and one of them loses every write. `--check` fails against the
+  tracked baseline, `--baseline` rewrites it.
 * [`link_dead_to_writers.py`](/scripts/link_dead_to_writers.py): Matches a dead
   Global to the name its writer uses.
 * [`module_body_types.py`](/scripts/module_body_types.py): Address to type, read

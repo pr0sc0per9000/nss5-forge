@@ -1,13 +1,13 @@
 module	va	type	member	bytes	status
 zipengine	0x0058dbf3	ZipFile	New	56	MATCH(thirdparty)
 zipengine	0x0058dc2b	ZipFile	Delete	53	MATCH(thirdparty)
-zipengine	0x0058dc60	ZipFile	readFileList	148	
+zipengine	0x0058dc60	ZipFile	readFileList	148	MATCH(thirdparty)
 zipengine	0x0058dcf4	ZipFile	clearFileList	49	MATCH(thirdparty)
 zipengine	0x0058dd25	ZipFile	getFileCount	40	
 zipengine	0x0058dd4d	ZipFile	setName	47	MATCH(thirdparty)
 zipengine	0x0058dd7c	ZipFile	getName	15	MATCH(thirdparty)
 zipengine	0x0058dd8b	ZipFile	getFileInfo	28	
-zipengine	0x0058dda7	ZipFile	getFileInfoByName	28	
+zipengine	0x0058dda7	ZipFile	getFileInfoByName	28	MATCH(thirdparty)
 zipengine	0x0058ddc3	ZipWriter	New	48	MATCH(thirdparty)
 zipengine	0x0058ddf3	ZipWriter	Delete	32	MATCH(thirdparty)
 zipengine	0x0058de13	ZipWriter	OpenZip	147	
@@ -19,28 +19,28 @@ zipengine	0x0058e42a	ZipWriter	CloseZip	92
 zipengine	0x0058e486	ZipReader	New	41	MATCH(thirdparty)
 zipengine	0x0058e4af	ZipReader	Delete	32	MATCH(thirdparty)
 zipengine	0x0058e4cf	ZipReader	OpenZip	103	
-zipengine	0x0058e536			254	
-zipengine	0x0058e634			395	
-zipengine	0x0058e7bf			66	
+zipengine	0x0058e536	ZipReader	ExtractFile	254	
+zipengine	0x0058e634	ZipReader	ExtractFileToDisk	395	
+zipengine	0x0058e7bf	ZipReader	CloseZip	66	
 zipengine	0x0058e801	ZipRamStream	New	45	MATCH(thirdparty)
 zipengine	0x0058e82e	ZipRamStream	Delete	51	MATCH(thirdparty)
-zipengine	0x0058e861			112	
-zipengine	0x0058e8d1			110	
-zipengine	0x0058e93f			53	
-zipengine	0x0058e974			143	
-zipengine	0x0058ea03			24	
-zipengine	0x0058ea1b			117	
-zipengine	0x0058ea90			180	
-zipengine	0x0058eb44			385	
-zipengine	0x0058ecc5			268	
-zipengine	0x0058edd1			54	
+zipengine	0x0058e861	ZipRamStream	ZCreate	112	MATCH(thirdparty)
+zipengine	0x0058e8d1	TZipFileList	New	110	MATCH(thirdparty)
+zipengine	0x0058e93f	TZipFileList	Delete	53	
+zipengine	0x0058e974	TZipFileList	Create	143	MATCH(thirdparty)
+zipengine	0x0058ea03	TZipFileList	getFileCount	24	MATCH(thirdparty)
+zipengine	0x0058ea1b	TZipFileList	getFileInfo	117	MATCH(thirdparty)
+zipengine	0x0058ea90	TZipFileList	findFile	180	MATCH(thirdparty)
+zipengine	0x0058eb44	TZipFileList	ScanCentralHeader	385	MATCH(thirdparty)
+zipengine	0x0058ecc5	TZipFileList	extractFilename	268	MATCH(thirdparty)
+zipengine	0x0058edd1	TZipFileList	deletePathFromFilename	54	MATCH(thirdparty)
 zipengine	0x0058ee07	tm	New	97	MATCH(thirdparty)
 zipengine	0x0058ee68	tm	Delete	14	MATCH(thirdparty)
 zipengine	0x0058ee76	tm_zip	New	76	MATCH(thirdparty)
 zipengine	0x0058eec2	tm_zip	Delete	14	MATCH(thirdparty)
-zipengine	0x0058eed0	zip_fileinfo	New	95	
+zipengine	0x0058eed0	zip_fileinfo	New	95	MATCH(thirdparty)
 zipengine	0x0058ef2f	zip_fileinfo	Delete	34	MATCH(thirdparty)
-zipengine	0x0058ef51			183	
+zipengine	0x0058ef51	zip_fileinfo	getBank	183	MATCH(thirdparty)
 zipengine	0x0058f008	SZIPFileDataDescriptor	New	55	MATCH(thirdparty)
 zipengine	0x0058f03f	SZIPFileDataDescriptor	Delete	14	MATCH(thirdparty)
 zipengine	0x0058f04d	SZIPFileDataDescriptor	fill	60	MATCH(thirdparty)
@@ -56,7 +56,7 @@ zipengine	0x0058f575	SZipFileEntry	EqEq	38	MATCH(thirdparty)
 zipengine	0x0058f59b	SZipFileEntry	Compare	75	MATCH(thirdparty)
 zipengine	0x0058f5e6	TZipEngineStreamFactory	New	34	MATCH(thirdparty)
 zipengine	0x0058f608	TZipEngineStreamFactory	Delete	32	MATCH(thirdparty)
-zipengine	0x0058f628			231	
+zipengine	0x0058f628	TZipEngineStreamFactory	CreateStream	231	
 zipengine	0x0058f70f	TZipEStream	New	81	MATCH(thirdparty)
 zipengine	0x0058f760	TZipEStream	Delete	85	MATCH(thirdparty)
 zipengine	0x0058f7b5	TZipEStream	Create	205	
@@ -64,9 +64,9 @@ zipengine	0x0058f882	TZipEStream	find_file	309
 zipengine	0x0058f9b7	TZipEStream	Eof	26	
 zipengine	0x0058f9d1	TZipEStream	Pos	26	
 zipengine	0x0058f9eb	TZipEStream	Size	15	MATCH(thirdparty)
-zipengine	0x0058f9fa	TZipEStream	Seek	147	
+zipengine	0x0058f9fa	TZipEStream	Seek	147	MATCH(thirdparty)
 zipengine	0x0058fa8d	TZipEStream	Flush	14	MATCH(thirdparty)
-zipengine	0x0058fa9b	TZipEStream	Close	70	
+zipengine	0x0058fa9b	TZipEStream	Close	70	MATCH(thirdparty)
 zipengine	0x0058fae1	TZipEStream	Read	63	
 zipengine	0x0058fb20			127	
 zipengine	0x0058fb9f			67	
@@ -166,7 +166,7 @@ fontmachine	0x005929d7	TDrawingPoint	Create	34	MATCH(thirdparty)
 fontmachine	0x005929f9	TDrawingPoint	Clone	26	
 fontmachine	0x00592a13		Fn_00592A13	36	MATCH(thirdparty,unreflected,try_function)
 fontmachine	0x00592a37		Fn_00592A37	322	MATCH(thirdparty,unreflected,try_function)
-fontmachine	0x00592b79		Fn_00592B79	14	MATCH(thirdparty,unattributed)	
+fontmachine	0x00592b79		Fn_00592B79	14	MATCH(thirdparty,unattributed)
 fontmachine	0x00592b87		Fn_00592B87	75	MATCH(thirdparty,unreflected,try_function)
 fontmachine	0x00592bd4			850	
 fontmachine	0x00592f26	TClass	New	41	MATCH(thirdparty)

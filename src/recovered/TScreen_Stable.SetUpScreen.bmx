@@ -8,7 +8,7 @@
 '   0x00C6DEE4 g_stable_pnl03:TPanel, 0x00C6DEE8 g_stable_pnl04:TPanel
 '   0x00C6DF1C g_stable_channel:TChannel -- same Global TScreen_Stable.ButtonQuit types TChannel
 '   0x00C6DF24 g_stable_sndGallop:TSound -- LoadSoundChecked construction site (CreateScreen)
-'   0x00C6DF70 g_stable_state:Int, 0x00C6E298 g_horses:TList (slot 0x70 = TList.Count)
+'   0x00C6DF70 g_stable_state:Int, 0x00C6E298 g_runners:TList (slot 0x70 = TList.Count)
 '   0x00C6F028 g_profile:TProfile, slot 0x10C = GetStableSize()i
 '   TGadget slots: 0x54 Hide, 0x58 Show, 0x70 SetAlph(f); TGadget.alive at +0x38.
 ' SHAPE NOTES
@@ -30,7 +30,12 @@
 		'!Global g_stable_channel:TChannel
 		'!Global g_stable_sndGallop:TSound
 		'!Global g_stable_state:Int
-		'!Global g_horses:TList
+		' 0x00C6E298 is the RACE RUNNERS list, not the master horse list. THorse.SelectRunners
+		' declares both in one body -- g_horses for 0x00C6E294 (the list it enumerates and
+		' sorts) and g_runners for 0x00C6E298 (the list it Clears and AddLasts into) -- so the
+		' two are provably different slots, and the module body creates them separately. Spelled
+		' g_runners here, this body's slot shared the emitted variable of the master list.
+		'!Global g_runners:TList
 		'!Global g_profile:TProfile
 		TScreen.SetActive("stable", "")
 		TScreen_GameMenu.UpdateTitlePanel()
@@ -73,7 +78,7 @@
 		End If
 		TScreen_Stable.RefreshTableForSale()
 		TScreen_Stable.RefreshTableOwned()
-		If g_horses.Count() = 0 Or g_stable_state = 0
+		If g_runners.Count() = 0 Or g_stable_state = 0
 			TScreen_Stable.SetUpNextRace()
 		End If
 	End Function

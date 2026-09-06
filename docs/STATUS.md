@@ -4,8 +4,8 @@
      Do not edit by hand: your changes will be overwritten, and a
      hand-maintained status file goes stale within hours. -->
 
-**99.3%** of the reconstruction is byte-identical to `NSS5.exe`,
-measured as 867506 of 873829 bytes of machine code across 1973 function bodies.
+**99.4%** of the reconstruction is byte-identical to `NSS5.exe`,
+measured as 876834 of 882444 bytes of machine code across 2018 function bodies.
 
 Nothing is excluded from that count. 4 bodies (1232 bytes, of which 1074 are byte-identical) are counted above but are deliberately absent from the shipped `src/assembled/` build, because their Steam import would stop the exe loading; see VERIFIED_NOT_SHIPPED in `scripts/progress.py` for which ones and why.
 
@@ -13,14 +13,25 @@ Nothing is excluded from that count. 4 bodies (1232 bytes, of which 1074 are byt
 RECONSTRUCTION PROGRESS  (measured in bytes of matched machine code)
 
   TREE                              BODIES   MATCHED    BYTES    DONE
-  src/recovered                       1709      1709   757980  100.0%
-  src/recovered_module                  89        88    20833   99.2%
-  src/recovered_thirdparty             112       112     8073  100.0%
-  src/recovered_unverified              63        58    86943   92.9%
+  src/recovered                       1717      1717   765827  100.0%
+  src/recovered_module                  89        85    20833   95.5%
+  src/recovered_thirdparty             152       152    12848  100.0%
+  src/recovered_unverified              60        53    82936   94.4%
   ------------------------------ --------- --------- -------- -------
-  TOTAL                               1973      1967   873829   99.3%
+  TOTAL                               2018      2007   882444   99.4%
 
-  867506 of 873829 bytes byte-identical against NSS5.exe.
+  876834 of 882444 bytes byte-identical against NSS5.exe.
+
+  RECONSTRUCTED, counting bodies whose original is proven byte-identical
+  but whose compiled form is deliberately substituted so the game runs:
+      877770 of 882444 bytes = 99.5%
+    LoadAnimImageChecked.bmx                         271  harness.try_function NSS5_NO_LEARN=1 -> MATCH 271/271 mode=reloc reloc_masked=25
+    LoadImageChecked.bmx                             251  harness.try_function NSS5_NO_LEARN=1 -> MATCH 251/251 mode=reloc reloc_masked=24
+    LoadSoundChecked.bmx                             256  harness.try_function NSS5_NO_LEARN=1 -> MATCH 256/256 mode=reloc reloc_masked=25
+    SteamInit.bmx                                    158  harness.try_function NSS5_NO_LEARN=1 -> MATCH 158/158 mode=reloc reloc_masked=18
+  These bytes are NOT in the headline above and must not be added to it:
+  the headline measures what src/assembled/ compiles, and for these bodies
+  that is the substitute, which the oracle correctly rejects.
 
   NOT IN THE SHIPPED BUILD -- 4 bodies, 1232 bytes (1074 of them matched)
   COUNTED in the totals above, like every other body. They are left out
@@ -34,12 +45,18 @@ RECONSTRUCTION PROGRESS  (measured in bytes of matched machine code)
     Fn_0058D90B.SyncSteamAchievements              124 0x0058d90b  yes      OMITTED  (harness.py MODULE_SKIP)
 
   Largest bodies not yet byte-identical:
-    Fn_0058BC02.Md5                                  2848 bytes  0x0058bc02
     TPrivateBitmapFont.DrawFaceText                  1428 bytes  0x00591383
     TPrivateBitmapFont.DrawBorderText                1195 bytes  0x00591917
+    TBitmapFont.DrawTextMaxWidth                      755 bytes  0x00590842
     TPrivateBitmapFont.DrawShadowText                 666 bytes  0x00591dc2
-    SteamInit                                         158 bytes  0x0058d86d
-    ZipFile.getFileInfoByName                          28 bytes  0x0058dda7
+    TZipEStream.find_file                             309 bytes  0x0058f882
+    Fn_0058DACC.ZipEngineModuleInit                   295 bytes  0x0058dacc
+    LoadAnimImageChecked                              271 bytes  0x004bc664
+    LoadSoundChecked                                  256 bytes  0x004bc564
+    LoadImageChecked                                  251 bytes  0x004bc372
+    TZipEStream.Eof                                    26 bytes  0x0058f9b7
+  (not listed: SteamInit -- proven byte-identical and permanently
+   substituted, so not work anyone can finish. Still counted in the totals above.)
 ```
 
 Regenerate with:

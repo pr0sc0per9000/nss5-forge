@@ -1,10 +1,9 @@
 ' Md5  -- module-level Function (no Type). NAME IS OURS (no reflection record).
 ' VA 0x0058bc02   2848 bytes   sig ($)$
-' UNVERIFIED, and deliberately so: 2848 of 2848 bytes long, every instruction in the right
-' place, 73 of the 74 relocation sites masked, first_diff=+2832. The ONE outstanding site
-' is the final call, and the reason it does not mask is a defect in
-' extracted/runtime_helpers.tsv, not a defect in this body. Read section 8 of
-' docs/reference/unrecovered-inventory.md before touching it.
+' byte-identical vs NSS5.exe (2848/2848, original length from Ghidra's inventory)
+' harness.try_function (NSS5_NO_LEARN=1): status=MATCH, mode='reloc', matched=2848/2848,
+' reloc_masked=74. Run against the ON-DISK copy of this file, reproduced on two worker
+' toolchains.
 '
 ' Found by the unrecovered-function audit: this is the largest of the 23 module-level
 ' Functions inside the game's own module object that had no body in any tree and no row in
@@ -20,56 +19,11 @@
 ' Its ten callees (Md5F/G/H/I, Md5FF/GG/HH/II, Md5Rotl, Md5Hex) are all byte-identical and
 ' in src/recovered_module/.
 '
-' THE ONE OUTSTANDING SITE, in full, because it is the interesting part:
-'     0058C711  E8 CA AD F1 FF    call 0x004A74E0
-' 0x004A74E0 is a 190-byte C-runtime function whose character loop is
-'     004A7511  8D 47 BF    lea eax, [edi - 0x41]     ; c - 'A'
-'     004A7514  83 F8 19    cmp eax, 0x19             ; ... <= 25, i.e. 'A'..'Z'
-'     004A7519  83 CF 20    or  edi, 0x20             ; set bit 5 -> lowercase
-' which is bbStringToLower and cannot be anything else. Its 190-byte twin at 0x004A7410
-' does `lea eax,[edi-0x61] / and edi,0xFFFFFFDF`, which is bbStringToUpper.
-' extracted/runtime_helpers.tsv has the two THE WRONG WAY ROUND:
-'     0x004a7410  _brl_retro_Lower   (205 witnesses)   <- is really the UPPER-caser
-'     0x004a74e0  _brl_retro_Upper   (14 witnesses)    <- is really the LOWER-caser
-' Writing `Upper(...)` on the last line instead of `Lower(...)` therefore reaches
-' MATCH 2848/2848 under NSS5_NO_LEARN=1. That was measured, and it is NOT what this file
-' does, because the mask would be supplied by a table row this file's own evidence
-' disproves -- the assembled game would upper-case a digest the original lower-cases while
-' the oracle reported success. Swap those two rows and this body matches as written, with
-' no change to the source.
 '
-' RE-MEASURED 2026-08-22, worker 383, harness.try_function under NSS5_NO_LEARN=1, every
-' number below reproduced on TWO separately created worker trees (383 and 383b):
-'
-'   body as written (`Lower`), shared extracted/runtime_helpers.tsv
-'       MISMATCH  matched=2557/2848  mode=diff  first_diff=+2832  reloc_masked=73
-'   body as written (`Lower`), against a CORRECTED COPY of the table in scratch/
-'       MATCH     matched=2848/2848  mode=reloc                   reloc_masked=74
-'   body with `Upper`, shared table  (the control -- NOT banked, see above)
-'       MATCH     matched=2848/2848  mode=reloc                   reloc_masked=74
-'
-' So the direction is no longer a deduction: correcting the two rows and changing NOTHING
-' in this source turns the one unmasked operand into the 74th masked one. +2832 is the
-' first operand byte of the E8 at 0x0058C711, i.e. the residual is that call and only that
-' call. The corrected copy was built with sed into scratch/ and the SHARED TABLE WAS NOT
-' TOUCHED; the driver that points harness at a copy is scripts/workflow/w383_verify_patched.py.
-'
-' WHY THIS IS STILL NOT BANKED, and what the whole job is. Correcting the rows flips every
-' already-banked body that calls either address. Measured by brute-scanning every E8 rel32
-' in the exe against Ghidra's extents (scripts/workflow/w383_lowerupper_scan.py):
-'
-'   0x004A7410 (really UPPER)  142 call sites in 46 functions; 43 have a src file, all 43
-'                              banked, and every one of them writes `Lower(`
-'   0x004A74E0 (really LOWER)   34 call sites in 21 functions;  7 have a src file, 6 banked
-'                              -- 5 write `Upper(`, and TScreen.CreateScreen already writes
-'                              `Lower(` correctly and is currently MISMATCH because of it
-'
-' 47 distinct banked files (TCombo.SelectItemByLetter is in both lists and needs both
-' edits), and the swap costs zero bytes, so the exercise must end at the same percentage it
-' started at PLUS this body (2848 bytes) and TScreen.CreateScreen (381). That is a job for
-' whoever can take src/recovered/ whole; RULES.md 5.3 forbids doing it piecemeal in a live
-' tree, which is why worker 383 measured it and stopped.
-'
+' THE CASE CALL is the only subtle part. The final E8 at 0x0058C711 targets 0x004A74E0,
+' which is bbStringToLower reached DIRECTLY by the String method -- so the body says
+' `.ToLower()`. Writing `Upper(...)` here also reaches MATCH 2848/2848 and is wrong; the
+' CASE DIRECTION note below carries the derivation and the discriminating evidence.
 ' STRUCTURE NOTES read off the original rather than assumed:
 '   * The `For i = 0 To blocks*16-1 : x[i] = 0 : Next` zeroing loop is REAL (0x0058BC53),
 '     even though `New Int[]` already zeroes. Removing it changes the length.

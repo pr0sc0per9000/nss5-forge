@@ -27,7 +27,11 @@
 	Method Update:Int()
 		'!Global g_cam_targetx:Float
 		'!Global g_cam_targety:Float
-		'!Global g_engine_state:Int
+		' 0x00C5B1CC, the top-level game state, read at 0x004EB6B2
+' `833dccb1c50003 cmp dword ptr [0xc5b1cc], 3`; this body never touches 0x00C5B208.
+' g_engine_state is TEngine.MatchOver's name for 0x00C5B208, the half counter, and
+' TEngine.MatchLoop already calls 0x00C5B1CC g_gamestate.
+		'!Global g_gamestate:Int
 		'!Global g_replay_mode:Int
 		'!Global g_players:TList
 		'!Global g_replay_time:Int
@@ -35,7 +39,7 @@
 		'!Global g_focusplayer:TPlayer
 		Local tx:Float = g_cam_targetx
 		Local ty:Float = g_cam_targety
-		If g_engine_state = 3
+		If g_gamestate = 3
 			If g_replay_mode = 8 And g_players <> Null
 				For Local p:TPlayer = EachIn g_players
 					For Local f:TReplayFrame = EachIn p.replayframes

@@ -34,14 +34,25 @@ WHAT IT CHECKS, AND THE INCIDENT BEHIND EACH
 2. No two bodies claim the same VA.
    Two files describing one function means one of them is wrong, and both are counted.
 
-3. No NEAR-MISS match markers.
+3. No header that contradicts itself.
+   Ten bodies in src/recovered_unverified/ opened with "-- NOT VERIFIED" on line 1 and
+   carried a bare "byte-identical vs NSS5.exe" on line 2, inserted above the VA line by a
+   bulk header pass. progress.py had no negative test, so it counted all ten -- 10,670
+   bytes -- while every one was contradicted by its own status/score record. The check is
+   claim.negatives(): a CURRENT negative in the status block (the first 6 comment lines),
+   with lines introduced by a history marker ("Before:", "Control:") exempt, because
+   documenting a rejected alternative is the discipline this project asks for. Measured
+   over the whole corpus that rule has 10 true positives and 0 false ones; the one body it
+   would otherwise have caught wrongly, TEngine.SetUpMatch, is exempted by its "Before:".
+
+4. No NEAR-MISS match markers.
    progress.py counts the literal phrase "byte-identical vs NSS5.exe". A header saying
    "byte-identical TO NSS5.exe", or "VERIFIED MATCH", is making the claim in a form nothing
    counts. TFormation.GetPlayerXY sat miscounted as outstanding for a whole day for exactly
    this, while being byte-identical the entire time. This one silently UNDER-reports, which
    is why it survives so long: nobody investigates a number that is too low.
 
-4. Files that RULES.md tells people to run actually exist.
+5. Files that RULES.md tells people to run actually exist.
    This file's own absence is the worked example.
 
 WHAT IT DELIBERATELY DOES NOT CHECK
@@ -57,6 +68,8 @@ import subprocess
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "scripts"))
+
+import claim as K                                              # noqa: E402
 
 TREES = ["src/recovered", "src/recovered_module", "src/recovered_thirdparty",
          "src/recovered_unverified"]
@@ -139,6 +152,17 @@ def main():
             seen_va[va] = rel
 
         if MATCHED.search(head):
+            # Header says both things at once. Counting it either way without saying so
+            # hides a corpus defect behind a number, so this is an error, and the measures
+            # resolve it towards NOT counting until the oracle settles it.
+            for line in K.negatives(K.header(open(path, encoding="utf-8",
+                                                  errors="replace").read())):
+                errors.append("%s: header claims 'byte-identical vs NSS5.exe' AND retracts "
+                              "it in its own status block (%s). One of the two is wrong. "
+                              "Re-run the oracle under NSS5_NO_LEARN=1 and delete whichever "
+                              "line it disproves; until then the measures count this body "
+                              "as UNMATCHED." % (rel, line.lstrip("' ").strip()[:70]))
+                break
             for rx in SELF_DECLARED_BUILD_FAIL:
                 if rx.search(head):
                     errors.append("%s: header claims 'byte-identical vs NSS5.exe' AND declares "

@@ -1,5 +1,42 @@
-' TOptions.GetNewControl -- NOT VERIFIED (near miss, 703 of 705 bytes, delta -2, COMPLETE)
-' byte-identical vs NSS5.exe
+' TOptions.GetNewControl
+' byte-identical vs NSS5.exe (705/705, mode=reloc, reloc_masked=48, NSS5_NO_LEARN=1)
+' VA 0x004E2C3A   705 bytes (Ghidra-authoritative)   KIND=Function (static, no Self)   SIG=()i
+' vtable slot 0x3c
+'
+' VERIFICATION. harness.try_method("TOptions","GetNewControl", <this body>) reports MATCH
+' 705/705, mode=reloc, reloc_masked=48, learned_helpers absent, NSS5_NO_LEARN=1 exported
+' before the harness import. Two structural negative controls on the same build:
+'   `Return -3` -> `Return -9`          MISMATCH 558/705, first_diff=460
+'   `0 Until 15` -> `0 To 15`           MISMATCH 558/705, first_diff=323
+' so the oracle is discriminating here and the MATCH is not a masking artifact.
+'
+' GAP B IS CLOSED, and the cause was NOT the backend peephole the notes below guessed at.
+' It was the joystick/keyboard selector's SOURCE FORM. The body now spells it
+'     Local mode:Int = g_options_int01
+'     Select mode / Case 0 <KEYBOARD> / Default <JOYSTICK> / End Select
+' and that is exactly 705. Attribution measured this pass, not inferred: rebuilding the
+' same two blocks as `If mode <> 0 <JOYSTICK> Else <KEYBOARD> EndIf`, changing nothing
+' else, reproduces the historical near miss byte for byte -- 703 vs 705, delta -2,
+' first_diff=10. The missing 2 bytes are the `EB 00` at ORIGINAL +656: a Select emits an
+' unconditional jmp past the LAST Case body to the join point even when the join is the
+' next instruction, and If/Else does not (codegen-patterns 10.2). The 'NOT YET TRIED'
+' experiment listed below is therefore moot, and the earlier conclusion that this was a
+' toolchain divergence with 'no documented lever' was wrong -- there was a lever.
+'
+' The `byte-identical` marker on line 2 was originally inserted by a bulk header pass
+' (122bd86) that never ran the oracle; status/score/TOptions.GetNewControl.txt still
+' records 515/703 (73.3%) but predates 122bd86 by two days and scores the older If/Else
+' draft. The marker is now earned by the run above.
+'
+' ORACLE BLIND SPOT, corroborated separately: the four axis thresholds live in the .data
+' constant pool and are reached by absolute address, so the oracle masks them -- changing
+' `If jx > 0.4` to `> 0.5` still reports MATCH 705/705. Read out of NSS5.exe directly, the
+' pool entries the original's four `fld dword ptr` sites name are 0x00C75FF0 = -0.4,
+' 0x00C75FF4 = +0.4, 0x00C75FF8 = -0.4, 0x00C75FFC = +0.4, in that order, which is what
+' this body has. The values are evidence-backed; they are just not oracle-backed.
+'
+' HISTORY BELOW IS KEPT FOR ITS DERIVATIONS. Everything it marks STILL OPEN is closed.
+' ---- original notes (header line then read: NOT VERIFIED, near miss, 703 of 705, delta -2)
 ' VA 0x004E2C3A   705 bytes (Ghidra-authoritative)   KIND=Function (static, no Self)   SIG=()i
 ' vtable slot 0x3c
 '

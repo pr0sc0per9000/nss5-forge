@@ -1,10 +1,27 @@
-' TPlayer.InterceptBall -- NOT VERIFIED (revised by a
-' later pass that read the FULL original disassembly at VA 0x004F9201 instead of only the
-' Ghidra C, via scripts/bytematch.py's disasm_original(0x004f9201, 696)).
+' TPlayer.InterceptBall
 ' VA 0x004F9201   696 bytes   vtable slot 0x124   sig (:TBall)i
-' byte-identical vs NSS5.exe
-' Previous score: 307/686 (44.8%), first diff at byte 5 (the `sub esp,N` immediate --
-' i.e. the whole local-variable/stack-slot layout was off, not a late statement).
+' byte-identical vs NSS5.exe (696/696, original length from Ghidra's inventory), verified
+' with NSS5_NO_LEARN=1. The run that earned this line:
+'   harness.try_method("TPlayer", "InterceptBall", <the body below>)
+'   -> status=MATCH  mode=reloc  matched=696/696  orig_len=696  our_len=696
+'      orig_va=0x004F9201  orig_len_from=ghidra  learned_helpers=(none)
+' and re-checked in the whole-program build, which a probe cannot stand in for because
+' assemble.py merges Globals across files and this body declares one:
+' scripts/assemble.py -> BUILD OK, then scripts/reverify.py --pending
+' TPlayer.InterceptBall -> 696/696 length.
+'
+' HEADER HISTORY. This file used to read `-- NOT VERIFIED` on line 1 while a bare
+' `byte-identical vs NSS5.exe` line sat under the VA line; the two contradicted each
+' other and the NOT VERIFIED half was the true one at the time it was written. The body
+' itself has since been revised (commit 8056bbc, the Global-wiring pass) and now matches,
+' so the marker is earned and line 1 is gone. The `Previous score: 307/686 (44.8%), first
+' diff at byte 5` paragraph that used to sit here, and status/score/TPlayer.InterceptBall
+' .txt (305/686, delta -10, written 2026-08-16 -- before the body's last edit), both
+' describe a superseded draft with an extra stack slot and must not be quoted as the
+' current state; regenerate the score file with `scripts/reverify.py --pending --reports`.
+' The findings below (revised by a pass that read the FULL original disassembly at
+' VA 0x004F9201 rather than only the Ghidra C, via scripts/bytematch.py's
+' disasm_original(0x004f9201, 696)) are what make it match and are unchanged.
 '
 ' RESOLVED, from the raw disassembly (not just the Ghidra pseudo-C):
 '   TBall fields: velocity+84 jumpx+56 jumpy+60 direction+92 x+24 y+28

@@ -3,9 +3,10 @@
 ' byte-identical vs NSS5.exe (156/156, original length from Ghidra's inventory)
 ' assumes: TScreen Global + TButton Global; early-return guard (156 vs 151 as If/Else); DoMessage resolved on TScreen slot 0x94
 	Function ButtonTestData:Int()
-		'!Global g_screen:TScreen
+		' 0x00C64D18, the data-editor screen, built by TScreen_EditMenu.CreateScreen.
+'!Global g_screen_editmenu:TScreen
 		'!Global g_btn_test:TButton
-		If g_screen.GetGadgetByName("editmenu_save").hidden
+		If g_screen_editmenu.GetGadgetByName("editmenu_save").hidden
 			TScreen_TestMenu.SetUpScreen()
 			Return 0
 		EndIf

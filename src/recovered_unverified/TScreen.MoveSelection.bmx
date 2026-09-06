@@ -47,14 +47,22 @@
 '  * 0x00C6F088 g_chanclick:TChannel and 0x00C61CF8 g_activegadget:TGadget are both CERTAIN
 '    in explain_global.py (TScreen.CheckInput, TScreen.MouseSelection, TScreen.TabToGadget,
 '    TScreen.FindNewActiveGadget, TCombo.Activate, TScreen.RemoveGadget, ... all agree).
-'  * 0x00C61720 g_snd_select:TSound -- explain_global.py resolves 0 names for this exact
-'    address (not yet CERTAIN/STRONG), but TScreen.SetUp (byte-verified, already in
-'    src/recovered) loads Click.ogg into 0x00C6171C (g_sndclick, CERTAIN elsewhere) and
-'    Select.ogg into 0x00C61720 immediately after, in that source order -- so 0x00C61720 is
-'    the Select.ogg TSound. src/recovered/TTable.UpdateActivated.bmx names this same address
-'    g_snd_move and puts "g_snd_select" on 0x00C6171C instead, which is backwards relative to
-'    SetUp's verified load order. g_snd_select is used here to agree with the verified
-'    TScreen.SetUp evidence, not the unverified TTable body's naming.
+'  * 0x00C61720 g_snd_select:TSound -- settled from the machine code rather than from a
+'    name tally, because explain_global.py resolves 0 names for this exact address.
+'    TScreen.SetUp @0x00510174 stores LoadSound("GameMedia/Sounds/Click.ogg") into
+'    0x00C6171C at 0x00510240 and LoadSound("GameMedia/Sounds/Select.ogg") into
+'    0x00C61720 at 0x0051026D; the two pushed BBStrings are at 0xc7d8ac and 0xc7d8ec and
+'    read exactly those paths. So 0x00C61720 holds Select.ogg, and the read here at
+'    0x00511ECA (`push dword ptr [0xc61720]`) is the movement blip. That is the whole of
+'    this body's sound evidence and it does not depend on any other body's naming.
+'    Corpus-wide there are 17 absolute references to the pair, in six bodies:
+'    0x00C6171C (Click.ogg) is the commit sound, read by TScreen.CheckInput @0x00511503,
+'    TInputBox.Update @0x00515B63, TTable.UpdateActivated @0x00516B96 (Case 5) and
+'    TCombo.Update @0x0051874C (Case 5); 0x00C61720 (Select.ogg) is the movement sound,
+'    read here and by TTable.UpdateActivated @0x00516B35/B6F/BD0/C3A and TCombo.Update
+'    @0x00518635/670/6AB/705, all Cases 1-4. Click.ogg being the commit sound and
+'    Select.ogg the movement blip is the opposite of what the two asset names suggest
+'    read in isolation, which is why the pairing has to come from the LoadSound stores.
 '  * 0x00C7DBF8 g_screen_float09:Float -- untouched by any other body in the corpus
 '    (explain_global.py: 0 names resolved at this address). This is the "no candidate found
 '    yet" distance sentinel; first claimed here, name follows the existing g_screen_float01

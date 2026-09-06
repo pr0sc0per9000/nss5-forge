@@ -72,13 +72,28 @@
 ' This is the same shape src/recovered/TProfile.LoadSavedGame.bmx already uses for its own
 ' Steam callee at 0x0058D90B.
 '
-' WHY THIS FILE STAYS IN src/recovered_unverified/ although it is byte-identical: it is
-' named in assemble.py's UNVERIFIED_SKIP, and it must stay named there. It now calls
-' SteamPostPlayerValue, which harness.MODULE_SKIP keeps OUT of the whole-program build, so
-' assembling this body would leave an undefined reference. (assemble.py's own note gives a
-' second, independent reason: the save format is a clean break in this project.) The byte
-' verdict is what matters and progress.py counts it from the phrase above regardless of
-' tree; the location is a build-surface decision.
+' WHY THIS FILE STAYS IN src/recovered_unverified/ although it is byte-identical: the
+' location is a build-surface decision and the byte verdict above is what matters;
+' progress.py counts it from the phrase above regardless of tree.
+'
+' CORRECTION 2026-08-23. This paragraph used to say the file "must stay named" in
+' assemble.py's UNVERIFIED_SKIP because assembling it "would leave an undefined reference"
+' to SteamPostPlayerValue. That was wrong, and it cost the shipped build its entire save
+' feature: with the name in UNVERIFIED_SKIP, TProfile.SaveGame assembled to an EMPTY
+' `Method SaveGame:Int(a0:String) / End Method`, so every one of its six callers -- the
+' StartCareer first-save, the pre-travel autosave in TScreen_WorldMap.SetUpScreen, the
+' post-fixture save in TProfile.FixturePlayed, TScreen_GameMenu.ButtonQuit,
+' TScreen_Options.ButtonTick and TScreen_SeasonReview.ButtonPlay -- wrote nothing at all,
+' and the main menu's load list, which scans g_userpath + "Save/" for *.sav, was
+' permanently empty.
+' There is no undefined reference. The '!Raw pragma pair below declares an empty
+' `Function SteamPostPlayerValue:Int()`, and assemble.py emits '!Raw fragments verbatim
+' into the assembled program -- the same mechanism that has been carrying
+' src/recovered/TProfile.LoadSavedGame.bmx's identical SyncSteamAchievements placeholder
+' in every build. The file declares no '!Import, so nothing re-imports the Steam link
+' surface, and the empty placeholder also removes the up-to-2s dead leaderboard poll the
+' real callee would otherwise add to every save. The entry has been removed from
+' UNVERIFIED_SKIP; see the note left in its place there.
 '
 ' THE CALL THAT USED TO BE MISSING:
 '     E8 A9 78 02 00   call 0x0058D987

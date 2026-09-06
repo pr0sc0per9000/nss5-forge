@@ -12,10 +12,17 @@
 		'!Global g_matchstate:Int
 		'!Global g_engine_int27:Int
 		'!Global g_player_int50:Int
-		'!Global g_snd_whistle:TSound
-		'!Global g_chan_whistle:TChannel
+		' The shoot-out plays the CROWD GOAL sample on the crowd channel, not the whistle:
+' 0x004D7777 `ff3548b3c500 push dword ptr [0xc5b348]` (channel) and 0x004D777D
+' `ff3564b3c500 push dword ptr [0xc5b364]` (sound). TEngine.SetUp loads 0x00C5B364 from
+' the literal "EngineMedia/Match/Sounds/CrowdGoal.ogg" at 0x004CE0D1 and stores it at
+' 0x004CE0F6. g_snd_whistle and g_chan_whistle are TEngine.SetUp's, DoHalfEnds',
+' SetUpSetPiece's and UpdateSetPieceReady's names for 0x00C5B34C and 0x00C5B33C, so
+' finishing a shoot-out blew the referee's whistle instead of the crowd's roar.
+		'!Global g_snd_crowd:TSound
+		'!Global g_chan_crowd:TChannel
 		If TEngine.CheckShootOutComplete()
-			PlaySound(g_snd_whistle, g_chan_whistle)
+			PlaySound(g_snd_crowd, g_chan_crowd)
 			g_engine_int27 = g_player_int50
 			g_matchstate = 11
 			g_shootoutkicks :+ 1

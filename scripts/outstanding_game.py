@@ -17,10 +17,16 @@ Only the first group can hide a surprise. Usage:
 THE OTHER TREE  (--thirdparty)
 ------------------------------
 Same coverage.py calls, the other side of the same partition: everything in the universe
-NOT owned by one of the Types the game's main module declares. Those live in
+the game's own main module does not own. Those live in
 src/recovered_thirdparty/<module>/ -- the zip module and the bitmap-font/text renderer --
 and nothing in the large/sweep phases touches them, so a pass sharding over Types here
 cannot collide with one working the main list.
+
+Two things in this view are not really the bundled modules' and are listed anyway,
+because nobody has proved otherwise: the TVolume/TWinVolume/TWinVolumeDriver/TVolSpace
+family (2,157 bytes -- see coverage.UNATTRIBUTED_PROBABLY_MODULE) and the six BLIde
+`z_*` background Types, one pair per bundled module. Both are counted against this
+project until somebody can name the module that ships them.
 
 That view groups by owning Type rather than by size, and the difference is deliberate:
 these modules are mostly 14-byte New/Delete stubs hanging off a Type, so a pass that owns a
@@ -40,7 +46,13 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def candidate_index():
-    """{label_lower: path} for every body sitting in the unverified/candidate trees."""
+    """{label_lower: path} for every body sitting in the unverified/candidate trees.
+
+    Note that src/recovered_unverified/ is now scanned by coverage.load_recovered()
+    itself, so a body there that carries an unretracted byte-equality claim already
+    counts as MATCHED and never reaches this index. What lands in IN PROGRESS is what
+    is genuinely still open.
+    """
     idx = {}
     for d in ("recovered_unverified", "recovered", "recovered_module"):
         for p in glob.glob(os.path.join(ROOT, "src", d, "*.bmx")):
@@ -53,14 +65,21 @@ def candidate_index():
     return idx
 
 
-def thirdparty(inv, uni, matched, decl, shards):
-    """The functions the game's own Types do NOT own, grouped by owning Type."""
+def thirdparty(inv, uni, owner_of, matched, decl, shards):
+    """The functions the game's own module does NOT own, grouped by owning Type.
+
+    Ownership comes from coverage.load_universe()'s own owner map, not from
+    re-deriving it out of the label here: a module-level Function's label carries no
+    dot, so the old `lab.split(".")[0] in decl` test filed every one of them under
+    "third-party". coverage.py now decides it once, from
+    extracted/type_declaration_order.tsv for Type methods and from
+    extracted/module_functions.tsv's `owner` column for module-level Functions.
+    """
     out = []
     for va, lab in uni.items():
         if va in matched:
             continue
-        owner = lab.split(".", 1)[0] if "." in lab else ""
-        if owner in decl:
+        if owner_of.get(va) == "game":
             continue
         out.append((va, lab, inv[va]))
 
@@ -71,7 +90,7 @@ def thirdparty(inv, uni, matched, decl, shards):
 
     groups = sorted(bytype.items(), key=lambda kv: -sum(x[2] for x in kv[1]))
     total = sum(n for _v, _l, n in out)
-    print("outstanding third-party: %d functions, %d bytes, %d Types"
+    print("outstanding bundled-module: %d functions, %d bytes, %d Types"
           % (len(out), total, len(groups)))
     print()
     for t, items in groups:
@@ -99,7 +118,7 @@ def main():
 
     inv = C.load_inventory()
     brl = C.load_brl()
-    uni = C.load_universe(inv, brl)
+    uni, owner_of = C.load_universe(inv, brl)
     rec = C.load_recovered()
     matched = {va for va, (_p, ok) in rec.items() if ok}
 
@@ -109,7 +128,7 @@ def main():
             decl.add(r["type"])
 
     if "--thirdparty" in sys.argv:
-        thirdparty(inv, uni, matched, decl, shards)
+        thirdparty(inv, uni, owner_of, matched, decl, shards)
         return
 
     cand = candidate_index()
@@ -118,9 +137,8 @@ def main():
     for va, lab in uni.items():
         if va in matched:
             continue
-        owner = lab.split(".", 1)[0] if "." in lab else ""
-        if owner and owner not in decl:
-            continue          # third-party / stock, handled by check_stock_types.py
+        if owner_of.get(va) != "game":
+            continue          # bundled module code, shown by --thirdparty
         n = inv.get(va, 0)
         if va in rec:
             state = "ON DISK"

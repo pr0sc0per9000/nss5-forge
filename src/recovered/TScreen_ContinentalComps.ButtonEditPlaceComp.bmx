@@ -9,8 +9,11 @@
 ' 0x00c658d8 = TScreen_EditCompetition classtable+0x34 -> SetUpScreen(i,$)i;
 ' 0x00c837a4 = "continentalcomps".
 	Function ButtonEditPlaceComp:Int()
-		'!Global g_table:TTable
-		Local id:Int = Int(g_table.GetSelectedText(0))
+		' 0x00C65A48, this screen's places table, measured at 0x00534279
+' `a1485ac600 mov eax,[0xc65a48]`; TScreen_ContinentalComps.CreateScreen builds it as
+' g_cc_tableplaces. g_table is TScreen_EditNations.CreateScreen's name for 0x00C65038.
+'!Global g_cc_tableplaces:TTable
+		Local id:Int = Int(g_cc_tableplaces.GetSelectedText(0))
 		LogLine("ButtonEditPlaceComp:" + id)
 		If id <> 0
 			TScreen_EditCompetition.SetUpScreen(id, "continentalcomps")

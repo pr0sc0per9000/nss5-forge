@@ -13,7 +13,10 @@
 	Function Update:Int()
 		'!Global g_blackjack_state:Int
 		'!Global g_channel:TChannel
-		'!Global g_bj_btn3:TButton
+		' 0x00C6C01C, the quit button, which TScreen_BlackJack.CreateScreen builds and names
+' g_object753 (its header line 104 pins the whole 0x00C6C01C/20/24/28 run).
+' g_bj_btn3 is TScreen_BlackJack.SetUpScreen's name for 0x00C6C020.
+				'!Global g_object753:TButton
 		Select g_blackjack_state
 			Case 0
 			Case 1
@@ -22,7 +25,7 @@
 					DealersTurn()
 				EndIf
 			Case 3
-				If g_channel.Playing() = 0 And TScreenMessage.Count() = 0 And g_bj_btn3.hidden
+				If g_channel.Playing() = 0 And TScreenMessage.Count() = 0 And g_object753.hidden
 					TScreen_BlackJack.SetUpScreen()
 				EndIf
 		End Select

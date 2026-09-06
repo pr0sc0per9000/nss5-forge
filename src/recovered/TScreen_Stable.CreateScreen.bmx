@@ -19,8 +19,15 @@
 '     0x00C6DF38 g_stable_imgRailing:TImage      <- LoadImage construction site
 '     0x00C6DF48 g_stable_imgFinishLine:TImage   <- LoadImage construction site
 '     0x00C6DEA0 g_screen_stable:TScreen         <- TScreen.CreateScreen construction site
-'     0x00C66768 g_pan_money:TPanel              <- globals_final.tsv, construction-typed;
-'                     only READ here (a shared nav/HUD panel built by another screen)
+'     0x00C66768 g_pan_title:TPanel              <- globals_final.tsv, construction-typed;
+'                     only READ here. TScreen_GameMenu.CreateScreen builds it as
+'                     TPanel.CreatePanel("pan_title", ...) and fourteen other screens
+'                     read the same slot. g_pan_money is the corpus's name for the
+'                     NEIGHBOURING slot 0x00C667B0, the nav panel TScreen_GameMenu
+'                     builds as "pan_nav", so spelling this one g_pan_money put two
+'                     slots on one emitted variable and this AddGadget attached the
+'                     nav panel to the stable screen instead of the title bar. The
+'                     original touches 0x00C66768 here and never 0x00C667B0.
 '     0x00C6DEB0 g_stable_panNav:TPanel          <- TPanel.CreatePanel construction site
 '     0x00C6DEB4 g_stable_btnHome:TButton        <- TButton.CreateButton construction site
 '     0x00C6DEB8 g_stable_btnStable:TButton      <- ditto
@@ -111,7 +118,7 @@
 '!Global g_stable_imgRailing:TImage
 '!Global g_stable_imgFinishLine:TImage
 '!Global g_screen_stable:TScreen
-'!Global g_pan_money:TPanel
+'!Global g_pan_title:TPanel
 '!Global g_stable_panNav:TPanel
 '!Global g_stable_btnHome:TButton
 '!Global g_stable_btnStable:TButton
@@ -158,7 +165,7 @@
 			g_stable_imgFinishLine = LoadImage(g_path + "GameMedia/Images/Stable/FinishLine.png")
 		EndIf
 		g_screen_stable = TScreen.CreateScreen("stable", Null, Draw, Update)
-		g_screen_stable.AddGadget(g_pan_money)
+		g_screen_stable.AddGadget(g_pan_title)
 		g_stable_panNav = TPanel.CreatePanel("pan_nav", "", 0, g_screenHeight - 60, g_screenWidth, 60, "FFFFFF", "FFFFFF", 3, 1.0, 0, 0, 0)
 		g_screen_stable.AddGadget(g_stable_panNav)
 		Local h:Int = 40

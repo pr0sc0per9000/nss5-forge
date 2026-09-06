@@ -307,3 +307,45 @@ g_wm_bar	0x00C68418	TScreen_WorldMap.UpdateTravelTime is not an exact bijection 
 g_wm_panel	0x00C68414	TScreen_WorldMap.UpdateTravelTime declares 11 names but only 10 in-band addresses (g_wm_float07 lives at 0x00C8C0C8, outside the module-global band, so it never appears in the touch list). After removing that one out-of-
 g_yellowcardimg	0x00C5B2E0	Same body as g_secondyellowimg (TPlayer.YellowCard) -- see that entry for the full derivation. The g_font2:TBitmapFont anchor at 0x00C5B1C8 (STRONG, from the unrelated non-call body TEngine.DrawMyText) pins msgfont there
 g_zonelist	0x00C6D568	STRONG, 1 body: TTrainingZone.Clear, sole touch 00c6d568[ptr] for 'g_zonelist.Remove(Self)'; corroborated by TTrainingZone.Update (harv_6.json) also removing Self from the same 0x00C6D568 list on fade-out. TTrainingZone 
+# ---- 0x00C6EFDC / 0x00C6EFE0 : the 800x600 design canvas, width then height ----------
+# RETRACTS three rows of the generated extracted/global_address_map.tsv that have this pair
+# the wrong way round: :2155 `g_screen_height 0x00C6EFDC STRONG`, :2238 `g_screen_width
+# 0x00C6EFE0 CERTAIN` and :2242 `g_screen_y 0x00C6EFDC STRONG`. The map contradicts itself
+# there -- :2161 already pins g_screen_int21 to 0x00C6EFDC CERTAIN, and the alias layer
+# sends g_screen_height to g_screen_int22 -- so one of the two has to give, and it is not
+# the binary. Pinned here rather than trusted from the map because unify_names.py reads
+# these before solving, so the next --emit reproduces the corrected rows instead of the
+# inverted ones. Three independent lines of evidence, none of them prose:
+#  1. .data. NSS5.exe holds 0x00C6EFDC = 0x00000320 = 800 and 0x00C6EFE0 = 0x00000258 = 600.
+#     800 is a width. A dword search of the whole `code` section finds 143 references to
+#     0x00C6EFDC and 127 to 0x00C6EFE0 and NOT ONE STORE to either: they are static
+#     initialisers, which is also why no writer-based table could ever settle them.
+#  2. The slots that ARE written are the other pair. 0x00C6EFE4/E8 are 0 in .data and are
+#     stored exactly twice each, both inside SetUpGraphics (0x00506A5D): 0x00506AF6
+#     `a3e4efc600 mov [0xc6efe4],eax` and 0x00506AFE `a3e8efc600 mov [0xc6efe8],eax` from
+#     the TGraphicsMode object's +8 and +0xc, then the floor at 0x00506B3A
+#     `mov [0xc6efe4],0x320` / 0x00506B44 `mov [0xc6efe8],0x258`. Width takes 800, height
+#     takes 600, in that order, on the slot pair that is NOT this one.
+#  3. Two byte-identical bodies pin the pairing by argument order, which is independent of
+#     any header. TScreen_Pairs.CreateScreen (VA 0x00578D12) line 38 is
+#     `CreatePanel("navpanel","",0,g_screen_height-60,g_screen_width,60,...)`; arguments go
+#     right to left, so the WIDTH argument is pushed first, and the original does
+#     0x00578DE7 `ff35dcefc600 push [0xc6efdc]` then 0x00578DED `a1e0efc600 mov eax,
+#     [0xc6efe0]` (-60, pushed next). TScreen_Newspaper.CreateScreen (VA 0x00558C66) line
+#     47 has the identical shape with g_screen_x/g_screen_y and the identical byte order,
+#     0x00558E1E `push [0xc6efdc]` then 0x00558E24 `mov eax,[0xc6efe0]`, which settles
+#     g_screen_x/g_screen_y as the same pair under different spellings. Its line 48,
+#     `CreateButton(...,g_screen_x-130,g_screen_y-50,...)`, confirms it from the other side:
+#     y is the later argument, so it is pushed first, and the original loads 0x00C6EFE0 at
+#     0x00558E7C before 0x00C6EFDC at 0x00558E85.
+# TScreen.UpdateOffset.bmx (byte-identical) already declares the canonical spelling of this
+# pair as `g_screen_int21:Int = 800` / `g_screen_int22:Int = 600`, and the hand rows at
+# global_alias_overrides.tsv:569-570 already merge g_screenw/g_screenh onto them, so the
+# ALIAS layer was never wrong -- only these name->address rows. g_screen_int22 is pinned
+# below too: the generated map leaves the canonical itself AMBIGUOUS (:2162) while pinning
+# its partner g_screen_int21 CERTAIN, which is what let the inversion survive.
+g_screen_width	0x00C6EFDC	The 800x600 design canvas's WIDTH. .data 0x00C6EFDC = 0x320 = 800, never stored to anywhere in the `code` section. Argument-order proof in byte-identical TScreen_Pairs.CreateScreen: `CreatePanel("navpanel","",0,g_screen_height-60,g_screen_width,60,...)` pushes the width argument first and the original pushes [0xc6efdc] first (0x00578DE7). Supersedes global_address_map.tsv:2238, which has this name on 0x00C6EFE0 -- the height. Merges to g_screen_int21, which global_address_map.tsv:2161 already pins to this same address CERTAIN.
+g_screen_height	0x00C6EFE0	The 800x600 design canvas's HEIGHT. .data 0x00C6EFE0 = 0x258 = 600, never stored to. Same TScreen_Pairs.CreateScreen statement: the y argument `g_screen_height - 60` is loaded second, 0x00578DED `a1e0efc600 mov eax,[0xc6efe0]`. Supersedes global_address_map.tsv:2155, which has this name on 0x00C6EFDC -- the width. Merges to g_screen_int22.
+g_screen_x	0x00C6EFDC	TScreen_Newspaper.CreateScreen (byte-identical, VA 0x00558C66) uses g_screen_x where TScreen_Pairs.CreateScreen uses g_screen_width, in the same CreatePanel nav-bar statement, and the original emits the same two loads in the same order: 0x00558E1E push [0xc6efdc] (the width argument) then 0x00558E24 mov eax,[0xc6efe0]. Its line 48 `CreateButton(..., g_screen_x - 130, g_screen_y - 50, ...)` confirms from the other side, loading 0x00C6EFE0 at 0x00558E7C before 0x00C6EFDC at 0x00558E85. global_address_map.tsv:2241 reports this name AMBIGUOUS (`bodies disagree: 00c6efe0:1 00c6efdc:1`) -- the disagreement is the same inversion, not two real slots.
+g_screen_y	0x00C6EFE0	The height half of the g_screen_x pair, same two statements and the same byte order as the g_screen_x row above. Supersedes global_address_map.tsv:2242, which has this name on 0x00C6EFDC. The generated alias table already sends it to the right canonical (global_alias_map.tsv:264 `0x00C6EFE0 g_screen_y g_screen_int22`); only the address rows were inverted.
+g_screen_int22	0x00C6EFE0	The canonical name for the design canvas's height, left AMBIGUOUS at global_address_map.tsv:2162 while its partner g_screen_int21 is pinned to 0x00C6EFDC CERTAIN at :2161 -- an asymmetry that is itself the tell. src/recovered/TScreen.UpdateOffset.bmx is byte-identical and declares `'!Global g_screen_int21:Int = 800` / `'!Global g_screen_int22:Int = 600` for exactly this pair; its `g_screen_float01 = (g_engine_int162 - g_screen_int21) / 2` compiles to 0x00510825 `a1e4efc600 mov eax,[0xc6efe4]` / 0x0051082A `2b05dcefc600 sub eax,[0xc6efdc]`, pinning g_screen_int21 to 0x00C6EFDC and leaving 0x00C6EFE0 for g_screen_int22 in the next statement. .data confirms the values: 0x00C6EFDC = 800, 0x00C6EFE0 = 600.

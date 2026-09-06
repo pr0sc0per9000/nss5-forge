@@ -60,12 +60,12 @@
 ' ASSUMPTION 0x00C5D24C g_opt_playercam:Int
 ' ASSUMPTION 0x00C5D250 g_opt_matchfx:Int
 ' ASSUMPTION 0x00C5D254 g_opt_distance:Int
-' ASSUMPTION 0x00C5D258 g_opt_lbfindme:Int
-' ASSUMPTION 0x00C5D25C g_opt_lbmyage:Int
-' ASSUMPTION 0x00C5D260 g_opt_lbmyclub:Int
-' ASSUMPTION 0x00C5D264 g_opt_lbmynation:Int
+' ASSUMPTION 0x00C5D25C g_opt_lbfindme:Int
+' ASSUMPTION 0x00C5D260 g_opt_lbmyage:Int
+' ASSUMPTION 0x00C5D264 g_opt_lbmyclub:Int
+' ASSUMPTION 0x00C5D268 g_opt_lbmynation:Int
 ' ASSUMPTION 0x00C5D234 g_opt_matchspeed:Int
-' ASSUMPTION 0x00C5D268 g_opt_tooltips:Int
+' ASSUMPTION 0x00C5D258 g_opt_tooltips:Int
 ' ASSUMPTION 0x00C5D26C g_opt_highlightball:Int
 ' ASSUMPTION 0x00C5D270 g_opt_showenergy:Int
 ' ASSUMPTION 0x00C5D274 g_opt_currency:Int
@@ -76,6 +76,47 @@
 '   reference, matching LoadOptions.
 ' ASSUMPTION 0x00C5D294 g_opt_fixkick:Int
 ' ASSUMPTION 0x00C5D298 g_opt_bossoff:Int
+'
+' CORRECTION (comment only -- no statement changed, body re-verified byte-identical).
+' The six ASSUMPTION lines from g_opt_lbfindme to g_opt_tooltips were off by one slot
+' across a consecutive run: the run they name is 0x00C5D258/25C/260/264 for the four
+' leaderboard flags with tooltips pushed out to 0x00C5D268. That is what you get by
+' zipping the WriteLine order against the ADDRESSES IN ASCENDING ORDER: matchspeed sits
+' out of sequence at 0x00C5D234, and skipping over it shifts every later name by a slot
+' (the failure mode addr_oracle's ordered pairing is documented to have, and the reason
+' its self-reported accuracy is 83.4%).
+' PINNED FROM THE BINARY, not from order. Each WriteLine loads its Global and THEN pushes
+' its `key=` literal, so the two are adjacent and the pairing is read off, not inferred
+' (literal text via harness.read_string at the address the original pushes):
+'   0x004E3881 push [0xc5d254] / 0x004E3890 push 0xC76BB0 'distance='
+'   0x004E38A7 push [0xc5d25c] / 0x004E38B6 push 0xC76BD0 'leaderboardfindme='
+'   0x004E38CD push [0xc5d260] / 0x004E38DC push 0xC76C00 'leaderboardmyage='
+'   0x004E38F3 push [0xc5d264] / 0x004E3902 push 0xC76C30 'leaderboardmyclub='
+'   0x004E3919 push [0xc5d268] / 0x004E3928 push 0xC76C60 'leaderboardmynation='
+'   0x004E393F push [0xc5d234] / 0x004E394E push 0xC76C94 'matchspeed='
+'   0x004E3965 push [0xc5d258] / 0x004E3974 push 0xC76CB8 'tooltips='
+'   0x004E398B push [0xc5d26c] / 0x004E399A push 0xC76CD8 'highlightball='
+' TOptions.LoadOptions agrees key-for-key -- it pushes the key first and stores the result
+' after, giving 'leaderboardfindme' -> 0x004E4436 mov [0xc5d25c],eax, 'leaderboardmyage'
+' -> 0x004E4471 [0xc5d260], 'leaderboardmyclub' -> 0x004E44AC [0xc5d264],
+' 'leaderboardmynation' -> 0x004E44E7 [0xc5d268], 'matchspeed' -> 0x004E4522 [0xc5d234],
+' 'tooltips' -> 0x004E45A0 [0xc5d258]. So SAVE AND LOAD NEVER DISAGREED IN THE BINARY;
+' only this comment block did.
+' NOTHING BEHAVIOURAL WAS WRONG, and the Options round-trip was never broken by this.
+' A Global's identity in the assembled program is its NAME: both functions spell each key
+' with the same name, so each key is one variable end to end. The bad addresses here never
+' became a merge either -- build_alias_map.py refused all four edges they implied and they
+' sit in extracted/global_alias_map_skipped.tsv:10-13 as `AMBIGUOUS: name maps to 2
+' addresses`. Had they been applied, g_opt_lbfindme/lbmyage/lbmyclub/lbmynation would have
+' collapsed into ONE variable and all four leaderboard flags would share a value.
+' What the bad addresses DID cost: global_address_map.tsv:1528-1531 report those four names
+' AMBIGUOUS instead of pinning them, and 0x00C5D258 needed the hand row at
+' global_alias_overrides.tsv:270 to reach g_opt_tooltips. Cross-check on 0x00C5D258: a dword
+' search of the whole `code` section finds it in TScreen.Draw, TScreen.DoHelp,
+' TGadget.UpdateToolTip, TScreen_Options.RefreshButtons (+3300/+3357) and
+' TScreen_Options.ButtonToolTips (+68/+80, the two `= 1` / `= 0` stores) -- every one of
+' them the tooltips flag, none of them a leaderboard flag. 0x00C5D25C/260/264/268 are
+' touched by these two functions and by nothing else in the executable.
 '
 ' ASSUMPTION: 0x004A7AC0 is _bbStringFromInt (runtime_helpers.tsv). 0x004A7C20 is
 '   _bbStringConcat. 0x005B65FC resolved as _brl_filesystem_WriteFile, 0x005B8307 as

@@ -8,7 +8,7 @@
 ' ASSUMPTIONS
 '   Module Globals -- addresses are fact, NAMES are ours (module Globals carry no debug
 '   record). Construction sites establish the types:
-'     0x00C64434 g_screen:TScreen           (from TScreen.CreateScreen; dispatched through
+'     0x00C64434 g_screen_createaccount:TScreen  (from TScreen.CreateScreen; dispatched through
 '                                            slot 0x40 = TScreen.AddGadget throughout)
 '     0x00C64438 g_panDetails:TPanel        (from TPanel.CreatePanel; every label/inputbox
 '                                            is added to it via slot 0x74 = TGadget.AddChild,
@@ -90,7 +90,11 @@
 '   * String literals were read out of NSS5.exe with harness.read_string for every literal
 '     in this body; the oracle masks a literal's ADDRESS, not its content, so this body's
 '     text was independently confirmed, not merely left as a MATCH-blessed placeholder.
-'!Global g_screen:TScreen
+' 0x00C64434, this screen's own TScreen and its construction site. No other body names
+' the slot, so it takes a screen-qualified name of its own; g_screen was shared with five
+' other screens' slots and this assignment was one of only two writers to that one
+' emitted variable.
+'!Global g_screen_createaccount:TScreen
 '!Global g_panDetails:TPanel
 '!Global g_inpName:TInputBox
 '!Global g_inpEmail:TInputBox
@@ -102,8 +106,8 @@
 '!Global g_img_quit:TImage
 '!Global g_img_proceed:TImage
 	Function CreateScreen:Int()
-		g_screen = TScreen.CreateScreen("createaccount", Null, Null, Null)
-		g_screen.AddGadget(TPanel.CreatePanel("pan_title", GetText("Create Account"), 0, 0, g_screenwidth, 60, "FFFFFF", "FFFFFF", 4, 1.0, 0, 0, 1))
+		g_screen_createaccount = TScreen.CreateScreen("createaccount", Null, Null, Null)
+		g_screen_createaccount.AddGadget(TPanel.CreatePanel("pan_title", GetText("Create Account"), 0, 0, g_screenwidth, 60, "FFFFFF", "FFFFFF", 4, 1.0, 0, 0, 1))
 		Local x:Int = 140
 		Local y:Int = 90
 		Local w:Int = 520
@@ -113,7 +117,7 @@
 		x :+ 10
 		y :+ 40
 		w :- 20
-		g_screen.AddGadget(g_panDetails)
+		g_screen_createaccount.AddGadget(g_panDetails)
 		g_panDetails.AddChild(TLabel.CreateLabel("lbl_instrucs", GetText("account_Instrucs"), x, y, w, h * 4, 3, "888888", "FFFFFF", 1.0, 1, 0, 1, 1, Null, 1, 0, 0, 0, "", 0))
 		y :+ h * 4 + 10
 		g_panDetails.AddChild(TLabel.CreateLabel("lbl_name", GetText("Player Name"), x, y, lw, h, 3, "888888", "FFFFFF", 1.0, 1, 0, 1, 1, Null, 1, 0, 0, 0, "", 0))
@@ -138,8 +142,8 @@
 		g_inpKey = TInputBox.CreateInputBox("inp_Key", x + lw + 10, y, w - lw - 10, h, 1, 2, "FFFFFF", "000000", 32, 1.0, Null, 0, "")
 		g_panDetails.AddChild(g_inpKey)
 		g_panDetails.SetPosition(g_panDetails.x, (g_screenheight / 2) - (g_panDetails.h + 390) / 2, 1)
-		g_screen.AddGadget(TPanel.CreatePanel("pan_nav", "", 0, g_screenheight - 60, g_screenwidth, 60, "FFFFFF", "FFFFFF", 3, 1.0, 0, 0, 0))
-		g_screen.AddGadget(TButton.CreateButton("btn_quit", "", 10, g_screenheight - 50, 120, 40, 1, 2, "FFFFFF", "FFFFFF", g_img_quit, TScreen_MainMenu.SetUpScreen, 1.0, 1, GetText("tt_Back")))
-		g_screen.AddGadget(TButton.CreateButton("btn_play", "", 670, g_screenheight - 50, 120, 40, 1, 2, "FFFFFF", "FFFFFF", g_img_proceed, ButtonPlay, 1.0, 1, GetText("tt_CreateAccount")))
+		g_screen_createaccount.AddGadget(TPanel.CreatePanel("pan_nav", "", 0, g_screenheight - 60, g_screenwidth, 60, "FFFFFF", "FFFFFF", 3, 1.0, 0, 0, 0))
+		g_screen_createaccount.AddGadget(TButton.CreateButton("btn_quit", "", 10, g_screenheight - 50, 120, 40, 1, 2, "FFFFFF", "FFFFFF", g_img_quit, TScreen_MainMenu.SetUpScreen, 1.0, 1, GetText("tt_Back")))
+		g_screen_createaccount.AddGadget(TButton.CreateButton("btn_play", "", 670, g_screenheight - 50, 120, 40, 1, 2, "FFFFFF", "FFFFFF", g_img_proceed, ButtonPlay, 1.0, 1, GetText("tt_CreateAccount")))
 		Return 0
 	End Function

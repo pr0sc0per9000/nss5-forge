@@ -12,7 +12,11 @@
 ' LoadPixmap(a0) the body is the right length (247) and every byte agrees except the four
 ' operand bytes of that one E8; with LoadPixmapPNG(a0) it is exact. 0x0059BFED is named
 ' _brl_pngloader_LoadPixmapPNG in brl_functions.tsv and the game calls it directly.
-'!Global g_pathPrefix:String
+' The first guard operand is the SAVE root 0x00C6E9A8, not a second install root:
+' 0x004BC48C pushes it, and the install root 0x00C6E950 is the second operand.
+' src/recovered_module/LoadImageChecked.bmx carries the full evidence and the reason the
+' g_pathPrefix spelling silently tested the install root twice.
+'!Global g_userpath:String
 '!Global g_dataDir:String
 ' 0x005B9660 IDENTIFIED: brl.blitz DebugStop, NOT GCCollect. Spelling it GCCollect reaches
 '   MATCH only because the harness LEARNS the operand from this very body -- circular. With
@@ -40,7 +44,7 @@
 	Function LoadPixmapChecked:TPixmap(a0:String)
 		Local pix:TPixmap
 		If Not a0.Contains("incbin")
-			If Not a0.Contains(g_pathPrefix) And Not a0.Contains(g_dataDir)
+			If Not a0.Contains(g_userpath) And Not a0.Contains(g_dataDir)
 				a0 = g_dataDir + a0
 			End If
 			If FileType(a0) = 1

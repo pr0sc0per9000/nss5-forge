@@ -4,9 +4,9 @@
 ' VA 0x0054DF94   length 470   oracle: MATCH mode=reloc 470/470 reloc_masked=29
 '
 ' Assumptions:
-'   '!Global g_combo_club:TCombo   0x00C679C8  (globals_final: TCombo, construction/medium)
+'   '!Global g_stats_comboClub:TCombo   0x00C679C8  (globals_final: TCombo, construction/medium)
 '   '!Global g_combo_year:TCombo   0x00C679CC  (globals_final: TCombo, construction/medium)
-'   '!Global g_combo_level:TCombo  0x00C679D8  (globals_final: TCombo, construction/medium)
+'   '!Global g_stats_comboYearInt:TCombo  0x00C679D8  (globals_final: TCombo, construction/medium)
 '   '!Global g_profile:TProfile    0x00C6F028  (globals_final: TProfile, construction/high;
 '       corroborated here -- +0x40 is TProfile.careerstats:TList and it is enumerated
 '       through slot 0x8c, which is TList.ObjectEnumerator)
@@ -27,19 +27,24 @@
 '   Operand order matters (guide 10.1): `s.year > best` gives `39` (mem,reg); `best < s.year`
 '   would give `3B`.
 Function ComboClub:Int()
-	'!Global g_combo_club:TCombo
+	' 0x00C679C8 and 0x00C679D8 are this screen's own two combos, built by
+' TScreen_Stats.CreateScreen:145 and :168 as cmb_Clubs and cmb_YearsInt.
+' g_combo_club is TScreen_Leagues' name for 0x00C66F3C and g_combo_level is
+' TScreen_TestTournaments' name for 0x00C66444, so both spellings put two screens'
+' combos on one emitted variable.
+	'!Global g_stats_comboClub:TCombo
 	'!Global g_combo_year:TCombo
-	'!Global g_combo_level:TCombo
+	'!Global g_stats_comboYearInt:TCombo
 	'!Global g_profile:TProfile
-	Local clubid:Int = g_combo_club.GetSelectedItemId()
+	Local clubid:Int = g_stats_comboClub.GetSelectedItemId()
 	g_combo_year.ClearItems()
-	g_combo_level.ClearItems()
+	g_stats_comboYearInt.ClearItems()
 	Local best:Int = 0
 	For Local s:TStats_Team = EachIn g_profile.careerstats
 		If s.statlevel = 3 And (s.teamid = clubid Or clubid = 0)
 			If s.year > best
 				g_combo_year.AddItem(GetText("Year") + " " + s.year, "BBBBBB", "FFFFFF", s.year)
-				g_combo_level.AddItem(GetText("Year") + " " + s.year, "BBBBBB", "FFFFFF", s.year)
+				g_stats_comboYearInt.AddItem(GetText("Year") + " " + s.year, "BBBBBB", "FFFFFF", s.year)
 				best = s.year
 			EndIf
 		EndIf
@@ -49,6 +54,6 @@ Function ComboClub:Int()
 	Else
 		g_combo_year.SelectItemById(best)
 	EndIf
-	g_combo_level.SelectItem(0)
+	g_stats_comboYearInt.SelectItem(0)
 	UpdateStatTable()
 End Function

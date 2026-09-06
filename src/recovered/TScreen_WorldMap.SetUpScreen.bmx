@@ -27,7 +27,7 @@
 '   0x00C68448 g_wm_lat2         Float
 '   0x00C6844C g_wm_long2        Float
 '   0x00C68450 g_wm_zoom         Float         set to 1.0 -- fld1/fstp
-'   0x00C6EFE8 g_screenheight    Int
+'   0x00C6EFE8 g_screen_h    Int
 '   0x00C6E950 g_mediapath       String        already typed String elsewhere
 '   0x00C6F028 g_profile         TProfile      construction site
 '   0x00C59A48 g_club_sortby     Int           TClub sort-key selector, set to 33 before TList.Sort
@@ -71,7 +71,19 @@
 		'!Global g_wm_lat2:Float
 		'!Global g_wm_long2:Float
 		'!Global g_wm_zoom:Float
-		'!Global g_screenheight:Int
+		' THE RUNTIME WINDOW SIZE IS 0x00C6EFE4/0x00C6EFE8, NOT 0x00C6EFDC/0x00C6EFE0.
+' The lower pair are the 800x600 DESIGN canvas: they are static initialisers in the PE
+' image and no instruction anywhere in the program stores to them. The upper pair are
+' written from the chosen TGraphicsMode in FUN_00506A5D (0x00506AF6
+' `mov [0xc6efe4],eax`, fallback 0x00506B3A `mov [0xc6efe4],0x320`).
+' TScreen.UpdateOffset settles which is which: 0x00510825 `mov eax,[0xc6efe4]` /
+' `sub eax,[0xc6efdc]` halved into the borderX float, and 0x00510844 the same for
+' 0x00C6EFE8 minus 0x00C6EFE0 into borderY.
+' This body's own header already records 0x00C6EFE8 for it. g_screenheight is thirty-six
+' other bodies' name for 0x00C6EFE0, the 600 constant, so the equality test below became
+' a test on a compile-time constant that is always true and the hi-res world map in the
+' Else arm became unreachable.
+		'!Global g_screen_h:Int
 		'!Global g_mediapath:String
 		'!Global g_profile:TProfile
 		'!Global g_club_sortby:Int
@@ -79,7 +91,7 @@
 		TScreen.SetActive("worldmap", "")
 		g_profile.UpdateSelectedForMatch(g_profile.energy)
 		g_wm_lbl_money.SetText(FormatMoney(g_profile.bank, 0), "", -1, -1)
-		If g_screenheight = 600
+		If g_screen_h = 600
 			If Not g_wm_bg Or ImageHeight(g_wm_bg) > 640
 				g_wm_bg = LoadImageChecked(g_mediapath + "GameMedia/Images/Backgrounds/WorldMap2.jpg", -1)
 				MidHandleImage(g_wm_bg)

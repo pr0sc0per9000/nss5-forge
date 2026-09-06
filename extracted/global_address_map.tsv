@@ -2152,7 +2152,7 @@ g_screen_fx	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
 g_screen_fy	-	AMBIGUOUS	Float	1	no alignment forced it (1 bodies)
 g_screen_gamemenu	-	AMBIGUOUS	TScreen	1	no alignment forced it (1 bodies)
 g_screen_h	0x00C6EFE8	CERTAIN	Int	12	forced in 2 bodies, unanimous
-g_screen_height	0x00C6EFDC	STRONG	Int	3	forced in 1 body
+g_screen_height	0x00C6EFE0	CERTAIN	Int	3	CORRECTED BY HAND: this pair was inverted; 0x00C6EFDC=800 and 0x00C6EFE0=600 in .data, neither is ever stored to; see global_address_adjudicated.tsv
 g_screen_helpok	0x00C61730	STRONG	Int	1	forced in 1 body
 g_screen_home	-	AMBIGUOUS	TScreen	1	no alignment forced it (1 bodies)
 g_screen_int01	0x00C61730	STRONG	Int	2	forced in 1 body
@@ -2235,11 +2235,11 @@ g_screen_top	-	AMBIGUOUS	Float	2	no alignment forced it (2 bodies)
 g_screen_usemouse	0x00C6173C	CERTAIN	Int	1	forced, agrees with verified pair
 g_screen_w	-	AMBIGUOUS	Int	15	bodies disagree: 00c6efe4:2 00c6efdc:1 00c6cfb0:1
 g_screen_webpage	-	AMBIGUOUS	TScreen	1	no alignment forced it (1 bodies)
-g_screen_width	0x00C6EFE0	CERTAIN	Int	4	forced in 2 bodies, unanimous
+g_screen_width	0x00C6EFDC	CERTAIN	Int	4	CORRECTED BY HAND: this pair was inverted; 0x00C6EFDC=800 and 0x00C6EFE0=600 in .data, neither is ever stored to; see global_address_adjudicated.tsv
 g_screen_worldmap	-	AMBIGUOUS	TScreen	1	no alignment forced it (1 bodies)
 g_screen_worldmap_int01	0x00C68428	STRONG	Int	1	forced in 1 body
 g_screen_x	-	AMBIGUOUS	Int	2	bodies disagree: 00c6efe0:1 00c6efdc:1
-g_screen_y	0x00C6EFDC	STRONG	Int	1	forced in 1 body
+g_screen_y	0x00C6EFE0	CERTAIN	Int	1	CORRECTED BY HAND: this pair was inverted; 0x00C6EFDC=800 and 0x00C6EFE0=600 in .data, neither is ever stored to; see global_address_adjudicated.tsv
 g_screencomps_table	0x00C65588	STRONG	TTable	1	forced in 1 body
 g_screenflag	0x00C6173C	CERTAIN	Int	1	forced, agrees with verified pair
 g_screenh	0x00C6EFE0	CERTAIN	Int	4	forced, agrees with verified pair

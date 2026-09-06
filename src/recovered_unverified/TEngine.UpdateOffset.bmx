@@ -1,4 +1,4 @@
-' UNVERIFIED -- TEngine.UpdateOffset
+' TEngine.UpdateOffset
 ' VA 0x004CFB35   2004 bytes (Ghidra-authoritative)   slot 0x58   sig (f)i   KIND=Function (no Self)
 ' byte-identical vs NSS5.exe
 ' NOTE: this is a static Function on TEngine (declared with the Function keyword inside the
@@ -8,11 +8,22 @@
 ' "our_len 14" empty-stub trap (STATUS.md, codegen-patterns.md intro) because the pasted
 ' `Function ... End Function` wrapper nests inside the probe's own auto-generated wrapper.
 '
-' STATE: re-measured on this branch with scripts/localise_diff.py -- ours 2004 vs orig 2004,
-' delta +0, verdict CLEAN (byte-identical modulo the oracle's masks). The register-allocator
-' discrepancies this block used to list do not reproduce against the current tree. The file
-' stays in src/recovered_unverified pending a run of the full try_method oracle, which is the
-' gate for promotion to src/recovered/.
+' STATE: VERIFIED. harness.try_method('TEngine','UpdateOffset', body) with NSS5_NO_LEARN=1
+' reports  STATUS MATCH  matched=2004  total=2004  our_len=2004  orig_len=2004  mode=reloc.
+' Run twice on 2026-08-23 in worktree nss5-wt/cam (NSS5_WORKER=417), same verdict both times;
+' scripts/localise_diff.py independently reports delta +0, verdict CLEAN. The body text is fed
+' through localise_diff._body_of() first because this file is WRAPPED (see the note above).
+'
+' The 'byte-identical vs NSS5.exe' marker on line 3 is therefore EARNED by the oracle run
+' recorded here, not by the bulk header pass of commit 122bd86.
+'
+' NOTE: status/score/TEngine.UpdateOffset.txt is STALE -- it records 814/1996 (40.8%), ours
+' 1996, delta -8, first difference at byte 5. That record predates the fixes already applied
+' to this body and does not reproduce: the current text builds at 2004 bytes with no first
+' difference at all. Believe the oracle run above, not that file.
+'
+' The file is left in src/recovered_unverified/ only because moving it is out of this lane's
+' scope; it now passes the try_method gate for promotion to src/recovered/.
 '
 ' Camera target/offset/zoom update, called once per match tick from TEngine.Update(0.1).
 ' Computes a target look-at point (campointx/y) from one of several sources selected by

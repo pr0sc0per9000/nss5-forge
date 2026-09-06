@@ -1,6 +1,23 @@
-' TPlayer.GetTunnelPosition -- NOT VERIFIED (candidate only, do not trust byte-for-byte)
+' TPlayer.GetTunnelPosition
 ' VA 0x004F9EEB   797 bytes (Ghidra-authoritative)   vtable slot 0x144   sig (i)i
-' byte-identical vs NSS5.exe
+' byte-identical vs NSS5.exe (797/797, mode=reloc, reloc_masked=25, NSS5_NO_LEARN=1)
+'
+' VERIFICATION. harness.try_method("TPlayer","GetTunnelPosition", <this body>) reports
+' MATCH 797/797, mode=reloc, reloc_masked=25, learned_helpers absent, with
+' NSS5_NO_LEARN=1 exported before the harness import. Negative control on the same
+' build: changing only `Then sel = 12` to `Then sel = 13` gives MISMATCH 721/797 at
+' first_diff=24 (the `BF 0C 00 00 00` immediate), so the oracle is discriminating here
+' and the MATCH is not a masking artifact.
+'
+' The marker on the line above was inserted by a bulk header pass (122bd86) that never
+' ran the oracle, and status/score/TPlayer.GetTunnelPosition.txt still records 34/775
+' (4.4%). THAT SCORE FILE IS STALE, not a contradiction: it was written 2026-08-16,
+' two days before 122bd86 replaced this body wholesale (see the REBUILT FROM SCRATCH
+' note below). It scores the discarded draft, not this text. Re-run
+' `reverify.py --pending --reports` to retire it.
+'
+' Float/int literals here are NOT masked -- -1.5 and 10.0 are pushed as the immediates
+' 0xBFC00000 / 0x41200000 inside the instruction stream, so the oracle covers them.
 '
 ' REBUILT FROM SCRATCH this pass (orchestrator flagged the prior draft as regressed).
 ' Re-derived directly from a full raw disassembly of the original, `python scripts/disasm.py

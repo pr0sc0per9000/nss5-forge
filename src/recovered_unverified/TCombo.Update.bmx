@@ -53,14 +53,16 @@
 '     TCombo.Deactivate.bmx already use via g_activegadget/g_activecombo).
 '   0x00C6F088 g_chanclick:TChannel, 0x00C6171C g_sndclick:TSound -- CERTAIN, forced
 '     from the verified pair TScreen.CheckInput ("PlaySound(g_sndclick, g_chanclick)").
-'     Used here for the case-5 "select" PlaySound. NOTE this takes precedence over
-'     TTable.UpdateActivated's own weaker, unverified prose names for these same two
-'     addresses (g_chan_ui / g_snd_select) -- the address solver treats
-'     g_sndclick/g_chanclick as the stronger, forced evidence for those slots.
-'   0x00C61720 -- UNRESOLVED by the address solver (0 forced names either way).
-'     Reusing TTable.UpdateActivated's own declared name for this exact address
-'     (its header states 0x00C61720 -> TSound, "g_snd_move"), the only precedent
-'     anywhere in the corpus; used here for the case 1-4 "scroll" PlaySound.
+'     Used here for the case-5 "select" PlaySound, read at 0x0051874C.
+'     0x00C6171C is the Click.ogg slot: TScreen.SetUp @0x00510174 stores
+'     LoadSound("GameMedia/Sounds/Click.ogg") into it at 0x00510240. So choosing an item
+'     from a combo plays Click.ogg, the commit sound.
+'   0x00C61720 g_snd_move:TSound -- the same TScreen.SetUp stores
+'     LoadSound("GameMedia/Sounds/Select.ogg") into this slot at 0x0051026D, so it is the
+'     Select.ogg movement blip. Read here at 0x00518635/670/6AB/705 for the case 1-4
+'     scroll PlaySound, and by TTable.UpdateActivated at 0x00516B35/B6F/BD0/C3A for the
+'     same purpose. extracted/global_alias_overrides.tsv merges g_snd_move onto
+'     g_snd_select, the name TScreen.SetUp gives the slot it loads Select.ogg into.
 '   TScreen.GetInput() -- static Function, class-table slot 0x80 (a `ct` call per the
 '     annotator, not a vtable dispatch): identical first call in
 '     TTable.UpdateActivated, translated the same way there.
