@@ -1,0 +1,89 @@
+name: Discord
+
+# Posts to the project Discord.
+#
+#   push to main    the new commits go to #github-feed
+#   pre-release     test build, pings @Playtester in #announcements
+#   release         pings @Update Pings in #announcements
+#
+# Secrets: DISCORD_FEED_WEBHOOK, DISCORD_ANNOUNCE_WEBHOOK
+# Variables: DISCORD_PLAYTEST_ROLE, DISCORD_UPDATE_ROLE (role ids)
+# Without the webhook secrets (forks) every step skips.
+#
+# Event text is only ever read by jq from the event file, never pasted into the
+# script, so a commit message or release name cannot run as shell or ping anyone.
+
+on:
+  push:
+    branches: [main]
+  release:
+    types: [prereleased, released]
+
+permissions: {}
+
+jobs:
+  commits:
+    name: Post commits to #github-feed
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    env:
+      WEBHOOK: ${{ secrets.DISCORD_FEED_WEBHOOK }}
+    steps:
+      - name: Post
+        if: env.WEBHOOK != ''
+        run: |
+          if [ "$(jq '.commits | length' "$GITHUB_EVENT_PATH")" = 0 ]; then
+            echo "No commits in this push."
+            exit 0
+          fi
+          jq '{
+            username: "nss5-forge",
+            avatar_url: "https://github.com/pr0sc0per9000.png",
+            allowed_mentions: {parse: []},
+            embeds: [{
+              title: "\(.commits | length) new commit\(if (.commits | length) == 1 then "" else "s" end) on main",
+              url: .compare,
+              color: 3066993,
+              description: ([.commits[] | "[`\(.id[0:7])`](\(.url)) \(.message | split("\n")[0])"] | join("\n"))[0:4000]
+            }]
+          }' "$GITHUB_EVENT_PATH" > payload.json
+          curl -fsS -H "Content-Type: application/json" -d @payload.json "$WEBHOOK"
+
+  release:
+    name: Announce release in #announcements
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    env:
+      WEBHOOK: ${{ secrets.DISCORD_ANNOUNCE_WEBHOOK }}
+      PLAYTEST_ROLE: ${{ vars.DISCORD_PLAYTEST_ROLE }}
+      UPDATE_ROLE: ${{ vars.DISCORD_UPDATE_ROLE }}
+    steps:
+      - name: Post
+        if: env.WEBHOOK != ''
+        run: |
+          if [ "$(jq '.release.prerelease' "$GITHUB_EVENT_PATH")" = true ]; then
+            role=$PLAYTEST_ROLE
+            kind="Test build ready"
+            color=15105570
+          else
+            role=$UPDATE_ROLE
+            kind="New release"
+            color=5793266
+          fi
+          if [ -z "$role" ]; then
+            echo "Role variable for this release type is not set."
+            exit 1
+          fi
+          jq --arg role "$role" --arg kind "$kind" --argjson color "$color" '{
+            username: "nss5-forge",
+            avatar_url: "https://github.com/pr0sc0per9000.png",
+            content: "<@&\($role)> \($kind)",
+            allowed_mentions: {roles: [$role]},
+            embeds: [{
+              title: (if (.release.name // "") == "" then .release.tag_name else .release.name end),
+              url: .release.html_url,
+              color: $color,
+              description: ((.release.body // "")[0:3500])
+            }]
+          }' "$GITHUB_EVENT_PATH" > payload.json
+          curl -fsS -H "Content-Type: application/json" -d @payload.json "$WEBHOOK"
