@@ -5,6 +5,7 @@
 [![CI](https://github.com/pr0sc0per9000/nss5-forge/actions/workflows/ci.yml/badge.svg)](https://github.com/pr0sc0per9000/nss5-forge/actions/workflows/ci.yml)
 [![Reconstructed](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fpr0sc0per9000%2Fnss5-forge%2Fmain%2Fdocs%2Fprogress.json)](/docs/STATUS.md)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Discord](https://img.shields.io/badge/discord-join-5865F2?logo=discord&logoColor=white)](https://discord.gg/RqxcxUzRcQ)
 
 This project rebuilds New Star Soccer 5 from its own executable back into BlitzMax
 source code. Compile that source, and the machine code should come out the same as
