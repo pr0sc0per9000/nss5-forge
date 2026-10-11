@@ -9,6 +9,10 @@ name: Discord
 # Both release kinds also go to #github-feed without a ping, and every release
 # post carries a Download link to the release page.
 #
+# GitHub skips `prereleased` for a pre-release published from a draft, so a
+# pre-release posts on `published`. A full release posts on `released`, which
+# also fires when a pre-release is switched to a release.
+#
 # Secrets: DISCORD_FEED_WEBHOOK, DISCORD_ANNOUNCE_WEBHOOK
 # Variables: DISCORD_PLAYTEST_ROLE, DISCORD_UPDATE_ROLE (role ids)
 # Without the webhook secrets (forks) every step skips.
@@ -20,7 +24,7 @@ on:
   push:
     branches: [main]
   release:
-    types: [prereleased, released]
+    types: [published, released]
 
 permissions: {}
 
@@ -54,7 +58,10 @@ jobs:
 
   release:
     name: 'Post release to #announcements and #github-feed'
-    if: github.event_name == 'release'
+    if: >-
+      github.event_name == 'release' &&
+      ((github.event.action == 'published' && github.event.release.prerelease) ||
+      github.event.action == 'released')
     runs-on: ubuntu-latest
     env:
       WEBHOOK: ${{ secrets.DISCORD_ANNOUNCE_WEBHOOK }}
