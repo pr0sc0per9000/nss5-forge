@@ -5,7 +5,8 @@
 ' 0x00C6BBBC TRouletteWheel, 0x00C6BBC0 TRouletteBall. Hide() is TGadget slot 0x54,
 ' inherited by TPanel/TButton. The guard is an early return, not an If block.
 	Function Spin:Int()
-		'!Global g_roul_spinning:Int
+		' 0x00C6BBC4: data word 1 (ready to spin)
+		'!Global g_roul_spinning:Int = 1
 		'!Global g_roul_panel:TPanel
 		'!Global g_roul_btn1:TButton
 		'!Global g_roul_btn2:TButton
