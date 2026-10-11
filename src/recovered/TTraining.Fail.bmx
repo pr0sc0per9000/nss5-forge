@@ -20,13 +20,13 @@
 ' derivation and the discriminating 3x4 matrix: docs/reference/codegen-patterns.md
 ' 15.6. Re-verified under NSS5_NO_LEARN=1 on worker trees 380 and 380b.
 	Function Fail:Int()
-		'!Global g_snd_fail:TSound
+		'!Global g_player_trainingerrorsnd:TSound
 		'!Global g_object859:TChannel
 		'!Global g_train_int05:Int
 		'!Global g_player_int01:Int
 		'!Global g_train_msg1:String
 		'!Global g_train_msg2:String
-		PlaySound(g_snd_fail, g_object859)
+		PlaySound(g_player_trainingerrorsnd, g_object859)
 		TScreenMessage.ClearAll(0)
 		g_train_int05 = 2
 		g_player_int01 = 11
