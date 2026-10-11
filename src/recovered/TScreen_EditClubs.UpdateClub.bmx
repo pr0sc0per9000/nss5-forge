@@ -10,12 +10,17 @@
 ' Field names from object_model.json (TClub extends TBase_Team, fields +0x08..+0x5c).
 ' ClampInt is the recovered module Function at 0x00505F6D.
 
+' NAMES CHANGED 2026-10-11 (byte-neutral): g_ec_ib_name/g_ec_ib_tla/g_ec_ib_strength are
+' TScreen_EditContinents' boxes (0x00C64ED8/DC/EC). This body reads 0x00C653D8/E0/E8
+' (0x0052E98E, 0x0052E9F6, 0x0052EA5E), the boxes TScreen_EditClubs.CreateScreen stores
+' as g_editclubs_ibName/ibTla/ibStrength (0x0052D6FD, 0x0052D7B9, 0x0052D875).
+
 '!Global g_ec_club:TClub
-'!Global g_ec_ib_name:TInputBox
+'!Global g_editclubs_ibName:TInputBox
 '!Global g_ec_ib_short:TInputBox
-'!Global g_ec_ib_tla:TInputBox
+'!Global g_editclubs_ibTla:TInputBox
 '!Global g_ec_ib_nick:TInputBox
-'!Global g_ec_ib_strength:TInputBox
+'!Global g_editclubs_ibStrength:TInputBox
 '!Global g_ec_cmb_nation:TCombo
 '!Global g_ec_cmb_rival1:TCombo
 '!Global g_ec_cmb_rival2:TCombo
@@ -27,11 +32,11 @@
 '!Global g_ec_ib_capacity:TInputBox
 '!Global g_ec_ib_long:TInputBox
 '!Global g_ec_ib_lat:TInputBox
-g_ec_club.name = g_ec_ib_name.GetText()
+g_ec_club.name = g_editclubs_ibName.GetText()
 g_ec_club.shortname = g_ec_ib_short.GetText()
-g_ec_club.tla = g_ec_ib_tla.GetText()
+g_ec_club.tla = g_editclubs_ibTla.GetText()
 g_ec_club.nickname = g_ec_ib_nick.GetText()
-Local st:Int = Int(g_ec_ib_strength.GetText())
+Local st:Int = Int(g_editclubs_ibStrength.GetText())
 ClampInt(Varptr st, 1, 100)
 g_ec_club.strength = st
 Local n:TNation = TNation.SelectById(g_ec_cmb_nation.GetSelectedItemId())
