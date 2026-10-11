@@ -14,7 +14,8 @@
 '   TClub extends TBase_Team; +0x24 = strength:Int (TBase_Team field, object_model.json).
 '   TProfile fields used: +0x148 onloanfrom, +0x1d0 myclub:TClub (object_model.json).
 '   String literals read from the exe at 0x00C8FB24/54/7C/A0 (">>> avgrating = " etc).
-'   Float literals read from the exe: 0x00C8FB50=5.0, 0x00C8FBD4=0.5, 0x00C8FBD8=90.0,
+'   Float literals read from the exe: 0x00C8FB20=0.0 (year 1), 0x00C8FB50=5.0, 0x00C8FBD4=0.5,
+'     0x00C8FBD8=90.0,
 '     0x00C8FBDC=90.0 (two separate constant slots holding the same value).
 '
 ' Shape notes, established via localise_diff.py against the original:
@@ -38,7 +39,7 @@ Local week:Int = g_profile.date.GetWeek()
 Local value:Float
 If week <= 10
 	If year = 1
-		value = 0.5
+		value = 0.0
 	Else
 		value = g_profile.GetStat(18, 3, g_profile.clubid, year - 1)
 	EndIf
