@@ -2414,3 +2414,15 @@ address	alias	canonical	evidence
 0x00C6C16C	g_bj_cardlist	g_hand1	TBlackJack.CheckPlayerScore (0x00576E46) reads [0xC6C16C] at 0x00576EF5 and 0x00576F84, the player's hand TBlackJack.SetUp creates. Unaliased, the blackjack and five-card-trick checks always counted 0 cards.
 0x00C6E294	g_horses	g_allhorses	All 8 bodies that use g_horses in code read only [0xC6E294] (e.g. THorse.GetHorseByName, TScreen_Stable.RefreshTableOwned), the list THorse.New fills as g_allhorses.
 0x00C6F130	g_misc_arr03	g_tracks	The six music tracks. __bb_main +7037..+7075 creates TSound[6] at 0x00C6F130 (module_globals_decoded.tsv names it g_misc_arr03); TScreen_Options.PlayTrack and UpdateAudio read it as g_tracks. Declared once, in the tail, as g_tracks.
+#
+#	---- 0x00C6CC48 / 0x00C6CC40 : the contract negotiation card game ----------------------
+#	TScreen_Negotiate is the higher/lower card game on a contract offer. ButtonLower and
+#	ButtonHigher store the guess (-1/+1) in 0x00C6CC48; TScreen_Negotiate.Update reads it
+#	under a third name, always saw 0, and so never turned the next card, judged the guess,
+#	or reached Success/Fail. Fail ends the game by storing 99 in the step counter
+#	0x00C6CC40 and Success pays (step - 1) * 10 percent out of it, both under g_neg_stage,
+#	which nothing else touched: a fail left the game running and a success paid 0.
+#	Found by the build-vs-original Global pairing oracle (relocation-exact, byte-identical
+#	bodies only).
+0x00C6CC48	g_screen_negotiate_int04	g_neg_b	Writers: TScreen_Negotiate.ButtonLower 0x0057A6D6 `mov dword ptr [0xc6cc48], 0xffffffff` (c70548ccc600ffffffff) as g_neg_b and TScreen_Negotiate.ButtonHigher 0x0057A76C `mov dword ptr [0xc6cc48], 1` (c70548ccc60001000000) as g_neg_flag (canonical g_neg_b). TScreen_Negotiate.Update reads it at 0x0057A7FF, 0x0057A893 and 0x0057A8D2 `mov eax, dword ptr [0xc6cc48]` (a148ccc600) and clears it at 0x0057A8E5 and 0x0057A92D `mov dword ptr [0xc6cc48], 0` (c70548ccc60000000000), as g_screen_negotiate_int04. These 7 are the only references to 0x00C6CC48 in NSS5.exe, all in byte-identical bodies. Both Int, init 0, NSS5.exe data word 0. g_screen_negotiate_int04 appears in no other body or alias table.
+0x00C6CC40	g_neg_stage	g_neg02	TScreen_Negotiate.Fail 0x0057AB05 `mov dword ptr [0xc6cc40], 0x63` (c70540ccc60063000000) and TScreen_Negotiate.Success 0x0057AA33 `mov edx, dword ptr [0xc6cc40]` (8b1540ccc600) spell it g_neg_stage. The other 22 references spell the step counter g_neg02 or a name canonical to it: SetUpScreen 0x0057A4FC `mov dword ptr [0xc6cc40], 1` (c70540ccc60001000000), ButtonLower 0x0057A6CF and ButtonHigher 0x0057A765 `add dword ptr [0xc6cc40], 1` (830540ccc60001), twelve reads in Update (e.g. 0x0057A969 `cmp dword ptr [0xc6cc40], 5`, 833d40ccc60005), UpdateInstrucs 0x0057ABD9 (a140ccc600), ButtonAccept 0x0057ACFD (8b1540ccc600). These 24 are the only references in NSS5.exe, all in byte-identical bodies. Both Int, init 0, NSS5.exe data word 0. g_neg_stage appears only in Fail and Success.
