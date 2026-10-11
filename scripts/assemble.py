@@ -1244,6 +1244,8 @@ def count_placed(src):
     n = 0
     for i, l in enumerate(lines):
         if re.match(r"^\t(?:Method|Function)\s+\w+", l):
+            if l.rstrip().endswith(" Abstract"):
+                continue                  # a declaration, never a body
             if i + 1 < len(lines) and not re.match(r"^\tEnd\s+(?:Method|Function)",
                                                    lines[i + 1]):
                 n += 1
