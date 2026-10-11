@@ -51,10 +51,16 @@ python "$ROOT/scripts/debug_shims.py" "$DBG" || { echo "debug shims did not appl
 
 echo "compiling (debug) ..."
 # This is expected to fail at the LINK step; the compile output is what we want.
-"$BMX/bin/bmk.exe" makeapp -d -t console -g x86 "$DBG" 2>&1 | grep -vi "^Build Error: Failed to link" | tail -5
-
+# MinGW goes on PATH here too: bmk compiles extern/minizip/*.c with gcc, and without
+# it that step fails and no debug object is written.
+# ld.tmp is deleted first. bmk rewrites it only when the compile succeeds, so a stale
+# one from the last RELEASE build would otherwise link a release exe named nss5_dbg.exe.
 LD="$BMX/tmp/ld.tmp"
+rm -f "$LD"
+PATH="$MW/bin:$PATH" "$BMX/bin/bmk.exe" makeapp -d -t console -g x86 "$DBG" 2>&1 | grep -vi "^Build Error: Failed to link" | tail -5
+
 [ -f "$LD" ] || { echo "no $LD -- the compile step failed, see above"; exit 1; }
+grep -q "debug.win32.x86" "$LD" || { echo "$LD lists no debug objects -- not linking"; exit 1; }
 
 echo "linking (with bundled mingw on PATH) ..."
 PATH="$MW/bin:$PATH" "$MW/bin/g++.exe" -m32 -static -s \
