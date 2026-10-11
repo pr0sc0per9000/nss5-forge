@@ -88,6 +88,18 @@ FORCE = {"window": "1"}
 # also mutes music and effects. --player, which is how the release play.exe starts the
 # game, leaves them as the player set them.
 QUIET = {"music": "0", "soundfx": "0"}
+# Settings/Settings.txt beside the exe, read once at start-up by the module body
+# (`If ReadSettingFloat(... "Settings/Settings.txt", "opengl", 0, 1) = 1 Then
+# SetGraphicsDriver(GLMax2DDriver())`, otherwise D3D9). The original ships opengl=0.
+# WHY opengl=1: this launcher always runs the game WINDOWED, and windowed D3D9 stalls on
+# AMD drivers. About four seconds after a career loads (or at a match, a foul, a popup),
+# every Present starts spinning in the driver on QueryPerformanceCounter for ~200-500 ms
+# with the GPU idle, and it never recovers: 2-5 fps for the rest of the session. The game
+# code is not involved: a call trace across the drop shows the same per-frame calls before
+# and after, and builds from before and after the 100% work behave the same. With the
+# original's own opengl=1 switch the same scenario holds 144 fps (vsync). Measured
+# 2026-10-11 with an automated career-load test: D3D9 home screen 5.0 fps, OpenGL 144.0.
+SETTINGS_TXT = {"opengl": "1"}
 SCREEN_RESOLVE = "99"
 
 # The game's own defaults, line for line from TOptions.WriteNewOptionsIni, which writes them
@@ -150,6 +162,40 @@ def ini_paths():
             seen.add(rp)
             out.append(p)
     return out
+
+
+def force_settings_txt():
+    """Force SETTINGS_TXT into the build's Settings/Settings.txt; return a note.
+
+    Verified on disk like window=1. A missing file is left alone (the game then uses its
+    built-in defaults), and a failure to write is reported, not fatal: the game still runs
+    windowed, only slower.
+    """
+    p = os.path.join(RUNDIR, "Settings", "Settings.txt")
+    if not os.path.exists(p):
+        return "Settings.txt missing, renderer left to the game"
+    try:
+        text = open(p, encoding="utf-8", errors="replace").read()
+        changed = []
+        for key, want in SETTINGS_TXT.items():
+            rx = re.compile(r"(?mi)^(%s)\s*=\s*(.*)$" % re.escape(key))
+            m = rx.search(text)
+            if m:
+                if m.group(2).strip() != want:
+                    changed.append("%s %s->%s" % (key, m.group(2).strip(), want))
+                text = rx.sub("%s=%s" % (key, want), text, count=1)
+            else:
+                text = text.rstrip("\n") + "\n%s=%s\n" % (key, want)
+                changed.append("%s added=%s" % (key, want))
+        open(p, "w", encoding="utf-8").write(text)
+        check = open(p, encoding="utf-8", errors="replace").read()
+        for key, want in SETTINGS_TXT.items():
+            m = re.search(r"(?mi)^%s\s*=\s*(.*)$" % re.escape(key), check)
+            if not m or m.group(1).strip() != want:
+                return "Settings.txt [FAILED: %s did not verify]" % key
+        return "Settings.txt [%s]" % (", ".join(changed) if changed else "opengl=1 ok")
+    except OSError as e:
+        return "Settings.txt [FAILED: %s]" % e
 
 
 def force_windowed(quiet=True):
@@ -249,6 +295,7 @@ def force_windowed(quiet=True):
             "  This launcher's only job is to guarantee the game cannot come up fullscreen,\n"
             "  and it cannot make that guarantee here, so it will not start the exe.")
 
+    notes.append(force_settings_txt())
     return "\n            ".join(notes)
 
 

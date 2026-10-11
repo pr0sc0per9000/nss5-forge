@@ -22,7 +22,7 @@
 	Method GetKeeperHandHeight:Float()
 		'!Global g_keeperframes:Int[]
 		'!Global g_pscale:Float
-		If selectionno > 0 Then Return 100.0
+		If selectionno > 0 Then Return 0.0
 		Local v:Int = 0
 		For Local f:Int = EachIn g_keeperframes
 			If imageframenumber = f

@@ -96,7 +96,7 @@ Method Update:Int(a0:Int, a1:Int, a2:Int)
 	'!Global g_ply_turnrate:Float
 	'!Global g_time:Int
 	'!Global g_eng_hasjoystick:Int
-	'!Global g_joy_dragging:Int
+	'!Global g_joy_dragging:Int = 1
 	Local origDir:Float = direction
 	Local joyIdx:Int = 0
 	If g_opt_ctrlidx = 3

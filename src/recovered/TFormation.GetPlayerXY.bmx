@@ -325,8 +325,8 @@
 		If row = 0 And col > 1 And col < 5
 			If a5 = 1
 				If leg < a4 / 2.0 - a4 / 12.0 Then leg = a4 / 2.0 - a4 / 12.0
-			ElseIf leg > a4 / 12.0 + a4 / 2.0
-				leg = a4 / 12.0 + a4 / 2.0
+			ElseIf leg > a4 / 2.0 + a4 / 12.0
+				leg = a4 / 2.0 + a4 / 12.0
 			EndIf
 		EndIf
 		a7[0] = xPos - a3 / 2.0

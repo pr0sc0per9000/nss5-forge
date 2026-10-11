@@ -4,12 +4,15 @@
 ' Verified through the oracle from scratch with helper_map.record stubbed; MATCH over
 ' the full Ghidra-authoritative length, every byte.
 ' Body-only format: statements only, parameters are a0, a1, ...
+' NAME CHANGED 2026-10-11 (byte-neutral): 0x005343F1 `a1485ac600 mov eax,[0xc65a48]` reads
+' the places table, stored by TScreen_ContinentalComps.CreateScreen at 0x00533840 as
+' g_cc_tableplaces. g_cc_table is the qualifiers table, 0x00C65A4C.
 '!Global g_cc_combo:TCombo
-'!Global g_cc_table:TTable
+'!Global g_cc_tableplaces:TTable
 '!Global g_clubs:TList
 LogLine("RefreshClubCombo")
 g_cc_combo.ClearItems()
-Local c:TCompetition = TCompetition.SelectById(Int(g_cc_table.GetSelectedText(0)))
+Local c:TCompetition = TCompetition.SelectById(Int(g_cc_tableplaces.GetSelectedText(0)))
 If c <> Null
 	Local n:TNation = TNation.SelectById(c.based)
 	If n <> Null

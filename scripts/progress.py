@@ -187,12 +187,6 @@ TREES = [
 #     call (2026-10-10): the stub stays and the body stays unmatched, so 158 bytes of
 #     proven work sit in the denominator only.
 #
-#   src/recovered_unverified/TProfile.CheckAchievement.bmx  -- OMITTED
-#     Carries '!Import ".../libsteamstub.a" and Externs GetSteamAchievement and
-#     SetSteamAchievement directly, itself, in this file. Named in assemble.py's
-#     UNVERIFIED_SKIP, which also records that its Extern block is malformed for
-#     that assembler.
-#
 #   src/recovered_unverified/Fn_0058D987.SteamPostPlayerValue.bmx  -- OMITTED
 #     Carries the same '!Import and Externs FindLeaderboard, ReadSteam and
 #     UploadLeaderboardScore. Named in assemble.py's UNVERIFIED_SKIP.
@@ -245,8 +239,6 @@ VERIFIED_NOT_SHIPPED = {
     "src/recovered_module/SteamInit.bmx": (
         "SUBSTITUTED",
         "compiled as a neutralised 4-line stub; original kept as a comment"),
-    "src/recovered_unverified/TProfile.CheckAchievement.bmx": (
-        "OMITTED", "assemble.py UNVERIFIED_SKIP"),
     "src/recovered_module/Fn_0058D987.SteamPostPlayerValue.bmx": (
         "OMITTED", "harness.py MODULE_SKIP"),
     "src/recovered_module/Fn_0058D90B.SyncSteamAchievements.bmx": (

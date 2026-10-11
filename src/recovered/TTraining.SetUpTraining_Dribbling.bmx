@@ -31,7 +31,7 @@
 ' g_training_int04's original data-section value is 1 (read from NSS5.exe at
 ' 0x00C6CF94 -- codegen-patterns 21.1/21.3).
 '!Global g_training_int04:Int = 1
-'!Global g_training_int06:Int
+'!Global g_training_int06:Int = -1
 '!Global g_training_int08:String
 '!Global g_training_int09:String
 '!Global g_training_int10:String

@@ -53,7 +53,8 @@
 		'!Global g_hometeam:TTeam
 		'!Global g_awayteam:TTeam
 		'!Global g_fixture:TFixture
-		'!Global g_sbpage:Int
+		' 0x00C5B258: data word 1
+		'!Global g_sbpage:Int = 1
 		'!Global g_stat_shots_h:Int
 		'!Global g_stat_shots_a:Int
 		'!Global g_stat_ontarget_h:Int

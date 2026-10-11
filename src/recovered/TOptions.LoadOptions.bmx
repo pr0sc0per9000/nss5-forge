@@ -96,28 +96,28 @@
 		'!Global g_opt_soundfx:Float = 100.0
 		'!Global g_opt_music:Float = 100.0
 		'!Global g_opt_difficulty:Int
-		'!Global g_opt_radar:Int
+		'!Global g_opt_radar:Int = 1
 		'!Global g_opt_matchlength:Int
-		'!Global g_opt_matchspeed:Int
+		'!Global g_opt_matchspeed:Int = 2
 		'!Global g_opt_matchscale:Float = 1.0
 		'!Global g_opt_replayscale:Float = 2.0
 		'!Global g_opt_displayinitials:Int
 		'!Global g_opt_screen:Int
-		'!Global g_opt_window:Int
+		'!Global g_opt_window:Int = 1
 		'!Global g_opt_playercam:Int
 		'!Global g_opt_matchfx:Int
 		'!Global g_opt_distance:Int
 		'!Global g_opt_tooltips:Int
-		'!Global g_opt_lbfindme:Int
+		'!Global g_opt_lbfindme:Int = 1
 		'!Global g_opt_lbmyage:Int
 		'!Global g_opt_lbmyclub:Int
 		'!Global g_opt_lbmynation:Int
-		'!Global g_opt_highlightball:Int
+		'!Global g_opt_highlightball:Int = 1
 		'!Global g_opt_showenergy:Int
 		'!Global g_opt_currency:Int
 		'!Global g_opt_reqfreekicks:Int
 		'!Global g_opt_reqcorners:Int
-		'!Global g_opt_lbview:Int
+		'!Global g_opt_lbview:Int = 1
 		'!Global g_opt_language:String
 		'!Global g_opt_fixkick:Int
 		'!Global g_opt_bossoff:Int

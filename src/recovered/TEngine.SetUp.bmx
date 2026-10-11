@@ -89,7 +89,10 @@
 '!Global g_limit_scroll_x:Int
 '!Global g_limit_scroll_y1:Int
 '!Global g_limit_scroll_y2:Int
-'!Global g_img_trophy:TImage
+' NAME CHANGED 2026-10-11 (byte-neutral): 0x00C5B2DC is this body's own trophy overlay
+' (store 0x004CDB87 `891ddcb2c500`, reads 0x004CDB74/0x004CDEA8/0x004CE47F; nothing else in
+' NSS5.exe touches it). g_img_trophy is TScreen_GameMenu's icon at 0x00C66740.
+'!Global g_engine_imgtrophy:TImage
 '!Global g_img_yellow:TImage
 '!Global g_img_secondyellow:TImage
 '!Global g_img_red:TImage
@@ -131,7 +134,7 @@
 		g_limit_scroll_x = ReadSettingFloat("incbin::Inc/Engine.ini", "limitscrollx", 0, 100)
 		g_limit_scroll_y1 = ReadSettingFloat("incbin::Inc/Engine.ini", "limitscrolly1", 0, 100)
 		g_limit_scroll_y2 = ReadSettingFloat("incbin::Inc/Engine.ini", "limitscrolly2", 0, 100)
-		g_img_trophy = LoadImageChecked("EngineMedia/Match/Other/Trophy.png", -1)
+		g_engine_imgtrophy = LoadImageChecked("EngineMedia/Match/Other/Trophy.png", -1)
 		g_img_yellow = LoadImageChecked("EngineMedia/Match/Other/YellowCard.png", -1)
 		g_img_secondyellow = LoadImageChecked("EngineMedia/Match/Other/SecondYellowCard.png", -1)
 		g_img_red = LoadImageChecked("EngineMedia/Match/Other/RedCard.png", -1)
@@ -149,7 +152,7 @@
 		g_img_energy = LoadImageChecked("EngineMedia/Match/Other/Energy.png", -1)
 		g_img_booze28 = LoadImageChecked(g_iconpath + "Booze28.png", -1)
 		g_img_nrg28 = LoadImageChecked(g_iconpath + "NRG28.png", -1)
-		MidHandleImage(g_img_trophy)
+		MidHandleImage(g_engine_imgtrophy)
 		MidHandleImage(g_img_yellow)
 		MidHandleImage(g_img_secondyellow)
 		MidHandleImage(g_img_red)
@@ -181,7 +184,7 @@
 		g_engine_labels[2] = TLabel.CreateLabel("lbl_Scores2", "", 10, 36, 60, 26, 3, "FFFFFF", "FFFFFF", sc, 9, 1, 1, 1, Null, 1, 0, 0, 0, "", 0)
 		g_engine_labels[3] = TLabel.CreateLabel("lbl_Scores3", "", 70, 36, 120, 26, 3, "c0c0c0", "FFFFFF", sc, 0, 1, 1, 1, Null, 1, 0, 0, 0, "", 0)
 		g_lbl_time = TLabel.CreateLabel("lbl_Time", "", 190, 10, 70, 52, 3, "FFFFFF", "FFFFFF", sc, 5, 1, 1, 1, Null, 1, 0, 0, 0, "", 0)
-		g_lbl_agg = TLabel.CreateLabel("lbl_Agg", "", 270, 10, 100, 52, 3, "888888", "FFFFFF", sc, 1, 1, 1, 1, g_img_trophy, 1, 0, 0, 0, "", 0)
+		g_lbl_agg = TLabel.CreateLabel("lbl_Agg", "", 270, 10, 100, 52, 3, "888888", "FFFFFF", sc, 1, 1, 1, 1, g_engine_imgtrophy, 1, 0, 0, 0, "", 0)
 		TScreen.DoProgressBar(10, GetText("Loading"), "00FF00", 0)
 		TPitch.SetUp()
 		TFormation.SetUp()

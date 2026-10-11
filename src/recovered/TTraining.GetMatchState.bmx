@@ -6,7 +6,8 @@
 ' Body-only format: statements only, parameters are a0, a1, ...
 '!Global g_tr_active:Int   ' 0x00C6CF98
 '!Global g_tr_mode:Int     ' 0x00C6CF90
-'!Global g_tr_count:Int    ' 0x00C6CFFC
+' 0x00C6CFFC: data word -1
+'!Global g_tr_count:Int = -1
 '!Global g_training_int11:Int       ' 0x00C6CFD0
 '!Global g_training_int12:Int       ' 0x00C6CFD4
 '!Global g_tr_x2:Int       ' 0x00C6CFD8

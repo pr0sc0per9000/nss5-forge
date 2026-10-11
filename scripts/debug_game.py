@@ -94,6 +94,59 @@ FAULT_RX = re.compile(r"Unhandled Exception|Attempt to access|EXCEPTION_|Access 
                       re.I)
 
 
+FRAME_LOC_RX = re.compile(r"^@(.+)<(\d+),(\d+)>\s*$")
+FRAME_FN_RX = re.compile(r"^(Function|Method)\s+(\S+)")
+
+
+def parse_stack(err_text):
+    """StackTrace{...} -> [(name, file, line, col)], INNERMOST FIRST.
+
+    The stub prints frames outermost first, each as `@file<line,col>` then `Function name`
+    (or `Method name`), then that scope's variables. Block scopes inside a function add
+    another `@file<line,col>` with no Function line; the last one before the next Function
+    is where that function actually was. The outermost frame (the module body) dumps every
+    module Global, so a parser that stops at the first `Global` line only ever sees the
+    GameMain() call site, never the frame that faulted."""
+    i = err_text.find("StackTrace{")
+    if i < 0:
+        return []
+    frames = []
+    pending = None
+    for raw in err_text[i:].split("\n")[1:]:
+        line = STUB_PREFIX.sub("", raw.rstrip("\r")).strip()
+        if line == "}":
+            break
+        m = FRAME_LOC_RX.match(line)
+        if m:
+            if pending and frames:
+                frames[-1][1:] = list(pending)
+            pending = (m.group(1), int(m.group(2)), int(m.group(3)))
+            continue
+        m = FRAME_FN_RX.match(line)
+        if m:
+            loc = pending or ("?", 0, 0)
+            frames.append([m.group(2)] + list(loc))
+            pending = None
+            continue
+        if pending and frames:
+            frames[-1][1:] = list(pending)
+            pending = None
+    if pending and frames:
+        frames[-1][1:] = list(pending)
+    return [tuple(f) for f in reversed(frames)]
+
+
+def source_line(path, n):
+    try:
+        with open(path, encoding="utf-8", errors="replace") as f:
+            for k, l in enumerate(f, 1):
+                if k == n:
+                    return l.strip()
+    except OSError:
+        pass
+    return ""
+
+
 def argval(flag, default=None):
     if flag in sys.argv:
         i = sys.argv.index(flag)
@@ -229,10 +282,7 @@ def collect(rundir, stdout_path, stderr_path, traced, secs, killed, rc):
 
     faults = [l.strip() for l in (out_text + "\n" + err_text).split("\n")
               if FAULT_RX.search(l)]
-    stack = []
-    m = re.search(r"StackTrace\{(.*?)(?:\n\}|Global )", err_text, re.S)
-    if m:
-        stack = [l for l in m.group(1).split("\n") if l.strip()][:25]
+    stack = parse_stack(err_text)
 
     loglines = [l for l in out_text.split("\n") if l.strip()]
 
@@ -258,9 +308,15 @@ def collect(rundir, stdout_path, stderr_path, traced, secs, killed, rc):
             lines.append("   " + f[:200])
         lines.append("")
     if stack:
-        lines.append("STACK (from the debug stub):")
-        for s in stack:
-            lines.append("   " + s.rstrip()[:200])
+        lines.append("STACK (from the debug stub, innermost first):")
+        for k, (name, path, ln, col) in enumerate(stack[:16]):
+            lines.append("   %-28s %s:%d" % (name, os.path.basename(path), ln))
+            if k < 3 and ln:
+                src = source_line(path, ln)
+                if src:
+                    lines.append("      > " + src[:160])
+        if len(stack) > 16:
+            lines.append("   ... %d outer frames" % (len(stack) - 16))
         lines.append("")
     if tail:
         lines.append("LAST %d CALLS BEFORE EXIT (most recent last):" % len(tail))

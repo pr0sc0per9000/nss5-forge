@@ -121,7 +121,7 @@
 
 '!Global g_engine_int163:Int
 '!Global g_screen_float02:Float
-'!Global g_gadget_float:Float
+'!Global g_gadget_float:Float = 128.0
 '!Global g_gadget_int01:Int
 Local ix:Int = Int(x)
 Local iy:Int = Int(y)

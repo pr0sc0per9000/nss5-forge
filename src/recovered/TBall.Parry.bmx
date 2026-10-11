@@ -136,7 +136,7 @@
 				WrapAngle(Self.direction)
 				Return 0
 			Else
-				LogLine("Parry")
+				LogLine("Parry: Tip over")
 				Self.velocity = Self.velocity * 0.7
 				Self.zvelocity = Rnd(2.5, 3.5)
 				Self.direction = Self.direction + Rand(-15, 15)
@@ -146,7 +146,7 @@
 				Return 0
 			EndIf
 		Else
-			LogLine("Parry: Tip over")
+			LogLine("Parry")
 			Cos(Self.direction)
 			Local sn:Float = Sin(Self.direction)
 			a0.currentanim = g_player_arr23

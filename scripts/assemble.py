@@ -130,25 +130,9 @@ UNVERIFIED_SKIP = {
     #      defect: no .sav was ever written, so TScreen_MainMenu.UpdateLoadTable's scan of
     #      g_userpath + "Save/" found an empty directory. Saves now go through the real
     #      zipengine bodies over minizip (extern/minizip), so they are retail zips.
-    "TProfile.CheckAchievement.bmx",          # Steam. The other two reasons this entry
-                                              # used to give are both FIXED and no longer
-                                              # true (2026-08-22): the Extern block is
-                                              # '!Raw pragmas now, not ordinary statements,
-                                              # so there is no orphan `End Extern`; and the
-                                              # body does NOT perform an extra
-                                              # reference-release -- the original retains
-                                              # only (`inc [eax+4]` @0x0056cfc7), which is
-                                              # bcc's initGlobalRef path, and the body
-                                              # reproduces it. It now builds and reaches
-                                              # MATCH 625/625 mode=reloc (it needs its
-                                              # '!GlobalInit 98 pragma; see the file's own
-                                              # header). Kept here purely because it
-                                              # Imports libsteamstub.a, which
-                                              # src/recovered_module/SteamInit.bmx exists to
-                                              # keep out of the shipped build -- the same
-                                              # reason the equally-matched
-                                              # Fn_0058D987.SteamPostPlayerValue.bmx is
-                                              # listed above.
+    # TProfile.CheckAchievement.bmx WAS LISTED HERE. It now Imports
+    # extern/steamstub/steamnull.c instead of libsteamstub.a, so it ships with no Steam
+    # link surface; skipped, every achievement call compiled to an empty stub.
 }
 # A '!Global pragma's TYPE is the rest of the declaration, not one whitespace-delimited
 # token. The old `(\S+)` stopped at the first space, so
@@ -1260,6 +1244,8 @@ def count_placed(src):
     n = 0
     for i, l in enumerate(lines):
         if re.match(r"^\t(?:Method|Function)\s+\w+", l):
+            if l.rstrip().endswith(" Abstract"):
+                continue                  # a declaration, never a body
             if i + 1 < len(lines) and not re.match(r"^\tEnd\s+(?:Method|Function)",
                                                    lines[i + 1]):
                 n += 1

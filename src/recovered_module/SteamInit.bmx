@@ -37,7 +37,7 @@
 ' This file is not covered by scripts/reverify.py (that tool scans src/recovered/ for
 ' `Type.Method.bmx` names only), so it will NOT be flagged as a regression. Recording the
 ' divergence here is therefore the only thing that keeps it honest.
-'!Global g_steamstate:Int
+'!Global g_steamstate:Int = -1
 	Function SteamInit:Int()
 		' Steam stripped -- see the header. 0 = the original's "offline" state.
 		g_steamstate = 0

@@ -77,6 +77,6 @@
 			Wend
 			LogLine("first names = " + String(g_team_arr01.Length))
 			LogLine("last names = " + String(g_team_arr02.Length))
-			CloseStream(a1)
+			CloseFile(a1)
 		EndIf
 	End Function

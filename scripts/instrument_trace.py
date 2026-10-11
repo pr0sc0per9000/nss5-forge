@@ -245,11 +245,19 @@ def main():
     # paragraph and the hard failure below.
     tail = "\n".join(parts)
     anchor = 'Print "[boot] GameMain returned"'
-    if tail.count(anchor) != 1:
-        raise SystemExit("expected exactly one %r to anchor DbgTraceClose(), found %d.\n"
-                         "Injecting blind would silently disable the tracer."
-                         % (anchor, tail.count(anchor)))
-    tail = tail.replace(anchor, anchor + "\nDbgTraceClose()", 1)
+    if tail.count(anchor) == 1:
+        tail = tail.replace(anchor, anchor + "\nDbgTraceClose()", 1)
+    else:
+        # The matched module body has no boot Print; its last statement is the bare
+        # `GameMain()` call at column 0 (functions are indented, so it is unique).
+        calls = [m.start() for m in re.finditer(r"(?m)^GameMain\(\)[^\n]*$", tail)]
+        if len(calls) != 1:
+            raise SystemExit("expected exactly one %r or one column-0 GameMain() to anchor "
+                             "DbgTraceClose(), found %d and %d.\n"
+                             "Injecting blind would silently disable the tracer."
+                             % (anchor, tail.count(anchor), len(calls)))
+        end = tail.index("\n", calls[0])
+        tail = tail[:end] + "\nDbgTraceClose()" + tail[end:]
 
     os.makedirs(os.path.dirname(SYMS), exist_ok=True)
     with open(OUT, "w", encoding="utf-8", newline="") as f:
