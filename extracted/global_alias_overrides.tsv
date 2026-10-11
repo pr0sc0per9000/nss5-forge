@@ -2400,3 +2400,7 @@ address	alias	canonical	evidence
 #	---- 0x00C6DF54 : race camera tween start --------------------------------------------
 #	The UNFIXABLE TODAY note on this slot above is stale: TScreen_Stable.Update is recovered.
 0x00C6DF54	g_screen_stable_float03	g_stable_startxprev	The only two references: TScreen_Stable.Update `fstp dword ptr [0xc6df54]` (d91d54dfc600) at 0x00588D0F as g_stable_startxprev, and TScreen_Stable.Draw `fld dword ptr [0xc6df54]` (d90554dfc600) at 0x0058913E, right after the render tween fmul, as g_screen_stable_float03. Both Float.
+#
+#	---- 0x00C6F090 : the shared SFX channel --------------------------------------------
+0x00C6F090	g_audio_channel	g_object859	TSlotMachine.DoPrize `push dword ptr [0xc6f090]` (ff3590f0c600) at 0x005785CA as g_audio_channel. Writer: the module body `mov dword ptr [0xc6f090], eax` (a390f0c600) at 0x004BBB42 after AllocChannel, as g_object859; UpdateAudio sets its volume from the SFX option. Both TChannel.
+0x00C6F090	g_interview_channel	g_object859	TScreen_Interview.Fail `push dword ptr [0xc6f090]` (ff3590f0c600) at 0x0057BE27 as g_interview_channel. Writer as in the row above. Both TChannel.
