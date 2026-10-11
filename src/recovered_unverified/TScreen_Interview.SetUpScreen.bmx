@@ -143,7 +143,7 @@
 '!Global g_font2:TBitmapFont
 '!Global g_profile:TProfile
 '!Global g_screen_interview_int02:Int
-'!Global g_screen_interview_int03:Int
+'!Global g_screen_interview_int03:Int = 9
 '!Global g_screen_interview_int04:Int
 '!Global g_screen_interview_int05:Int
 '!Global g_screen_interview_int06:String

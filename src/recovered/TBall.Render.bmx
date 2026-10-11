@@ -61,7 +61,7 @@
 '!Global g_screen_options_int03:Int
 '!Global g_Object80:TImage
 '!Global g_player_float02:Float
-'!Global g_ball_float17:Float
+'!Global g_ball_float17:Float = 0.2
 '!Global g_ball_float18:Float
 Method Render:Int(a0:Float)
 	If Self.hideball <> 0 Then Return 0

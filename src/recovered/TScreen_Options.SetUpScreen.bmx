@@ -30,9 +30,8 @@
 '!Global g_options_prevscreen:String
 '!Global g_opt_screen:Int
 '!Global g_opt_window:Int
-' g_options_int04's original data-section value is 2 (read from NSS5.exe at
-' 0x00C5D234 -- codegen-patterns 21.1/21.3).
-'!Global g_options_int04:Int = 2
+' g_options_int04 is 0x00C5D274 (g_opt_currency); its data-section word is 1.
+'!Global g_options_int04:Int = 1
 '!Global g_opt_b:Int
 '!Global g_opt_d:Int
 '!Global g_options_int11:Int

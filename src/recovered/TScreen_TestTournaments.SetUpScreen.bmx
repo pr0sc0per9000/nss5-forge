@@ -25,9 +25,14 @@
 '!Global g_tt_tbl_fixtures:TTable
 '!Global g_tt_cmb_comp:TCombo
 '!Global g_tt_comp:TCompetition
+<<<<<<< HEAD
 ' 0x00C66428 starts at 1: NSS5.exe's data word there is 1 (file offset 0x864228).
 '!Global g_tt_group:Int = 1
 '!Global g_tt_round:Int
+=======
+'!Global g_tt_group:Int
+'!Global g_tt_round:Int = 1
+>>>>>>> ba710e1 (Match original initial values of option, training and UI globals)
 '!Global g_tt_sdate:Int
 '!Global g_profile:TProfile
 TScreen.SetActive("tournaments", "")
