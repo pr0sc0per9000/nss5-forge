@@ -2374,3 +2374,7 @@ address	alias	canonical	evidence
 #
 #	---- 0x00C63D08 : Options restart message shown once ---------------------------------
 0x00C63D08	g_screen_options_int12	g_opt_msgshown	TScreen_Options.ComboRes tests and sets the shown-once flag `cmp dword ptr [0xc63d08], 0` (833d083dc60000) at 0x00521297 and `mov dword ptr [0xc63d08], 1` (c705083dc60001000000) at 0x005212BB; TScreen_Options.ButtonWindow does the same at 0x005210CD and 0x005210F1 as g_opt_msgshown. Exactly 4 dword references. Both Int, init 0, one body each.
+#	---- 0x00C6B834 : casino and race result message duration ---------------------------
+#	No writer in NSS5.exe; the data word is 1000 (file offset 0x869634). TRoulette.GetResult
+#	now carries the initialiser, as the row for this slot above asks.
+0x00C6B834	g_msg_int01	g_blackjack_int01	Arg 4 (duration) of TScreenMessage.Create. TSlotMachine.DoPrize pushes it at 0x00578605 and TScreen_Stable.Update at 0x00588F45/0x00588FC1 (`ff3534b8c600 push dword ptr [0xc6b834]`) as g_msg_int01; TRoulette.GetResult and the blackjack bodies push the same slot as g_blackjack_int01. 14 reads, no writer anywhere in NSS5.exe, data word 1000. Both Int; both were 0 here, so every result message lived for 0 ms.

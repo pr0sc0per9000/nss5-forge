@@ -34,7 +34,7 @@
 '!Global g_snd_win:TSound
 '!Global g_chan_bet:TChannel
 '!Global g_font_msg:TBitmapFont
-'!Global g_blackjack_int01:Int
+'!Global g_blackjack_int01:Int = 1000
 '!Global g_engine_int162:Int
 '!Global g_engine_int163:Int
 
