@@ -347,7 +347,8 @@ def load_data():
 
 
 # ---------------------------------------------------------------- emission
-def emit_type(tname, d, target=None, body=None, field_decls=None, bodies=None):
+def emit_type(tname, d, target=None, body=None, field_decls=None, bodies=None,
+              concrete=False):
     """Emit one Type. `target`/`body` fill ONE member; `bodies` fills MANY.
 
     THIS FUNCTION REPLACES, IT DOES NOT ACCUMULATE. It builds its output from `d` alone
@@ -479,7 +480,10 @@ def emit_type(tname, d, target=None, body=None, field_decls=None, bodies=None):
         # TBase_Team.GetFixtureList, TGadget.Update/Draw/SetAlph,
         # TTrainingObject.Update/Render/Clear and TVolume's ten. Every subclass the
         # original instantiates overrides all of them (read from its class tables).
-        if (kw == "Method" and name not in tb and emit_name == name
+        # `concrete` is the method probe's own Type: build_source() ends the probe with
+        # `New <Type>` to keep it linked, and bcc refuses to instantiate an abstract Type,
+        # so there the slot stays an empty Method, exactly as before.
+        if (not concrete and kw == "Method" and name not in tb and emit_name == name
                 and m.get("va", "").lower() == "0x005b95ac"):
             out.append(head + " Abstract")
             continue
@@ -1101,7 +1105,8 @@ def build_source(tname, mname, body, d=None):
     # libsteamstub.a) -- see module_imports()'s docstring / module_functions()'s FIX note.
     all_imports = list(dict.fromkeys(list(imports_) + module_imports()))
     return "\n".join([_header_with(all_imports), head,
-                      emit_type(tname, d, target=mname, body=body, field_decls=fdecls),
+                      emit_type(tname, d, target=mname, body=body, field_decls=fdecls,
+                                concrete=True),
                       tail, "",
                       gtext, "",
                       MODFUNC_SEP.join(module_functions()), "",
