@@ -94,5 +94,5 @@
 				dict.Insert(tag, fieldText)
 			Next
 		Wend
-		CloseStream(a1)
+		CloseFile(a1)
 	End Function

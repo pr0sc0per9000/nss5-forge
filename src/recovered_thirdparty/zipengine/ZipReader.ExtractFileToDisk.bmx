@@ -13,8 +13,8 @@
 ' File arm: FileType(ExtractDir(a1))=0 -> CreateDir(ExtractDir(a1),1) (no Else);
 ' WriteFile(a1) -> ebx; `cmp ebx,Null / je` is the direct-compare `<> Null` shape;
 ' ExtractFile(a0,a2,a3) is slot 0x50 -> edx; the And at 0x0058E6FE is the setne/movzx
-' boolean form over both objects; CopyStream(src, dst, 0x1000); CloseFile(dst) is the
-' 0x005B812B CloseFile/CloseStream alias row; ret=1, flag=1.
+' boolean form over both objects; CopyStream(src, dst, 0x1000); CloseStream(dst) is
+' 0x005B812B, brl.stream's CloseStream (filesystem's CloseFile is 0x005B6615); ret=1, flag=1.
 ' Date stamp: ToCString(a1) first, then entry.header(+0x14).LastModDateTime(+0x3C) re-read
 ' per argument, pushed tm +0x1C,+0x18,+0x14,+0x08,+0x0C,+0x10, i.e. the call is
 ' (path, hour, min, sec, mday, mon, year) -> glue 0x00401510 (our name zipSetFileDate).
@@ -36,7 +36,7 @@
 			If dst <> Null
 				Local src:TRamStream = ExtractFile(a0, a2, a3)
 				If dst <> Null And src <> Null Then CopyStream(src, dst, 4096)
-				CloseFile(dst)
+				CloseStream(dst)
 				ret = 1
 				stamp = 1
 			EndIf

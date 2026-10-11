@@ -4,7 +4,8 @@
 ' m_name+8 first, then _brl_filesystem_FileSize (0x005B5BBF). The construction goes
 ' through TZipFileList's class table -- `call dword ptr [0x00C94FE4]` is TZipFileList+0x30,
 ' its Create Function -- with IgnoreCase and IgnorePaths both 0. 0x005B65E3 is
-' _brl_filesystem_ReadFile; the close at 0x005B812B is the CloseFile/CloseStream alias set.
+' _brl_filesystem_ReadFile; the close at 0x005B812B is _brl_stream_CloseStream (it follows
+' FlushStream in brl.stream; filesystem's CloseFile is the twin at 0x005B6615).
 '
 ' Earlier passes recorded this as blocked on the same phantom TZipFileList metadata gap as
 ' the getFile* delegates. There was never a gap: TZipFileList is fully present in
@@ -15,7 +16,7 @@
 			Local s:TStream = ReadFile(m_name)
 			If s <> Null
 				m_zipFileList = TZipFileList.Create(s, 0, 0)
-				CloseFile(s)
+				CloseStream(s)
 			EndIf
 		EndIf
 	End Method

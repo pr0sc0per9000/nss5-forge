@@ -14,5 +14,5 @@ While Not Eof(s)
 	g_credits = g_credits[..g_credits.Length + 1]
 	g_credits[g_credits.Length - 1] = ReadLine(s)
 Wend
-CloseFile(s)
+CloseStream(s)
 LogLine("CreditsLoaded")

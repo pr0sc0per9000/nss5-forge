@@ -49,7 +49,7 @@ If Not a0
 		THorse.Create(n, ReadLine(a0), Rand(80,100), Rand(80,100), Rand(40,100), st, price, 0, 0, Rand(4))
 		n :+ 1
 	Wend
-	CloseFile(a0)
+	CloseStream(a0)
 	TScreen_Stable.SetUpHorsesForSale()
 Else
 	While Not Eof(a0)
