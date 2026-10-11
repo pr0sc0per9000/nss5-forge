@@ -2315,3 +2315,8 @@ address	alias	canonical	evidence
 #	halfway line. global_address_map.tsv still files g_pitch_int17 at 0x00C5D638: its one
 #	forcing body was the old TTeam.ResetCornerFormation, which #24 renamed to g_goalline.
 0x00C5D674	g_pitch_int17	g_msgx	Sole writer TPitch.SetUp 0x004E5242 `a374d6c500 mov [0xc5d674],eax` after `mov eax,[0xc5d634]` / `neg eax` / `sub eax,0x3c` (TPitch.SetUp.bmx:152 `g_dugouty = -g_sideline - 60`). Readers: TPitch.DrawBosses 0x004E9866, 0x004E9A3D, 0x004E9A9B (x of the three boss AddDrawOb calls) and TPlayer.DoAnimCelebrate 0x004FD9CA as g_pitch_int17; TBossMessage.Create 0x005709A7 as g_msgx. 6 dword references in the image, all listed. DoAnimCelebrate reads 0x00C5D638 as g_player_int17 in the same body, so g_pitch_int17 is not that slot. All Int; no body declares both names.
+#	---- 0x00C5D238 : the match zoom option (matchscale) ------------------------------
+#	TOptions.LoadOptions/SaveOptions spell it g_opt_matchscale; TEngine.SetUpMatch,
+#	TEngine.CheckInput and TEngine.EndReplay spell it g_engine_float09. Split, the ini's
+#	matchscale never reached the match camera and F9/F10 zoom was never saved.
+0x00C5D238	g_engine_float09	g_opt_matchscale	LoadOptions 0x004E4246 `d91d38d2c500 fstp [0xc5d238]` after reading "matchscale" (0x00C7713C); SaveOptions reads it at 0x004E3775. SetUpMatch 0x004CE913 `fstp [0xc5d238]` (the playercam>1 2.0 override) then 0x004CE919 `fld [0xc5d238]` / 0x004CE91F `fstp [0xc5b1d4]` (zoom = matchscale), CheckInput F9/F10 0x004D298E/0x004D29E2, EndReplay 0x004D498C, all as g_engine_float09. TEngine.SetUpReplay.bmx header already names 0x00C5D238 for both. Both Float, default 1.0; no body declares both names.
