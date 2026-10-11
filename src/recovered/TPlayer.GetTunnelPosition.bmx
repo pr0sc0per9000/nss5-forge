@@ -93,8 +93,9 @@
 		'!Global g_player_int01:Int
 		'!Global g_engine_int18:Int
 		'!Global g_engine_int20:Int
-		'!Global g_player_double18:Double
-		'!Global g_player_double19:Double
+		' 0x00C7A0E0 / 0x00C7A0E8: never written in NSS5.exe; data words 30.0 (huddle radius)
+		'!Global g_player_double18:Double = 30.0
+		'!Global g_player_double19:Double = 30.0
 
 		Local sel:Int = Self.selectionno
 		If sel > 11 Then sel = 12
