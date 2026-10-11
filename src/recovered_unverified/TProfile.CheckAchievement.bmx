@@ -6,13 +6,11 @@
 ' and one on an independently created tree (321b): identical verdict, identical
 ' reloc_masked count every time.
 '
-' STAYS IN src/recovered_unverified/ ON PURPOSE, exactly like the already-matched
-' src/recovered_unverified/Fn_0058D987.SteamPostPlayerValue.bmx. It is matched, not
-' shippable: it Imports libsteamstub.a, and src/recovered_module/SteamInit.bmx exists to
-' keep the Steam link surface out of src/assembled/. Moving it into src/recovered/ would
-' put that Import straight back, because assemble.py filters UNVERIFIED_SKIP and nothing
-' else. progress.py's VERIFIED_NOT_SHIPPED already counts it in both numerator and
-' denominator and labels the absence; that is the whole point of that table.
+' SHIPPED. Its two Steam Externs link against extern/steamstub/steamnull.c, null
+' stand-ins, so STEAMSTUB.DLL stays out of the import table. Both calls sit behind
+' g_profile_int43 = 1 (0x00C6F3B8, g_steamstate), which the stripped SteamInit never
+' sets. Without this body the build compiled CheckAchievement as an empty stub and no
+' achievement was ever recorded, announced or saved.
 '
 ' The MATCH needs the '!GlobalInit 98 pragma below. Without it the SAME source reports
 ' MISMATCH, mode=diff, 623/625, first_diff=51, with the entire residue in two bytes: the
@@ -191,7 +189,7 @@
 '   disassembly at 0x0056d0ba..0x0056d0d1.
 
 '!GlobalInit 98
-'!Import "<repo>/extern/steamstub/libsteamstub.a"
+'!Import "<repo>/extern/steamstub/steamnull.c"
 '!Raw Extern
 '!Raw Function GetSteamAchievement:Int(name:Byte Ptr)
 '!Raw Function SetSteamAchievement(name:Byte Ptr)

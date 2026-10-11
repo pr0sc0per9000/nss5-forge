@@ -9,7 +9,7 @@ measured as 896537 of 896537 bytes of machine code across 2079 function bodies.
 
 Left out of that count: SteamInit (158 bytes), by the owner's decision. The build keeps a stub for the Steam bootstrap, so it compiles to something else on purpose and is counted neither way.
 
-3 bodies (1074 bytes, of which 1074 are byte-identical) are counted above but are deliberately absent from the shipped `src/assembled/` build, because their Steam import would stop the exe loading; see VERIFIED_NOT_SHIPPED in `scripts/progress.py` for which ones and why.
+2 bodies (449 bytes, of which 449 are byte-identical) are counted above but are deliberately absent from the shipped `src/assembled/` build, because their Steam import would stop the exe loading; see VERIFIED_NOT_SHIPPED in `scripts/progress.py` for which ones and why.
 
 ```
 RECONSTRUCTION PROGRESS  (measured in bytes of matched machine code)
@@ -27,13 +27,12 @@ RECONSTRUCTION PROGRESS  (measured in bytes of matched machine code)
   Left out of the measure: SteamInit, 158 bytes at 0x0058d86d:
     the Steam bootstrap; the build keeps a stub by the owner's decision.
 
-  NOT IN THE SHIPPED BUILD -- 3 bodies, 1074 bytes (1074 of them matched)
+  NOT IN THE SHIPPED BUILD -- 2 bodies, 449 bytes (449 of them matched)
   COUNTED in the totals above, like every other body. They are left out
   of src/assembled/ because their Steam import would stop the exe loading;
   that is a fact about the build, not about whether they can be matched.
   (see VERIFIED_NOT_SHIPPED in scripts/progress.py for the evidence)
     BODY                                         BYTES VA          MATCHED  ABSENCE
-    TProfile.CheckAchievement                      625 0x0056cf70  yes      OMITTED  (assemble.py UNVERIFIED_SKIP)
     Fn_0058D987.SteamPostPlayerValue               325 0x0058d987  yes      OMITTED  (harness.py MODULE_SKIP)
     Fn_0058D90B.SyncSteamAchievements              124 0x0058d90b  yes      OMITTED  (harness.py MODULE_SKIP)
 ```
