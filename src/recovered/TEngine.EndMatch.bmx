@@ -18,9 +18,9 @@
 '        globals_final says TKit for 0x00C5B218; TKit slot 0x40 is GetPaintedFan(i,i) which
 '        takes two arguments, and the call site passes none.  TTeam slot 0x40 is Clear().
 '        0x00C5B218 is already TTeam in TBall.CheckSideLines.
-'      g_engine_obj20:TTable   0x00C5B2B0 -- GUESS.  All the bytes require is a Type whose
-'        slot 0x34 is a no-argument Method; 30 Types qualify (TTable/TButton/TCombo/... all
-'        .Update()).  The Type is not determined by this function.
+'      g_replayframes:TList    0x00C5B2B0 -- the replay frame list TEngine.SetUpMatch and
+'        TEngine.CreateReplayFrames fill. TList slot 0x34 is Clear(), so the original clears
+'        it here; any no-argument slot 0x34 method gives the same bytes.
 '      g_profile:TProfile      0x00C6F028  (+0x78 = contractwage)
 '      g_engine_memstart:Int   0x00C5B378   g_engine_memend:Int 0x00C5B37C
 '      g_engine_fnend:Int()    0x00C5B1C0 -- a FUNCTION-POINTER Global, `call [0xC5B1C0]`
@@ -39,7 +39,7 @@
 		'!Global g_training_int03:Int
 		'!Global g_hometeam:TTeam
 		'!Global g_opponentteam:TTeam
-		'!Global g_engine_obj20:TTable
+		'!Global g_replayframes:TList
 		'!Global g_profile:TProfile
 		'!Global g_engine_memstart:Int
 		'!Global g_engine_memend:Int
@@ -68,7 +68,7 @@
 		EndIf
 		TPlayer.ClearAll()
 		TScreenMessage.ClearAll(0)
-		If g_engine_obj20 <> Null Then g_engine_obj20.Update()
+		If g_replayframes <> Null Then g_replayframes.Clear()
 		TPitchMark.ResetPitchMarks()
 		TPhotographer.ClearAll()
 		TCameraMan.ClearAll()
