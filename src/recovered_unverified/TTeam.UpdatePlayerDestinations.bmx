@@ -562,7 +562,7 @@
 '!Global g_training_int11:Int
 '!Global g_training_int12:Int
 '!Global g_pitchhalfwidth:Int
-'!Global g_pitchhalfheight:Int
+'!Global g_goalline:Int
 '!Global g_pitchgoalhalf:Int
 '!Global g_pitchscale:Float
 '!Global g_matchtimer:Int
@@ -616,7 +616,7 @@ If g_trainingmode <> 0
 						Else
 							Local h:TPlayer = TPlayer.GetHumanPlayer()
 							If h <> Null
-								Self.formation.GetPlayerXY(p.selectionno, h.x, h.y, g_pitchhalfwidth * 2, g_pitchhalfheight * 2, dir, 0, Varptr p.desx, Varptr p.desy, scale, 1.0)
+								Self.formation.GetPlayerXY(p.selectionno, h.x, h.y, g_pitchhalfwidth * 2, g_goalline * 2, dir, 0, Varptr p.desx, Varptr p.desy, scale, 1.0)
 							EndIf
 						EndIf
 					EndIf
@@ -642,8 +642,8 @@ Select g_matchstate
 		desy = -yy
 	Case 3
 	Case 4
-		Local d1:Float = Dist2D(desx, desy, 0, g_pitchhalfheight * -dir)
-		Local d2:Float = Dist2D(desx, desy, 0, g_pitchhalfheight * dir)
+		Local d1:Float = Dist2D(desx, desy, 0, g_goalline * -dir)
+		Local d2:Float = Dist2D(desx, desy, 0, g_goalline * dir)
 		If d1 < TPitch.YardsToPixels(45.0)
 			If chase
 				desx = 0.0
@@ -692,10 +692,10 @@ For Local p:TPlayer = EachIn Self.squad
 		If g_trainingmode = 9
 			Local h:TPlayer = TPlayer.GetHumanPlayer()
 			If h <> Null
-				Self.formation.GetPlayerXY(p.selectionno, h.x, h.y, g_pitchhalfwidth * 2, g_pitchhalfheight * 2, dir, 0, Varptr p.desx, Varptr p.desy, scale, 1.0)
+				Self.formation.GetPlayerXY(p.selectionno, h.x, h.y, g_pitchhalfwidth * 2, g_goalline * 2, dir, 0, Varptr p.desx, Varptr p.desy, scale, 1.0)
 			EndIf
 		Else
-			Self.formation.GetPlayerXY(p.selectionno, desx, desy, g_pitchhalfwidth * 2, g_pitchhalfheight * 2, dir, chase, Varptr p.desx, Varptr p.desy, scale, 1.0)
+			Self.formation.GetPlayerXY(p.selectionno, desx, desy, g_pitchhalfwidth * 2, g_goalline * 2, dir, chase, Varptr p.desx, Varptr p.desy, scale, 1.0)
 		EndIf
 	ElseIf Not (p.x <= -g_pitchhalfwidth)
 		p.desx = -g_pitchhalfwidth - TPitch.YardsToPixels(1.0)
@@ -800,7 +800,7 @@ If TEngine.SetPiece() And ball.setpiecetaker <> Null
 		EndIf
 	EndIf
 	If g_matchstate = 4 And ball.teaminpossession <> Self.id
-		Local wd:Float = Dist2D(ball.setpiecex, ball.setpiecey, 0, g_pitchhalfheight * -Self.GetShootingDirection())
+		Local wd:Float = Dist2D(ball.setpiecex, ball.setpiecey, 0, g_goalline * -Self.GetShootingDirection())
 		If wd < TPitch.YardsToPixels(60.0)
 			For Local p:TPlayer = EachIn Self.squad
 				If p.matchstats.reds Or p.selectionno > 10 Then Continue
@@ -862,7 +862,7 @@ If g_matchstate = 8 And g_newstar <> Null And g_newstar.teamid = Self.id
 							If p.x < 0.0
 								p.desx = -p.desx
 							EndIf
-							p.desy = g_pitchhalfheight
+							p.desy = g_goalline
 							If p.y < 0.0
 								p.desy = -p.desy
 							EndIf
@@ -903,7 +903,7 @@ Else
 			For Local p:TPlayer = EachIn Self.squad
 				If p.selectionno > 0 And p.selectionno < 11 And p <> ball.controlledby
 					If Dist2D(ball.controlledby.x, ball.controlledby.y, p.desx, p.desy) < TPitch.YardsToPixels(15.0)
-						Self.formation.GetPlayerXY(ball.controlledby.selectionno, desx, desy + TPitch.YardsToPixels(15.0) * dir, g_pitchhalfwidth * 2, g_pitchhalfheight * 2, dir, chase, Varptr p.desx, Varptr p.desy, scale, 1.0)
+						Self.formation.GetPlayerXY(ball.controlledby.selectionno, desx, desy + TPitch.YardsToPixels(15.0) * dir, g_pitchhalfwidth * 2, g_goalline * 2, dir, chase, Varptr p.desx, Varptr p.desy, scale, 1.0)
 					EndIf
 					If p.distancetoball < TPitch.YardsToPixels(30.0) And p.passison = 0
 						Local o:TPlayer = TPlayer.GetPlayerById(p.opponentid)

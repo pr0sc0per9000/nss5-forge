@@ -124,7 +124,7 @@
 '    form a subtraction was written in.
 '
 ' 6. Case 6's Y-offset is split into TWO STATEMENTS, not one expression:
-'       py = g_pitchhalfheight * -team.GetShootingDirection()
+'       py = g_goalline * -team.GetShootingDirection()
 '       py = Int(py + TPitch.YardsToPixels(5.5) * team.GetShootingDirection())
 '    Writing it as one `Int(A + Yards(5.5)*B)` expression (mathematically identical) leaves
 '    `team` in a register that does not survive the intervening YardsToPixels() CALL as
@@ -174,7 +174,7 @@
 '     corrected project-wide already -- see TBall.CheckSideLines.bmx's note)
 '   0x00C5B238 g_engine_int25:Int, 0x00C5B274/78/7C/80/84/88 g_engine_int33..38:Int (usage-
 '     typed, globals_final.tsv, no better name established elsewhere)
-'   0x00C5D634 g_pitchhalfwidth:Int, 0x00C5D638 g_pitchhalfheight:Int (established:
+'   0x00C5D634 g_pitchhalfwidth:Int, 0x00C5D638 g_goalline:Int (established:
 '     TBall.CheckSideLines.bmx)
 '   0x00C5D64C g_engine_int103:Int, 0x00C5D658 g_player_int19:Int, 0x00C5D65C
 '     g_engine_int104:Int (usage-typed, no better name established elsewhere)
@@ -240,7 +240,7 @@ Function SetUpSetPiece:Int(a0:Int, a1:Int, a2:Int, a3:Int)
 	'!Global g_engine_int37:Int
 	'!Global g_engine_int38:Int
 	'!Global g_pitchhalfwidth:Int
-	'!Global g_pitchhalfheight:Int
+	'!Global g_goalline:Int
 	'!Global g_engine_int103:Int
 	'!Global g_player_int19:Int
 	'!Global g_engine_int104:Int
@@ -319,7 +319,7 @@ Function SetUpSetPiece:Int(a0:Int, a1:Int, a2:Int, a3:Int)
 						Else
 							a2 = g_pitchhalfwidth + 6
 						End If
-						a3 = (g_pitchhalfheight - 3) * team.GetShootingDirection()
+						a3 = (g_goalline - 3) * team.GetShootingDirection()
 					Case 6
 						team.CheckComManagement()
 						If ball.x > -g_engine_int103 * 0.75 And ball.x < g_engine_int103 * 0.75
@@ -331,7 +331,7 @@ Function SetUpSetPiece:Int(a0:Int, a1:Int, a2:Int, a3:Int)
 						Else
 							a2 = g_engine_int104
 						End If
-						a3 = g_pitchhalfheight * -team.GetShootingDirection()
+						a3 = g_goalline * -team.GetShootingDirection()
 						a3 = Int(a3 + TPitch.YardsToPixels(5.5) * team.GetShootingDirection())
 					Case 7
 						Select side
