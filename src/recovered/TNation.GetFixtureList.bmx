@@ -4,7 +4,7 @@
 ' ASSUMPTIONS
 '   0x00C6099C -> g_competitions:TList  (slot 0x8C ObjectEnumerator; same address other
 '     recovered bodies already declare TList)
-'   0x00C59E44 -> g_nation_sortmode:Int (bare dword store of 17, no refcount traffic -> Int)
+'   0x00C59E44 -> g_sortmode:Int (bare dword store of 17, no refcount traffic -> Int)
 '   0x005B40BF resolved to CreateList (the following AddLast at slot 0x44 confirms, 10.8).
 '   0x00C6632C = TMyDate+0x30 Create(i,i,i):TMyDate; slot 0x54 on TMyDate = GetYear()i.
 '   Slot 0x88 on the TList = TList.Sort -- written `l.Sort()`; bcc materialises both
@@ -17,8 +17,12 @@
 '   one is `X And (A Or B)`, not a nested If.
 '   `grp` is incremented at the END of the teampool loop body; `For EachIn` supplies its own
 '   null-skip so no explicit guard is written (10.6).
+' NAME CHANGED 2026-10-11 (byte-neutral): 0x004BFA85 `c705449ec50011000000 mov [0xc59e44],0x11`
+' sets the fixture sort mode TFixture.Compare reads at 0x004C5169 (case 17 sorts by date) and
+' TCompetition.SortFixtureList writes as g_sortmode. g_nation_sortmode resolved to g_natsortby,
+' the nation sort mode at 0x00C596F4.
 '!Global g_competitions:TList
-'!Global g_nation_sortmode:Int
+'!Global g_sortmode:Int
 LogLine("GetFixtureList:Nation")
 Local l:TList = CreateList()
 For Local c:TCompetition = EachIn g_competitions
@@ -40,6 +44,6 @@ For Local c:TCompetition = EachIn g_competitions
 		Next
 	EndIf
 Next
-g_nation_sortmode = 17
+g_sortmode = 17
 l.Sort()
 Return l
