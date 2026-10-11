@@ -11,12 +11,11 @@
 	Function ButtonMatchFx:Int()
 		'!Global g_activegadget:TGadget
 		'!Global g_opt_matchfx:Int
-		'!Global g_opt_refresh:Int()
 		Select TButton(g_activegadget).name
 			Case "options_matchfxon"
 				g_opt_matchfx = 1
 			Case "options_matchfxoff"
 				g_opt_matchfx = 0
 		End Select
-		g_opt_refresh()
+		RefreshButtons()
 	End Function

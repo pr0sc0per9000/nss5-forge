@@ -14,12 +14,11 @@
 	Function ButtonShowEnergy:Int()
 		'!Global g_activegadget:TGadget
 		'!Global g_opt_showenergy:Int
-		'!Global g_opt_refresh:Int()
 		Select TButton(g_activegadget).name
 			Case "options_showenergyon"
 				g_opt_showenergy = 1
 			Case "options_showenergyoff"
 				g_opt_showenergy = 0
 		End Select
-		g_opt_refresh()
+		RefreshButtons()
 	End Function

@@ -14,12 +14,11 @@
 	Function ButtonToolTips:Int()
 		'!Global g_activegadget:TGadget
 		'!Global g_opt_tooltips:Int
-		'!Global g_opt_refresh:Int()
 		Select TButton(g_activegadget).name
 			Case "options_tooltipson"
 				g_opt_tooltips = 1
 			Case "options_tooltipsoff"
 				g_opt_tooltips = 0
 		End Select
-		g_opt_refresh()
+		RefreshButtons()
 	End Function

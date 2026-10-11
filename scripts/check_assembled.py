@@ -393,7 +393,8 @@ def main():
         _stem = os.path.basename(ASM)[:-4]                   # nss5_assembled
         objs = [os.path.join(_objdir, f) for f in os.listdir(_objdir)
                 if f.endswith(".o") and ".debug." not in f
-                and (f.startswith(_stem + ".bmx") or f.startswith("nss5_external.bmx"))]
+                and (f.startswith(_stem + ".bmx") or f.startswith("nss5_external.bmx")
+                     or any(f.startswith(u + ".bmx") for u in H.unit_stems()))]
         if not objs:
             raise RuntimeError("no release object for %s in %s -- re-run assemble.py"
                                % (_stem, _objdir))

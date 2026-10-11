@@ -11,11 +11,11 @@
 '   the call is the argument-less Sort().
 ' EachIn class table 0x00c6c450 = TCard; puVar3[3] = +0xc = TCard.randno.
 	Function Shuffle:Int()
-		'!Global g_cards:TList
+		'!Global g_card_list:TList
 		'!Global g_card_int01:Int
-		For Local c:TCard = EachIn g_cards
+		For Local c:TCard = EachIn g_card_list
 			c.randno = Rand(9999)
 		Next
 		g_card_int01 = 5
-		g_cards.Sort()
+		g_card_list.Sort()
 	End Function

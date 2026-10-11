@@ -1,6 +1,6 @@
 # src/recovered_thirdparty - bodies that belong to a THIRD-PARTY MODULE
 
-None of this is the game's own code. These are two BlitzMax community modules NSS5 links
+None of this is the game's own code. These are three BlitzMax community modules NSS5 links
 that our BlitzMax install does not ship. Their `code`-section extents are measured and
 listed in the table below.
 
@@ -8,6 +8,7 @@ listed in the table below.
 |---|---|---|---|---|
 | `zipengine/` | **ZipEngine** (Irrlicht-derived zip reader + minizip writer) | 0x0058DBF3 - 0x0058FEE0 | 77 | 8,966 |
 | `fontmachine/` | **Font Machine 1.5.1** (`.fmf` bitmap-font renderer) | 0x0058FF89 - 0x0059356A | 102 | 13,887 |
+| `volumes/` | **BaH.Volumes 1.06** (MIT, see `volumes/LICENSE`) | 0x00597F30 - 0x00598AEA | 35 | 3,003 |
 
 ## Why they are not in `src/recovered/`
 
@@ -26,6 +27,12 @@ These Types are third-party module Types, so their bodies live here, keyed by mo
 3. `MANIFEST.tsv` is generated: every function in the two code blocks, with its Type,
    member, size and verification status. `status=MISPLACED` marks a verified body that is
    still sitting in `src/recovered/` and needs migrating (28 of them at time of writing).
-4. The `z_*` Types interleaved between the two blocks (`z_blide_bg…`) are **BLIde-generated
-   background classes belonging to the game's own project**, not third-party. They are
-   excluded from the manifest.
+4. The `z_*` Types inside the fontmachine block (`z_blide_bg…`, GUIDs e3390d53 and 84d6b1ac)
+   are BLIde-generated classes that FontMachine's own inits register. The game's own set is
+   GUID 1a09b2da at 0x004BBF31. Until they have bodies they are listed in
+   `src/unrecovered/fontmachine.bmx`.
+5. `<mod>/unit/<stem>.bmx` is one of the module's compile units: its Imports, its Types in
+   declaration order and its top-level statements. `assemble.py` emits it as
+   `src/assembled/<stem>.bmx`, and `python scripts/compare_module_body.py --unit
+   src/assembled/<stem>.bmx --va <init VA> --in-build` checks the init the build compiled. Its VA line is
+   that init's.

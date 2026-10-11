@@ -1,33 +1,7 @@
 ' LoadAnimImageChecked  -- module-level Function (no Type)
 ' VA 0x004bc664   271 bytes   sig ($,i,i,i,i,i):TImage
-' NOT byte-identical AS COMPILED, and deliberately so: this file carries a BOOT SHIM
-' (the box below). Measured, harness.try_function under NSS5_NO_LEARN=1, against the
-' body this file actually compiles:
-'     MISMATCH   our_len=272  orig_len=271  first_diff=+22
-'
-' THE ORIGINAL BODY IS RECONSTRUCTED AND PROVEN. Replace the two Return MissingArtImage()
-' shims with what the original does -- and note the branches are NOT symmetric:
-'     "cannot see anim image" branch  ->  DebugStop  then  Return Null
-'     "could not be loaded"           ->  DebugStop  (falls through to Return img)
-' changing nothing else, and the same oracle reports
-'     MATCH  271/271  mode=reloc  reloc_masked=25
-' The asymmetry is what the length turns on: the first branch carries BOTH a DebugStop and
-' an explicit Return Null, and without that Return the body is 266 bytes, not 271.
-'
-' So the 271 bytes are recovered work and the shipped build declines to use them. That is
-' the same shape as src/recovered_module/SteamInit.bmx and it is counted the same way:
-' scripts/progress.py names this file in VERIFIED_ORIGINAL_SUBSTITUTED, which keeps it OUT
-' of the headline (the headline measures what the tree compiles, and the shim is not
-' byte-identical) and reports it in the separately-labelled reconstruction figure instead.
-'
-' ############################################################################
-' # DELIBERATE DIVERGENCE FROM THE ORIGINAL -- BOOT SHIM.                    #
-' # Both DebugStops are removed and both branches return a visible           #
-' # placeholder image instead. Restore the two branches above to get the     #
-' # original behaviour back. This file is in src/recovered_module/ and is    #
-' # NOT covered by scripts/reverify.py, so nothing will flag it -- which is  #
-' # exactly why it is written down here.                                     #
-' ############################################################################
+' byte-identical vs NSS5.exe (271/271, mode=reloc, reloc_masked=25, harness.try_function
+' under NSS5_NO_LEARN=1). The original body: no boot shim.
 '
 ' NAME AND GLOBAL NAMES ARE OURS. **91 callers** -- the single most-called unrecovered
 ' module Function. The LoadAnimImage sibling of LoadImageChecked (0x004BC372): identical
@@ -74,10 +48,8 @@
 				LogLine("Loading anim image: " + a0)
 			Else
 				LogLine("WARNING! >>>>>>>>>>>> Cannot see anim image: " + a0)
-				' BOOT SHIM: DebugStop removed -- it halts every -d build on the first
-				' missing asset, and missing assets are expected while functions are stubs.
-				' The WARNING/ERROR LogLine above still names the file.
-				Return MissingArtImage()
+				DebugStop
+				Return Null
 			End If
 		End If
 		img = LoadAnimImage(a0, a1, a2, a3, a4, a5)
@@ -85,10 +57,7 @@
 			LogLine("Anim Image loaded")
 		Else
 			LogLine("ERROR! >>>>>>>>>>>>>> Anim Image could not be loaded: " + a0)
-			' BOOT SHIM: DebugStop removed -- it halts every -d build on the first
-			' missing asset, and missing assets are expected while functions are stubs.
-			' The WARNING/ERROR LogLine above still names the file.
-			Return MissingArtImage()
+			DebugStop
 		End If
 		Return img
 	End Function

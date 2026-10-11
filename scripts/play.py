@@ -4,6 +4,8 @@
     python scripts/play.py --debug         # debug build -- null checks on, names the bug
     python scripts/play.py --minutes 15    # longer cap
     python scripts/play.py --forever       # no cap  (NOT RECOMMENDED -- read below)
+    python scripts/play.py --player        # as the release play.exe runs it: sound left
+                                           # as the player set it, and no cap
 
 WHY THIS EXISTS -- READ BEFORE REMOVING THE WATCHDOG
 ====================================================
@@ -81,8 +83,34 @@ STATUS = os.path.join(ROOT, "status")
 # of range: TOptions.LoadOptions bounds-checks with `If g_opt_screen >= g_gfxmodes.Count()`
 # and falls back to FindRes800600(), so an out-of-range value makes the game resolve 800x600
 # against its own mode list on any machine.
-FORCE = {"window": "1", "music": "0", "soundfx": "0"}
+FORCE = {"window": "1"}
+# Dev runs only. Every local launch (this script by hand, smoke_boot.py, debug_game.py)
+# also mutes music and effects. --player, which is how the release play.exe starts the
+# game, leaves them as the player set them.
+QUIET = {"music": "0", "soundfx": "0"}
 SCREEN_RESOLVE = "99"
+
+# The game's own defaults, line for line from TOptions.WriteNewOptionsIni, which writes them
+# only when Options.ini does not exist. A file this script creates must carry them all:
+# with the file present the game skips WriteNewOptionsIni, reads every missing key as 0 and
+# saves the zeros back, so every control was unbound (k_Up=0 ... k_Pause=0) and the
+# training panel showed no keys. `screen` is SCREEN_RESOLVE, see above.
+DEFAULT_OPTIONS = [
+    "j_Control=0", "j_Scheme=0",
+    "k_Up=38", "k_Down=40", "k_Left=37", "k_Right=39", "k_Button=90", "k_Button2=88",
+    "k_Button3=67", "k_Button4=32", "k_Pause=27", "k_Replay=112",
+    "j_Up=-3", "j_Down=-4", "j_Left=-1", "j_Right=-2", "j_Button=2", "j_Button2=0",
+    "j_Button3=1", "j_Button4=3", "j_Pause=7", "j_Replay=6",
+    "soundfx=100", "music=100", "difficulty=2", "radar=0", "matchlength=5", "matchscale=2",
+    "replayscale=2", "displayinitials=1", "screen=" + SCREEN_RESOLVE, "window=1",
+    "playercam=2", "matchfx=1", "distance=0", "leaderboardfindme=1", "leaderboardmyage=0",
+    "leaderboardmyclub=0", "leaderboardmynation=0", "matchspeed=2", "tooltips=1",
+    "highlightball=1", "showenergy=0", "currency=1", "requestfreekicks=0",
+    "requestcorners=0", "leaderboardview=1", "language=0", "fixkick=1", "bossoff=0",
+]
+# The control keys among them. A file where every one of these is 0 was written by that
+# bug, since 0 is no key; such a file gets the defaults back for these keys only.
+CONTROL_KEYS = [l.split("=", 1)[0] for l in DEFAULT_OPTIONS if l[:2] in ("k_", "j_")]
 
 
 def ini_paths():
@@ -124,8 +152,10 @@ def ini_paths():
     return out
 
 
-def force_windowed():
+def force_windowed(quiet=True):
     """Rewrite the display keys in EVERY Options.ini, preserving other settings.
+
+    `quiet` also mutes music and effects (QUIET), for dev runs. --player passes False.
 
     If no Options.ini exists at any candidate path, one is created at the path
     TOptions.LoadOptions actually reads -- see the note at the end of ini_paths() above --
@@ -139,6 +169,7 @@ def force_windowed():
     that main() would print and launch past anyway: the whole point of this function is a
     guarantee, and a guarantee that cannot be kept must stop the launch, not report on it.
     """
+    keys = dict(FORCE, **QUIET) if quiet else dict(FORCE)
     paths = ini_paths()
     created = None
     if not paths:
@@ -146,11 +177,9 @@ def force_windowed():
                               "Settings", "Options.ini")
         try:
             os.makedirs(os.path.dirname(target), exist_ok=True)
-            # Seed the new file with an out-of-range screen index so
-            # TOptions.LoadOptions resolves it through FindRes800600()
-            # against this machine's own mode list.
+            # The game's full defaults (DEFAULT_OPTIONS), screen resolved by the game.
             with open(target, "w", encoding="utf-8") as fh:
-                fh.write("screen=" + SCREEN_RESOLVE + chr(10))
+                fh.write(chr(10).join(DEFAULT_OPTIONS) + chr(10))
         except OSError as e:
             raise SystemExit(
                 "REFUSING TO LAUNCH: no Options.ini exists anywhere, and one could not\n"
@@ -169,7 +198,20 @@ def force_windowed():
         try:
             text = open(path, encoding="utf-8", errors="replace").read()
             changed = []
-            for key, want in FORCE.items():
+            # Repair the all-zero controls the old seed file caused (see DEFAULT_OPTIONS).
+            found = {}
+            for key in CONTROL_KEYS:
+                m = re.search(r"(?mi)^%s\s*=\s*(.*)$" % re.escape(key), text)
+                if m:
+                    found[key] = m.group(1).strip()
+            if found and all(v in ("0", "") for v in found.values()):
+                for line in DEFAULT_OPTIONS:
+                    key, want = line.split("=", 1)
+                    if key in found:
+                        text = re.sub(r"(?mi)^%s\s*=.*$" % re.escape(key),
+                                      "%s=%s" % (key, want), text, count=1)
+                changed.append("controls were all 0, defaults restored")
+            for key, want in keys.items():
                 rx = re.compile(r"(?mi)^(%s)\s*=\s*(.*)$" % re.escape(key))
                 m = rx.search(text)
                 if m:
@@ -185,7 +227,7 @@ def force_windowed():
             # same class of gap that made the earlier bug invisible: the launcher reported
             # "already windowed" while the file the game actually loaded said window=0.
             check = open(path, encoding="utf-8", errors="replace").read()
-            for key, want in FORCE.items():
+            for key, want in keys.items():
                 rx = re.compile(r"(?mi)^(%s)\s*=\s*(.*)$" % re.escape(key))
                 m = rx.search(check)
                 if not m or m.group(2).strip() != want:
@@ -212,11 +254,15 @@ def force_windowed():
 
 def main():
     debug = "--debug" in sys.argv
+    # --player is the release play.exe. A player's game must not be killed after five
+    # minutes, and their sound settings are theirs; windowed mode is still forced.
+    player = "--player" in sys.argv
     minutes = 5.0
     for i, a in enumerate(sys.argv):
         if a == "--minutes" and i + 1 < len(sys.argv):
             minutes = float(sys.argv[i + 1])
-    cap = None if "--forever" in sys.argv else minutes * 60
+    capped = "--minutes" in sys.argv or not player
+    cap = None if "--forever" in sys.argv or not capped else minutes * 60
 
     exe = os.path.join(RUNDIR,
                        "nss5_dbg.exe" if debug else "nss5_assembled.exe")
@@ -245,14 +291,14 @@ def main():
         print("        Globals dump -- the debug stub waits to be asked and this script")
         print("        does not ask. For debugging use:")
         print("            python scripts/debug_game.py --minutes %g" % minutes)
-    print("  display : %s" % force_windowed())
-    print("  watchdog: %s" % ("NONE -- --forever was passed" if cap is None
+    print("  display : %s" % force_windowed(quiet=not player))
+    print("  watchdog: %s" % ("NONE" if cap is None
                               else "hard kill after %g minutes" % minutes))
     print("  output  : %s" % log)
     print("  exe     : %s" % os.path.basename(exe))
     print()
     print("  Close the game window normally when done; this exits immediately after.")
-    if cap is None:
+    if "--forever" in sys.argv:
         print("  !! With --forever a hang can lock the display until you power-cycle.")
     print()
 

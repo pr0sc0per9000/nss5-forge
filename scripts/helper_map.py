@@ -40,6 +40,7 @@ single-witness entries are marked so a MATCH that leans on one can be seen for w
 
 import os
 import re
+import shutil
 import subprocess
 import sys
 
@@ -48,9 +49,15 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import bytematch as _bytematch
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# nm and objdump. The legacy toolchain's MinGW ships neither, so they come from BlitzMax
+# NG's MinGW unpacked to tools/blitzmax (scripts/setup.py says where to get it), or from
+# any i386 binutils on PATH. Without them no call operand can be named on our side, and
+# every body that calls anything reads as a difference.
 BIN = os.path.join(ROOT, "tools", "blitzmax", "BlitzMax", "MinGW32x86", "bin")
 NM = os.path.join(BIN, "nm.exe")
 OBJDUMP = os.path.join(BIN, "objdump.exe")
+if not os.path.exists(OBJDUMP) and shutil.which("objdump") and shutil.which("nm"):
+    NM, OBJDUMP = shutil.which("nm"), shutil.which("objdump")
 TABLE = os.path.join(ROOT, "extracted", "runtime_helpers.tsv")
 
 RT_LO, RT_HI = 0x00401000, 0x004BA000          # the C runtime range in NSS5.exe
@@ -287,9 +294,106 @@ BRL_TABLE = os.path.join(ROOT, "extracted", "brl_functions.tsv")
 # structural proof, not the oracle learning from the body under test: TZipEStream.Seek is
 # 147/147 with everything but this one operand already agreeing, which is precisely the
 # situation NSS5_NO_LEARN exists to stop a body from resolving for itself.
+#
+# minizip 1.01e and the ZipEngine C glue, linked statically below 0x004BA000. The exe
+# carries "unzip 1.01 Copyright 1998-2004 Gilles Vollant" and "inflate 1.2.3", and each
+# address is fixed by its body against zlib-1.2.3/contrib/minizip: unzLocateFile rejects
+# names over 255 bytes; unzOpenCurrentFile and ...Password both call unzOpenCurrentFile3
+# (0x00402A20), with (f,0,0,0,0) and (f,0,0,0,pw); unzeof returns -102 on NULL, else tests
+# pfile_in_zip_read (+0x9C) -> rest_read_uncompressed (+0x5C); unztell reads +0x9C -> +0x18;
+# unzReadCurrentFile calls inflate and crc32; unzOpen calls unzOpen2 with no callbacks;
+# zipOpenNewFileInZip forwards to zipOpenNewFileInZip3 (0x00404180). The glue names are
+# ours (extern/minizip/zipengine_glue.c): 0x00401580 calls unzGetCurrentFileInfo and returns
+# the uncompressed size at +0x1C; 0x004015B0 forwards eleven arguments to
+# zipOpenNewFileInZip3; 0x00401510 sets a file's date through mktime and utime.
+# 0x004A4520 is pub.stdc localtime_: it forwards its argument to the msvcrt localtime thunk.
+# 0x004A7990 is _bbStringFromDouble: it formats an eight-byte argument with "%#.17lg" and
+# tail-calls _bbStringFromCString (0x004A7960), between that and _bbStringFromFloat
+# (0x004A79D0); none of its six call sites is in a body that already matched.
+# Module initialisers, for the init chains compare_module_body.py --unit compares. Each is
+# byte-identical, relocations aside, to the `___bb_<mod>_<mod>` of the legacy module archive
+# it is named after, and every call inside it lands on another init in this list or on
+# _bbObjectRegisterType, so the names prove each other. 0x004A8F90 is _bbObjectRegisterType:
+# every init passes it one class table per Type, in declaration order.
+# BaH.Volumes' Win32 calls go through the import thunks below. dll_imports.tsv names them
+# undecorated; our side links the stdcall name, so both go in the set. Every one of these
+# thunks is called only from 0x005983DE..0x00598ADB, the volumes code. 0x004A78D0 is
+# _bbStringFromWString: its 61 bytes are blitz_string.c:194 (Null -> &bbEmptyString, an
+# inline wcslen, then _bbStringFromShorts at 0x004A7700).
+# The module body's own calls. Each module init and BRL Function below matches the legacy
+# archive's symbol byte for byte with relocations masked, its calls land on named functions,
+# and an init registers the class tables its module declares. _bbIncbinAdd (blitz_incbin.c)
+# and _bbArrayNew (blitz_array.c, varargs lengths, NewEx twin at 0x004A63A0) are C runtime,
+# built by another gcc, and named by structure. EnableOpenALAudio is 194/194 with one call
+# operand off: NSS5's openalaudio lays out 36 bytes earlier from TOpenALChannel.Create on.
+# Three more the composition check needed: 0x005B963C is RuntimeError (TReplay.LoadReplayFile
+# proves it; brl_functions.tsv files it under NullMethodError), 0x005B0F66 is GraphicsModes
+# (95/95, it ends where CountGraphicsModes starts), 0x004A6800 is _bbArrayCastFromObject
+# (blitz_array.c:304, bbEmptyArray and bbArrayClass tests, then strcmp on the type tag).
 BRL_ALIAS_ADDITIONS = {
+    0x004a8cc0: "_bbIncbinAdd",
+    0x005a1264: "___bb_d3d7max2d_d3d7max2d",
+    0x0059f150: "___bb_ramstream_ramstream",
+    0x0059a808: "___bb_freeaudioaudio_freeaudioaudio",
+    0x00599d4c: "___bb_freetypefont_freetypefont",
+    0x00595ba8: "___bb_openalaudio_openalaudio",
+    0x00595504: "___bb_freejoy_freejoy",
+    0x005951e4: "___bb_jpgloader_jpgloader",
+    0x00594f54: "___bb_oggloader_oggloader",
+    0x0059f440: "___bb_d3d9max2d_d3d9max2d",
+    0x004a6370: "_bbArrayNew",
+    0x0059f0f4: "_brl_random_SeedRnd",
+    0x005b0f4a: "_brl_graphics_GetGraphicsDriver",
+    0x005a4cc7: "_brl_glmax2d_GLMax2DDriver",
+    0x005b0e4c: "_brl_graphics_SetGraphicsDriver",
+    0x005a1207: "_brl_d3d9max2d_D3D9Max2DDriver",
+    0x00596aff: "_brl_openalaudio_EnableOpenALAudio",
+    0x005b963c: "_brl_blitz_RuntimeError",
+    0x005b0f66: "_brl_graphics_GraphicsModes",
+    0x004a6800: "_bbArrayCastFromObject",
+    0x005b6958: "___bb_bank_bank",
+    0x005b34c0: "___bb_linkedlist_linkedlist",
+    0x005ab414: "___bb_win32_win32",
+    0x004a9c00: "_FindFirstVolumeW@8",
+    0x004a9c08: "_FindNextVolumeW@12",
+    0x004a9c10: "_FindVolumeClose@4",
+    0x004a9c18: "_GetDiskFreeSpaceExW@16",
+    0x004a9c20: "_GetLogicalDrives@0",
+    0x004a9c28: "_GetVolumeInformationW@32",
+    0x004a9c30: "_GetVolumePathNamesForVolumeNameW@16",
+    0x004a9c38: "_SetErrorMode@4",
+    0x004a9a10: "_SHGetFolderPathW@20",
+    0x004a78d0: "_bbStringFromWString",
+    0x005b929c: "___bb_blitz_blitz",
+    0x005acb0c: "___bb_max2d_max2d",
+    0x0059bf40: "___bb_pngloader_pngloader",
+    0x0059c78c: "___bb_retro_retro",
+    0x00592bd4: "___bb_reflection_reflection",
+    0x005b3490: "___bb_math_math",
+    0x0059ca88: "___bb_basic_basic",
+    0x0059c75c: "___bb_zlib_zlib",
+    0x005b4a18: "___bb_system_system",
+    0x00598aec: "___bb_map_map",
+    0x004a8f90: "_bbObjectRegisterType",
     0x005b9674: "_brl_blitz_DebugLog",
     0x004a8d60: "_bbMemAlloc",
+    0x004022b0: "_unzOpen",
+    0x00403020: "_unzClose",
+    0x004023a0: "_unzLocateFile",
+    0x00403000: "_unzOpenCurrentFile",
+    0x00402fe0: "_unzOpenCurrentFilePassword",
+    0x00402580: "_unzReadCurrentFile",
+    0x00402860: "_unztell",
+    0x00402880: "_unzeof",
+    0x00403c90: "_zipOpen",
+    0x00404a00: "_zipOpenNewFileInZip",
+    0x00403d60: "_zipWriteInFileInZip",
+    0x00404a40: "_zipClose",
+    0x00401580: "_unzGetCurrentFileSize",
+    0x004015b0: "_zipOpenNewFileInZipPassword",
+    0x00401510: "_zipSetFileDate",
+    0x004a4520: "_localtime_",
+    0x004a7990: "_bbStringFromDouble",
 }
 
 

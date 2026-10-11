@@ -116,6 +116,10 @@ def main():
         shutil.copy(ASM, os.path.join(wd, "nss5_assembled.bmx"))
         if os.path.exists(EXT):
             shutil.copy(EXT, os.path.join(wd, "nss5_external.bmx"))
+        for u in H.unit_stems():
+            up = os.path.join(os.path.dirname(EXT), u + ".bmx")
+            if os.path.exists(up):
+                shutil.copy(up, os.path.join(wd, u + ".bmx"))
 
     # Rewrite ONLY the copy's header: drop the bare Imports, insert Framework + the list.
     p = os.path.join(fw_dir, "nss5_assembled.bmx")

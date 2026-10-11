@@ -14,12 +14,11 @@
 	Function ButtonBossFx:Int()
 		'!Global g_activegadget:TGadget
 		'!Global g_opt_bossfx:Int
-		'!Global g_opt_refresh:Int()
 		Select TButton(g_activegadget).name
 			Case "options_bossoff"
 				g_opt_bossfx = 1
 			Case "options_bosson"
 				g_opt_bossfx = 0
 		End Select
-		g_opt_refresh()
+		RefreshButtons()
 	End Function

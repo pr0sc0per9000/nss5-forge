@@ -1,5 +1,9 @@
 # Disposition: the three fontmachine `Draw*Text` bodies are equivalent, not matching
 
+> **Closed.** All three now match: `extern/bcc/spill_tie.patch`, which `scripts/setup.py`
+> applies, gives each of the three functions the tie rule that reproduces the original's
+> slots. This document is the record of why no source change could do it.
+
 **Status: final disposition. No further sweeps.**
 
 `TPrivateBitmapFont`'s three text-drawing methods are the last three bodies in the corpus

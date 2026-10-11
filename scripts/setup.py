@@ -44,6 +44,7 @@ import sys
 import json
 import shutil
 import hashlib
+import subprocess
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MANIFEST = os.path.join(ROOT, "binary", "checksums.json")
@@ -91,10 +92,13 @@ TOOLS = [
     ("mingw", "tools/blitzmax-legacy-src/_mingw/mingw", "bin/g++.exe", True,
      "  its bundled MinGW (_src/win32_x86/mingw_v5b.7z)", None),
     ("ghidra", "tools/ghidra_12.1.2_PUBLIC", "ghidraRun.bat", False,
-     "Ghidra 12.1.2 (only to decompile)",
+     "Ghidra 12.1.2 (to decompile, and for the oracle)",
      "https://github.com/NationalSecurityAgency/ghidra/releases"),
     ("jdk", "tools/jdk", "bin/java.exe", False,
-     "JDK 21+ (only to decompile; Ghidra requires it)", "https://adoptium.net/"),
+     "JDK 21+ (Ghidra requires it)", "https://adoptium.net/"),
+    ("binutils", "tools/blitzmax/BlitzMax/MinGW32x86", "bin/objdump.exe", False,
+     "nm/objdump (for the oracle; BlitzMax NG's MinGW)",
+     "https://github.com/bmx-ng/bmx-ng/releases (win32 x86 mingw, BlitzMax/MinGW32x86 only)"),
 ]
 
 # ---------------------------------------------------------------- extracted/
@@ -258,6 +262,81 @@ def check_build_inputs():
     return [n for n in BUILD_INPUTS if not os.path.exists(os.path.join(ex, n))]
 
 
+# ---------------------------------------------------------------- bcc
+# extern/bcc/spill_tie.patch changes one comparison in bcc's register allocator, for three
+# named FontMachine functions only (extern/bcc/README.md). It is applied to the toolchain's
+# own source and bcc is rebuilt once, so every build and every probe uses one compiler.
+BCC_PATCH = os.path.join(ROOT, "extern", "bcc", "spill_tie.patch")
+BCC_MARK = "nss5-forge: the three FontMachine Draw*Text bodies"
+
+
+def _apply_patch(patch, root):
+    """Apply a one-file unified diff, exact context only. -> None, or why not."""
+    plines = open(patch, encoding="latin-1").read().split("\n")
+    target = next((l[4:].strip() for l in plines if l.startswith("+++ ")), None)
+    if not target:
+        return "no +++ line in %s" % patch
+    path = os.path.join(root, target[2:] if target.startswith("b/") else target)
+    src = open(path, encoding="latin-1", newline="").read().split("\n")
+    out, pos, k = [], 0, 0
+    while k < len(plines):
+        m = re.match(r"^@@ -(\d+)(?:,\d+)? \+\d+(?:,\d+)? @@", plines[k])
+        k += 1
+        if not m:
+            continue
+        start = int(m.group(1)) - 1
+        out += src[pos:start]
+        pos = start
+        while k < len(plines) and not plines[k].startswith("@@"):
+            l = plines[k]
+            k += 1
+            if l.startswith("+"):
+                out.append(l[1:])
+            elif l.startswith((" ", "-")):
+                if pos >= len(src) or src[pos] != l[1:]:
+                    return "context differs at %s line %d" % (target, pos + 1)
+                if l[0] == " ":
+                    out.append(src[pos])
+                pos += 1
+    out += src[pos:]
+    open(path, "w", encoding="latin-1", newline="").write("\n".join(out))
+    return None
+
+
+def patch_bcc():
+    """-> (status, detail). Applies extern/bcc/spill_tie.patch and rebuilds bcc once."""
+    bmx = os.path.join(ROOT, "tools", "blitzmax-legacy-src")
+    cpp = os.path.join(bmx, "_src", "codegen", "cgallocregs.cpp")
+    bcc = os.path.join(bmx, "bin", "bcc.exe")
+    stamp = os.path.join(bmx, "bin", "bcc.spill_tie")
+    want = sha256(BCC_PATCH)
+    if os.path.exists(stamp) and open(stamp).read().strip() == want:
+        return "present", ""
+    if not os.path.exists(cpp):
+        return "FAILED", "no %s" % os.path.relpath(cpp, ROOT)
+    if BCC_MARK not in open(cpp, encoding="latin-1").read():
+        why = _apply_patch(BCC_PATCH, bmx)
+        if why:
+            return "FAILED", why
+    if os.path.exists(bcc) and not os.path.exists(bcc[:-4] + ".unpatched.exe"):
+        shutil.copy2(bcc, bcc[:-4] + ".unpatched.exe")
+    env = dict(os.environ)
+    env["PATH"] = os.path.join(bmx, "_mingw", "mingw", "bin") + os.pathsep + env.get("PATH", "")
+    env["BLITZMAXPATH"] = bmx
+    p = subprocess.run([os.path.join(bmx, "bin", "bmk.exe"), "makeapp", "-a", "-r", "-z",
+                        "-t", "console", "-o", "../../bin/bcc", "../compiler/bcc.cpp"],
+                       cwd=os.path.join(bmx, "_src", "win32_x86"), env=env,
+                       capture_output=True, text=True, errors="replace")
+    if p.returncode != 0:
+        return "FAILED", ((p.stdout or "") + (p.stderr or "")).strip()[-600:]
+    with open(stamp, "w") as f:
+        f.write(want + "\n")
+    note = ""
+    if os.path.isdir(os.path.join(ROOT, "tools", "bmx-workers")):
+        note = "delete tools/bmx-workers: its toolchain copies still hold the old bcc"
+    return "applied", note
+
+
 def verify(src, name, spec):
     """-> (ok, message). Size is checked first because it is instant."""
     path = os.path.join(src, name)
@@ -379,6 +458,14 @@ def main():
         print("    %-42s %s" % (label, "present" if there else "MISSING"))
         if not there and need:
             missing.append((rel, probe, label, url))
+    if not missing and not check_only:
+        st, detail = patch_bcc()
+        print("    %-42s %s" % ("bcc spill-tie patch (extern/bcc)", st))
+        if detail:
+            print("      " + detail.replace("\n", "\n      "))
+        if st == "FAILED":
+            missing.append(("tools/blitzmax-legacy-src", "bin/bcc.exe",
+                            "bcc with extern/bcc/spill_tie.patch", None))
     if missing:
         print()
         print("  The build needs these. Install into the paths shown, then re-run:")

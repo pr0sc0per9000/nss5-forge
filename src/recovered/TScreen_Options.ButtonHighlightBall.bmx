@@ -14,12 +14,11 @@
 	Function ButtonHighlightBall:Int()
 		'!Global g_activegadget:TGadget
 		'!Global g_opt_highlightball:Int
-		'!Global g_opt_refresh:Int()
 		Select TButton(g_activegadget).name
 			Case "options_highlightballon"
 				g_opt_highlightball = 1
 			Case "options_highlightballoff"
 				g_opt_highlightball = 0
 		End Select
-		g_opt_refresh()
+		RefreshButtons()
 	End Function

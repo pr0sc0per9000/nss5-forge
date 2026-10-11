@@ -14,6 +14,11 @@ Exactly two regions of NSS5.exe, and nothing else:
 
 Both extents come from Ghidra's function inventory, like every other verification here.
 
+--unit SRC.bmx --va VA compares one compile unit's init instead: a third-party module
+or a file it imports (zipengine 0x0058DACC, fontmachine 0x0058FDD4 / 0x00592780, the
+three volumes units), built alone behind a Framework probe. Add --in-build to judge the
+init as src/assembled/ actually compiled it, which is the verdict a marker needs.
+
 WHY THIS SCRIPT HAS TO EXIST
 ============================
 `harness.try_method` finds a Type method through its BBDebugScope reflection record.
@@ -80,8 +85,11 @@ Library:
 
 import json
 import os
+import re
+import shutil
 import subprocess
 import sys
+import tempfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -127,7 +135,8 @@ def _release_objects(exe):
     stem = os.path.splitext(os.path.basename(exe))[0]
     out = [os.path.join(objdir, f) for f in os.listdir(objdir)
            if f.endswith(".o") and ".debug." not in f
-           and (f.startswith(stem + ".bmx") or f.startswith("nss5_external.bmx"))]
+           and (f.startswith(stem + ".bmx") or f.startswith("nss5_external.bmx")
+                or any(f.startswith(u + ".bmx") for u in H.unit_stems()))]
     return sorted(out)
 
 
@@ -331,6 +340,23 @@ def compare_body(exe, objpath=None, va=MAIN_VA, regions=True):
         # Never swallow this. With no name map NOTHING masks by name and every call
         # operand reads as a difference, which looks exactly like a bad reconstruction.
         res["naming_error"] = res.get("naming_error") or "our-side symbol table is empty"
+    # The third-party units' inits are called from the module body's init chain and have no
+    # name on either side. A call to one masks only once that init is proven in this build,
+    # the same rule compare_unit applies to a sub-unit.
+    if va == MAIN_VA:
+        origtab = dict(origtab)
+        for stem, uva in sorted(_unit_spec_vas().items()):
+            r2 = compare_unit_in_build(stem, uva, exe)
+            res.setdefault("sub_units", []).append("%s %s" % (stem, r2.get("status")))
+            hit2 = _unit_entry(objs, stem)
+            if r2.get("status") != "MATCH" or isinstance(hit2, str):
+                continue
+            b2 = _place(hit2[0], exe, hit2[3], objs)
+            if b2 is None:
+                continue
+            tag = "<unit init %s>" % stem
+            ournames[b2 + hit2[2]] = tag
+            origtab[uva] = (tag, 999)
 
     ospan, uspan = H._span(_bytematch.ORIG), H._span(exe)
     octx, uctx = (_bytematch.ORIG, va), (exe, our_va)
@@ -384,10 +410,242 @@ def build_and_compare(src_path, keep=False, workdir=None):
     return res
 
 
+# ---------------------------------------------------------------- one unit's init
+#
+# Every BlitzMax compile unit (a module, or a file another unit Imports) gets one init
+# function: a run-once guard, a call per Import, a bbObjectRegisterType per Type, then its
+# module-level statements. NSS5.exe holds one for each third-party unit it links (zipengine
+# 0x0058DACC, fontmachine 0x0058FDD4 and 0x00592780, the three volumes units). None has a
+# linker symbol in the original and none is a Function, so neither harness entry point can
+# reach it. This builds the unit behind a two-line probe,
+#
+#     Framework BRL.Blitz
+#     Import "<stem>.bmx"
+#
+# so nothing else is auto-imported, finds the unit's own `___bb_..._<stem>` entry, which
+# bcc places at offset 0 of the unit's object, and compares it like __bb_main above.
+
+def _unit_entry(objs, stem):
+    """-> (objpath, symbol, offset, length) for the init of unit `stem`, or a reason."""
+    rx = re.compile(r"^_+bb_\w*_%s$" % re.escape(stem.lower()))
+    hits = []
+    for o in objs:
+        syms = _helper_map.object_symbols(o)
+        for s, off in syms.items():
+            if rx.match(s.lower()) and off == 0:
+                hits.append((o, s, syms))
+    if len(hits) != 1:
+        return "expected one init symbol for unit %r at offset 0, found %d" % (stem, len(hits))
+    o, s, syms = hits[0]
+    nxt = sorted(v for v in syms.values() if v > 0)
+    if nxt:
+        return o, s, 0, nxt[0]
+    # The init is the unit's only function: its length is the code section's size.
+    out = _helper_map._run([_helper_map.OBJDUMP, "-h", o])
+    m = re.search(r"^\s*\d+\s+code\s+([0-9a-fA-F]+)", out, re.M)
+    if not m:
+        return "unit %r: no next symbol and no code section size" % stem
+    return o, s, 0, int(m.group(1), 16)
+
+
+def _place_by_bytes(objpath, exe, n, objs):
+    """-> our VA of the first `n` bytes of `objpath`'s code section, or None.
+
+    resolve_base anchors an object through a Type method it defines. A unit with no Types
+    (volumes.bmx is one Import and nothing else) has none, so find the bytes themselves:
+    the object's code with every relocated dword masked, accepted only if it occurs exactly
+    once in the exe.
+    """
+    out = _helper_map._run([_helper_map.OBJDUMP, "-s", "-j", "code", objpath])
+    raw = bytearray()
+    for line in out.splitlines():
+        m = re.match(r"^\s+[0-9a-fA-F]+\s((?:[0-9a-fA-F]{2,8}\s){1,4})", line)
+        if m:
+            raw += bytes.fromhex("".join(m.group(1).split()))
+    if len(raw) < n:
+        return None
+    relocs = [r for r in _helper_map.code_relocations(objpath) if r[0] < n]
+    masked = set()
+    for off, _kind, _sym in relocs:
+        masked.update(range(off, off + 4))
+    pat = b"".join(b"." if i in masked else re.escape(raw[i:i + 1]) for i in range(n))
+    b, img, secs = _bytematch.load(exe)
+    _va2off, o2v, _c = _bytematch._helpers(b, img, secs)
+    # Every module init with one Import has this same shape, so the bytes alone are not
+    # unique. A candidate must also CALL what ours calls: each DISP32 whose symbol another
+    # object of this probe defines must land on that symbol's address.
+    known = {}
+    for o in objs:
+        if o == objpath:
+            continue
+        syms = _helper_map.object_symbols(o)
+        base = _helper_map.resolve_base(o, exe, syms)
+        if base is not None:
+            known.update({s: base + v for s, v in syms.items()})
+    hits = []
+    for m in re.finditer(pat, b, re.S):
+        va = o2v(m.start())
+        ok = True
+        for off, kind, sym in relocs:
+            if kind == "DISP32" and sym in known:
+                rel = int.from_bytes(b[m.start() + off:m.start() + off + 4], "little", signed=True)
+                ok = ok and (va + off + 4 + rel == known[sym])
+        if ok:
+            hits.append(va)
+    return hits[0] if len(hits) == 1 else None
+
+
+def _unit_spec_vas():
+    """-> {stem: init VA} from the VA line of every src/recovered_thirdparty/*/unit/*.bmx."""
+    out = {}
+    tp = os.path.join(ROOT, "src", "recovered_thirdparty")
+    for mod in (os.listdir(tp) if os.path.isdir(tp) else []):
+        ud = os.path.join(tp, mod, "unit")
+        for f in (os.listdir(ud) if os.path.isdir(ud) else []):
+            if f.endswith(".bmx"):
+                m = re.search(r"^'\s*VA\s+(0x[0-9A-Fa-f]+)\s+\d+\s+bytes",
+                              open(os.path.join(ud, f), encoding="utf-8").read(), re.M)
+                if m:
+                    out[f[:-4]] = int(m.group(1), 16)
+    return out
+
+
+def _place(objpath, exe, n, objs):
+    """Our VA of `objpath`'s offset 0: through a Type method it defines, else by bytes."""
+    base = _helper_map.resolve_base(objpath, exe)
+    return base if base is not None else _place_by_bytes(objpath, exe, n, objs)
+
+
+def _compare_unit_in(exe, objs, src_path, stem, va, res, child_result):
+    """The comparison itself, for a unit already built into `exe` from `objs`.
+
+    `child_result(child)` gives the verdict for an Imported unit, the same way this one is
+    being judged, so a call to a sub-unit's init masks only once that init is proven.
+    """
+    n = _bytematch.ghidra_sizes().get(va)
+    hit = _unit_entry(objs, stem)
+    if isinstance(hit, str):
+        res.update(status="ERROR", message=hit)
+        return res
+    objpath, sym, off, our_n = hit
+    our_va = _place(objpath, exe, our_n, objs)
+    if our_va is None:
+        res.update(status="ERROR", message="could not place %s in %s" % (sym, exe))
+        return res
+    our_va += off
+    ab = H._fn_bytes(_bytematch.ORIG, va, n)
+    cb = H._fn_bytes(exe, our_va, our_n)
+    res.update(orig_len=n, our_len=our_n, our_va="0x%08X" % our_va, objpath=objpath,
+               orig_len_from="ghidra", our_len_from="%s in %s" % (sym, os.path.basename(objpath)))
+    ournames, origtab, ourfns, nerr = _name_tables(exe, objs)
+    if nerr:
+        res["naming_error"] = nerr
+    # A sub-unit's init has no name on either side: ours carries the build directory in its
+    # symbol, the original none. So the call to it masks only once that init is itself
+    # proven. Judge each Imported unit that has a spec first, and on MATCH name both ends of
+    # the call after it.
+    origtab = dict(origtab)
+    vas = _unit_spec_vas()
+    src_text = open(src_path, encoding="utf-8-sig", errors="replace").read()
+    for child in re.findall(r'(?im)^\s*Import\s+"([\w.]+)\.bmx"', src_text):
+        if child not in vas:
+            continue
+        r2 = child_result(child)
+        res.setdefault("sub_units", []).append("%s %s" % (child, r2.get("status")))
+        hit2 = _unit_entry(objs, child)
+        if r2.get("status") != "MATCH" or isinstance(hit2, str):
+            continue
+        b2 = _place(hit2[0], exe, hit2[3], objs)
+        if b2 is None:
+            continue
+        tag = "<unit init %s>" % child
+        ournames[b2 + hit2[2]] = tag
+        origtab[vas[child]] = (tag, 999)
+    ospan, uspan = H._span(_bytematch.ORIG), H._span(exe)
+    mode, same, total, masked, first = H.compare(
+        ab, cb, ospan, uspan, (_bytematch.ORIG, va), (exe, our_va),
+        ournames=ournames, origtab=origtab, learn=None, ourfns=ourfns)
+    res.update(mode=mode, matched=same, total=total, reloc_masked=masked,
+               status="MATCH" if (mode in ("exact", "reloc") and n == our_n)
+                      else "MISMATCH")
+    if n != our_n:
+        res["reason"] = "length differs (orig %d vs ours %d)" % (n, our_n)
+    if res["status"] == "MISMATCH":
+        res["first_diff"] = first
+        sites = unmaskable_calls(ab, va, origtab, ospan)
+        blind = [(o, t) for o, t, known in sites if not known]
+        res["call_sites"] = len(sites)
+        res["unmaskable_call_sites"] = ["+%d->0x%08X" % (o, t) for o, t in blind]
+        res["first_diff_is_unmaskable_call"] = any(o <= first < o + 5 for o, _t in blind)
+        res["disasm_orig"] = H.disasm_window(ab, va, first)
+        res["disasm_ours"] = H.disasm_window(cb, our_va, first)
+    return res
+
+
+def _unit_res(stem, va):
+    res = {"function": "%s unit init" % stem, "orig_va": "0x%08X" % va, "no_learn": H.NO_LEARN}
+    if not _bytematch.ghidra_sizes().get(va):
+        res.update(status="UNCERTAIN_LEN", message="0x%08X is not in Ghidra's inventory" % va)
+    return res
+
+
+def compare_unit_in_build(stem, va, exe=DEFAULT_EXE):
+    """Compare unit `stem`'s init as the assembled build compiled it: the verdict that
+    counts, because the headline measures what src/assembled/ compiles."""
+    res = _unit_res(stem, va)
+    if res.get("status"):
+        return res
+    res["where"] = "in the assembled build"
+    src_path = os.path.join(os.path.dirname(os.path.abspath(exe)), stem + ".bmx")
+    vas = _unit_spec_vas()
+    return _compare_unit_in(os.path.abspath(exe), _release_objects(exe), src_path, stem, va,
+                            res, lambda c: compare_unit_in_build(c, vas[c], exe))
+
+
+def compare_unit(src_path, va, keep=False):
+    """Build unit `src_path` behind a Framework probe and compare its init with `va`."""
+    src_path = os.path.abspath(src_path)
+    stem = os.path.splitext(os.path.basename(src_path))[0]
+    res = _unit_res(stem, va)
+    if res.get("status"):
+        return res
+    res["where"] = "in a Framework BRL.Blitz probe"
+    wd = tempfile.mkdtemp(prefix="nss5unit_")
+    # Copy the unit and every sibling .bmx it may Import, so relative Imports resolve.
+    for f in os.listdir(os.path.dirname(src_path)):
+        if f.lower().endswith(".bmx") and os.path.isfile(os.path.join(os.path.dirname(src_path), f)):
+            shutil.copy(os.path.join(os.path.dirname(src_path), f), wd)
+    probe = os.path.join(wd, "unitprobe.bmx")
+    with open(probe, "w", encoding="utf-8-sig") as f:
+        f.write('Framework BRL.Blitz\nImport "%s.bmx"\n' % stem)
+    exe = os.path.join(wd, "unitprobe.exe")
+    try:
+        with H.BuildLock():
+            p = subprocess.run([H.BMK, "makeapp", "-r", "-t", "console", probe],
+                               cwd=H.BMX_ROOT, env=H._env(), capture_output=True,
+                               text=True, errors="replace", timeout=1800)
+        if p.returncode != 0 or not os.path.exists(exe):
+            res.update(status="BUILD_FAIL",
+                       message=((p.stdout or "") + (p.stderr or "")).strip()[-2500:])
+            return res
+        objdir = os.path.join(wd, ".bmx")
+        objs = sorted(os.path.join(objdir, f) for f in os.listdir(objdir)
+                      if f.endswith(".o") and ".debug." not in f)
+        vas = _unit_spec_vas()
+        return _compare_unit_in(exe, objs, src_path, stem, va, res, lambda c: compare_unit(
+            os.path.join(os.path.dirname(src_path), c + ".bmx"), vas[c]))
+    finally:
+        if not keep:
+            shutil.rmtree(wd, ignore_errors=True)
+        else:
+            res["workdir"] = wd
+
+
 # --------------------------------------------------------------------------- main
 
 def _print(r):
-    print("MODULE BODY  %s  ->  %s" % (r.get("orig_va"), r.get("status")))
+    print("%s  %s  ->  %s" % ("UNIT INIT" if "unit init" in r.get("function", "") else "MODULE BODY",
+                              r.get("orig_va"), r.get("status")))
     if r.get("message"):
         print("  " + r["message"][:2000])
         return
@@ -399,6 +657,10 @@ def _print(r):
           % (r.get("mode"), r.get("matched"), r.get("total"), r.get("reloc_masked")))
     if r.get("reason"):
         print("  " + r["reason"])
+    if r.get("where"):
+        print("  where    : %s" % r["where"])
+    for s in r.get("sub_units", []):
+        print("  sub-unit : %s (a call to it masks only on MATCH)" % s)
     if r.get("naming_error"):
         print("  NAMING: %s" % r["naming_error"])
     if not r.get("no_learn"):
@@ -435,7 +697,7 @@ def _print(r):
 
 def main():
     a = sys.argv[1:]
-    exe, obj, src, va, as_json = DEFAULT_EXE, None, None, MAIN_VA, False
+    exe, obj, src, va, as_json, unit, in_build = DEFAULT_EXE, None, None, MAIN_VA, False, None, False
     i = 0
     while i < len(a):
         if a[i] == "--exe":
@@ -446,13 +708,24 @@ def main():
             i += 1; src = a[i]
         elif a[i] == "--entry":
             va = INIT_VA
+        elif a[i] == "--unit":
+            i += 1; unit = a[i]
+        elif a[i] == "--in-build":
+            in_build = True
+        elif a[i] == "--va":
+            i += 1; va = int(a[i], 16)
         elif a[i] == "--json":
             as_json = True
         else:
             print(__doc__)
             return 2
         i += 1
-    r = build_and_compare(src) if src else compare_body(exe, obj, va=va)
+    if unit and in_build:
+        r = compare_unit_in_build(os.path.splitext(os.path.basename(unit))[0], va, exe)
+    elif unit:
+        r = compare_unit(unit, va)
+    else:
+        r = build_and_compare(src) if src else compare_body(exe, obj, va=va)
     if as_json:
         print(json.dumps(r, indent=1, default=str))
     else:
