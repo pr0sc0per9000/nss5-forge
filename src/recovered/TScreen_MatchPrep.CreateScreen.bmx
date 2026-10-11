@@ -123,26 +123,41 @@
 ' btnplay and prgenergy are also read by this screen's SetUpScreen (as g_matchprep_btnplay
 ' and g_matchprep_barenergy); global_alias_overrides.tsv rows 2052-2053 join them. The other
 ' two slots are private to this body and needed no row.
+' NAMES CHANGED 2026-10-11 (byte-neutral, every slot paired by global_pair_oracle):
+'   g_mediapath    -> g_iconpath              0x00C6F170, the 12 icon loads (push [0xc6f170]
+'                     at 0x0055C13B..0x0055C3CF). g_mediapath is aliased to the install
+'                     root 0x00C6E950, which is "" in NSS5.exe, so each load returned Null.
+'   g_img_star     -> g_matchprep_imgstar     0x00C68578 (guard 0x0055C0DF, store 0x0055C12E).
+'                     g_img_star is TScreen_Abilities' 0x00C66A70, built first, so the shared
+'                     name made `If Not g_img_star` skip this whole load block.
+'   g_img_booze28  -> g_matchprep_imgbooze28  0x00C68598 (store 0x0055C25A); TEngine.SetUp's
+'                     g_img_booze28 is 0x00C5B320, drawn in matches by TPlayer.UpdateMovement.
+'   g_img_nrg28    -> g_matchprep_imgnrg28    0x00C68594 (store 0x0055C1E2); TEngine.SetUp's
+'                     g_img_nrg28 is 0x00C5B31C.
+'   g_img_backicon -> g_img_quit              0x00C6F194, ArrowL.png (push at 0x0055C628).
+'                     g_img_backicon was aliased to 0x00C6F254, Cross.png.
+' The first four must land together: the star split alone would rerun the block with the empty path and
+' overwrite TEngine's Booze28/NRG28 with Null.
 '!Global g_screen_matchprep:TScreen
 '!Global g_matchprep_panabilities:TPanel
 '!Global g_pan_health:TPanel
-'!Global g_img_star:TImage
+'!Global g_matchprep_imgstar:TImage
 '!Global g_img_drugsboost:TImage
 '!Global g_img_boozeboost:TImage
 '!Global g_img_shinpadsboost:TImage
 '!Global g_img_bootboost:TImage
 '!Global g_img_painkiller:TImage
 '!Global g_img_drugs28:TImage
-'!Global g_img_nrg28:TImage
-'!Global g_img_booze28:TImage
+'!Global g_matchprep_imgnrg28:TImage
+'!Global g_matchprep_imgbooze28:TImage
 '!Global g_img_shinpads28:TImage
 '!Global g_img_boot28:TImage
 '!Global g_img_arrowr:TImage
 '!Global g_img_eye:TImage
 '!Global g_img_helpicon:TImage
-'!Global g_img_backicon:TImage
+'!Global g_img_quit:TImage
 '!Global g_img_playicon:TImage
-'!Global g_mediapath:String
+'!Global g_iconpath:String
 '!Global g_skinpath:String
 '!Global g_screenwidth:Int
 '!Global g_screenheight:Int
@@ -173,20 +188,20 @@
 '!Global g_lbl_Status:TLabel
 	Function CreateScreen()
 		g_screen_matchprep = TScreen.CreateScreen("matchprep", Null, Null, Null)
-		If Not g_img_star
-			g_img_star = LoadImageChecked(g_skinpath + "GameMedia/Images/Interface/Star52.png", -1)
-			g_img_drugs28 = LoadImageChecked(g_mediapath + "Drugs28.png", -1)
-			g_img_drugsboost = LoadImageChecked(g_mediapath + "DrugsBoost.png", -1)
-			g_img_nrg28 = LoadImageChecked(g_mediapath + "NRG28.png", -1)
-			g_img_boozeboost = LoadImageChecked(g_mediapath + "BoozeBoost.png", -1)
-			g_img_booze28 = LoadImageChecked(g_mediapath + "Booze28.png", -1)
-			g_img_shinpadsboost = LoadImageChecked(g_mediapath + "ShinPadsBoost.png", -1)
-			g_img_shinpads28 = LoadImageChecked(g_mediapath + "ShinPads28.png", -1)
-			g_img_bootboost = LoadImageChecked(g_mediapath + "BootBoost.png", -1)
-			g_img_boot28 = LoadImageChecked(g_mediapath + "Boot28.png", -1)
-			g_img_painkiller = LoadImageChecked(g_mediapath + "PainKiller.png", -1)
-			g_img_arrowr = LoadImageChecked(g_mediapath + "ArrowR.png", -1)
-			g_img_eye = LoadImageChecked(g_mediapath + "Eye.png", -1)
+		If Not g_matchprep_imgstar
+			g_matchprep_imgstar = LoadImageChecked(g_skinpath + "GameMedia/Images/Interface/Star52.png", -1)
+			g_img_drugs28 = LoadImageChecked(g_iconpath + "Drugs28.png", -1)
+			g_img_drugsboost = LoadImageChecked(g_iconpath + "DrugsBoost.png", -1)
+			g_matchprep_imgnrg28 = LoadImageChecked(g_iconpath + "NRG28.png", -1)
+			g_img_boozeboost = LoadImageChecked(g_iconpath + "BoozeBoost.png", -1)
+			g_matchprep_imgbooze28 = LoadImageChecked(g_iconpath + "Booze28.png", -1)
+			g_img_shinpadsboost = LoadImageChecked(g_iconpath + "ShinPadsBoost.png", -1)
+			g_img_shinpads28 = LoadImageChecked(g_iconpath + "ShinPads28.png", -1)
+			g_img_bootboost = LoadImageChecked(g_iconpath + "BootBoost.png", -1)
+			g_img_boot28 = LoadImageChecked(g_iconpath + "Boot28.png", -1)
+			g_img_painkiller = LoadImageChecked(g_iconpath + "PainKiller.png", -1)
+			g_img_arrowr = LoadImageChecked(g_iconpath + "ArrowR.png", -1)
+			g_img_eye = LoadImageChecked(g_iconpath + "Eye.png", -1)
 		End If
 		g_matchprep_pantitle = TPanel.CreatePanel("pan_title", GetText("Match Preparation"), 0, 0, g_screenwidth, 60, "FFFFFF", "FFFFFF", 4, 1.0, 0, 0, 1)
 		g_screen_matchprep.AddGadget(g_matchprep_pantitle)
@@ -195,7 +210,7 @@
 		g_matchprep_pantitle.AddChild(g_matchprep_lblcash)
 		g_matchprep_pantitle.AddChild(TButton.CreateButton("btn_help", "", g_screenwidth - 50, 10, 40, 40, 1, 2, "FFFFFF", "FFFFFF", g_img_helpicon, TScreen.ButtonHelp, 1.0, 1, ""))
 		g_screen_matchprep.AddGadget(TPanel.CreatePanel("pan_nav", "", 0, g_screenheight - 60, g_screenwidth, 60, "FFFFFF", "FFFFFF", 3, 1.0, 0, 0, 0))
-		g_screen_matchprep.AddGadget(TButton.CreateButton("btn_quit", "", 10, g_screenheight - 50, 120, 40, 1, 2, "FFFFFF", "FFFFFF", g_img_backicon, TScreen_WorldMap.SetUpScreen, 1.0, 1, GetText("tt_Back")))
+		g_screen_matchprep.AddGadget(TButton.CreateButton("btn_quit", "", 10, g_screenheight - 50, 120, 40, 1, 2, "FFFFFF", "FFFFFF", g_img_quit, TScreen_WorldMap.SetUpScreen, 1.0, 1, GetText("tt_Back")))
 		g_screen_matchprep.AddGadget(TButton.CreateButton("btn_skip", GetText("Skip Match"), 300, g_screenheight - 50, 200, 40, 1, 3, "FFFFFF", "FFFFFF", g_img_arrowr, TScreen_MatchPrep.ButtonSkipMatch, 1.0, 1, ""))
 		g_matchprep_btnplay = TButton.CreateButton("btn_play", "", g_screenwidth - 130, g_screenheight - 50, 120, 40, 1, 3, "FFFFFF", "FFFFFF", g_img_playicon, TScreen_MatchPrep.ButtonPlay, 1.0, 1, GetText("tt_Proceed"))
 		g_screen_matchprep.AddGadget(g_matchprep_btnplay)
@@ -219,31 +234,31 @@
 		x :+ 10
 		g_screen_matchprep.AddGadget(g_matchprep_panabilities)
 		g_matchprep_panabilities.AddChild(TLabel.CreateLabel("lbl_Pace", GetText("Pace"), x, y, w, h, 3, "FFFFFF", "FFFFFF", 1.0, 4, 1, 0, 1, Null, 1, 0, 0, 0, "", 0))
-		g_matchprep_prgpace = TProgressBar.CreateProgressBar("prg_Pace", "", x + w, y, wnum2, h, 3, "FFFFFF", SkillColour(1), "FFFFFF", 0.8, 5, g_img_star)
+		g_matchprep_prgpace = TProgressBar.CreateProgressBar("prg_Pace", "", x + w, y, wnum2, h, 3, "FFFFFF", SkillColour(1), "FFFFFF", 0.8, 5, g_matchprep_imgstar)
 		y :+ h + 10
 		g_matchprep_panabilities.AddChild(g_matchprep_prgpace)
 		g_matchprep_panabilities.AddChild(TLabel.CreateLabel("lbl_Flair", GetText("Flair"), x, y, w, h, 3, "FFFFFF", "FFFFFF", 1.0, 4, 1, 0, 1, Null, 1, 0, 0, 0, "", 0))
-		g_matchprep_prgflair = TProgressBar.CreateProgressBar("prg_Flair", "", x + w, y, wnum2, h, 3, "FFFFFF", SkillColour(7), "FFFFFF", 0.8, 5, g_img_star)
+		g_matchprep_prgflair = TProgressBar.CreateProgressBar("prg_Flair", "", x + w, y, wnum2, h, 3, "FFFFFF", SkillColour(7), "FFFFFF", 0.8, 5, g_matchprep_imgstar)
 		y :+ h + 10
 		g_matchprep_panabilities.AddChild(g_matchprep_prgflair)
 		g_matchprep_panabilities.AddChild(TLabel.CreateLabel("lbl_Tackling", GetText("Tackling"), x, y, w, h, 3, "FFFFFF", "FFFFFF", 1.0, 4, 1, 0, 1, Null, 1, 0, 0, 0, "", 0))
-		g_matchprep_prgtackling = TProgressBar.CreateProgressBar("prg_Tackling", "", x + w, y, wnum2, h, 3, "FFFFFF", SkillColour(3), "FFFFFF", 0.8, 5, g_img_star)
+		g_matchprep_prgtackling = TProgressBar.CreateProgressBar("prg_Tackling", "", x + w, y, wnum2, h, 3, "FFFFFF", SkillColour(3), "FFFFFF", 0.8, 5, g_matchprep_imgstar)
 		y :+ h + 10
 		g_matchprep_panabilities.AddChild(g_matchprep_prgtackling)
 		g_matchprep_panabilities.AddChild(TLabel.CreateLabel("lbl_Dribbling", GetText("Dribbling"), x, y, w, h, 3, "FFFFFF", "FFFFFF", 1.0, 4, 1, 0, 1, Null, 1, 0, 0, 0, "", 0))
-		g_matchprep_prgdribbling = TProgressBar.CreateProgressBar("prg_Dribbling", "", x + w, y, wnum2, h, 3, "FFFFFF", SkillColour(2), "FFFFFF", 0.8, 5, g_img_star)
+		g_matchprep_prgdribbling = TProgressBar.CreateProgressBar("prg_Dribbling", "", x + w, y, wnum2, h, 3, "FFFFFF", SkillColour(2), "FFFFFF", 0.8, 5, g_matchprep_imgstar)
 		y :+ h + 10
 		g_matchprep_panabilities.AddChild(g_matchprep_prgdribbling)
 		g_matchprep_panabilities.AddChild(TLabel.CreateLabel("lbl_Passing", GetText("Passing"), x, y, w, h, 3, "FFFFFF", "FFFFFF", 1.0, 4, 1, 0, 1, Null, 1, 0, 0, 0, "", 0))
-		g_matchprep_prgpassing = TProgressBar.CreateProgressBar("prg_Passing", "", x + w, y, wnum2, h, 3, "FFFFFF", SkillColour(4), "FFFFFF", 0.8, 5, g_img_star)
+		g_matchprep_prgpassing = TProgressBar.CreateProgressBar("prg_Passing", "", x + w, y, wnum2, h, 3, "FFFFFF", SkillColour(4), "FFFFFF", 0.8, 5, g_matchprep_imgstar)
 		y :+ h + 10
 		g_matchprep_panabilities.AddChild(g_matchprep_prgpassing)
 		g_matchprep_panabilities.AddChild(TLabel.CreateLabel("lbl_Shooting", GetText("Shooting"), x, y, w, h, 3, "FFFFFF", "FFFFFF", 1.0, 4, 1, 0, 1, Null, 1, 0, 0, 0, "", 0))
-		g_matchprep_prgshooting = TProgressBar.CreateProgressBar("prg_Shooting", "", x + w, y, wnum2, h, 3, "FFFFFF", SkillColour(6), "FFFFFF", 0.8, 5, g_img_star)
+		g_matchprep_prgshooting = TProgressBar.CreateProgressBar("prg_Shooting", "", x + w, y, wnum2, h, 3, "FFFFFF", SkillColour(6), "FFFFFF", 0.8, 5, g_matchprep_imgstar)
 		y :+ h + 10
 		g_matchprep_panabilities.AddChild(g_matchprep_prgshooting)
 		g_matchprep_panabilities.AddChild(TLabel.CreateLabel("lbl_Heading", GetText("Heading"), x, y, w, h, 3, "FFFFFF", "FFFFFF", 1.0, 4, 1, 0, 1, Null, 1, 0, 0, 0, "", 0))
-		g_matchprep_prgheading = TProgressBar.CreateProgressBar("prg_Heading", "", x + w, y, wnum2, h, 3, "FFFFFF", SkillColour(5), "FFFFFF", 0.8, 5, g_img_star)
+		g_matchprep_prgheading = TProgressBar.CreateProgressBar("prg_Heading", "", x + w, y, wnum2, h, 3, "FFFFFF", SkillColour(5), "FFFFFF", 0.8, 5, g_matchprep_imgstar)
 		g_matchprep_panabilities.AddChild(g_matchprep_prgheading)
 		x = 405
 		y = 130
@@ -258,7 +273,7 @@
 		g_prg_drugs = TProgressBar.CreateProgressBar("prg_Drugs", GetText("Enhancers"), x + wnum3 + 10, y, w, h, 3, "FFFFFF", "38FF24", "FFFFFF", 0.8, 1, Null)
 		y :+ h + 10
 		g_pan_health.AddChild(g_prg_drugs)
-		g_btn_booze = TButton.CreateButton("btn_Booze", FormatMoney(100, 0), x, y, wnum3, h, 1, 3, "FFFFFF", "FFFFFF", g_img_booze28, TScreen_MatchPrep.ButtonBooze, 1.0, 1, GetText("tt_BuyBooze"))
+		g_btn_booze = TButton.CreateButton("btn_Booze", FormatMoney(100, 0), x, y, wnum3, h, 1, 3, "FFFFFF", "FFFFFF", g_matchprep_imgbooze28, TScreen_MatchPrep.ButtonBooze, 1.0, 1, GetText("tt_BuyBooze"))
 		g_pan_health.AddChild(g_btn_booze)
 		g_prg_booze = TProgressBar.CreateProgressBar("prg_Booze", GetText("Booze"), x + wnum3 + 10, y, w, h, 3, "FFFFFF", "FF9900", "FFFFFF", 0.8, 1, Null)
 		y :+ h + 10
@@ -278,7 +293,7 @@
 		g_prg_injury = TProgressBar.CreateProgressBar("prg_Injury", "", x + wnum3 + 10, y, w, h, 3, "FFFFFF", "FF0000", "FFFFFF", 0.8, 1, Null)
 		y :+ h + 10
 		g_pan_health.AddChild(g_prg_injury)
-		g_btn_nrg = TButton.CreateButton("btn_NRG", FormatMoney(250, 0), x, y, wnum3, h, 1, 3, "FFFFFF", "FFFFFF", g_img_nrg28, TScreen_MatchPrep.ButtonNRG, 1.0, 1, GetText("tt_BuyNRG"))
+		g_btn_nrg = TButton.CreateButton("btn_NRG", FormatMoney(250, 0), x, y, wnum3, h, 1, 3, "FFFFFF", "FFFFFF", g_matchprep_imgnrg28, TScreen_MatchPrep.ButtonNRG, 1.0, 1, GetText("tt_BuyNRG"))
 		g_pan_health.AddChild(g_btn_nrg)
 		g_prg_nrg = TProgressBar.CreateProgressBar("prg_NRG", "NRG", x + wnum3 + 10, y, w, h, 3, "FFFFFF", "38FF24", "FFFFFF", 0.8, 1, Null)
 		y :+ h + 10

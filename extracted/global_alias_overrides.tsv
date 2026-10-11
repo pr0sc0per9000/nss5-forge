@@ -279,7 +279,6 @@ address	alias	canonical	evidence
 #	the auto-generated names g_Object867/g_Object868. Same slots, so this is one more
 #	construct-under-one-name / read-under-another split.
 0x00C6F254	g_img_back	g_object867	g_img_back annotated 0x00C6F254; module body loads Cross.png into that slot as g_Object867
-0x00C6F254	g_img_backicon	g_object867	same slot 0x00C6F254
 0x00C6F274	g_img_play	g_object868	g_img_play annotated 0x00C6F274; module body loads Tick.png into that slot as g_Object868
 0x00C6F274	g_img_tick	g_object868	same slot 0x00C6F274
 0x00C6F274	g_img_playicon	g_object868	same slot 0x00C6F274
