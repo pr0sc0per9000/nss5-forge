@@ -2382,3 +2382,8 @@ address	alias	canonical	evidence
 #	---- 0x00C6B85C : the casino stake ---------------------------------------------------
 0x00C6B85C	g_bj_bet	g_screen_blackjack_int01	TBlackJack.ShowResult `mov eax, dword ptr [0xc6b85c]` (a15cb8c600) at 0x005778F5. The only writers are the seven `mov dword ptr [0xc6b85c], imm` (c7055cb8c600, 50 to 5000) in TScreen_Casino.SetStake 0x005743CD..0x00574415, spelled g_screen_blackjack_int01. All Int, init 50.
 0x00C6B85C	g_slot_bet	g_screen_blackjack_int01	TSlotMachine.DoPrize `mov edx, dword ptr [0xc6b85c]` (8b155cb8c600) at 0x005784FB. Writers as in the row above. All Int, init 50.
+#
+#	---- 0x00C6C01C / 0x00C6C028 / 0x00C6C020 : blackjack quit, play and hold buttons ------
+0x00C6C01C	g_bj_btn1	g_object753	TScreen_BlackJack.SetUpScreen reads `mov eax, dword ptr [0xc6c01c]` (a11cc0c600) at 0x0057686D (Show). Sole writer TScreen_BlackJack.CreateScreen `mov dword ptr [0xc6c01c], ebx` (891d1cc0c600) at 0x00576665 (btn_quit) as g_object753. Same pattern as the adjudicated g_bj_btn4 row. One body each.
+0x00C6C028	g_bj_btn2	g_object756	TScreen_BlackJack.SetUpScreen reads `mov eax, dword ptr [0xc6c028]` (a128c0c600) at 0x0057687B (Show). Sole writer CreateScreen `mov dword ptr [0xc6c028], ebx` (891d28c0c600) at 0x005767C5 (btn_play) as g_object756.
+0x00C6C020	g_bj_btn3	g_object754	TScreen_BlackJack.SetUpScreen reads `mov eax, dword ptr [0xc6c020]` (a120c0c600) at 0x00576889 (Hide). Sole writer CreateScreen `mov dword ptr [0xc6c020], ebx` (891d20c0c600) at 0x005766D9 (btn_hold) as g_object754.
