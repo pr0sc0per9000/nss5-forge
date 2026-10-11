@@ -221,10 +221,18 @@ def enable_debug_log():
     fixed = re.sub(r"(?m)^debug=0\s*$",
                    lambda m: m.group(0).replace("debug=0", "debug=1"), text)
     if fixed != text:
-        with open(p, "w", encoding="utf-8", newline="") as f:
-            f.write(fixed)
         print("    src/assembled/Settings/Settings.txt  debug=0 -> debug=1")
         print("      (the startup log the tooling reads is only written when this is 1)")
+    # The game's own OpenGL renderer: windowed D3D9 drops to 2-5 fps on AMD drivers
+    # (see SETTINGS_TXT in scripts/play.py, which also forces this on every launch).
+    gl = re.sub(r"(?m)^opengl=0\s*$",
+                lambda m: m.group(0).replace("opengl=0", "opengl=1"), fixed)
+    if gl != fixed:
+        print("    src/assembled/Settings/Settings.txt  opengl=0 -> opengl=1")
+        print("      (windowed D3D9 stalls at 2-5 fps; the game's OpenGL renderer does not)")
+    if gl != text:
+        with open(p, "w", encoding="utf-8", newline="") as f:
+            f.write(gl)
 
 
 def derive():
