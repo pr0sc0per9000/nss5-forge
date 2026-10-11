@@ -2356,3 +2356,6 @@ address	alias	canonical	evidence
 #
 #	---- 0x00C5D220 : SFX volume in training --------------------------------------------
 0x00C5D220	g_options_float01	g_opt_soundfx	TTraining.UpdateSounds (VA 0x00580001) reads `fld dword ptr [0xc5d220]` (d90520d2c500) at 0x00580008 for its channel volumes. The only writers are TOptions.LoadOptions 0x004E40ED and TScreen_Options.ButtonSFX 0x00521046/0x00521054/0x00521062, all `fstp dword ptr [0xc5d220]` (d91d20d2c500), already g_opt_soundfx. 14 dword references. Both Float, init 100.0. Split, training channels always played at full volume.
+#
+#	---- 0x00C5D274 : currency baseline on the Options screen ---------------------------
+0x00C5D274	g_options_int04	g_opt_currency	TScreen_Options.SetUpScreen (VA 0x0051FAB3) reads `mov eax, dword ptr [0xc5d274]` (a174d2c500) at 0x0051FB2D into the 0x00C63D04 baseline that TScreen_Options.ButtonTick compares at 0x00521732 `cmp dword ptr [0xc5d274], eax` (390574d2c500). Writers: TOptions.LoadOptions 0x004E4654 `mov dword ptr [0xc5d274], eax` (a374d2c500); TScreen_Options.ButtonCurrency 0x0052159F/0x005215AB/0x005215B7 `mov dword ptr [0xc5d274], 1/2/3` (c70574d2c500). 11 dword references. Both Int. Split, the baseline was always 2, so a change to GBP was never detected.
