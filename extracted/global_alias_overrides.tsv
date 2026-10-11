@@ -2390,3 +2390,6 @@ address	alias	canonical	evidence
 #
 #	---- 0x00C6C17C : blackjack dealer's turn ------------------------------------------
 0x00C6C17C	g_bj_dealerturn	g_bj3	TBlackJack.DealersTurn `mov dword ptr [0xc6c17c], 1` (c7057cc1c60001000000) at 0x00577052 as g_bj_dealerturn. TBlackJack.Reset writes 0 at 0x00576D3C and TBlackJack.Draw 0x005774A5 / GetDealerScore 0x0057758E read it (a17cc1c600), all as g_bj3. One body declares g_bj_dealerturn; Int.
+#
+#	---- 0x00C6DF6C : the horse the player backed ---------------------------------------
+0x00C6DF6C	g_stable_racenum	g_screen_stable_int04	TScreen_Stable.ButtonHorse `mov dword ptr [0xc6df6c], eax` (a36cdfc600) at 0x00588865 and SetUpNextRace `mov dword ptr [0xc6df6c], 0` at 0x00588614, as g_screen_stable_int04. Readers as g_stable_racenum: RefreshRunners 0x00588A30 (a16cdfc600), Update 0x00588F1D/0x00588FA3, FinishRace 0x005894C8, THorse.Render 0x0058AF60. Both Int.
