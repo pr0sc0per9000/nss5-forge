@@ -1947,7 +1947,7 @@ proxy=0
 |-----|---------------|--------------------|
 | `saveloc` | 0 | Save-game location: 0 = install folder, 1 = user AppData. **UNCERTAIN** |
 | `debug` | 0 | Enables the debug overlay / the 85 debug labels found in the exe |
-| `opengl` | 0 | 0 = DirectX 7 driver, 1 = OpenGL. The exe contains both `D3D7Max2D` and `gldrawtextfont.bin` strings, so both BlitzMax Max2D backends are linked in |
+| `opengl` | 0 | 0 = Direct3D 9, falling back to DirectX 7 if D3D9 does not start; 1 = OpenGL (module body: `SetGraphicsDriver(GLMax2DDriver(), 2)`, else `If Not D3D9Max2DDriver() Then SetGraphicsDriver(D3D7Max2DDriver(), 2)`). `scripts/play.py` writes 1 before every launch, see #26 |
 | `fullnames` | 0 | Show full player names vs abbreviations |
 | `nettimeout` | 5 | Seconds before a network request gives up |
 | `port` | 0 | 0 = default |
