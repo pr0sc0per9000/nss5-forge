@@ -2378,3 +2378,7 @@ address	alias	canonical	evidence
 #	No writer in NSS5.exe; the data word is 1000 (file offset 0x869634). TRoulette.GetResult
 #	now carries the initialiser, as the row for this slot above asks.
 0x00C6B834	g_msg_int01	g_blackjack_int01	Arg 4 (duration) of TScreenMessage.Create. TSlotMachine.DoPrize pushes it at 0x00578605 and TScreen_Stable.Update at 0x00588F45/0x00588FC1 (`ff3534b8c600 push dword ptr [0xc6b834]`) as g_msg_int01; TRoulette.GetResult and the blackjack bodies push the same slot as g_blackjack_int01. 14 reads, no writer anywhere in NSS5.exe, data word 1000. Both Int; both were 0 here, so every result message lived for 0 ms.
+#
+#	---- 0x00C6B85C : the casino stake ---------------------------------------------------
+0x00C6B85C	g_bj_bet	g_screen_blackjack_int01	TBlackJack.ShowResult `mov eax, dword ptr [0xc6b85c]` (a15cb8c600) at 0x005778F5. The only writers are the seven `mov dword ptr [0xc6b85c], imm` (c7055cb8c600, 50 to 5000) in TScreen_Casino.SetStake 0x005743CD..0x00574415, spelled g_screen_blackjack_int01. All Int, init 50.
+0x00C6B85C	g_slot_bet	g_screen_blackjack_int01	TSlotMachine.DoPrize `mov edx, dword ptr [0xc6b85c]` (8b155cb8c600) at 0x005784FB. Writers as in the row above. All Int, init 50.
