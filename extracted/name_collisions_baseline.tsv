@@ -11,6 +11,10 @@
 # find_name_collisions.py before and after the change: 30 -> 28 collisions found, exactly
 # those two gone (plus g_training_state, which the detector stops misreading once the
 # 0x00C5B208 alias rows land), and NOTHING added.
+# 2026-10-11, ui fixes: g_screen_mainmenu_int03 REMOVED. TScreen_MainMenu.UpdateVersionInfo
+# and TScreen_Options.ResetScreen now spell 0x00C639FC g_mainmenu_str and the version
+# 0x00C6E900 g_version; TScreen_MainMenu.NewGame spells 0x00C63A00 g_mm_minver. The name is
+# gone from the corpus.
 name	slots	bodies
 g_img_boot	0x00C66730,0x00C66938	0x00C66730=TScreen_GameMenu.CreateScreen | 0x00C66938=TScreen_Home.CreateScreen
 g_img_money	0x00C66738,0x00C6693C	0x00C66738=TScreen_GameMenu.CreateScreen | 0x00C6693C=TScreen_Home.CreateScreen
@@ -18,4 +22,3 @@ g_img_relationships	0x00C66734,0x00C66934	0x00C66734=TScreen_GameMenu.CreateScre
 g_img_star	0x00C66940,0x00C66A70	0x00C66940=TScreen_Home.CreateScreen | 0x00C66A70=TScreen_Abilities.CreateScreen
 g_pan_lifestyle	0x00C66998,0x00C6815C	0x00C66998=TScreen_Home.CreateScreen | 0x00C6815C=TScreen_Finances.CreateScreen
 g_prg_achievements	0x00C66790,0x00C669A8	0x00C66790=TScreen_GameMenu.CreateScreen | 0x00C669A8=TScreen_Home.CreateScreen,TScreen_Home.SetUpScreen
-g_screen_mainmenu_int03	0x00C639FC,0x00C6E900	0x00C639FC=TScreen_Options.ResetScreen | 0x00C6E900=TScreen_MainMenu.UpdateVersionInfo
