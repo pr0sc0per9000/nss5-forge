@@ -8,18 +8,22 @@
 '   0x00C6080C TList of TContinent
 ' Ghidra prints the AddItem calls with GetText's argument merged in; the disassembly shows
 ' GetText takes one argument and TCombo.AddItem($,$,$,i) takes four.
+' NAME CHANGED 2026-10-11 (byte-neutral): 0x0054793C `a1e071c600`, 0x005479AE `8b15e071c600`
+' and 0x005479E7 `8b1de071c600` read 0x00C671E0, the continent combo that
+' TScreen_Continents.CreateScreen stores at 0x005466EC as g_continents_cmbcontinent
+' (canonical g_combo1). g_continents_combo is the competition combo, 0x00C671E8.
 '!Global g_continents_level:Int
-'!Global g_continents_combo:TCombo
+'!Global g_combo1:TCombo
 '!Global g_continents_table1:TTable
 '!Global g_continents_table2:TTable
 '!Global g_continents_table3:TTable
 '!Global g_continents:TList
 g_continents_level = a0
-g_continents_combo.ClearItems()
+g_combo1.ClearItems()
 g_continents_table1.ClearItems()
 g_continents_table3.Hide()
 g_continents_table2.Hide()
 For Local c:TContinent = EachIn g_continents
-	g_continents_combo.AddItem(c.name, "BBBBBB", "FFFFFF", c.id)
+	g_combo1.AddItem(c.name, "BBBBBB", "FFFFFF", c.id)
 Next
-If g_continents_level = 1 Then g_continents_combo.AddItem(GetText("World"), "BBBBBB", "FFFFFF", 7)
+If g_continents_level = 1 Then g_combo1.AddItem(GetText("World"), "BBBBBB", "FFFFFF", 7)
