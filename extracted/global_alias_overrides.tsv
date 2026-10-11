@@ -2393,3 +2393,6 @@ address	alias	canonical	evidence
 #
 #	---- 0x00C6DF6C : the horse the player backed ---------------------------------------
 0x00C6DF6C	g_stable_racenum	g_screen_stable_int04	TScreen_Stable.ButtonHorse `mov dword ptr [0xc6df6c], eax` (a36cdfc600) at 0x00588865 and SetUpNextRace `mov dword ptr [0xc6df6c], 0` at 0x00588614, as g_screen_stable_int04. Readers as g_stable_racenum: RefreshRunners 0x00588A30 (a16cdfc600), Update 0x00588F1D/0x00588FA3, FinishRace 0x005894C8, THorse.Render 0x0058AF60. Both Int.
+#
+#	---- 0x00C6DF64 : races run this visit ----------------------------------------------
+0x00C6DF64	g_stable_racecount	g_screen_stable_int02	TScreen_Stable.SetUpNextRace `add dword ptr [0xc6df64], 1` (830564dfc60001) at 0x00588585 then compares it with 6 and pushes it, as g_stable_racecount. TScreen_Stable.ButtonQuit `mov dword ptr [0xc6df64], 0` (c70564dfc60000000000) at 0x0058846C and THorse.DoHealthUpdate at 0x0058B9E3 reset it, and ButtonRaceHorse reads it, as g_screen_stable_int02. Both Int.
