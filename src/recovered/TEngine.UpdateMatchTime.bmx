@@ -22,7 +22,7 @@
 ' Module Globals declared by this body (names are ours; the TYPES are load-bearing):
 '   g_intraining 0x00C6CF90   g_matchstate 0x00C5B1FC   g_myprofile:TPlayer 0x00C5B248
 '   g_statestarted 0x00C5B254 g_matchtimer 0x00C6EFD4   g_shootoutstarted 0x00C5B244
-'   g_homeTeam:TTeam 0x00C5B218  g_possessionhome 0x00C5B25C  g_possessionaway 0x00C5B260
+'   g_homeTeam:TTeam 0x00C5B218  g_engine_float07 0x00C5B25C  g_engine_float08 0x00C5B260
 '   g_half 0x00C5B208  g_minutes 0x00C5B210  g_lastminutetick 0x00C5B214
 '   g_halflength 0x00C5B20C  g_opt_matchlength 0x00C5D230
 	Function UpdateMatchTime:Int()
@@ -33,8 +33,8 @@
 		'!Global g_matchtimer:Int
 		'!Global g_shootoutstarted:Int
 		'!Global g_homeTeam:TTeam
-		'!Global g_possessionhome:Float
-		'!Global g_possessionaway:Float
+		'!Global g_engine_float07:Float
+		'!Global g_engine_float08:Float
 		'!Global g_half:Int
 		'!Global g_minutes:Int
 		'!Global g_lastminutetick:Int
@@ -63,9 +63,9 @@
 		If b <> Null And b.KeeperHolding() Then Return 0
 		TPlayer.UpdateMatchRatingAll()
 		If b <> Null And b.teaminpossession = g_homeTeam.id Then
-			g_possessionhome = g_possessionhome + 0.01
+			g_engine_float07 = g_engine_float07 + 0.01
 		Else
-			g_possessionaway = g_possessionaway + 0.01
+			g_engine_float08 = g_engine_float08 + 0.01
 		End If
 		Local tick:Int = (g_halflength * 60 * g_opt_matchlength) / 90
 		If g_matchtimer > g_lastminutetick + tick Then
