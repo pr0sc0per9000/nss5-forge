@@ -2396,3 +2396,7 @@ address	alias	canonical	evidence
 #
 #	---- 0x00C6DF64 : races run this visit ----------------------------------------------
 0x00C6DF64	g_stable_racecount	g_screen_stable_int02	TScreen_Stable.SetUpNextRace `add dword ptr [0xc6df64], 1` (830564dfc60001) at 0x00588585 then compares it with 6 and pushes it, as g_stable_racecount. TScreen_Stable.ButtonQuit `mov dword ptr [0xc6df64], 0` (c70564dfc60000000000) at 0x0058846C and THorse.DoHealthUpdate at 0x0058B9E3 reset it, and ButtonRaceHorse reads it, as g_screen_stable_int02. Both Int.
+#
+#	---- 0x00C6DF54 : race camera tween start --------------------------------------------
+#	The UNFIXABLE TODAY note on this slot above is stale: TScreen_Stable.Update is recovered.
+0x00C6DF54	g_screen_stable_float03	g_stable_startxprev	The only two references: TScreen_Stable.Update `fstp dword ptr [0xc6df54]` (d91d54dfc600) at 0x00588D0F as g_stable_startxprev, and TScreen_Stable.Draw `fld dword ptr [0xc6df54]` (d90554dfc600) at 0x0058913E, right after the render tween fmul, as g_screen_stable_float03. Both Float.
