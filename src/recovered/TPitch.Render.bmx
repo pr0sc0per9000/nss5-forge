@@ -210,7 +210,7 @@ Function Render:Int(a0:Float, a1:Float, a2:Float)
 	Next
 	TDrawOb.AddDrawOb(g_goal1shadowimg, 0, -g_player_int17, 0, 0, 2, 0.3, 0, "FFFFFF", 0.5, 0.5, 3, 0, "", 0, 0)
 	TDrawOb.AddDrawOb(g_goal1img, 0, -g_player_int17, 0, 0, 3, 1.0, 0, "FFFFFF", 0.5, 0.5, 3, 0, "", 0, 0)
-	TDrawOb.AddDrawOb(g_goal1netimg, 0, (-g_pitch_int10 - g_player_int17) - 2, 0, 0, 3, 1.0, 0, "FFFFFF", 0.5, 0.5, 3, 0, "", 0, 0)
+	TDrawOb.AddDrawOb(g_goal1netimg, 0, (-g_player_int17 - g_pitch_int10) - 2, 0, 0, 3, 1.0, 0, "FFFFFF", 0.5, 0.5, 3, 0, "", 0, 0)
 	TDrawOb.AddDrawOb(g_goal2shadowimg, 0, g_player_int17 + g_pitch_int10 + 4, 0, 0, 2, 0.3, 0, "FFFFFF", 0.5, 0.5, 3, 0, "", 0, 0)
 	TDrawOb.AddDrawOb(g_goal2img, 0, g_player_int17 + g_pitch_int10 + 4, 0, 0, 3, 1.0, 0, "FFFFFF", 0.5, 0.5, 3, 0, "", 0, 0)
 	Local flap:Int = (g_player_int50 Mod 1000) > 500

@@ -7,7 +7,9 @@
 '   0x00C674D0 g_kits_fixture:TFixture -- it is argument 1 of TEngine.SetUpMatch,
 '     whose reflection signature (:TFixture,:TTeam,:TTeam,()i)i fixes the type.
 '   0x00C674D4 / 0x00C674D8 :TClub, 0x00C674DC..0x00C674E8 :TKit (construction sites),
-'     0x00C674F4 / 0x00C674F8 :Int, 0x00C68624 :Float (x87 dword load).
+'     0x00C674F4 g_kits_showhome / 0x00C674F8 g_kits_showaway :Int (CreateTeamSimple's
+'     controller argument, pushed at 0x0054A625 / 0x0054A673; SetUpScreen sets each to 1
+'     for the user's side), 0x00C68624 :Float (x87 dword load).
 '   0x00C674C0 is NOT an Int: it is argument 4 of SetUpMatch, declared ()i, i.e. a
 '     function-pointer Global.  globals_final.tsv types it Int and is wrong.
 '   0x00C674EC / 0x00C674F0 hold references (retain of bbNullObject + release of the old
@@ -25,8 +27,8 @@
 		'!Global g_kits_kit4:TKit
 		'!Global g_kits_obj1:Object
 		'!Global g_kits_obj2:Object
-		'!Global g_kits_int1:Int
-		'!Global g_kits_int2:Int
+		'!Global g_kits_showhome:Int
+		'!Global g_kits_showaway:Int
 		'!Global g_kits_energy:Float
 		'!Global g_kits_fn:Int()
 		TScreen.DoProgressBar(1.0, GetText("Retrieve Team"), "00FF00", 1)
@@ -49,8 +51,8 @@
 		If g_kits_club2.CheckManagerChangeFormation() And g_kits_club2.id = g_profile.clubid And g_kits_fixture.level = 0
 			g_profile.formationchanged = 1
 		End If
-		Local t1:TTeam = TTeam.CreateTeamSimple(g_kits_club1.id, g_kits_club1.labelshortname, g_kits_club1.tla, g_kits_club1.strength, g_kits_int1, g_kits_kit1, g_kits_kit3, g_kits_club1.formation, sel, 1, g_kits_fixture)
-		Local t2:TTeam = TTeam.CreateTeamSimple(g_kits_club2.id, g_kits_club2.labelshortname, g_kits_club2.tla, g_kits_club2.strength, g_kits_int2, g_kits_kit2, g_kits_kit4, g_kits_club2.formation, sel, 2, g_kits_fixture)
+		Local t1:TTeam = TTeam.CreateTeamSimple(g_kits_club1.id, g_kits_club1.labelshortname, g_kits_club1.tla, g_kits_club1.strength, g_kits_showhome, g_kits_kit1, g_kits_kit3, g_kits_club1.formation, sel, 1, g_kits_fixture)
+		Local t2:TTeam = TTeam.CreateTeamSimple(g_kits_club2.id, g_kits_club2.labelshortname, g_kits_club2.tla, g_kits_club2.strength, g_kits_showaway, g_kits_kit2, g_kits_kit4, g_kits_club2.formation, sel, 2, g_kits_fixture)
 		TEngine.SetUpMatch(g_kits_fixture, t1, t2, g_kits_fn)
 		g_kits_obj1 = Null
 		g_kits_obj2 = Null

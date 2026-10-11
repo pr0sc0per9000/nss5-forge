@@ -9,10 +9,10 @@
 	Method DoAnimFall:Int()
 		'!Global g_animfall:Int[]
 		'!Global g_sndfall:TSound
-		'!Global g_chanfall:TChannel
+		'!Global g_player_oofchannel:TChannel
 		'!Global g_ball:TBall
 		LogLine("DoAnimFall")
-		PlaySound(g_sndfall, g_chanfall)
+		PlaySound(g_sndfall, g_player_oofchannel)
 		Self.currentanim = g_animfall
 		Self.frame = 0
 		Self.joy.Clear()

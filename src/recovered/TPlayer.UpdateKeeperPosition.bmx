@@ -44,7 +44,7 @@
 '   0x00C6EFD4 g_matchclock:Int        the millisecond match clock (same address as
 '                                       g_player_int50 / g_matchtime elsewhere); named
 '                                       to match the sibling TPlayer.DoKeeperDiveAI.
-'   0x00C5D63C g_goal_halfw:Int        goal-mouth half-width (TPlayer.DoKeeperDiveAI:
+'   0x00C5D63C g_goalpost:Int        goal-mouth half-width (TPlayer.DoKeeperDiveAI:
 '                                       "goal mouth spans [-(g+20), g+20] on the byline").
 '   0x00C5DE70 g_player_int33:Int      ball/player height unit; dive-height threshold,
 '                                       dominant name across the corpus (10 bodies incl.
@@ -199,7 +199,7 @@
 '!Global g_ball:TBall
 '!Global g_penboxside:Int
 '!Global g_matchclock:Int
-'!Global g_goal_halfw:Int
+'!Global g_goalpost:Int
 '!Global g_player_int33:Int
 '!Global g_tr_mode:Int
 '!Global g_player_int19:Int
@@ -252,7 +252,7 @@ Self.desy = goaly + Sin(ang) * dist
 Local ctrl:TPlayer = g_ball.controlledby
 If ctrl <> Null
 	If g_tr_mode Then Return 0
-	Local ip:TInterceptPoint = GetInterceptPoint(-g_goal_halfw - 10, goaly, g_goal_halfw + 10, goaly, ctrl.x, ctrl.y, ctrl.x + Cos(ctrl.direction) * 100.0, ctrl.y + Sin(ctrl.direction) * 100.0)
+	Local ip:TInterceptPoint = GetInterceptPoint(-g_goalpost - 10, goaly, g_goalpost + 10, goaly, ctrl.x, ctrl.y, ctrl.x + Cos(ctrl.direction) * 100.0, ctrl.y + Sin(ctrl.direction) * 100.0)
 	If ctrl.teamid <> Self.teamid And ctrl.distancetogoal_opp < TPitch.YardsToPixels(30.0) And ctrl.CleanThrough()
 		If ip.intercept Or ctrl.distancetogoal_opp < TPitch.YardsToPixels(12.0)
 			Self.InterceptBall(g_ball)

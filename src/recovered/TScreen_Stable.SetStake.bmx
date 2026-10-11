@@ -7,12 +7,12 @@
 ' 0x00C6E91C String ("00FF00"), 0x00C6DF68 Int (the stake).
 ' The trailing Select has no Default: the last compare is followed by a jmp to after the
 ' bodies (patterns 10.2).
-'!Global g_stable_panel:TPanel
+'!Global g_stable_panstake:TPanel
 '!Global g_activegadget:TGadget
 '!Global g_greenhex:String
 '!Global g_stakeamount:Int
 	Function SetStake:Int()
-		For Local g:TGadget = EachIn g_stable_panel.children
+		For Local g:TGadget = EachIn g_stable_panstake.children
 			g.SetColour("FFFFFF", "FFFFFF")
 			If g = g_activegadget Then g.SetColour(g_greenhex, "FFFFFF")
 		Next

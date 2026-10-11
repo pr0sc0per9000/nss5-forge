@@ -78,9 +78,10 @@ ends with `result: BUILD OK`.
 ## Run it
 
 ```bash
-bash scripts/build_debug.sh
-python scripts/debug_game.py --minutes 10
+python scripts/debug_game.py
 ```
+
+Playtesting: `debug_game.py`. Normal play: the regular exe.
 
 **Do not run the built `.exe` yourself.** It can start in full screen and lock up,
 holding the display and the keyboard, and that needs a power cycle to clear.

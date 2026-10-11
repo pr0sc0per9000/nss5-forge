@@ -17,7 +17,7 @@
 '                                             way; the Type is chosen on semantics, not on bytes.
 '      g_pitchhalfwidth:Int    0x00C5D634
 '      g_pitchmargin:Int       0x00C5A4C8
-'      g_pitchhalfheight:Int   0x00C5D638
+'      g_goalline:Int   0x00C5D638
 '    All three pitch Globals are bare dword loads with no refcount traffic -> Int (guide 11.2).
 '  * call [0x00C5BAA0] is a class-table interior, not a Global: TEngine+0x70 =
 '    SetUpSetPiece (i,i,i,i)i at 0x004D2F01 (globals_classtable_slots.tsv + vtable_map.tsv).
@@ -36,7 +36,7 @@ Method CheckSideLines:Int()
 	'!Global g_hometeam:TTeam
 	'!Global g_pitchhalfwidth:Int
 	'!Global g_pitchmargin:Int
-	'!Global g_pitchhalfheight:Int
+	'!Global g_goalline:Int
 	If Self.active = 0 Then Return 0
 	If g_matchstate <> 1 And g_matchstate <> 10 Then Return 0
 	Local p:TPlayer = Self.lasttouchedby
@@ -52,7 +52,7 @@ Method CheckSideLines:Int()
 		TEngine.SetUpSetPiece(3, t, 0, 0)
 		Return 0
 	EndIf
-	If Self.y > g_pitchhalfheight + g_pitchmargin
+	If Self.y > g_goalline + g_pitchmargin
 		If p.GetShootingDirection() = 1
 			TEngine.SetUpSetPiece(6, t, 0, 0)
 			Return 0
@@ -61,7 +61,7 @@ Method CheckSideLines:Int()
 			Return 0
 		EndIf
 	EndIf
-	If Self.y < -g_pitchhalfheight - g_pitchmargin
+	If Self.y < -g_goalline - g_pitchmargin
 		If p.GetShootingDirection() = -1
 			TEngine.SetUpSetPiece(6, t, 0, 0)
 			Return 0

@@ -9,7 +9,10 @@
 '!Global g_screen_fy:Float
 '!Global g_mm_lasttime:Int
 '!Global g_mm_index:Int
-'!Global g_mm_delay:Int
+' g_mm_delay is 0x00C7EC8C, data value 0x00000FA0 = 4000 in NSS5.exe, never stored to: its
+' only two references are the reads here (0x0051CEE4 `03058cecc700 add eax,[0xc7ec8c]`,
+' 0x0051CFC1 `ff358cecc700 push [0xc7ec8c]`). At 0 every credit was a 0 ms alert.
+'!Global g_mm_delay:Int = 4000
 ' g_mm_offx/g_mm_offw original data-section values are 10.0 / 20.0
 ' (0x00C7EC90 / 0x00C7EC94). Never stored to anywhere in the corpus -- see
 ' codegen-patterns 21.1.

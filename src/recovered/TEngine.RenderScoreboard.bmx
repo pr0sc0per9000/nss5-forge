@@ -5,7 +5,7 @@
 '   0x00C5B1FC g_matchstate:Int      0x00C73DD8 g_sbalpha:Float      0x00C73DDC g_sbfadein:Float
 '   0x00C73DE0 g_sbfadeout:Float     0x00C73DE4 g_sbscroll:Int       0x00C5B25C g_posshome:Float
 '   0x00C5B260 g_possaway:Float      0x00C6EFE4 g_screen_w:Int       0x00C6EFE8 g_screen_h:Int
-'   0x00C6EFEC g_joyactive:Int       0x00C5B2D4 g_homebadge:TImage   0x00C5B2D8 g_awaybadge:TImage
+'   0x00C6EFEC g_joyactive:Int       0x00C5B2D4 g_homebadge:TImage   0x00C5B2D8 g_object22:TImage
 '   0x00C6F34C g_sbbar1:TImage       0x00C6F3B0 g_sbbar2:TImage      0x00C5B218 g_hometeam:TTeam
 '   0x00C5B21C g_awayteam:TTeam      0x00C5B22C g_fixture:TFixture   0x00C5B258 g_sbpage:Int
 '   0x00C5B264/68 shots h/a          0x00C5B26C/70 on-target h/a     0x00C5B274/78 free kicks h/a
@@ -47,7 +47,7 @@
 		'!Global g_screen_h:Int
 		'!Global g_joyactive:Int
 		'!Global g_homebadge:TImage
-		'!Global g_awaybadge:TImage
+		'!Global g_object22:TImage
 		'!Global g_object872:TImage
 		'!Global g_object873:TImage
 		'!Global g_hometeam:TTeam
@@ -120,9 +120,9 @@
 				DrawImageRect(g_object873, 0, yy - 32, g_screen_w, 4, 0)
 				DrawImageRect(g_object873, 0, yy + 468, g_screen_w, 4, 0)
 
-				If g_homebadge <> Null And g_awaybadge <> Null
+				If g_homebadge <> Null And g_object22 <> Null
 					DrawImage(g_homebadge, xleft, yy - 58, 0)
-					DrawImage(g_awaybadge, xright, yy - 58, 0)
+					DrawImage(g_object22, xright, yy - 58, 0)
 				EndIf
 
 				DrawMyText(g_hometeam.name, xleft, yy, 1, 1, 1.0, g_sbalpha, "FFFFFF", 0)
@@ -307,10 +307,10 @@
 
 			If g_kickcount > 0
 				DrawMyText(GetText("Penalties").ToUpper(), 10, g_screen_h - 100, 0, 0, 0.5, 1.0, "FFFFFF", 0)
-				If g_homebadge <> Null And g_awaybadge <> Null
+				If g_homebadge <> Null And g_object22 <> Null
 					SetScale(0.5, 0.5)
 					DrawImage(g_homebadge, 30, g_screen_h - 60, 0)
-					DrawImage(g_awaybadge, 30, g_screen_h - 30, 0)
+					DrawImage(g_object22, 30, g_screen_h - 30, 0)
 					SetScale(1.0, 1.0)
 				EndIf
 				Local kx:Int = 40

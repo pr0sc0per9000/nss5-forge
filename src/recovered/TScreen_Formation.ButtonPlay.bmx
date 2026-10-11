@@ -5,14 +5,14 @@
 '  * Globals (names ours; declared types are load-bearing):
 '      0x00C677DC g_screen_formation_int06:Int   0x00C677D8 g_screen_formation_int05:Int
 '      0x00C5B210 g_engine_int20:Int             0x00C6F028 g_profile:TProfile
-'      0x00C5B22C g_engine_fixture:TFixture      0x00C677B0 g_formation_team:TTeam
+'      0x00C5B22C g_engine_fixture:TFixture      0x00C677B0 g_playerteam:TTeam (SetUpScreen's)
 '      0x00C5B218 g_hometeam:TTeam             0x00C5B21C g_opponentteam:TTeam
 '      0x00C5B364 g_engine_snd:TSound            0x00C5B348 g_engine_chan:TChannel
 '    0x00C5B22C is TPlayer(guess) in globals_final.tsv; TFixture is what other bodies
 '    established (TEngine.EndMatch / DrawScores / CheckShootOutComplete all use it), and
 '    +0x3C = TFixture.level is the club-vs-nation switch read here.
 '    0x00C5B218 is TKit(conflict) in the table; TTeam is what TBall.CheckSideLines uses
-'    and is forced here by the assignment g_formation_team = g_opponentteam.
+'    and is forced here by the assignment g_playerteam = g_opponentteam.
 '    0x00C677DC is TPlayer(construction) in the table but the store is a bare
 '    `mov dword [g],0` with no refcount traffic, so it is an Int (guide 11.2).
 '  * TProfile slot 0x150 is CheckAchievement(i)i; 0x59 = 89.
@@ -25,7 +25,7 @@
 	'!Global g_engine_int20:Int
 	'!Global g_profile:TProfile
 	'!Global g_engine_fixture:TFixture
-	'!Global g_formation_team:TTeam
+	'!Global g_playerteam:TTeam
 	'!Global g_hometeam:TTeam
 	'!Global g_opponentteam:TTeam
 	'!Global g_engine_snd:TSound
@@ -55,13 +55,13 @@
 	EndIf
 	If g_engine_fixture.level = 0
 		If g_profile.myclub <> Null
-			g_profile.myclub.formation = TFormation.GetTacticIdByName(g_formation_team.formation.name)
+			g_profile.myclub.formation = TFormation.GetTacticIdByName(g_playerteam.formation.name)
 		EndIf
 	ElseIf g_profile.mynation <> Null
-		g_profile.mynation.formation = TFormation.GetTacticIdByName(g_formation_team.formation.name)
+		g_profile.mynation.formation = TFormation.GetTacticIdByName(g_playerteam.formation.name)
 	EndIf
-	If g_formation_team = g_hometeam And g_opponentteam.controller = 1
-		g_formation_team = g_opponentteam
+	If g_playerteam = g_hometeam And g_opponentteam.controller = 1
+		g_playerteam = g_opponentteam
 		Return 0
 	EndIf
 	If g_engine_int20 > 0

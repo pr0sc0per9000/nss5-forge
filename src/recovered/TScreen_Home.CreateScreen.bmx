@@ -16,6 +16,11 @@
 '   0x00C669A8 g_prg_home_achievements
 ' Each was spelled with a name another screen uses for a DIFFERENT slot. Evidence and
 ' the two player-visible failures are under THE SEVEN NAME COLLISIONS below.
+'
+' GLOBAL RENAMED (2026-10-11): g_prg_energy -> g_bar_energy in THIS file only. The help
+' box at 0x0053C994 pushes 0x00C66790 (`ff359067c600`), the title bar's energy bar, which
+' TScreen_GameMenu.CreateScreen stores at 0x0053A330 as g_bar_energy. g_prg_energy had no
+' writer, so THelpBox.Create got Null and drew the Energy help box at (10,10).
 ' TScreen_Home.CreateScreen
 ' VA 0x0053BA31   4273 bytes   mode=reloc   byte-identical vs NSS5.exe
 ' (4273/4273, original length from Ghidra's inventory, reloc_masked=412; re-verified with
@@ -80,7 +85,7 @@
 '   the names are guesses at their role):
 '     0x00C66768 g_pan_stable:TPanel   0x00C667B0 g_pan_money:TPanel
 '         (the same two Globals TScreen_Abilities.CreateScreen re-adds -- names kept identical)
-'     0x00C66788 g_lbl_bank:TLabel     0x00C66790 g_prg_energy:TProgressBar
+'     0x00C66788 g_lbl_bank:TLabel     0x00C66790 g_bar_energy:TProgressBar
 '     0x00C66798 g_btn_play:TButton    0x00C667A4 g_btn_main:TButton
 '     0x00C6676C g_btn_help:TButton    0x00C66770 g_btn_options:TButton
 '     0x00C66774 g_btn_quit:TButton
@@ -170,7 +175,7 @@
 '!Global g_pan_stable:TPanel
 '!Global g_pan_money:TPanel
 '!Global g_lbl_bank:TLabel
-'!Global g_prg_energy:TProgressBar
+'!Global g_bar_energy:TProgressBar
 '!Global g_btn_play:TButton
 '!Global g_btn_main:TButton
 '!Global g_btn_help:TButton
@@ -279,7 +284,7 @@
 		g_pan_achievements.AddChild(g_prg_home_achievements)
 		g_pan_achievements.AddChild(g_btn_achievements)
 		g_screen_home.lHelp.AddLast(THelpBox.Create(g_lbl_bank, 0, 0, 0, 0, GetText("CHELP_BANK"), 1, 2))
-		g_screen_home.lHelp.AddLast(THelpBox.Create(g_prg_energy, 0, 0, 0, 0, GetText("CHELP_ENERGY"), 1, 2))
+		g_screen_home.lHelp.AddLast(THelpBox.Create(g_bar_energy, 0, 0, 0, 0, GetText("CHELP_ENERGY"), 1, 2))
 		g_screen_home.lHelp.AddLast(THelpBox.Create(g_btn_main, 0, 0, 0, 0, GetText("CHELP_MAINBUTTONS"), 2, 2))
 		g_screen_home.lHelp.AddLast(THelpBox.Create(g_btn_play, 0, 0, 0, 0, GetText("CHELP_PLAYBUTTON"), 2, 2))
 		g_screen_home.lHelp.AddLast(THelpBox.Create(g_btn_options, 0, 0, 0, 0, GetText("CHELP_OPTIONSBUTTON"), 1, 2))

@@ -17,7 +17,7 @@
 '                                      joystick button (+0x1C). Same four arrays and the
 '                                      same Int[] typing as TOptions.LoadOptions.
 '   0x00C5D634 g_pitch_halfw:Int  0x00C5D638 g_pitch_halfh:Int   (names from TPitch.IsOnPitch)
-'   0x00C5D63C g_goal_halfw:Int        goal mouth spans [-(g+20), g+20] on the byline
+'   0x00C5D63C g_goalpost:Int        goal mouth spans [-(g+20), g+20] on the byline
 '   0x00C5DE70 g_keeper_maxheight:Int  dive-height thresholds (half / full)
 '   0x00C5A4D0 g_ball_friction:Float   0x00C5A4D4 g_ball_gravity:Float
 '
@@ -66,7 +66,7 @@
 		'!Global g_opt_ctrlright:Int[]
 		'!Global g_pitch_halfw:Int
 		'!Global g_pitch_halfh:Int
-		'!Global g_goal_halfw:Int
+		'!Global g_goalpost:Int
 		'!Global g_keeper_maxheight:Int
 		'!Global g_ball_friction:Float
 		'!Global g_ball_gravity:Float
@@ -161,8 +161,8 @@
 			bz = bz + bzvel
 			If Not g_ball.controlledby Then bdir = bdir + g_ball.curlamount
 			ip = GetInterceptPoint(p1x, p1y, p2x, p2y, g_ball.x, g_ball.y, bx, by)
-			If GetInterceptPoint(-g_pitch_halfw, goaly, -g_goal_halfw - 20, goaly, g_ball.x, g_ball.y, bx, by).intercept Then Return 0
-			If GetInterceptPoint(g_goal_halfw + 20, goaly, g_pitch_halfw, goaly, g_ball.x, g_ball.y, bx, by).intercept Then Return 0
+			If GetInterceptPoint(-g_pitch_halfw, goaly, -g_goalpost - 20, goaly, g_ball.x, g_ball.y, bx, by).intercept Then Return 0
+			If GetInterceptPoint(g_goalpost + 20, goaly, g_pitch_halfw, goaly, g_ball.x, g_ball.y, bx, by).intercept Then Return 0
 		Until bz <= 0 Or bvel <= 0 Or ip.intercept
 		If ip.intercept
 			Local dist:Float = Dist2D(Self.x, Self.y + yoff, bx, by)

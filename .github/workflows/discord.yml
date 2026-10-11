@@ -6,6 +6,9 @@ name: Discord
 #   pre-release     test build, pings @Playtester in #announcements
 #   release         pings @Update Pings in #announcements
 #
+# Both release kinds also go to #github-feed without a ping, and every release
+# post carries a Download link to the release page.
+#
 # Secrets: DISCORD_FEED_WEBHOOK, DISCORD_ANNOUNCE_WEBHOOK
 # Variables: DISCORD_PLAYTEST_ROLE, DISCORD_UPDATE_ROLE (role ids)
 # Without the webhook secrets (forks) every step skips.
@@ -23,7 +26,7 @@ permissions: {}
 
 jobs:
   commits:
-    name: Post commits to #github-feed
+    name: 'Post commits to #github-feed'
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     env:
@@ -50,11 +53,12 @@ jobs:
           curl -fsS -H "Content-Type: application/json" -d @payload.json "$WEBHOOK"
 
   release:
-    name: Announce release in #announcements
+    name: 'Post release to #announcements and #github-feed'
     if: github.event_name == 'release'
     runs-on: ubuntu-latest
     env:
       WEBHOOK: ${{ secrets.DISCORD_ANNOUNCE_WEBHOOK }}
+      FEED_WEBHOOK: ${{ secrets.DISCORD_FEED_WEBHOOK }}
       PLAYTEST_ROLE: ${{ vars.DISCORD_PLAYTEST_ROLE }}
       UPDATE_ROLE: ${{ vars.DISCORD_UPDATE_ROLE }}
     steps:
@@ -74,16 +78,23 @@ jobs:
             echo "Role variable for this release type is not set."
             exit 1
           fi
-          jq --arg role "$role" --arg kind "$kind" --argjson color "$color" '{
+          # Same post twice: with the role ping for #announcements, without it for #github-feed.
+          post='{
             username: "nss5-forge",
             avatar_url: "https://github.com/pr0sc0per9000.png",
-            content: "<@&\($role)> \($kind)",
-            allowed_mentions: {roles: [$role]},
+            content: "\($ping)\($kind)\nDownload: <\(.release.html_url)>",
+            allowed_mentions: (if $ping == "" then {parse: []} else {roles: [$role]} end),
             embeds: [{
               title: (if (.release.name // "") == "" then .release.tag_name else .release.name end),
               url: .release.html_url,
               color: $color,
               description: ((.release.body // "")[0:3500])
             }]
-          }' "$GITHUB_EVENT_PATH" > payload.json
-          curl -fsS -H "Content-Type: application/json" -d @payload.json "$WEBHOOK"
+          }'
+          args=(--arg role "$role" --arg kind "$kind" --argjson color "$color")
+          jq "${args[@]}" --arg ping "<@&$role> " "$post" "$GITHUB_EVENT_PATH" > announce.json
+          curl -fsS -H "Content-Type: application/json" -d @announce.json "$WEBHOOK"
+          if [ -n "$FEED_WEBHOOK" ]; then
+            jq "${args[@]}" --arg ping "" "$post" "$GITHUB_EVENT_PATH" > feed.json
+            curl -fsS -H "Content-Type: application/json" -d @feed.json "$FEED_WEBHOOK"
+          fi

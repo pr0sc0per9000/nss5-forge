@@ -20,8 +20,10 @@
 '   g_prevscreen @ 0x00C63CEC -- String, not Int. Confirmed against
 '     src/recovered/TScreen_Options.ButtonBack.bmx, which passes the identical global to
 '     the identical TScreen.SetActive($,$) call.
-'   g_screen_mainmenu_int03 @ 0x00C639FC -- String. The literal assigned is the STRING "0",
+'   g_mainmenu_str @ 0x00C639FC -- String. The literal assigned is the STRING "0",
 '     not the integer 0; it compiles to the standard refcounted store idiom.
+'     Renamed 2026-10-11 from g_screen_mainmenu_int03, which also named 0x00C63A00 in
+'     TScreen_MainMenu.NewGame; g_mainmenu_str is TScreen_Language.ButtonLanguage's name.
 '   g_player_int01 @ 0x00C5B1FC -- Int (hand-verified, globals_corrections.tsv).
 '
 ' The third argument to SetUpGraphics is 0 here and 1 at the GameMain boot call site --
@@ -31,12 +33,12 @@
 		'!Global g_screen_options_int01:Int
 		'!Global g_screen_options_int02:Int
 		'!Global g_prevscreen:String
-		'!Global g_screen_mainmenu_int03:String
+		'!Global g_mainmenu_str:String
 		'!Global g_player_int01:Int
 		LogLine("ResetScreen")
 		SetUpGraphics(g_screen_options_int01, g_screen_options_int02, 0)
 		TScreen.SetActive(g_prevscreen, "")
-		g_screen_mainmenu_int03 = "0"
+		g_mainmenu_str = "0"
 		TScreen_MainMenu.UpdateVersionInfo()
 		If g_prevscreen <> "mainmenu" And g_player_int01 = 0
 			TScreen_GameMenu.UpdateTitlePanel()
