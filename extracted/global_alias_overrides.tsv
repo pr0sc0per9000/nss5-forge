@@ -2371,3 +2371,6 @@ address	alias	canonical	evidence
 #
 #	---- 0x00C5D1BC : training controls panel down key ----------------------------------
 0x00C5D1BC	g_key_b	g_ctrl_down	TPanel_Controls.RenderTraining (VA 0x005849F2) builds `g_key_a, g_key_c, g_key_b, g_key_d`; the g_key_b load is `mov eax, dword ptr [0xc5d1bc]` (a1bcd1c500) at 0x00584B84 and the g_key_d load is `mov eax, dword ptr [0xc5d1cc]` (a1ccd1c500) at 0x00584B6D. RenderTraining.bmx:17 and global_alias_map.tsv:39 both put g_key_b at 0x00C5D1BC; global_alias_unified.tsv:113 files it under 0x00C5D1CC, which sent both loads to TOptions.g_ctrl_right. g_key_b occurs in one body.
+#
+#	---- 0x00C63D08 : Options restart message shown once ---------------------------------
+0x00C63D08	g_screen_options_int12	g_opt_msgshown	TScreen_Options.ComboRes tests and sets the shown-once flag `cmp dword ptr [0xc63d08], 0` (833d083dc60000) at 0x00521297 and `mov dword ptr [0xc63d08], 1` (c705083dc60001000000) at 0x005212BB; TScreen_Options.ButtonWindow does the same at 0x005210CD and 0x005210F1 as g_opt_msgshown. Exactly 4 dword references. Both Int, init 0, one body each.
