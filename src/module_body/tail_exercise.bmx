@@ -27,108 +27,78 @@
 ' artefacts of missing context rather than real bugs. It is a net, not a verdict.
 ' ============================================================================
 
-Print "[boot] module body entered (EXERCISE tail)"
+' The boot below is src/module_body/tail.bmx's, statement for statement, up to its
+' GameMain() call; this file then walks the screens instead of entering the game.
 
-g_dataDir = AppDir + "/"
+Global g_promotionplace_int05:String = ""         ' 0x00C6E950, the install root
+Global g_replay_div:Int = 25                      ' 0x00C6F02C, the fixed timestep in ms
+Global g_logstream:TStream                        ' 0x00C6EFF0
+Global g_forgotpwurl:String = "http://www.newstarsoccer.com/forgottenpassword.php?msg=Enter your player name and click reset to change your password..."   ' 0x00C6EF10
+Global g_version:String = "1.15"                  ' 0x00C6E900
+Global g_col_highlight:String = "00FF00"          ' 0x00C6E91C
+Global g_locale_lang:String = "en"                ' 0x00C5A33C
 
-' Same save-root resolution as src/module_body/tail.bmx, and it has to stay the same:
-' a rig that reads a different Options.ini from the one the game reads reports on a
-' configuration no player has. See tail.bmx for the evidence behind CSIDL_PERSONAL.
-' The two tails are alternates, so only one of these Extern blocks is ever compiled.
-' The declaration is flush left inside the block on purpose: scripts/assemble.py's
-' count_placed() counts every tab-indented `Function` in the emitted file as a Type
-' member with a body, and an Extern prototype indented like one makes the placed-vs-
-' present body counts disagree, which aborts the assembly.
-Extern "win32"
-Function SHGetFolderPathW:Int(hwndOwner:Int, nFolder:Int, hToken:Int, dwFlags:Int, pszPath:Short Ptr)
-End Extern
-
-Function UserDocumentsDir:String()
-	Local buf:Short[520]
-	If SHGetFolderPathW(0, 5, 0, 0, Varptr buf[0]) = 0
-		Local d:String = String.FromWString(Varptr buf[0])
-		If d.length > 0 Then Return d
-	EndIf
-	Return CurrentDir()
-End Function
-' CASE DIRECTION CORRECTED 2026-08-22: module-body offset +5632 calls the brl.retro
-' Trim wrapper (0x0059C8E8) and +5641 calls 0x004A7410, which is _bbStringToUpper,
-' not the _brl_retro_Lower the learned helper table used to name it. See
-' docs/reference/codegen-patterns.md 15.6.
-g_savedir = Trim(ReadSettingString(g_dataDir + "Settings/Settings.txt", "saveloc")).ToUpper()
-If Right(g_savedir, 1) <> "/" And Right(g_savedir, 1) <> "\"
-	g_savedir = g_savedir + "/"
+AppTitle = "New Star Soccer 5"                                                    ' +5552
+Global g_userpath:String = Trim(ReadSettingString(g_promotionplace_int05 + "Settings/Settings.txt", "saveloc")).ToUpper()   ' +5585 #65
+If Right(g_userpath, 1) <> "/" And Right(g_userpath, 1) <> "\"                  ' +5664
+	g_userpath = g_userpath + "/"
 EndIf
-If g_savedir.length < 3
-	g_savedir = UserDocumentsDir() + "/New Star Soccer 5/"
+If g_userpath.length < 3                                                          ' +5801
+	g_userpath = Fn_0059812E() + "/New Star Soccer 5/"                            ' BaH.Volumes GetUserDocumentsDir
 EndIf
-' INSTALL prefix (0x00C6E950), not the save root -- see the long note in tail.bmx.
-' TLocale.SetUp reads this slot for GameMedia/Languages/Languages.csv and hard-exits if
-' the file is missing, which is what stopped the first exerciser run after two lines.
-g_pathPrefix = g_dataDir
-CreateDir(g_savedir, False)
-CreateDir(g_savedir + "Settings/", False)
-CreateDir(g_savedir + "Save/", False)
-CreateDir(g_savedir + "Replays/", False)
-
-g_engine_int161 = Int(ReadSettingFloat(g_dataDir + "Settings/Settings.txt", "debug", 0.0, 2.0))
-g_club_int07    = Int(ReadSettingFloat(g_dataDir + "Settings/Settings.txt", "fullnames", 0.0, 1.0))
-g_misc_int62    = Int(ReadSettingFloat(g_dataDir + "Settings/Settings.txt", "nettimeout", 3.0, 99.0))
-g_misc_int63    = Int(ReadSettingFloat(g_dataDir + "Settings/Settings.txt", "port", 0.0, 100000000.0))
-g_misc_int64    = ReadSettingString(g_dataDir + "Settings/Settings.txt", "proxy")
-
-g_screen_int20 = MilliSecs()
-SeedRnd(g_screen_int20)
-g_engine_int164 = JoyCount()
-
-g_timestepMs = 25
-g_profile = New TProfile
-g_engine_int167 = g_timestepMs
-
-' Driver selection identical to the normal tail. An earlier version forced
-' GLMax2DDriver here "to be safe" and that was a mistake: it made the harness run
-' on a different graphics driver from the real game, so failures it reported were
-' not necessarily failures the player would see. A test rig that does not match
-' the thing under test reports its own bugs.
-' The one deliberate difference is WINDOWED, enforced at the SetUpGraphics call
-' below rather than here -- an unattended fullscreen mode switch leaves the
-' desktop at 800x600 if the run dies, which is the display corruption already
-' reported from the Options confirm button.
-If ReadSettingFloat(g_dataDir + "Settings/Settings.txt", "opengl", 0.0, 1.0) = 1.0
+CreateDir(g_userpath, False)                                                      ' +5861
+CreateDir(g_userpath + "Settings/", False)
+CreateDir(g_userpath + "Save/", False)
+CreateDir(g_userpath + "Replays/", False)
+g_forgotpwurl.Replace(" ", "%20")                                                 ' +5967, result discarded
+Global g_engine_int161:Int = Int(ReadSettingFloat(g_promotionplace_int05 + "Settings/Settings.txt", "debug", 0.0, 2.0))          ' +5991 #66
+Global g_club_int07:Int = Int(ReadSettingFloat(g_promotionplace_int05 + "Settings/Settings.txt", "fullnames", 0.0, 1.0))         ' +6070 #67
+Global g_misc_int62:Int = Int(ReadSettingFloat(g_promotionplace_int05 + "Settings/Settings.txt", "nettimeout", 3.0, 99.0))       ' +6149 #68
+Global g_misc_int63:Int = Int(ReadSettingFloat(g_promotionplace_int05 + "Settings/Settings.txt", "port", 0.0, 100000000.0))      ' +6231 #69
+Global g_misc_int64:String = ReadSettingString(g_promotionplace_int05 + "Settings/Settings.txt", "proxy")                       ' +6310 #70
+Global g_pausedms:Int = MilliSecs()                                               ' +6371 #71
+SeedRnd(g_pausedms)                                                               ' +6406
+Global g_engine_int164:Int = JoyCount()                                           ' +6420 #72
+If g_engine_int161                                                                ' +6455
+	g_logstream = WriteFile(g_promotionplace_int05 + "log.txt")
+EndIf
+LogLine("Debug=" + g_engine_int161)                                               ' +6522
+Global g_profile:TProfile = New TProfile                                          ' +6559 #73
+Global g_frameaccum:Int = g_replay_div                                            ' +6605 #74, one full tick
+LogLine(GetGraphicsDriver().ToString())                                           ' +6640
+If ReadSettingFloat(g_promotionplace_int05 + "Settings/Settings.txt", "opengl", 0.0, 1.0) = 1.0    ' +6663
 	SetGraphicsDriver(GLMax2DDriver(), 2)
 Else
-	If D3D9Max2DDriver() = Null
+	If Not D3D9Max2DDriver()                                                      ' +6741
 		SetGraphicsDriver(D3D7Max2DDriver(), 2)
 	EndIf
 EndIf
-If Not SetAudioDriver("OpenAL") Then SetAudioDriver("FreeAudio")
-
-g_Object857 = AllocChannel()
-g_musicchannel = AllocChannel()
-g_Object859 = AllocChannel()
-g_Object860 = LoadSoundChecked("GameMedia/Sounds/Cash.ogg", 0)
-g_Object861 = LoadSoundChecked("GameMedia/Sounds/Achievement.ogg", 0)
-
-SetMaskColor(8, 132, 107)
-AutoMidHandle(False)
-
-g_screen_achievements_int03 = g_dataDir + "GameMedia/Images/Icons/"
-g_Object862 = LoadImageChecked(g_screen_achievements_int03 + "ArrowL.png", -1)
-g_Object863 = LoadImageChecked(g_screen_achievements_int03 + "ArrowR.png", -1)
-g_Object864 = LoadImageChecked(g_screen_achievements_int03 + "ArrowU.png", -1)
-g_Object865 = LoadImageChecked(g_screen_achievements_int03 + "ArrowD_Red.png", -1)
-g_Object866 = LoadImageChecked(g_screen_achievements_int03 + "Refresh.png", -1)
-g_Object867 = LoadImageChecked(g_screen_achievements_int03 + "Cross.png", -1)
-g_Object868 = LoadImageChecked(g_screen_achievements_int03 + "Tick.png", -1)
-g_Object869 = LoadImageChecked(g_screen_achievements_int03 + "CrossSmall.png", -1)
-g_Object870 = LoadImageChecked(g_screen_achievements_int03 + "TickSmall.png", -1)
-g_Object871 = LoadImageChecked(g_screen_achievements_int03 + "Help.png", -1)
-g_Object872 = LoadImageChecked("GameMedia\Images\Interface\MessageBg.png", -1)
-g_Object873 = LoadImageChecked("GameMedia\Images\Interface\MessageLine.png", 1)
-
-g_col_highlight = "00FF00"
-g_col_key = "00FF00"
-g_opt_refresh = TScreen_Options.RefreshButtons
+EnableOpenALAudio()                                                               ' +6778
+If Not SetAudioDriver("OpenAL")                                                   ' +6783
+	SetAudioDriver("FreeAudio")
+	LogLine("FreeAudio")
+EndIf
+Global g_object857:TChannel = AllocChannel()                                      ' +6827 #75
+Global g_musicchannel:TChannel = AllocChannel()                                   ' +6865 #76
+Global g_object859:TChannel = AllocChannel()                                      ' +6903 #77
+Global g_object860:TSound = LoadSoundChecked("GameMedia/Sounds/Cash.ogg", 0)       ' +6941 #78
+Global g_object861:TSound = LoadSoundChecked("GameMedia/Sounds/Achievement.ogg", 0)    ' +6989 #79
+Global g_tracks:TSound[6]                                                         ' +7037 #80
+SetMaskColor(8, 132, 107)                                                         ' +7085
+AutoMidHandle(False)                                                              ' +7102
+Global g_iconpath:String = g_promotionplace_int05 + "GameMedia/Images/Icons/"     ' +7112 #81
+Global g_object862:TImage = LoadImageChecked(g_iconpath + "ArrowL.png", -1)       ' +7164 #82
+Global g_object863:TImage = LoadImageChecked(g_iconpath + "ArrowR.png", -1)       ' #83
+Global g_object864:TImage = LoadImageChecked(g_iconpath + "ArrowU.png", -1)       ' #84
+Global g_object865:TImage = LoadImageChecked(g_iconpath + "ArrowD_Red.png", -1)   ' #85
+Global g_object866:TImage = LoadImageChecked(g_iconpath + "Refresh.png", -1)      ' #86
+Global g_object867:TImage = LoadImageChecked(g_iconpath + "Cross.png", -1)        ' #87
+Global g_object868:TImage = LoadImageChecked(g_iconpath + "Tick.png", -1)         ' #88
+Global g_object869:TImage = LoadImageChecked(g_iconpath + "CrossSmall.png", -1)   ' #89
+Global g_object870:TImage = LoadImageChecked(g_iconpath + "TickSmall.png", -1)    ' #90
+Global g_object871:TImage = LoadImageChecked(g_iconpath + "Help.png", -1)         ' #91
+Global g_object872:TImage = LoadImageChecked("GameMedia\Images\Interface\MessageBg.png", -1)    ' +7794 #92
+Global g_object873:TImage = LoadImageChecked("GameMedia\Images\Interface\MessageLine.png", 1)   ' +7842 #93
 
 ' ---- boot, exactly as GameMain does, minus the loop -----------------------------
 ' Each boot step is individually guarded. An unguarded one ends the whole sweep and we

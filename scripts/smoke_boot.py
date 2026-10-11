@@ -70,7 +70,9 @@ LOG = os.path.join(RUNDIR, "log.txt")
 # CreateScreen ran without dying, and "SetActive:mainmenu" means the game handed control to
 # the menu -- i.e. a complete, successful boot.
 MARKERS = [
-    ("settings read", r"saveloc|Settings/|\[boot\]"),
+    # `Debug=<n>` is the module body's own first LogLine, of a value it just read from
+    # Settings/Settings.txt.
+    ("settings read", r"saveloc|Settings/|\[boot\]|(?:^|\n)Debug="),
     ("language file loaded", r"Load variable:|Languages\.csv"),
     ("kits set up", r"basemask|baseshirt"),
     ("engine media loaded", r"EngineMedia"),

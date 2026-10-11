@@ -688,6 +688,19 @@ def thirdparty_functions():
     return _TPFUNCS
 
 
+def unit_stems():
+    """-> stems of the third-party units assemble.py emits beside nss5_assembled.bmx, one
+    per src/recovered_thirdparty/<mod>/unit/<stem>.bmx. Their objects are part of the
+    assembled build, so every reader of its objects must take them too."""
+    out = set()
+    if os.path.isdir(THIRDPARTY_DIR):
+        for sub in os.listdir(THIRDPARTY_DIR):
+            d = os.path.join(THIRDPARTY_DIR, sub, "unit")
+            if os.path.isdir(d):
+                out.update(f[:-4] for f in os.listdir(d) if f.endswith(".bmx"))
+    return out
+
+
 def module_imports():
     """-> deduplicated list of '!Import arguments lifted from src/recovered_module/."""
     module_functions()          # populates _MODIMPORTS as a side effect

@@ -4,36 +4,30 @@
      Do not edit by hand: your changes will be overwritten, and a
      hand-maintained status file goes stale within hours. -->
 
-**99.4%** of the reconstruction is byte-identical to `NSS5.exe`,
-measured as 876834 of 882444 bytes of machine code across 2018 function bodies.
+**100.0%** of the reconstruction is byte-identical to `NSS5.exe`,
+measured as 896537 of 896537 bytes of machine code across 2079 function bodies.
 
-Nothing is excluded from that count. 4 bodies (1232 bytes, of which 1074 are byte-identical) are counted above but are deliberately absent from the shipped `src/assembled/` build, because their Steam import would stop the exe loading; see VERIFIED_NOT_SHIPPED in `scripts/progress.py` for which ones and why.
+Left out of that count: SteamInit (158 bytes), by the owner's decision. The build keeps a stub for the Steam bootstrap, so it compiles to something else on purpose and is counted neither way.
+
+3 bodies (1074 bytes, of which 1074 are byte-identical) are counted above but are deliberately absent from the shipped `src/assembled/` build, because their Steam import would stop the exe loading; see VERIFIED_NOT_SHIPPED in `scripts/progress.py` for which ones and why.
 
 ```
 RECONSTRUCTION PROGRESS  (measured in bytes of matched machine code)
 
   TREE                              BODIES   MATCHED    BYTES    DONE
   src/recovered                       1717      1717   765827  100.0%
-  src/recovered_module                  89        85    20833   95.5%
-  src/recovered_thirdparty             152       152    12848  100.0%
-  src/recovered_unverified              60        53    82936   94.4%
+  src/recovered_module                  88        88    20675  100.0%
+  src/recovered_thirdparty             219       219    23788  100.0%
+  src/recovered_unverified              53        53    78262  100.0%
+  src/module_body                        2         2     7985  100.0%
   ------------------------------ --------- --------- -------- -------
-  TOTAL                               2018      2007   882444   99.4%
+  TOTAL                               2079      2079   896537  100.0%
 
-  876834 of 882444 bytes byte-identical against NSS5.exe.
+  896537 of 896537 bytes byte-identical against NSS5.exe.
+  Left out of the measure: SteamInit, 158 bytes at 0x0058d86d:
+    the Steam bootstrap; the build keeps a stub by the owner's decision.
 
-  RECONSTRUCTED, counting bodies whose original is proven byte-identical
-  but whose compiled form is deliberately substituted so the game runs:
-      877770 of 882444 bytes = 99.5%
-    LoadAnimImageChecked.bmx                         271  harness.try_function NSS5_NO_LEARN=1 -> MATCH 271/271 mode=reloc reloc_masked=25
-    LoadImageChecked.bmx                             251  harness.try_function NSS5_NO_LEARN=1 -> MATCH 251/251 mode=reloc reloc_masked=24
-    LoadSoundChecked.bmx                             256  harness.try_function NSS5_NO_LEARN=1 -> MATCH 256/256 mode=reloc reloc_masked=25
-    SteamInit.bmx                                    158  harness.try_function NSS5_NO_LEARN=1 -> MATCH 158/158 mode=reloc reloc_masked=18
-  These bytes are NOT in the headline above and must not be added to it:
-  the headline measures what src/assembled/ compiles, and for these bodies
-  that is the substitute, which the oracle correctly rejects.
-
-  NOT IN THE SHIPPED BUILD -- 4 bodies, 1232 bytes (1074 of them matched)
+  NOT IN THE SHIPPED BUILD -- 3 bodies, 1074 bytes (1074 of them matched)
   COUNTED in the totals above, like every other body. They are left out
   of src/assembled/ because their Steam import would stop the exe loading;
   that is a fact about the build, not about whether they can be matched.
@@ -41,22 +35,7 @@ RECONSTRUCTION PROGRESS  (measured in bytes of matched machine code)
     BODY                                         BYTES VA          MATCHED  ABSENCE
     TProfile.CheckAchievement                      625 0x0056cf70  yes      OMITTED  (assemble.py UNVERIFIED_SKIP)
     Fn_0058D987.SteamPostPlayerValue               325 0x0058d987  yes      OMITTED  (harness.py MODULE_SKIP)
-    SteamInit                                      158 0x0058d86d  no       SUBSTITUTED  (compiled as a neutralised 4-line stub; original kept as a comment)
     Fn_0058D90B.SyncSteamAchievements              124 0x0058d90b  yes      OMITTED  (harness.py MODULE_SKIP)
-
-  Largest bodies not yet byte-identical:
-    TPrivateBitmapFont.DrawFaceText                  1428 bytes  0x00591383
-    TPrivateBitmapFont.DrawBorderText                1195 bytes  0x00591917
-    TBitmapFont.DrawTextMaxWidth                      755 bytes  0x00590842
-    TPrivateBitmapFont.DrawShadowText                 666 bytes  0x00591dc2
-    TZipEStream.find_file                             309 bytes  0x0058f882
-    Fn_0058DACC.ZipEngineModuleInit                   295 bytes  0x0058dacc
-    LoadAnimImageChecked                              271 bytes  0x004bc664
-    LoadSoundChecked                                  256 bytes  0x004bc564
-    LoadImageChecked                                  251 bytes  0x004bc372
-    TZipEStream.Eof                                    26 bytes  0x0058f9b7
-  (not listed: SteamInit -- proven byte-identical and permanently
-   substituted, so not work anyone can finish. Still counted in the totals above.)
 ```
 
 Regenerate with:

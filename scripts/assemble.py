@@ -128,8 +128,8 @@ UNVERIFIED_SKIP = {
     #      TScreen_WorldMap.SetUpScreen's pre-travel autosave) all called it and got nothing.
     #      That is the whole "saving does not save, and no career appears in the load list"
     #      defect: no .sav was ever written, so TScreen_MainMenu.UpdateLoadTable's scan of
-    #      g_userpath + "Save/" found an empty directory. The clean break is now real and
-    #      lives in src/behaviour/Zip{Writer,Reader}.* -- see those files.
+    #      g_userpath + "Save/" found an empty directory. Saves now go through the real
+    #      zipengine bodies over minizip (extern/minizip), so they are retail zips.
     "TProfile.CheckAchievement.bmx",          # Steam. The other two reasons this entry
                                               # used to give are both FIXED and no longer
                                               # true (2026-08-22): the Extern block is
@@ -171,6 +171,7 @@ PLACEHOLDER = os.path.join(ROOT, "src", "placeholder")
 MODBODY_DIR = os.path.join(ROOT, "src", "module_body")
 MODBODY_TAIL = os.path.join(MODBODY_DIR, "tail.bmx")
 MODBODY_GLOBALS = os.path.join(MODBODY_DIR, "globals.tsv")
+TYPE_GLOBALS = os.path.join(MODBODY_DIR, "type_globals.tsv")
 INCBIN_SRC = os.path.join(ROOT, "extracted", "incbin")
 
 # The eleven Incbin'd assets, IN THE ORDER the module body registers them
@@ -206,6 +207,18 @@ INCBIN_ORDER = [
 # blitz, ramstream, retro, freeaudioaudio, freejoy, openalaudio, freetypefont. Every one
 # of those either appears below or is already in the generated header. That is the
 # program stating its own import list, and it agrees with what the tail needs to compile.
+# The original module body's init chain, __bb_main +367..+432, after the implicit
+# ___bb_blitz_blitz at +362. Each name is fixed by the callee's own init shape and the
+# Types it registers; an Import is called only if no earlier one reaches it, so RamStream
+# must precede Retro (retro -> basic -> ramstream). The original's last call is its
+# Framework, BRL.D3D9Max2D; here it is the last Import, because a Framework is passed to
+# every unit the build compiles and would add a call to each third-party unit's init.
+INIT_CHAIN = [
+    "BRL.D3D7Max2D", "BRL.RamStream", "BRL.Retro", "BRL.PNGLoader", "BRL.FreeAudioAudio",
+    "BRL.FreeTypeFont", '"volumes.bmx"', "BRL.OpenALAudio", "PUB.FreeJoy", "BRL.JPGLoader",
+    "BRL.OggLoader", '"fontmachine.bmx"', '"zipengine.bmx"', "BRL.D3D9Max2D",
+]
+
 MODBODY_IMPORTS = [
     "BRL.Retro",          # Lower, Trim, Right, Replace
     "BRL.FileSystem",     # CreateDir, CurrentDir
@@ -224,13 +237,10 @@ MODBODY_IMPORTS = [
 # Modules the ORIGINAL did not import, that this reconstruction does. Kept separate from
 # MODBODY_IMPORTS so that list stays a faithful record of the original's own 15.
 #
-# PUB.ZLib: the original reached zlib through minizip, which is C linked into NSS5.exe and
-# cannot be reconstructed as BlitzMax (see src/behaviour/ZipReader.OpenZip.bmx). A genuine
-# retail save is a ZipCrypto-encrypted, DEFLATED zip entry -- measured:
+# PUB.ZLib: the original reached zlib through minizip, which is C linked into NSS5.exe.
+# extern/minizip/minizip.bmx imports it again for the same reason. A genuine retail save
+# is a ZipCrypto-encrypted, DEFLATED zip entry -- measured:
 #     flag=0x0001 method=8 csize=985503 usize=8439894
-# so without an inflate the reconstruction can write and read its own saves and still not
-# open a single save a player already owns. src/behaviour/ZipReader.ExtractFile.bmx uses
-# this module's uncompress(); ZipCrypto itself is BlitzMax in that same file.
 RECON_IMPORTS = [
     "PUB.ZLib",
 ]
@@ -391,6 +401,67 @@ def apply_alias_map(text, alias):
         n[0] += 1
         return alias[m.group(1).lower()]
     return pat.sub(sub, text), n[0]
+
+
+def type_globals():
+    """-> [{slot, owner, name, decl, init, also}] from src/module_body/type_globals.tsv."""
+    out, hdr = [], None
+    if not os.path.exists(TYPE_GLOBALS):
+        return out
+    for line in open(TYPE_GLOBALS, encoding="utf-8").read().split("\n"):
+        if not line.strip() or (line.startswith("# ") or line == "#"):
+            continue
+        p = line.split("\t")
+        if hdr is None:
+            hdr = p
+            continue
+        r = dict(zip(hdr, p + [""] * (len(hdr) - len(p))))
+        r["also"] = [a.strip() for a in r.get("also_named", "").split(",") if a.strip()]
+        out.append(r)
+    return out
+
+
+def inject_type_globals(tname, text, globs):
+    """Declare `globs` inside Type `tname`'s text, last, so an initialiser can name any of
+    the Type's own members (g_opt_refresh = RefreshButtons). Their order among themselves
+    is what fixes the init order, and that is kept."""
+    if not globs:
+        return text
+    lines = text.split("\n")
+    i = max(k for k, l in enumerate(lines) if re.match(r"^\s*End\s*Type\b", l, re.I))
+    decl = ["\tGlobal %s:%s%s" % (g["name"], g["decl"], " = " + g["init"] if g["init"] else "")
+            for g in globs]
+    return "\n".join(lines[:i] + decl + lines[i:])
+
+
+def qualify_type_globals(src, globs):
+    """-> (src, n): every use of a Type-scoped Global outside its owner becomes Owner.name.
+
+    Inside the owner the bare name resolves; everywhere else bcc needs the Type. The
+    machine code is the same either way.
+    """
+    owner = {g["name"].lower(): g["owner"] for g in globs}
+    if not owner:
+        return src, 0
+    pat = re.compile(r"(?<![.\w])(%s)\b" % "|".join(
+        sorted(map(re.escape, owner), key=len, reverse=True)), re.I)
+    out, cur, n = [], None, [0]
+
+    def sub(mm):
+        if owner[mm.group(1).lower()].lower() == cur:
+            return mm.group(1)
+        n[0] += 1
+        return "%s.%s" % (owner[mm.group(1).lower()], mm.group(1))
+    for line in src.split("\n"):
+        m = re.match(r"^\s*Type\s+(\w+)", line, re.I)
+        if m:
+            cur = m.group(1).lower()
+        elif re.match(r"^\s*End\s*Type\b", line, re.I):
+            out.append(line)
+            cur = None
+            continue
+        out.append(line if line.lstrip().startswith("'") else pat.sub(sub, line))
+    return "\n".join(out), n[0]
 
 
 def modbody_globals():
@@ -678,6 +749,59 @@ def _recovered_files():
     return out
 
 
+# '!Import arguments lifted from Type-method bodies by load_recovered().
+RECOVERED_IMPORTS = []
+
+
+def unit_specs():
+    """-> [spec] for every src/recovered_thirdparty/<mod>/unit/<stem>.bmx.
+
+    A third-party module was its own compile unit (or several) in the original, so it has
+    its own init, which registers its Types and runs its top-level statements. A spec names
+    the unit's Types in declaration order ('!Types), the module Functions it holds
+    ('!Functions), the unit that Imports it ('!Parent, for a sub-unit), and carries its
+    source lines as written: SuperStrict and the Imports, then after '!Statements the
+    top-level statements. assemble.py fills in the Types and Functions from the corpus.
+    """
+    out = []
+    tp = os.path.join(ROOT, "src", "recovered_thirdparty")
+    for mod in sorted(os.listdir(tp)) if os.path.isdir(tp) else []:
+        ud = os.path.join(tp, mod, "unit")
+        if not os.path.isdir(ud):
+            continue
+        for fn in sorted(os.listdir(ud)):
+            if not fn.endswith(".bmx"):
+                continue
+            spec = {"mod": mod, "stem": fn[:-4], "path": os.path.join(ud, fn),
+                    "types": [], "functions": [], "parent": None, "head": [], "stmts": []}
+            part = "head"
+            for line in open(spec["path"], encoding="utf-8").read().split("\n"):
+                s = line.strip()
+                if s.startswith("'!Types "):
+                    spec["types"] += s.split()[1:]
+                elif s.startswith("'!Functions "):
+                    spec["functions"] += s.split()[1:]
+                elif s.startswith("'!Parent "):
+                    spec["parent"] = s.split()[1]
+                elif s == "'!Statements":
+                    part = "stmts"
+                elif s and not s.startswith("'"):
+                    spec[part].append(line.replace("<repo>", ROOT.replace("\\", "/")))
+            out.append(spec)
+    return out
+
+
+def _tp_function(mod, stem):
+    """-> (Function text, [pragma decls]) for src/recovered_thirdparty/<mod>/<stem>.bmx,
+    read the way harness.thirdparty_functions() reads it."""
+    text = open(os.path.join(ROOT, "src", "recovered_thirdparty", mod, stem + ".bmx"),
+                encoding="utf-8", errors="replace").read()
+    text, _imps = H.split_imports(text)
+    text, decls = H.split_globals(text)
+    body = "\n".join(l for l in text.split("\n") if not l.lstrip().startswith("'")).strip()
+    return "\n".join(l[1:] if l.startswith("\t") else l for l in body.split("\n")), decls
+
+
 def load_recovered():
     """(Type, Method) -> (body, pragma globals, comment text, filename)"""
     out, dupes = {}, []
@@ -689,6 +813,11 @@ def load_recovered():
             continue
         tname, mname = base.split(".", 1)
         text = open(os.path.join(_dir, fn), encoding="utf-8", errors="replace").read()
+        text, imps = H.split_imports(text)
+        # A module with its own unit imports what it needs there (src/.../unit/), so the
+        # bodies' '!Import lines, which exist for the single-body probes, stay out.
+        if not os.path.isdir(os.path.join(_dir, "unit")):
+            RECOVERED_IMPORTS.extend(i for i in imps if i not in RECOVERED_IMPORTS)
         text, gdecls = H.split_globals(text)
         comments = "\n".join(l for l in text.split("\n") if l.lstrip().startswith("'"))
 
@@ -1372,6 +1501,25 @@ def main():
     # declaration map is built, so two aliases collapse into a single Global here and the
     # existing conflict reporting below sees them as one slot -- which is what they are.
     alias = global_alias_map()
+    # Type-scoped Globals: their other corpus names fold into the canonical one, and the
+    # canonical one leaves the module-level declarations below (it is declared in its Type).
+    tglobals = type_globals()
+    for g in tglobals:
+        g["name"] = alias.get(g["name"].lower(), g["name"])
+        for a in g["also"]:
+            if a.lower() != g["name"].lower():
+                alias[a.lower()] = g["name"]
+    tg_names = {g["name"].lower() for g in tglobals}
+    # The tail declares its own Globals in place (the guarded #65..#93 and the code-free
+    # ones before AppTitle), so they leave the module-level declarations too.
+    _tail_path = MODBODY_TAIL
+    if os.environ.get("NSS5_TAIL", "").lower() == "exercise":
+        _tail_path = os.path.join(MODBODY_DIR, "tail_exercise.bmx")
+    tail_names = set()
+    if os.path.exists(_tail_path):
+        for _m in re.finditer(r"(?im)^\s*Global\s+(\w+)",
+                              open(_tail_path, encoding="utf-8").read()):
+            tail_names.add(alias.get(_m.group(1).lower(), _m.group(1)).lower())
 
     gtypes = collections.defaultdict(set)
     for (_t, _m), (_b, gd, _c, _f) in recovered.items():
@@ -1469,7 +1617,9 @@ def main():
     # DIFFERENT blocks now both survive, which is the correct outcome and the one the
     # line-level version could not express.
     raw_groups = [list(gd) for (_t, _m), (_b, gd, _c, _f) in recovered.items()]
-    raw_groups.append(list(H._MODGLOBALS))
+    # A third-party Function's '!Raw lines belong to its own unit or the external one (see
+    # tp_gtext and the units below); here they would be declared twice.
+    raw_groups.append([g for g in H._MODGLOBALS if g not in H._TPGLOBALS])
     seen_raw, raw_lines = set(), []
     for group in raw_groups:
         frag = [g.strip() for g in group
@@ -1481,12 +1631,10 @@ def main():
             continue
         seen_raw.add(key)
         raw_lines.extend(frag)
-    # No file under src/recovered/ or src/recovered_thirdparty/ uses '!Import, so
-    # H.module_imports() -- which covers src/recovered_module/ only -- is complete. If a
-    # Type-method file ever needs one, load_recovered() will also need its own
-    # H.split_imports() pass; not added speculatively, since only what is actually
-    # exercised should be wired.
+    # Module Functions carry their '!Import lines through H.module_imports(), Type-method
+    # bodies (the zipengine stream over minizip) through load_recovered().
     import_lines = H.module_imports()
+    import_lines += [i for i in RECOVERED_IMPORTS if i not in import_lines]
 
     # ---- recover the Globals that exist only in prose --------------------------------
     # A pragma is authoritative, so resolve names in three tiers and never let a weaker
@@ -1626,8 +1774,23 @@ def main():
         return out, n
 
     chunks, filled = emit(main_set)
+    _tg_by_owner = collections.defaultdict(list)
+    for g in tglobals:
+        _tg_by_owner[g["owner"].lower()].append(g)
+    chunks = [inject_type_globals(t, c, _tg_by_owner.get(t.lower()))
+              for t, c in zip(main_set, chunks)]
     side_chunks, side_filled = emit(side_set)
     order = main_set                          # what the MAIN module declares
+
+    # Third-party modules with a unit spec get their own file; their Types leave the
+    # external unit. emit() above has already filled H._TYPETEXT for every one of them.
+    units = unit_specs()
+    unit_types = {t for u in units for t in u["types"]}
+    missing = sorted(unit_types - set(side_set))
+    if missing:
+        raise SystemExit("unit spec names Types the external unit does not have: %s"
+                         % ", ".join(missing))
+    side_chunks = [H._TYPETEXT[t] for t in side_set if t not in unit_types]
 
     # A conflict is REPORTED, not silently resolved. The declared type picks the vtable
     # slot for every call through the Global, so choosing alphabetically is choosing at
@@ -1682,6 +1845,8 @@ def main():
     array_sizes_new, array_sizes_filled, array_size_conflicts = [], [], []
     gout = []
     for k in sorted(set(gtypes) | set(array_sizes)):
+        if alias.get(k, k).lower() in tg_names or alias.get(k, k).lower() in tail_names:
+            continue
         v = gtypes.get(k, set())
         # Carry the captured initial value through the regenerated declaration.
         # A conflicting initialiser is suspicious enough to leave OFF rather than
@@ -1751,7 +1916,16 @@ def main():
     # cosmetic gap: fontmachine's two point helpers (0x00592A13, 0x00592A37) are called by
     # all three Draw*Text bodies, i.e. by every glyph the game draws, so without them the
     # text layer cannot even be compiled, let alone run.
-    tpfns = "\n".join(H.thirdparty_functions())
+    unit_fn = {}                                   # stem -> (text, decls), unit Functions
+    for u in units:
+        for s in u["functions"]:
+            unit_fn[s] = _tp_function(u["mod"], s)
+    unit_fn_texts = {t for t, _d in unit_fn.values()}
+    unit_decl_names = {m.group(1).lower() for _t, ds in unit_fn.values() for g in ds
+                       for m in [re.match(GLOBAL_DECL_RX, g.strip())] if m}
+    unit_raws = {g.strip() for _t, ds in unit_fn.values() for g in ds
+                 if not re.match(GLOBAL_DECL_RX, g.strip())}
+    tpfns = "\n".join(f for f in H.thirdparty_functions() if f not in unit_fn_texts)
 
     # The Globals those functions declare, emitted HERE and not in the main unit. The
     # external unit is Imported by nss5_assembled.bmx, and an imported unit cannot see the
@@ -1767,12 +1941,12 @@ def main():
         if not mm:
             # A '!Raw pragma rather than a '!Global one: emit it verbatim, same as the
             # main unit does, since that is exactly what Raw means.
-            if g.strip() and g.strip() not in tp_seen:
+            if g.strip() and g.strip() not in tp_seen and g.strip() not in unit_raws:
                 tp_seen.add(g.strip())
                 tp_lines.append(g.strip())
             continue
         nm = alias.get(mm.group(1).lower(), mm.group(1).lower())
-        if nm in tp_seen:
+        if nm in tp_seen or mm.group(1).lower() in unit_decl_names:
             continue
         tp_seen.add(nm)
         tp_lines.append("Global %s:%s" % (nm, mm.group(2)))
@@ -1840,6 +2014,13 @@ def main():
                        "(see assemble.py's RECON_IMPORTS)"] + \
             ["Import " + m for m in add_rc]
 
+    # The third-party units are Imported by the main and the external unit alike. A
+    # sub-unit is Imported by its parent's own source lines instead.
+    unit_imports = ['Import "%s.bmx"' % u["stem"] for u in units if not u["parent"]]
+    if unit_imports:
+        keep = keep + ["' Third-party modules, each its own compile unit "
+                       "(src/recovered_thirdparty/<mod>/unit/)"] + unit_imports
+
     ext_head = "\n".join(keep + [""] + ph)
 
     # ---- the zipengine module body's one surviving top-level statement ------------------
@@ -1896,6 +2077,37 @@ def main():
     # with the BOM.
     open(ext_path, "w", encoding="utf-8-sig").write(ext)
 
+    # ---- the third-party units ------------------------------------------------------
+    # Source lines as the spec has them, then the Types in the spec's order, then the
+    # Globals its Functions declare (unless a statement declares them), the Functions,
+    # and last the top-level statements. Only the Imports, the Type order and the
+    # statements reach the unit's init; compare_module_body.py --unit checks it.
+    unit_renames, unit_texts = 0, []
+    for u in units:
+        stmt_globals = {g.lower() for g in re.findall(r"(?im)^\s*Global\s+(\w+)",
+                                                      "\n".join(u["stmts"]))}
+        decls = []
+        for s in u["functions"]:
+            for g in unit_fn[s][1]:
+                mm = re.match(GLOBAL_DECL_RX, g.strip())
+                line = ("Global %s:%s" % (mm.group(1), mm.group(2))) if mm else g.strip()
+                if (mm and mm.group(1).lower() in stmt_globals) or line in decls:
+                    continue
+                decls.append(line)
+        utext = "\n".join(
+            ["' generated by assemble.py from %s -- do NOT edit"
+             % os.path.relpath(u["path"], ROOT).replace(os.sep, "/")]
+            + u["head"] + [""]
+            + [H._TYPETEXT[t] for t in u["types"]] + [""]
+            + decls + [""]
+            + [unit_fn[s][0] for s in u["functions"]] + [""]
+            + u["stmts"] + [""])
+        utext, n = apply_alias_map(utext, alias)
+        unit_renames += n
+        unit_texts.append(utext)
+        open(os.path.join(OUT_DIR, u["stem"] + ".bmx"), "w", encoding="utf-8-sig").write(utext)
+    ext_renames += unit_renames
+
     rawtext = "\n".join(raw_lines)
 
     # ---- THE MODULE BODY -----------------------------------------------------------
@@ -1934,17 +2146,43 @@ def main():
 
     # Collection Globals the corpus uses but never assigns -- must run after every Global
     # is declared and before any game code touches one. See that file's header.
+    # src/module_body/collections.bmx used to create 69 lists here. The original's
+    # __bb_main creates none of them: each is created by the game body that owns it
+    # (TNation.New, TSnowFlake.SetUp, TGadget.New ...), and every one of those bodies is
+    # in the corpus, so the module body no longer adds them.
     coll = ""
-    coll_path = os.path.join(MODBODY_DIR, "collections.bmx")
-    if os.path.exists(coll_path):
-        coll = open(coll_path, encoding="utf-8").read()
 
-    src = "\n".join(["\n".join(keep), 'Import "nss5_external.bmx"', "",
+    # A FRAMEWORK, as the original had. bmk passes the program's Framework to every unit it
+    # compiles, and without one bcc imports every installed module into each unit, so every
+    # third-party unit's init gained a call per module: zipengine's came out 420 bytes
+    # against the original's 295. With a Framework each unit's init holds its own Imports
+    # and nothing else. BRL.Blitz is the empty one; the modules the program needs are all
+    # Imported by name above.
+    #
+    # THE IMPORT ORDER IS THE INIT CHAIN. __bb_main +362..+437 calls one init per Import
+    # that no earlier Import already reaches, in source order: INIT_CHAIN, the original's
+    # own. Every other Import the program needs is reached through those, so it goes after
+    # them and costs no call.
+    chain = ["Import " + m for m in INIT_CHAIN]
+    seen = {c.split(None, 1)[1].strip().lower() for c in chain}
+    rest = [l for l in keep if l.startswith("Import ")
+            and l.split(None, 1)[1].strip().lower() not in seen]
+    main_keep = ["SuperStrict", "Framework BRL.Blitz",
+                 "' The original's init chain, in order (assemble.py INIT_CHAIN)"] + chain + \
+                ["' Already reached through the chain: no init call"] + rest
+    # The external unit's init would be one more call in the chain. Import it only while it
+    # still declares something.
+    ext_used = bool(side_chunks or tp_lines or tpfns.strip() or ph or zipe_init)
+    src = "\n".join(["\n".join(main_keep),
+                     'Import "nss5_external.bmx"' if ext_used else "", "",
                      "\n".join(incbin_lines), "",
                      "\n".join(chunks), "", gtext, "", rawtext, "", modfns, "",
                      coll, "", tail]) + "\n"
 
     src, src_renames = apply_alias_map(src, alias)
+    src, n_qual = qualify_type_globals(src, tglobals)
+    print("  Type-scoped Globals         : %d declared in their Types, %d uses qualified"
+          % (len(tglobals), n_qual))
     print("  Global alias merges applied : %d names, %d references rewritten"
           % (len(alias), src_renames + ext_renames))
     print("                                (one address had several recovered names;")
@@ -1978,7 +2216,7 @@ def main():
     # with the BOM.
     open(path, "w", encoding="utf-8-sig").write(src)
 
-    in_file = count_placed(src) + count_placed(ext)
+    in_file = count_placed(src) + count_placed(ext) + sum(map(count_placed, unit_texts))
     agree = in_file == filled + side_filled
 
     print("ASSEMBLY")

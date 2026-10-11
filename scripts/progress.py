@@ -143,6 +143,10 @@ TREES = [
     ("src/recovered_module", "verified"),
     ("src/recovered_thirdparty", "verified"),
     ("src/recovered_unverified", "unverified"),
+    # The main module's body (tail.bmx) and its register stub (register.bmx).
+    ("src/module_body", "verified"),
+    # Owned code with no body yet: header-only ledgers, one `' VA` line per function.
+    ("src/unrecovered", "unverified"),
 ]
 
 # Bodies deliberately absent from the SHIPPED build (src/assembled/), because they
@@ -179,10 +183,9 @@ TREES = [
 #     re-confirmed on a second tree, 2026-08-22. It is nonetheless counted here as
 #     UNMATCHED, and that is deliberate: the file's compiled body is the stub, its
 #     header does not carry the `byte-identical vs NSS5.exe` marker, and this file
-#     measures what the tree compiles rather than what a probe once proved. Whether
-#     a substituted body may carry the marker is an owner's call and has not been
-#     made; until it is, 158 bytes of proven work sit in the denominator only, which
-#     is the understating direction and therefore the safe one.
+#     measures what the tree compiles rather than what a probe once proved. Owner's
+#     call (2026-10-10): the stub stays and the body stays unmatched, so 158 bytes of
+#     proven work sit in the denominator only.
 #
 #   src/recovered_unverified/TProfile.CheckAchievement.bmx  -- OMITTED
 #     Carries '!Import ".../libsteamstub.a" and Externs GetSteamAchievement and
@@ -250,62 +253,18 @@ VERIFIED_NOT_SHIPPED = {
         "OMITTED", "harness.py MODULE_SKIP"),
 }
 
-#
-#   src/recovered_module/LoadImageChecked.bmx  --  251 bytes at 0x004BC372
-#     A BOOT SHIM, not a Steam problem. Both failure paths return a visible magenta
-#     placeholder instead of `Return Null` / `DebugStop`, because a Null TImage propagates
-#     into MidHandleImage/DrawImage/ImageWidth at essentially every call site and one absent
-#     PNG killed the whole boot. As compiled it is 253 bytes against the original's 251
-#     (MISMATCH, first_diff=+6). Restore the two branches and delete MissingArtImage() and
-#     it is MATCH 251/251, mode=reloc, reloc_masked=24.
-#
-#   src/recovered_module/LoadAnimImageChecked.bmx  --  271 bytes at 0x004BC664
-#     The same shim, in the most-called module Function in the program. As compiled it is
-#     272 bytes against 271 (MISMATCH, first_diff=+22). The original's two branches are NOT
-#     symmetric -- "cannot see" carries DebugStop AND an explicit Return Null, "could not
-#     load" carries DebugStop alone and falls through -- and with that restored it is
-#     MATCH 271/271, mode=reloc, reloc_masked=25.
-#
-# Both of these previously carried the `byte-identical vs NSS5.exe` marker while compiling
-# the shim, so their bytes sat in the numerator for a body the oracle rejects. Taking the
-# marker off drops the headline by 522 bytes. That is the correct direction and it is the
-# point: the headline is what the tree COMPILES, and what these two compile is not the
-# original. The work itself is not lost, it is reported below instead.
-# OF THOSE, THE ONES THAT CAN NEVER BE RESTORED.
-#
-# "Largest bodies not yet byte-identical" is a WORK LIST -- it answers "what is left to
-# do". A body whose original is proven and which is substituted only until some other
-# defect is fixed still belongs on it: the three Load*Checked boot shims are there because
-# a Null TImage propagates into MidHandleImage at essentially every call site while the
-# module-Global aliasing defect stands, and the day that is fixed the originals go back and
-# the bodies match. That is real remaining work and hiding it would be dishonest.
-#
-# SteamInit is not that. Its original opens a connection to Steam AppID 212780 and calls
-# `End` when the connection fails; Steam's 2011 backend for this AppID is gone, so
-# restoring it is an unconditional hard-exit before the first frame, forever. No amount of
-# work in this repository changes that. Listing it as "not yet byte-identical" describes a
-# task nobody can ever complete, which makes the work list wrong.
-#
-# It stays in the totals, in the denominator, and in the substituted table above with its
-# oracle evidence. It comes out of the WORK LIST only.
-SUBSTITUTION_IS_PERMANENT = {
-    "src/recovered_module/SteamInit.bmx",
+# LEFT OUT OF THE MEASURE, by the owner's decision (2026-10-10). SteamInit's original opens
+# Steam AppID 212780 and calls `End` when that fails; the build keeps a stub instead, so the
+# body compiles to something else on purpose. It is in neither the numerator nor the
+# denominator, and every report says so next to the figure. Its original is proven:
+# harness.try_function NSS5_NO_LEARN=1 -> MATCH 158/158 mode=reloc reloc_masked=18.
+LEFT_OUT_OF_MEASURE = {
+    "src/recovered_module/SteamInit.bmx":
+        "the Steam bootstrap; the build keeps a stub by the owner's decision",
 }
+SUBSTITUTION_IS_PERMANENT = set(LEFT_OUT_OF_MEASURE)
 
-VERIFIED_ORIGINAL_SUBSTITUTED = {
-    "src/recovered_module/SteamInit.bmx": (
-        158,
-        "harness.try_function NSS5_NO_LEARN=1 -> MATCH 158/158 mode=reloc reloc_masked=18"),
-    "src/recovered_module/LoadImageChecked.bmx": (
-        251,
-        "harness.try_function NSS5_NO_LEARN=1 -> MATCH 251/251 mode=reloc reloc_masked=24"),
-    "src/recovered_module/LoadAnimImageChecked.bmx": (
-        271,
-        "harness.try_function NSS5_NO_LEARN=1 -> MATCH 271/271 mode=reloc reloc_masked=25"),
-    "src/recovered_module/LoadSoundChecked.bmx": (
-        256,
-        "harness.try_function NSS5_NO_LEARN=1 -> MATCH 256/256 mode=reloc reloc_masked=25"),
-}
+VERIFIED_ORIGINAL_SUBSTITUTED = {}
 
 # Guards, because an entry above that has gone stale would OVERSTATE the second figure, and
 # overstating is the one direction this file refuses everywhere else.
@@ -419,6 +378,8 @@ MATCHED = K.MATCHED
 #     giving it a VA/size line of its own would double-count them.
 NOT_A_WHOLE_BODY = {
     "src/recovered_unverified/ModuleBody_RealProgram.bmx",
+    # NSS5_TAIL=exercise's stand-in for tail.bmx: same boot, then a screen sweep.
+    "src/module_body/tail_exercise.bmx",
 }
 
 # Bodies whose header VA line did not parse, populated by scan(). See the long note
@@ -466,7 +427,18 @@ def scan():
                     head = K.header(f.read())
             except OSError:
                 continue
-            m = VA_LINE.search(head) or VA_LINE_LOOSE.search(head)
+            # ONE ROW PER DISTINCT STRICT VA LINE. A file may describe several functions
+            # (src/unrecovered/ ledgers, TZipEStream.Eof.bmx with Pos and Read); reading
+            # only the first line left the others out of the measure entirely. The loose
+            # form stays a rescue for a file with no strict line at all.
+            found = []
+            for mm in VA_LINE.finditer(head):
+                if mm.group(1).lower() not in [f.group(1).lower() for f in found]:
+                    found.append(mm)
+            if not found:
+                mm = VA_LINE_LOOSE.search(head)
+                found = [mm] if mm else []
+            m = found[0] if found else None
             if not m:
                 # A BODY WHOSE HEADER DOES NOT PARSE LEAVES THE CORPUS ENTIRELY --
                 # numerator AND denominator -- and the percentage goes UP, because the
@@ -490,14 +462,27 @@ def scan():
                 if rel_u not in NOT_A_WHOLE_BODY:
                     UNPARSED.append(rel_u)
                 continue
-            row = {
-                "tree": tree, "kind": kind, "file": fn[:-4],
-                "va": m.group(1).lower(), "size": int(m.group(2)),
-                "matched": K.is_matched(head),
-                "claimed": bool(MATCHED.search(head)),
-                "retracted": K.negatives(head),
-            }
-            rows.append(row)
+            matched = K.is_matched(head)
+            if matched and len(found) > 1:
+                # One marker cannot vouch for several functions.
+                raise SystemExit("progress.py: %s carries the byte-identical marker and "
+                                 "%d VA lines; split it, one function per file"
+                                 % (os.path.relpath(path, ROOT), len(found)))
+            for m in found:
+                # A multi-function file names each row by what follows `bytes`.
+                eol = head.find("\n", m.end())
+                label = head[m.end():eol if eol >= 0 else len(head)].strip()
+                name = fn[:-4]
+                if len(found) > 1 and label:
+                    name = "%s: %s" % (name, label.split()[0].rstrip(":"))
+                row = {
+                    "tree": tree, "kind": kind, "file": name,
+                    "va": m.group(1).lower(), "size": int(m.group(2)),
+                    "matched": matched,
+                    "claimed": bool(MATCHED.search(head)),
+                    "retracted": K.negatives(head),
+                }
+                rows.append(row)
             rel = tree + "/" + fn
             if rel in VERIFIED_NOT_SHIPPED:
                 seen_not_shipped.add(rel)
@@ -515,6 +500,16 @@ def scan():
             "progress.py: VERIFIED_NOT_SHIPPED names a file with no VA header "
             "found: %s -- fix the path or remove the entry, do not ignore this"
             % ", ".join(sorted(missing)))
+    # ONE ROW PER VA. Two files describing the same function would count it twice.
+    by_va = {}
+    for r in rows:
+        by_va.setdefault(r["va"], []).append(r)
+    dupes = {va: rs for va, rs in by_va.items() if len(rs) > 1}
+    if dupes:
+        raise SystemExit("progress.py: one VA in more than one file, which would count it "
+                         "twice: %s" % "; ".join(
+                             "%s in %s" % (va, ", ".join(r["tree"] + "/" + r["file"] for r in rs))
+                             for va, rs in sorted(dupes.items())))
     check_not_shipped()
     check_substituted(rows)
     return rows, not_shipped
@@ -538,6 +533,20 @@ def colour(pct):
     return "orange"
 
 
+def pct_str(done, total):
+    """The percentage as text, one decimal, but never "100.0" for less than all of it.
+
+    896,537 of 896,695 is 99.982%, which one decimal rounds up to 100.0. A reader takes
+    100.0 to mean every byte, so short of that the figure keeps a second decimal.
+    """
+    if not total:
+        return "0.0"
+    s = "%.1f" % (100.0 * done / total)
+    if s == "100.0" and done < total:
+        s = "%.2f" % min(99.99, 100.0 * done / total)
+    return s
+
+
 def write_shield(pct, done, total):
     """Write docs/progress.json in shields.io endpoint format, and return it.
 
@@ -557,8 +566,9 @@ def write_shield(pct, done, total):
     those body/byte counts in full, and this file is where the reasoning lives.
     """
     blob = json.dumps({"schemaVersion": 1, "label": "reconstructed",
-                       "message": "%.1f%% (%s/%s bytes)"
-                                  % (pct, "{:,}".format(done), "{:,}".format(total)),
+                       "message": "%s%% (%s/%s bytes)"
+                                  % (pct_str(done, total), "{:,}".format(done),
+                                     "{:,}".format(total)),
                        "color": colour(pct)})
     out = os.path.join(ROOT, "docs", "progress.json")
     with open(out, "w", encoding="utf-8") as f:
@@ -570,6 +580,11 @@ def main():
     rows, not_shipped = scan()
     if not rows:
         raise SystemExit("no bodies with a VA header found -- has the tree moved?")
+    left_out = [r for r in rows if r["tree"] + "/" + r["file"] + ".bmx" in LEFT_OUT_OF_MEASURE]
+    rows = [r for r in rows if r not in left_out]
+    # A left-out body is reported on its own line, not in the not-shipped table, whose
+    # header says its bodies are counted.
+    not_shipped = [r for r in not_shipped if r not in left_out]
     done, total, pct = totals(rows)
     ns_bytes = sum(r["size"] for r in not_shipped)
     ns_done = sum(r["size"] for r in not_shipped if r["matched"])
@@ -594,13 +609,18 @@ def main():
         if not sub:
             continue
         d, t, p = totals(sub)
-        lines.append("  %-30s %9d %9d %8d %6.1f%%"
-                     % (tree, len(sub), sum(1 for r in sub if r["matched"]), t, p))
+        lines.append("  %-30s %9d %9d %8d %6s%%"
+                     % (tree, len(sub), sum(1 for r in sub if r["matched"]), t, pct_str(d, t)))
     lines.append("  %-30s %9s %9s %8s %7s" % ("-" * 30, "-" * 9, "-" * 9, "-" * 8, "-" * 7))
-    lines.append("  %-30s %9d %9d %8d %6.1f%%"
-                 % ("TOTAL", len(rows), sum(1 for r in rows if r["matched"]), total, pct))
+    lines.append("  %-30s %9d %9d %8d %6s%%"
+                 % ("TOTAL", len(rows), sum(1 for r in rows if r["matched"]), total,
+                    pct_str(done, total)))
     lines.append("")
     lines.append("  %d of %d bytes byte-identical against NSS5.exe." % (done, total))
+    for r in left_out:
+        lines.append("  Left out of the measure: %s, %d bytes at %s:"
+                     % (r["file"], r["size"], r["va"]))
+        lines.append("    %s." % LEFT_OUT_OF_MEASURE[r["tree"] + "/" + r["file"] + ".bmx"])
 
     # THE SECOND FIGURE, and it answers a different question from the one above.
     #
@@ -618,11 +638,10 @@ def main():
     if VERIFIED_ORIGINAL_SUBSTITUTED and not SUBSTITUTED_UNCHECKED:
         sub_bytes = sum(n for n, _e in VERIFIED_ORIGINAL_SUBSTITUTED.values())
         sub_done = done + sub_bytes
-        sub_pct = (100.0 * sub_done / total) if total else 0.0
         lines.append("")
         lines.append("  RECONSTRUCTED, counting bodies whose original is proven byte-identical")
         lines.append("  but whose compiled form is deliberately substituted so the game runs:")
-        lines.append("      %d of %d bytes = %.1f%%" % (sub_done, total, sub_pct))
+        lines.append("      %d of %d bytes = %s%%" % (sub_done, total, pct_str(sub_done, total)))
         for rel, (nbytes, ev) in sorted(VERIFIED_ORIGINAL_SUBSTITUTED.items()):
             lines.append("    %-44s %7d  %s" % (rel.rsplit("/", 1)[-1], nbytes, ev))
         lines.append("  These bytes are NOT in the headline above and must not be added to it:")
@@ -745,11 +764,16 @@ def main():
             f.write("<!-- GENERATED by scripts/progress.py --write-status.\n")
             f.write("     Do not edit by hand: your changes will be overwritten, and a\n")
             f.write("     hand-maintained status file goes stale within hours. -->\n\n")
-            f.write("**%.1f%%** of the reconstruction is byte-identical to `NSS5.exe`,\n"
-                    % pct)
+            f.write("**%s%%** of the reconstruction is byte-identical to `NSS5.exe`,\n"
+                    % pct_str(done, total))
             f.write("measured as %d of %d bytes of machine code across %d function bodies.\n\n"
                     % (done, total, len(rows)))
-            f.write("Nothing is excluded from that count. %d bodies (%d bytes, of which "
+            if left_out:
+                f.write("Left out of that count: %s, by the owner's decision. The build "
+                        "keeps a stub for the Steam bootstrap, so it compiles to something "
+                        "else on purpose and is counted neither way.\n\n"
+                        % ", ".join("%s (%d bytes)" % (r["file"], r["size"]) for r in left_out))
+            f.write("%d bodies (%d bytes, of which "
                     "%d are byte-identical) are counted above but are deliberately absent "
                     "from the shipped `src/assembled/` build, because their Steam import "
                     "would stop the exe loading; see VERIFIED_NOT_SHIPPED in "

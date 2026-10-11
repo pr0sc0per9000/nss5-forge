@@ -10,23 +10,23 @@ zipengine	0x0058dd8b	ZipFile	getFileInfo	28
 zipengine	0x0058dda7	ZipFile	getFileInfoByName	28	MATCH(thirdparty)
 zipengine	0x0058ddc3	ZipWriter	New	48	MATCH(thirdparty)
 zipengine	0x0058ddf3	ZipWriter	Delete	32	MATCH(thirdparty)
-zipengine	0x0058de13	ZipWriter	OpenZip	147	
+zipengine	0x0058de13	ZipWriter	OpenZip	147	MATCH(thirdparty)
 zipengine	0x0058dea6	ZipWriter	SetCompressionLevel	29	MATCH(thirdparty)
 zipengine	0x0058dec3	ZipWriter	AddFile	35	MATCH(thirdparty)
-zipengine	0x0058dee6	ZipWriter	AddFileToDest	584	
-zipengine	0x0058e12e	ZipWriter	AddStream	764	
-zipengine	0x0058e42a	ZipWriter	CloseZip	92	
+zipengine	0x0058dee6	ZipWriter	AddFileToDest	584	MATCH(thirdparty)
+zipengine	0x0058e12e	ZipWriter	AddStream	764	MATCH(thirdparty)
+zipengine	0x0058e42a	ZipWriter	CloseZip	92	MATCH(thirdparty)
 zipengine	0x0058e486	ZipReader	New	41	MATCH(thirdparty)
 zipengine	0x0058e4af	ZipReader	Delete	32	MATCH(thirdparty)
-zipengine	0x0058e4cf	ZipReader	OpenZip	103	
-zipengine	0x0058e536	ZipReader	ExtractFile	254	
-zipengine	0x0058e634	ZipReader	ExtractFileToDisk	395	
-zipengine	0x0058e7bf	ZipReader	CloseZip	66	
+zipengine	0x0058e4cf	ZipReader	OpenZip	103	MATCH(thirdparty)
+zipengine	0x0058e536	ZipReader	ExtractFile	254	MATCH(thirdparty)
+zipengine	0x0058e634	ZipReader	ExtractFileToDisk	395	MATCH(thirdparty)
+zipengine	0x0058e7bf	ZipReader	CloseZip	66	MATCH(thirdparty)
 zipengine	0x0058e801	ZipRamStream	New	45	MATCH(thirdparty)
 zipengine	0x0058e82e	ZipRamStream	Delete	51	MATCH(thirdparty)
 zipengine	0x0058e861	ZipRamStream	ZCreate	112	MATCH(thirdparty)
 zipengine	0x0058e8d1	TZipFileList	New	110	MATCH(thirdparty)
-zipengine	0x0058e93f	TZipFileList	Delete	53	
+zipengine	0x0058e93f	TZipFileList	Delete	53	MATCH(thirdparty)
 zipengine	0x0058e974	TZipFileList	Create	143	MATCH(thirdparty)
 zipengine	0x0058ea03	TZipFileList	getFileCount	24	MATCH(thirdparty)
 zipengine	0x0058ea1b	TZipFileList	getFileInfo	117	MATCH(thirdparty)
@@ -60,14 +60,14 @@ zipengine	0x0058f628	TZipEngineStreamFactory	CreateStream	231
 zipengine	0x0058f70f	TZipEStream	New	81	MATCH(thirdparty)
 zipengine	0x0058f760	TZipEStream	Delete	85	MATCH(thirdparty)
 zipengine	0x0058f7b5	TZipEStream	Create	205	
-zipengine	0x0058f882	TZipEStream	find_file	309	
-zipengine	0x0058f9b7	TZipEStream	Eof	26	
-zipengine	0x0058f9d1	TZipEStream	Pos	26	
+zipengine	0x0058f882	TZipEStream	find_file	309	MATCH(thirdparty)
+zipengine	0x0058f9b7	TZipEStream	Eof	26	MATCH(thirdparty)
+zipengine	0x0058f9d1	TZipEStream	Pos	26	MATCH(thirdparty)
 zipengine	0x0058f9eb	TZipEStream	Size	15	MATCH(thirdparty)
 zipengine	0x0058f9fa	TZipEStream	Seek	147	MATCH(thirdparty)
 zipengine	0x0058fa8d	TZipEStream	Flush	14	MATCH(thirdparty)
 zipengine	0x0058fa9b	TZipEStream	Close	70	MATCH(thirdparty)
-zipengine	0x0058fae1	TZipEStream	Read	63	
+zipengine	0x0058fae1	TZipEStream	Read	63	MATCH(thirdparty)
 zipengine	0x0058fb20			127	
 zipengine	0x0058fb9f			67	
 zipengine	0x0058fbe2			67	
@@ -76,6 +76,12 @@ zipengine	0x0058fc5c			322
 zipengine	0x0058fd9e			27	
 zipengine	0x0058fdb9			27	
 zipengine	0x0058fdd4			293	
+fontmachine	0x0058fef9	z_e3390d53_c8a7_41d3_9293_f4dcf0f638b5_3_0	New	34	MATCH(thirdparty)
+fontmachine	0x0058ff1b	z_e3390d53_c8a7_41d3_9293_f4dcf0f638b5_3_0	Delete	14	MATCH(thirdparty)
+fontmachine	0x0058ff29	z_blide_bge3390d53_c8a7_41d3_9293_f4dcf0f638b5	New	34	MATCH(thirdparty)
+fontmachine	0x0058ff4b	z_blide_bge3390d53_c8a7_41d3_9293_f4dcf0f638b5	Delete	14	MATCH(thirdparty)
+fontmachine	0x0058ff59	z_My_e3390d53_c8a7_41d3_9293_f4dcf0f638b5	New	34	MATCH(thirdparty)
+fontmachine	0x0058ff7b	z_My_e3390d53_c8a7_41d3_9293_f4dcf0f638b5	Delete	14	MATCH(thirdparty)
 fontmachine	0x0058ff89	TBitmapFont	New	118	MATCH(thirdparty)
 fontmachine	0x0058ffff	TBitmapFont	Delete	70	MATCH(thirdparty)
 fontmachine	0x00590045	TBitmapFont	SetDrawShadow	26	MATCH(thirdparty)
@@ -86,7 +92,7 @@ fontmachine	0x0059009d	TBitmapFont	SetProgressFunction	26	MATCH(thirdparty)
 fontmachine	0x005900b7	TBitmapFont	Load	1855	MATCH(thirdparty)
 fontmachine	0x005907f6	TBitmapFont	FontLoaded	18	MATCH(thirdparty)
 fontmachine	0x00590808	TBitmapFont	DrawText	58	MATCH(thirdparty)
-fontmachine	0x00590842	TBitmapFont	DrawTextMaxWidth	755	
+fontmachine	0x00590842	TBitmapFont	DrawTextMaxWidth	755	MATCH(thirdparty)
 fontmachine	0x00590b35	TBitmapFont	GetTxtWidth	278	MATCH(thirdparty)
 fontmachine	0x00590c4b	TBitmapFont	GetFontHeight	52	MATCH(thirdparty)
 fontmachine	0x00590c7f	TBitmapFont	GetFaceImage	72	
@@ -108,9 +114,9 @@ fontmachine	0x005910af			87
 fontmachine	0x00591106			376	
 fontmachine	0x0059127e	TPrivateBitmapFont	New	174	MATCH(thirdparty)
 fontmachine	0x0059132c	TPrivateBitmapFont	Delete	87	MATCH(thirdparty)
-fontmachine	0x00591383	TPrivateBitmapFont	DrawFaceText	1428	NEARMISS(1422/1428, src/recovered_unverified)
-fontmachine	0x00591917	TPrivateBitmapFont	DrawBorderText	1195	NEARMISS(1191/1195, src/recovered_unverified)
-fontmachine	0x00591dc2	TPrivateBitmapFont	DrawShadowText	666	NEARMISS(662/666, src/recovered_unverified)
+fontmachine	0x00591383	TPrivateBitmapFont	DrawFaceText	1428	MATCH(thirdparty)
+fontmachine	0x00591917	TPrivateBitmapFont	DrawBorderText	1195	MATCH(thirdparty)
+fontmachine	0x00591dc2	TPrivateBitmapFont	DrawShadowText	666	MATCH(thirdparty)
 fontmachine	0x0059205c	TPrivateBitmapFont	DrawTextLine	431	MATCH(thirdparty)
 fontmachine	0x0059220b	TRenderStatus	New	56	MATCH(thirdparty)
 fontmachine	0x00592243	TRenderStatus	Delete	14	MATCH(thirdparty)
@@ -152,6 +158,12 @@ fontmachine	0x00592733	TFontKerning	GetVKerning	18	MATCH(thirdparty)
 fontmachine	0x00592745	TPrivateFontKerning	New	44	MATCH(thirdparty)
 fontmachine	0x00592771	TPrivateFontKerning	Delete	14	MATCH(thirdparty)
 fontmachine	0x00592780			135	
+fontmachine	0x00592807	z_84d6b1ac_20df_4ac4_b754_f05b5e01c02b_3_0	New	34	MATCH(thirdparty)
+fontmachine	0x00592829	z_84d6b1ac_20df_4ac4_b754_f05b5e01c02b_3_0	Delete	14	MATCH(thirdparty)
+fontmachine	0x00592837	z_blide_bg84d6b1ac_20df_4ac4_b754_f05b5e01c02b	New	34	MATCH(thirdparty)
+fontmachine	0x00592859	z_blide_bg84d6b1ac_20df_4ac4_b754_f05b5e01c02b	Delete	14	MATCH(thirdparty)
+fontmachine	0x00592867	z_My_84d6b1ac_20df_4ac4_b754_f05b5e01c02b	New	34	MATCH(thirdparty)
+fontmachine	0x00592889	z_My_84d6b1ac_20df_4ac4_b754_f05b5e01c02b	Delete	14	MATCH(thirdparty)
 fontmachine	0x00592897	TFontMachineVersion	New	34	MATCH(thirdparty)
 fontmachine	0x005928b9	TFontMachineVersion	Delete	14	MATCH(thirdparty)
 fontmachine	0x005928c7	TFontMachineVersion	Version	14	MATCH(thirdparty)
@@ -178,3 +190,38 @@ fontmachine	0x00593037			355
 fontmachine	0x0059319a			405	
 fontmachine	0x0059332f			571	
 fontmachine	0x0059356a			241	
+volumes	0x00597f30			52	MATCH(thirdparty)
+volumes	0x00597f64			65	MATCH(thirdparty)
+volumes	0x00597fa5	TVolume	New	102	MATCH(thirdparty)
+volumes	0x0059800b	TVolume	Delete	70	MATCH(thirdparty)
+volumes	0x00598051			23	MATCH(thirdparty)
+volumes	0x00598068			51	MATCH(thirdparty)
+volumes	0x0059809b			51	MATCH(thirdparty)
+volumes	0x005980ce			27	MATCH(thirdparty)
+volumes	0x005980e9			23	MATCH(thirdparty)
+volumes	0x00598100			23	MATCH(thirdparty)
+volumes	0x00598117			23	MATCH(thirdparty)
+volumes	0x0059812e			23	MATCH(thirdparty)
+volumes	0x00598145			27	MATCH(thirdparty)
+volumes	0x00598160			284	MATCH(thirdparty)
+volumes	0x0059827c			152	MATCH(thirdparty)
+volumes	0x00598314	TWinVolumeDriver	New	70	MATCH(thirdparty)
+volumes	0x0059835a	TWinVolumeDriver	Delete	14	MATCH(thirdparty)
+volumes	0x00598368	TWinVolume	New	45	MATCH(thirdparty)
+volumes	0x00598395	TWinVolume	Delete	51	MATCH(thirdparty)
+volumes	0x005983c8	TWinVolume	Create	22	MATCH(thirdparty)
+volumes	0x005983de	TWinVolume	ListVolumes	681	MATCH(thirdparty)
+volumes	0x00598687	TWinVolume	GetVolumeFreeSpace	53	MATCH(thirdparty)
+volumes	0x005986bc	TWinVolume	GetVolumeSize	53	MATCH(thirdparty)
+volumes	0x005986f1	TWinVolume	GetVolumeInfo	379	MATCH(thirdparty)
+volumes	0x0059886c	TWinVolume	Refresh	114	MATCH(thirdparty)
+volumes	0x005988de	TWinVolume	GetUserHomeDir	23	MATCH(thirdparty)
+volumes	0x005988f5	TWinVolume	GetUserDesktopDir	23	MATCH(thirdparty)
+volumes	0x0059890c	TWinVolume	GetUserAppDir	23	MATCH(thirdparty)
+volumes	0x00598923	TWinVolume	GetUserDocumentsDir	23	MATCH(thirdparty)
+volumes	0x0059893a	TWinVolume	GetCustomDir	76	MATCH(thirdparty)
+volumes	0x00598986	TWinVolume	_getFolderPath	76	MATCH(thirdparty)
+volumes	0x005989d2	TVolSpace	New	87	MATCH(thirdparty)
+volumes	0x00598a29	TVolSpace	Delete	34	MATCH(thirdparty)
+volumes	0x00598a4b	TVolSpace	GetDiskSpace	78	MATCH(thirdparty)
+volumes	0x00598a99	TVolSpace	refresh	82	MATCH(thirdparty)

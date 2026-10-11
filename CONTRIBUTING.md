@@ -39,7 +39,10 @@ comparison in the project is made against that file.
 Do not contribute if you have seen leaked or unauthorised source code for New
 Star Soccer or for BlitzMax's commercial releases. Everything here is derived
 from the retail binary, its own embedded reflection tables, and observed
-behaviour.
+behaviour. The exception is third-party code the game links whose source is
+public under an open licence: BaH.Volumes 1.06 (MIT, `src/recovered_thirdparty/volumes`)
+and minizip 1.01e (zlib licence, `extern/minizip`). Each is checked byte for byte
+against the binary and keeps its licence.
 
 ## Ghidra
 

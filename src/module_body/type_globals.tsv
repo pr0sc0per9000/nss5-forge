@@ -1,0 +1,70 @@
+# The 65 Globals declared INSIDE a Type of the main module (__bb_main guarded Globals #0..#64).
+# bcc initialises a Type's own Globals just before it registers that Type, which is where
+# __bb_main has them. assemble.py declares each inside its owner and qualifies every use
+# outside the owner as Owner.name. also_named: other corpus names for the same slot.
+slot	owner	name	decl	init	also_named
+#0	TLocale	g_opt_labels	String[300]		
+#1	TEngine	g_engine_arr01	Int[99]		
+#2	TEngine	g_engine_labels	TLabel[4]		
+#3	TEngine	g_snd_chants	TSound[8]		g_engine_arr03
+#4	TKit	g_kitfiles	String[26]		
+#5	TKit	g_kit_arr02	Int[26]		
+#6	TOptions	g_options_arr02	Int[2]		
+#7	TOptions	g_ctrl_down	Int[2]		
+#8	TOptions	g_options_arr04	Int[2]		
+#9	TOptions	g_ctrl_right	Int[2]		
+#10	TOptions	g_options_arr06	Int[2]		
+#11	TOptions	g_options_arr07	Int[2]		
+#12	TOptions	g_ctl	Int[2]		
+#13	TOptions	g_opt_ctrlbutton4	Int[2]		g_options_arr09
+#14	TOptions	g_ctrl_pause	Int[2]		
+#15	TOptions	g_options_arr11	Int[2]		
+#16	TOptions	g_options_arr12	TImage[16]		
+#17	TOptions	g_options_arr13	TImage[16]		
+#18	TPitch	g_adboardimg	TImage[9]		g_pitch_arr01
+#19	TPitch	g_stadiumimg	TImage[16]		
+#20	TPitch	g_stadiumgimg	TImage[6]		
+#21	TPitch	g_fansimg	TImage[10]		
+#22	TPitch	g_pitch_arr05	Int[3,100,100]		
+#23	TPitch	g_pitch_arr06	TImage[2]		
+#24	TPhotographer	g_photographer_arr	TImage[3]		
+#25	TCameraMan	g_cameraman_images	TImage[2]		g_cameraman_arr
+#26	TScreen	g_fonts	TImageFont[4]		
+#27	TScreen_EditKits	g_screen_editkits_arr01	TKit[4]		
+#28	TScreen_EditKits	g_editkits_btnkit	TButton[4]		
+#29	TScreen_EditKits	g_editkits_cmbkittype	TCombo[4]		
+#30	TScreen_EditKits	g_editkits_cmbshirt1	TCombo[4]		
+#31	TScreen_EditKits	g_editkits_cmbshirt2	TCombo[4]		
+#32	TScreen_EditKits	g_editkits_cmbshorts	TCombo[4]		
+#33	TScreen_EditKits	g_editkits_cmbsocks	TCombo[4]		
+#34	TScreen_EditKits	g_editkits_inpshirt1	TInputBox[4]		g_screen_editkits_arr08
+#35	TScreen_EditKits	g_editkits_inpshirt2	TInputBox[4]		g_screen_editkits_arr09
+#36	TScreen_EditKits	g_editkits_inpshorts	TInputBox[4]		g_screen_editkits_arr10
+#37	TScreen_EditKits	g_editkits_inpsocks	TInputBox[4]		g_screen_editkits_arr11
+#38	TScreen_Shop	g_shop_img_items	TImage[10]		g_screen_shop_arr01
+#39	TScreen_Shop	g_shop_img_vehicles	TImage[10]		g_screen_shop_arr02
+#40	TScreen_Shop	g_shop_img_property	TImage[10]		g_screen_shop_arr03
+#41	TScreen_BootShop	g_bootshop_img_boots	TImage[10]		g_screen_bootshop_arr
+#42	TScreen_MyContract	g_screen_mycontract_arr	TButton[5]		
+#43	TScreen_Newspaper	g_np_heads	TImage[5]		g_screen_newspaper_arr
+#44	TScreen_Casino	g_casino_chipimages	TImage[7]		g_screen_casino_arr
+#45	TScreen_Roulette	g_screen_roulette_arr	Int[6]		
+#46	TRouletteWheel	g_roulette_arr	Int[]	[0,1,13,36,24,3,15,34,22,5,17,32,20,7,11,30,26,9,28,37,2,14,35,23,4,16,33,21,6,18,31,19,8,12,29,25,10,27]	
+#47	TScreen_Pairs	g_misc_arr01	TImage[5]		
+#48	TScreen_Pairs	g_screen_pairs_arr	TButton[16]		
+#49	TScreen_Pairs	g_misc_arr02	Int[9]		
+#50	TPair_Icon	g_pair_icon_arr01	TImage[5]		g_pair_backs
+#51	TPair_Icon	g_pair_fronts	TImage[4]		g_pair_icon_arr02
+#52	TScreen_Negotiate	g_icons	TImage[12]		
+#53	TScreen_Negotiate	g_btns	TButton[6]		
+#54	TScreen_Negotiate	g_nums	Int[6]		
+#55	TScreen_Interview	g_screen_interview_arr	Int[15]		
+#56	TTraining	g_training_arr	TSound[4]		
+#57	TPanel_Controls	g_panel_controls_lbl	TLabel[10]		g_panel_controls_arr01
+#58	TPanel_Controls	g_panel_controls_kick	TLabel[2]		g_panel_controls_arr02
+#59	TScreen_Stable	g_stable_oddslabels	TLabel[6]		g_screen_stable_arr01
+#60	TScreen_Stable	g_stable_horsebuttons	TButton[6]		g_screen_stable_arr02
+#61	TScreen_Stable	g_stable_imgpost	TImage[7]		
+#62	TScreen_Stable	g_stable_arr04	Float[3]		g_screen_stable_arr04
+#63	THorse	g_horse_arr	TImage[4]		
+#64	THorse	g_screen_stable_arr05	TImage[6]		

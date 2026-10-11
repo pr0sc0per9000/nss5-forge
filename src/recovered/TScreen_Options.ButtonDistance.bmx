@@ -14,12 +14,11 @@
 	Function ButtonDistance:Int()
 		'!Global g_activegadget:TGadget
 		'!Global g_opt_distance:Int
-		'!Global g_opt_refresh:Int()
 		Select TButton(g_activegadget).name
 			Case "options_distyards"
 				g_opt_distance = 0
 			Case "options_distmetres"
 				g_opt_distance = 1
 		End Select
-		g_opt_refresh()
+		RefreshButtons()
 	End Function

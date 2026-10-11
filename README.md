@@ -122,6 +122,7 @@ Four known problems, so you can rule them out first:
 ```
 src/recovered/             byte-verified function bodies
 src/recovered_unverified/  reconstructions not yet byte-identical
+src/unrecovered/           code with no body yet, one VA line per function
 src/recovered_module/      module-level functions
 src/recovered_thirdparty/  community modules the game links
 src/module_body/           the program's top-level bootstrap

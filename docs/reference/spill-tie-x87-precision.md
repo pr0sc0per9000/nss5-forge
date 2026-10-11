@@ -1,5 +1,10 @@
 # The spill tie-break is decided by x87 excess precision, not by the program
 
+> **Closed by `extern/bcc/spill_tie.patch`.** No single rule fits all nine slots, so the
+> patch gives each of the three functions its own: `mirror` (int bank) for DrawShadowText
+> and DrawBorderText, `le` (int bank) for DrawFaceText. Every other function compiles as
+> before.
+
 > **The three bodies this document is about are now dispositioned.** See
 > [`fontmachine-drawtext-disposition.md`](fontmachine-drawtext-disposition.md), which
 > re-measures the residual independently, adjudicates every call and data operand in all

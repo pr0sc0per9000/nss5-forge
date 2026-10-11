@@ -66,7 +66,8 @@ def main():
     # play.py derives its own location, so running it from its real path puts every
     # relative path it uses in the right place.
     os.chdir(root)
-    sys.argv = [play]
+    # --player: no time cap, and the player's own sound settings. Windowed is still forced.
+    sys.argv = [play, "--player"]
     sys.path.insert(0, os.path.join(root, "scripts"))
     try:
         runpy.run_path(play, run_name="__main__")

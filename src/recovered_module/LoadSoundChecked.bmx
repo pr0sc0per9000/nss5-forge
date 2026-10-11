@@ -1,28 +1,7 @@
 ' LoadSoundChecked  -- module-level Function (no Type)
 ' VA 0x004bc564   256 bytes   sig ($,i):TSound
-' NOT byte-identical AS COMPILED, and deliberately so: this file carries a BOOT SHIM.
-' Measured, harness.try_function under NSS5_NO_LEARN=1, against the body this file
-' actually compiles:
-'     MISMATCH   our_len=253  orig_len=256  first_diff=+6
-'
-' THE ORIGINAL BODY IS RECONSTRUCTED AND PROVEN. Restore the two DebugStops -- and note
-' the branches are NOT symmetric, which is what the length turns on:
-'     "cannot see sound" branch  ->  DebugStop  then  Return Null
-'     "could not be loaded"      ->  DebugStop  (falls through to Return snd)
-' changing nothing else, and the same oracle reports
-'     MATCH  256/256  mode=reloc  reloc_masked=25
-'
-' So the 256 bytes are recovered work and the shipped build declines to use them. Counted
-' by scripts/progress.py under VERIFIED_ORIGINAL_SUBSTITUTED: out of the headline (which
-' measures what the tree compiles) and into the separately-labelled reconstruction figure.
-'
-' ############################################################################
-' # DELIBERATE DIVERGENCE FROM THE ORIGINAL -- BOOT SHIM.                    #
-' # Both DebugStops are removed. Restore the two branches above to get the   #
-' # original behaviour back. This file is in src/recovered_module/, which    #
-' # scripts/reverify.py does not walk -- scripts/reverify_module.py does,    #
-' # and it is what caught this marker.                                       #
-' ############################################################################
+' byte-identical vs NSS5.exe (256/256, mode=reloc, reloc_masked=25, harness.try_function
+' under NSS5_NO_LEARN=1). The original body: no boot shim.
 '
 ' NAME AND GLOBAL NAMES ARE OURS. Third member of the asset-loader family, alongside
 ' LoadImageChecked (0x004BC372) and LoadAnimImageChecked (0x004BC664): same path
@@ -67,9 +46,7 @@
 				LogLine("Loading sound: " + a0)
 			Else
 				LogLine("WARNING! >>>>>>>>>>>> Cannot see sound: " + a0)
-				' BOOT SHIM: DebugStop removed -- it halts every -d build on the first
-				' missing asset, and missing assets are expected while functions are stubs.
-				' The WARNING/ERROR LogLine above still names the file.
+				DebugStop
 				Return Null
 			End If
 		End If
@@ -78,10 +55,7 @@
 			LogLine("Sound loaded")
 		Else
 			LogLine("ERROR! >>>>>>>>>>>>>> Sound could not be loaded: " + a0)
-			' BOOT SHIM: DebugStop removed -- it halts every -d build on the first
-			' missing asset, and missing assets are expected while functions are stubs.
-			' The WARNING/ERROR LogLine above still names the file.
-			Return Null
+			DebugStop
 		End If
 		Return snd
 	End Function

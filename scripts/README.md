@@ -48,6 +48,19 @@ anything new that starts the executable must do the same.
 
 ## Comparing against the original
 
+The byte oracle (`harness.py` and everything built on it) needs three generated inputs
+that a fresh clone does not have, and that nothing in the build creates:
+
+1. `extracted/ghidra/function_inventory.tsv`, every function's extent: import
+   `binary/NSS5.exe` into Ghidra headless with `scripts/ghidra_scripts/NSS5Seed.java` as
+   the post-script, passing this repo's path as its argument.
+2. `extracted/brl_functions.tsv`, the names of the BRL/PUB code: `python scripts/name_brl.py`.
+   It needs `nm` and `objdump`; `setup.py` says where to get them.
+3. `extracted/runtime_helpers.tsv`, the original's C runtime helpers:
+   `python scripts/assemble.py`, then `python scripts/learn_helpers.py`.
+
+Without them the oracle reports every call as a difference, or refuses to measure.
+
 The reconstruction is judged by whether it compiles to the same bytes as
 `NSS5.exe`.
 
@@ -65,6 +78,9 @@ The reconstruction is judged by whether it compiles to the same bytes as
   tooling is built on. Rarely run directly.
 * [`coverage.py`](/scripts/coverage.py): The canonical coverage number. Quote this
   rather than counting by hand.
+* [`learn_helpers.py`](/scripts/learn_helpers.py): Rebuilds
+  `extracted/runtime_helpers.tsv` from an assembled build, so the oracle can name calls
+  into the C runtime.
 * [`claim.py`](/scripts/claim.py): The one reader of a body's byte-identical
   claim. Every measure imports it, so one rule produces the headline percentage.
 * [`reconcile_claims.py`](/scripts/reconcile_claims.py): Sets what the oracle says
