@@ -2403,3 +2403,8 @@ address	alias	canonical	evidence
 #	---- 0x00C6F090 : the shared SFX channel --------------------------------------------
 0x00C6F090	g_audio_channel	g_object859	TSlotMachine.DoPrize `push dword ptr [0xc6f090]` (ff3590f0c600) at 0x005785CA as g_audio_channel. Writer: the module body `mov dword ptr [0xc6f090], eax` (a390f0c600) at 0x004BBB42 after AllocChannel, as g_object859; UpdateAudio sets its volume from the SFX option. Both TChannel.
 0x00C6F090	g_interview_channel	g_object859	TScreen_Interview.Fail `push dword ptr [0xc6f090]` (ff3590f0c600) at 0x0057BE27 as g_interview_channel. Writer as in the row above. Both TChannel.
+#	---- 0x00C5D66C : the stand segment width ----------------------------------------------
+#	TPitch.SetUp spells the slot g_stadiumhalfwidth; TPitch.DrawStadium and TPitch.DrawFans
+#	read it as g_pitch_int15, which nothing writes, so every long stand drew its four segments
+#	on top of each other and the crowd was misplaced.
+0x00C5D66C	g_pitch_int15	g_stadiumhalfwidth	Sole writer TPitch.SetUp 0x004E5B2D `mov dword ptr [0xc5d66c], eax` (a36cd6c500), the Int(ImageWidth(g_stadiumimg[0]) * 0.5) store at TPitch.SetUp.bmx:197, which reads it back at 0x004E5B61 (a16cd6c500) for g_pitchwidth. Readers under g_pitch_int15: TPitch.DrawStadium 0x004E700C `mov eax, dword ptr [0xc5d66c]` (a16cd6c500), the segment step d (TPitch.DrawStadium.bmx:33); TPitch.DrawFans 0x004E85C3 (a16cd6c500), the case 2 x offset (TPitch.DrawFans.bmx:103). These 4 are the only dword references to 0x00C5D66C in NSS5.exe, all in byte-identical bodies. Both names are Int with init 0, equal to NSS5.exe; g_pitch_int15 appears in no other body or alias table.
