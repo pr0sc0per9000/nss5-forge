@@ -37,6 +37,10 @@ Global g_forgotpwurl:String = "http://www.newstarsoccer.com/forgottenpassword.ph
 Global g_version:String = "1.15"                  ' 0x00C6E900
 Global g_col_highlight:String = "00FF00"          ' 0x00C6E91C
 Global g_locale_lang:String = "en"                ' 0x00C5A33C
+Global g_homeurl:String = "http://www.newstargames.com/"                       ' 0x00C6EA98
+Global g_url_facebook:String = "http://www.facebook.com/pages/New-Star-Soccer/173805879330444"   ' 0x00C6EBE4
+Global g_twitterurl:String = "http://twitter.com/newstargames"                 ' 0x00C6EC34
+Global g_mobile_url:String = "http://www.newstargames.com/en/text/releases/Releases/item/200/Releases-New-Star-Soccer"   ' 0x00C6EB58
 
 AppTitle = "New Star Soccer 5"                                                    ' +5552
 Global g_userpath:String = Trim(ReadSettingString(g_promotionplace_int05 + "Settings/Settings.txt", "saveloc")).ToUpper()   ' +5585 #65
