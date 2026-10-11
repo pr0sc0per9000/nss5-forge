@@ -2331,3 +2331,21 @@ address	alias	canonical	evidence
 0x00C5B2C4	g_replaymaxframe	g_replaymax	SUPERSEDES global_alias_unified.tsv:62 (which files it at 0x00C5B2C8). TEngine.UpdateReplay (VA 0x004D4A25) `If g_replayframe > g_replaymaxframe Then g_replayframe = g_replaymaxframe` is 0x004D4A76 `a1c4b2c500 mov eax,[0xc5b2c4]`, 0x004D4A7B `3905c8b2c500 cmp [0xc5b2c8],eax`, 0x004D4A83 `mov eax,[0xc5b2c4]`, 0x004D4A88 `a3c8b2c500 mov [0xc5b2c8],eax`. One body; Int.
 0x00C5B2C8	g_engine_int52	g_replayframe	SUPERSEDES global_alias_unified.tsv:60 (which files it at 0x00C5B2C4). TEngine.EndReplay stores it at 0x004D499D `a3c8b2c500` and pushes it at 0x004D49A2/0x004D49B1/0x004D49C0 `ff35c8b2c500`. The replay animation readers read 0x00C5B2C8: TPitch.Render 0x004E6C8C, TPitch.DrawFans 0x004E959B, TPitch.DrawBosses 0x004E97D0/0x004E99A7, TPhotographer.Render 0x004EB1D1, all `a1c8b2c500`. 5 bodies; Int; none declares g_replayframe.
 0x00C5B2C8	g_replaycur	g_replayframe	One slot, two variables. TEngine.StartReplay `g_replayCur = g_replayMin` is 0x004D493A `a1c0b2c500 mov eax,[0xc5b2c0]` then 0x004D493F `a3c8b2c500 mov [0xc5b2c8],eax`; TEngine.CheckReplayInput scrubs it with add/sub dword ptr [0xc5b2c8] at 0x004D4E19..0x004D4E55 and clamps it through 0x004D4E68 `8d05c8b2c500 lea eax,[0xc5b2c8]`. g_replayframe is 0x00C5B2C8 per the g_replay_time row (UpdateReplay 0x004D4A7B/0x004D4A88). No body declares both; Int.
+#	---- 0x00C5B1D4..0x00C5B1E8 : the camera, live and replay -------------------------
+#	TEngine.Render names the camera g_engine_float01..06 and TEngine.RenderReplay /
+#	UpdateOffsetReplay name the same six slots g_camz/g_camx/g_camy/g_oldcam*. Render reads
+#	0x00C5B1D8, 0x00C5B1E0, 0x00C5B1DC, 0x00C5B1E4, 0x00C5B1D4, 0x00C5B1E8 at 0x004D030F,
+#	0x004D0318, 0x004D032E, 0x004D0337, (float01), 0x004D0356 for
+#	`float02*a0 + float04*(..)`, `float03*a0 + float05*(..)`, `float01*a0 + float06*(..)`;
+#	RenderReplay reads the same slots in the same order at 0x004D534F, 0x004D5358,
+#	0x004D536E, 0x004D5377, 0x004D538D, 0x004D5396 for `g_camx*a0 + g_oldcamx*(..)`,
+#	`g_camy*a0 + g_oldcamy*(..)`, `g_camz*a0 + g_oldcamz*(..)`. Split, replays drew at a
+#	fixed zoom from a stale camera, and TPlayer.GetMouseDirection (g_engine_camx/camy,
+#	folded into g_camx/g_camy by global_alias_unified.tsv:27-28, read at 0x004FBD15 /
+#	0x004FBD1E) aimed live play with the replay camera. g_engine_camx/camy follow by chaining.
+0x00C5B1D4	g_camz	g_engine_float01	TEngine.RenderReplay (VA 0x004D5349) 0x004D538D `d905d4b1c500 fld [0xc5b1d4]`; TEngine.UpdateOffsetReplay (VA 0x004D4F09) 0x004D4F2A `fld [0xc5b1d4]` and fmul [0xc5b1d4] at 0x004D5132/0x004D5150/0x004D51D2/0x004D520E/0x004D524A. Neither writes it. Every store to 0x00C5B1D4 (fstp at SetUpMatch 0x004CE91F, SetUpReplay 0x004CF097, UpdateOffset 0x004D0011/0x004D0048, CheckInput 0x004D295B/0x004D29AF, StartReplay 0x004D482F, EndReplay 0x004D4992, CheckReplayInput 0x004D4D01/0x004D4D55) is spelled g_engine_float01 or g_engine_zoom (global_alias_adjudicated.tsv:230 folds g_engine_zoom into g_engine_float01). Reverses global_alias_unified.tsv:25-26. Both Float, both initialised 2.0; no body declares both.
+0x00C5B1D8	g_camx	g_engine_float02	RenderReplay 0x004D534F `fld [0xc5b1d8]` (g_camx) vs TEngine.Render 0x004D030F `fld [0xc5b1d8]` (g_engine_float02), same statement shape, see block header; TPlayer.GetMouseDirection 0x004FBD15 reads it as g_engine_camx. Both Float; no body declares both.
+0x00C5B1DC	g_camy	g_engine_float03	RenderReplay 0x004D536E `fld [0xc5b1dc]` (g_camy) vs TEngine.Render 0x004D032E `fld [0xc5b1dc]` (g_engine_float03); TPlayer.GetMouseDirection 0x004FBD1E reads it as g_engine_camy. Both Float; no body declares both.
+0x00C5B1E0	g_oldcamx	g_engine_float04	RenderReplay 0x004D5358 `fld [0xc5b1e0]` (g_oldcamx) vs TEngine.Render 0x004D0318 `fld [0xc5b1e0]` (g_engine_float04). Both Float; no body declares both.
+0x00C5B1E4	g_oldcamy	g_engine_float05	RenderReplay 0x004D5377 `fld [0xc5b1e4]` (g_oldcamy) vs TEngine.Render 0x004D0337 `fld [0xc5b1e4]` (g_engine_float05). Both Float; no body declares both.
+0x00C5B1E8	g_oldcamz	g_engine_float06	RenderReplay 0x004D5396 `fld [0xc5b1e8]` (g_oldcamz) vs TEngine.Render 0x004D0356 `fld [0xc5b1e8]` (g_engine_float06). Both Float; no body declares both.
