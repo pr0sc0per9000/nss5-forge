@@ -3,23 +3,30 @@
 [Contributing](/CONTRIBUTING.md) | [Status](/docs/STATUS.md) | [Tools](/scripts/README.md) | [Game behaviour](/docs/game/README.md)
 
 [![CI](https://github.com/pr0sc0per9000/nss5-forge/actions/workflows/ci.yml/badge.svg)](https://github.com/pr0sc0per9000/nss5-forge/actions/workflows/ci.yml)
-[![Reconstructed](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fpr0sc0per9000%2Fnss5-forge%2Fmain%2Fdocs%2Fprogress.json)](/docs/STATUS.md)
+[![Reconstructed](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fpr0sc0per9000%2Fnss5-forge%2Fbyte-matched-reconstruction%2Fdocs%2Fprogress.json)](/docs/STATUS.md)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Discord](https://img.shields.io/badge/discord-join-5865F2?logo=discord&logoColor=white)](https://discord.gg/RqxcxUzRcQ)
 
 This project rebuilds New Star Soccer 5 from its own executable back into BlitzMax
-source code. Compile that source, and the machine code should come out the same as
-the original, byte for byte. Same idea as [re3](https://github.com/GTAmodding/re3)
-and [isledecomp/isle](https://github.com/isledecomp/isle), applied to a BlitzMax game.
+source code, in the same spirit as [re3](https://github.com/GTAmodding/re3) and
+[isledecomp/isle](https://github.com/isledecomp/isle). It comes in two tracks:
+
+- **`main` is the playable build.** The reconstruction plus bug fixes and features the
+  original never had, and the mod loader that puts it in front of players. It is no
+  longer held to byte-for-byte, so it can carry those fixes. See
+  [`modloader/README`](/modloader/README.md).
+- **The [`byte-matched-reconstruction`](https://github.com/pr0sc0per9000/nss5-forge/tree/byte-matched-reconstruction)
+  branch is the byte-exact rebuild.** Compile it and the machine code comes out the same
+  as the original, byte for byte. It stays frozen as the reference.
 
 > **You need your own copy of the game.** New Star Soccer 5 belongs to New Star
 > Games Ltd. None of it is included here. Windows only.
 
 ## Status
 
-The badge above shows how much of the machine code matches. It is generated from
-the source, so it is always current. [`docs/STATUS.md`](/docs/STATUS.md) breaks it
-down.
+The badge above shows how much of the machine code the byte-exact reconstruction
+matches. It is generated from that branch's source, so it is always current.
+[`docs/STATUS.md`](/docs/STATUS.md) breaks it down.
 
 The game builds and runs. A new career gets through character creation and the club
 trial, and into training. It is not finished.
