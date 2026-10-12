@@ -109,6 +109,7 @@
 '!Global g_mainmenu_imgFacebook:TImage
 '!Global g_mainmenu_imgTwitter:TImage
 '!Global g_mainmenu_imgMobile:TImage
+'!Global g_mainmenu_imgMods:TImage      ' MOD LOADER: icon for the Mods button (ships in Mods\core)
 '!Global g_mainmenu_panBack:TPanel
 '!Global g_mainmenu_panSocial:TPanel
 '!Global g_mainmenu_panLoadGame:TPanel
@@ -137,18 +138,27 @@
 			g_mainmenu_imgFacebook = LoadImageChecked(g_iconPath + "Facebook.png", -1)
 			g_mainmenu_imgTwitter = LoadImageChecked(g_iconPath + "Twitter.png", -1)
 			g_mainmenu_imgMobile = LoadImageChecked(g_iconPath + "Mobile.png", -1)
+			g_mainmenu_imgMods = LoadImageChecked("mods_icon.png", -1)   ' MOD LOADER: beside our exe
 		EndIf
 		Local x:Int = 10
 		Local y:Int = g_screenHeight - 50
 		Local w:Int = 253
 		Local h:Int = 40
-		g_mainmenu_lblVersion = TLabel.CreateLabel("lbl_myversion", "v" + g_version, x, y, w / 2, h, 3, "888888", "FFFFFF", 1.0, 1, 0, 1, 1, Null, 1, 0, 0, 0, "", 0)
+		' MOD LOADER: the loader writes the latest release tag to version.txt every boot; show it.
+		Local vstr:String = "v" + g_version
+		Local vf:TStream = ReadFile("version.txt")
+		If vf
+			Local vline:String = Trim(ReadLine(vf))
+			CloseFile(vf)
+			If vline.length > 0 Then vstr = vline
+		EndIf
+		g_mainmenu_lblVersion = TLabel.CreateLabel("lbl_myversion", vstr, x, y, w / 2, h, 3, "888888", "FFFFFF", 1.0, 1, 0, 1, 1, Null, 1, 0, 0, 0, "", 0)
 		g_mainmenu_screen.AddGadget(g_mainmenu_lblVersion)
 		x = 285
 		y = 250
 		w = 230
 		h = 40
-		g_mainmenu_panBack = TPanel.CreatePanel("backpanel", "", x, y, w, (h + 10) * 5 + 10, "FFFFFF", "FFFFFF", 3, 0.8, 1, 0, 0)
+		g_mainmenu_panBack = TPanel.CreatePanel("backpanel", "", x, y, w, (h + 10) * 6 + 10, "FFFFFF", "FFFFFF", 3, 0.8, 1, 0, 0)   ' MOD LOADER: 6 buttons (added Mods)
 		g_mainmenu_screen.AddGadget(g_mainmenu_panBack)
 		x :+ 10
 		y :+ 10
@@ -160,6 +170,9 @@
 		g_mainmenu_screen.AddGadget(TButton.CreateButton("mainmenu_replays", GetText("Replays"), x, y, w, h, 1, 3, "FFFFFF", "FFFFFF", g_mainmenu_imgReplays, ButtonReplays, 1.0, 1, ""))
 		y :+ h + 10
 		g_mainmenu_screen.AddGadget(TButton.CreateButton("mainmenu_options", GetText("Options"), x, y, w, h, 1, 3, "FFFFFF", "FFFFFF", g_mainmenu_imgOptions, TScreen_Options.SetUpScreen, 1.0, 1, ""))
+		y :+ h + 10
+		' MOD LOADER: Mods button, opens the Mods folder
+		g_mainmenu_screen.AddGadget(TButton.CreateButton("mainmenu_mods", "Mods", x, y, w, h, 1, 3, "FFFFFF", "FFFFFF", g_mainmenu_imgMods, ButtonMods, 1.0, 1, ""))
 		y :+ h + 10
 		g_mainmenu_screen.AddGadget(TButton.CreateButton("quit", GetText("Quit"), x, y, w, h, 1, 3, "FFFFFF", "FFFFFF", g_imgQuit, ButtonQuit, 1.0, 1, ""))
 		x = 536

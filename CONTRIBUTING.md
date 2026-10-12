@@ -1,5 +1,15 @@
 # Contributing
 
+## Two tracks
+
+- **Byte-exact reconstruction** lives on the `byte-matched-reconstruction` branch and is
+  held to byte-for-byte, as described below. New recovered function bodies go there.
+- **`main` is the playable build**: the reconstruction plus fixes and features, and the
+  mod loader. It is not held to byte-for-byte, so bug fixes and new behaviour are welcome.
+  See [`modloader/README`](/modloader/README.md).
+
+The rules below are for the byte-exact track.
+
 ## Getting started
 
 If you are comfortable finding your way around the repository and confident in
