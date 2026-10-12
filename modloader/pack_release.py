@@ -25,10 +25,12 @@ BUILD = os.path.join(HERE, "build")
 
 NOTE = (
     "New Star Soccer 5 mod loader\r\n\r\n"
-    "Copy winmm.dll and the Mods folder next to NSS5.exe in your game folder:\r\n"
-    "  Steam > New Star Soccer 5 > right click > Manage > Browse local files.\r\n\r\n"
-    "Then press Play in Steam as normal. The first launch takes a second longer while it\r\n"
-    "builds the game from your own copy. To remove the loader, delete winmm.dll and Mods.\r\n"
+    "1. Extract this zip.\r\n"
+    "2. Move everything inside it into your New Star Soccer 5 folder (the one with NSS5.exe):\r\n"
+    "   in Steam, right click New Star Soccer 5 > Manage > Browse local files.\r\n"
+    "3. Press Play in Steam as normal.\r\n\r\n"
+    "The first launch takes a second longer while it builds the game from your own copy.\r\n"
+    "To remove the loader, delete winmm.dll and the Mods folder.\r\n"
 )
 
 
@@ -60,6 +62,7 @@ def main():
     shutil.copy2(winmm, os.path.join(out, "winmm.dll"))
     shutil.copy2(winmm, os.path.join(core, "winmm.dll"))
     shutil.copy2(launcher, os.path.join(core, "launcher.exe"))
+    shutil.copy2(os.path.join(HERE, "mods_icon.png"), os.path.join(core, "mods_icon.png"))
     with open(os.path.join(core, "version.txt"), "w", newline="") as f:
         f.write(version)
     with open(os.path.join(out, "Drop these into your New Star Soccer 5 folder.txt"), "w", newline="") as f:

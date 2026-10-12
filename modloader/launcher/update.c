@@ -151,9 +151,18 @@ void update_check(const wchar_t *core, progress_fn progress)
     first_end = strstr(resp + 1, "\"tag_name\"");      /* start of the 2nd release, or NULL */
     if (!first_end) first_end = resp + len;
 
+    /* version.txt is the DISPLAY version the game shows in the menu: always the repo's newest
+       release tag, refreshed every boot. Separate from which build is installed. */
     _snwprintf(vpath, 1024, L"%ls\\version.txt", core);
-    read_file_small(vpath, installed, sizeof installed);
-    if (installed[0] && !strcmp(installed, tag)) { HeapFree(heap(), 0, resp); return; }  /* current */
+    write_file_small(vpath, tag);
+
+    /* installed.txt records which release our built exe came from, to decide downloads. */
+    {
+        wchar_t ipath[1024];
+        _snwprintf(ipath, 1024, L"%ls\\installed.txt", core);
+        read_file_small(ipath, installed, sizeof installed);
+        if (installed[0] && !strcmp(installed, tag)) { HeapFree(heap(), 0, resp); return; }
+    }
 
     if (!find_asset(resp, first_end, "nss5_forge.exe.stripped", strip_url, 512) ||
         !find_asset(resp, first_end, "refill.bin", man_url, 512)) {
@@ -173,8 +182,8 @@ void update_check(const wchar_t *core, progress_fn progress)
     _snwprintf(dst2, 1024, L"%ls\\refill.bin", core);
     DeleteFileW(dst1); DeleteFileW(dst2);
     if (MoveFileW(tmp1, dst1) && MoveFileW(tmp2, dst2)) {
-        char u[256];
-        _snprintf(u, sizeof u, "%s", tag);
-        write_file_small(vpath, u);    /* record the new version; prepare_game rebuilds from it */
+        wchar_t ipath[1024];
+        _snwprintf(ipath, 1024, L"%ls\\installed.txt", core);
+        write_file_small(ipath, tag);  /* new build in place; prepare_game rebuilds from it */
     }
 }
