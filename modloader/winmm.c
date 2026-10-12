@@ -36,6 +36,7 @@ static wchar_t g_gamedir[PATHMAX];     /* lowercase, '/' separators, no trailing
 static int g_gamedir_len;
 int g_exact_build;                     /* NSS5.exe is the Steam build the hooks were made for */
 static int g_log_all;                  /* Mods\log_all_reads exists: log every file read */
+static int g_asset_mode;               /* host is our build in Mods\core: resolve assets to root */
 
 /* ------------------------------------------------------------------ small helpers */
 
@@ -270,17 +271,37 @@ static entry_t *lookup(const wchar_t *path)
     return NULL;
 }
 
+/* Our build lives in Mods\core and changes directory to there at start, so it opens the
+   game's own data ("GameMedia/...", "EngineMedia/...", "Inc/...") where they are not. In
+   asset mode those relative reads resolve to the real game root instead. Our own files
+   (Settings, saves by absolute path) are left alone. */
+static int is_asset(const wchar_t *key)
+{
+    return !wcsncmp(key, L"gamemedia/", 10) || !wcsncmp(key, L"enginemedia/", 12)
+        || !wcsncmp(key, L"inc/", 4);
+}
+
 static const wchar_t *redirect(const wchar_t *path)
 {
     entry_t *e = lookup(path);
-    if (!e) return NULL;
-    if (!InterlockedExchange(&e->logged, 1)) {
-        char k[PATHMAX * 3], m[PATHMAX * 3];
-        to_utf8(e->key, k, sizeof k);
-        to_utf8(g_mods[e->mod], m, sizeof m);
-        log_line("read %s from %s", k, m);
+    if (e) {
+        if (!InterlockedExchange(&e->logged, 1)) {
+            char k[PATHMAX * 3], m[PATHMAX * 3];
+            to_utf8(e->key, k, sizeof k);
+            to_utf8(g_mods[e->mod], m, sizeof m);
+            log_line("read %s from %s", k, m);
+        }
+        return e->path;
     }
-    return e->path;
+    if (g_asset_mode && path) {
+        static __thread wchar_t asset[PATHMAX];
+        wchar_t key[PATHMAX];
+        if (norm(path, key, PATHMAX) && is_asset(key)) {
+            _snwprintf(asset, PATHMAX, L"%ls/%ls", g_gamedir, key);
+            return asset;
+        }
+    }
+    return NULL;
 }
 
 static const wchar_t *redirect_a(const char *path, wchar_t *buf)
@@ -320,8 +341,9 @@ static void write_default_order(const wchar_t *modsdir, const wchar_t *orderpath
     h = FindFirstFileW(pat, &fd);
     if (h != INVALID_HANDLE_VALUE) {
         do {
-            if ((fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && fd.cFileName[0] != '.' && n < 512)
-                names[n++] = wdup(fd.cFileName);
+            if ((fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && fd.cFileName[0] != '.'
+                && _wcsicmp(fd.cFileName, L"core") && n < 512)
+                names[n++] = wdup(fd.cFileName);   /* core holds our build, not a content mod */
         } while (FindNextFileW(h, &fd));
         FindClose(h);
     }
@@ -370,6 +392,7 @@ static void read_order(const wchar_t *modsdir)
         while (end > line && (end[-1] == '\r' || end[-1] == ' ' || end[-1] == '\t')) *--end = 0;
         if (!*line || *line == '#') continue;
         if (!MultiByteToWideChar(CP_UTF8, 0, line, -1, name, PATHMAX)) continue;
+        if (!_wcsicmp(name, L"core")) continue;   /* our build, not a content mod */
         _snwprintf(dir, PATHMAX, L"%ls\\%ls", modsdir, name);
         if (wcschr(name, '/') || wcschr(name, '\\') || !is_dir(dir)) {
             log_line("load order: no folder Mods\\%s, skipped", line);
@@ -489,39 +512,113 @@ static void hook_iat(HMODULE exe)
         log_line("hook %s: %s", HOOKS[i].name, done[i] ? "on" : "not imported");
 }
 
+/* ------------------------------------------------------------------ anchor mode
+
+   When our build is installed (Mods/core), the game Steam launches is not the one that
+   plays. NSS5.exe loads this DLL at startup; we start our build as a child, keep NSS5.exe
+   alive and idle as the process Steam is watching (so playtime, overlay and achievements
+   stay attached to the launch), and exit with the child's code when it ends. NSS5.exe's own
+   game code never runs: this call does not return. Steam started the child with our build's
+   SteamAppId in the environment, so the child's steam_api talks to Steam on its own.
+
+   Anything heavy or any window belongs in launcher.exe, a normal process, never here under
+   the loader lock. This only ever starts a process and waits. If there is nothing to start,
+   or it will not start, it returns and the ordinary game runs instead. */
+static void run_anchor(const wchar_t *gamedir, const wchar_t *modsdir)
+{
+    wchar_t disabled[PATHMAX], launcher[PATHMAX], core[PATHMAX], cmd[PATHMAX];
+    const wchar_t *target = NULL;
+    STARTUPINFOW si;
+    PROCESS_INFORMATION pi;
+    DWORD code = 0;
+
+    _snwprintf(disabled, PATHMAX, L"%ls\\core\\off", modsdir);
+    if (GetFileAttributesW(disabled) != INVALID_FILE_ATTRIBUTES) {
+        log_line("Mods\\core\\off found: running the original game");
+        return;
+    }
+    _snwprintf(launcher, PATHMAX, L"%ls\\core\\launcher.exe", modsdir);
+    _snwprintf(core, PATHMAX, L"%ls\\core\\nss5_forge.exe", modsdir);
+    if (GetFileAttributesW(launcher) != INVALID_FILE_ATTRIBUTES) target = launcher;
+    else if (GetFileAttributesW(core) != INVALID_FILE_ATTRIBUTES) target = core;
+    else return;   /* our build is not installed: play the original */
+
+    _snwprintf(cmd, PATHMAX, L"\"%ls\"", target);
+    ZeroMemory(&si, sizeof si);
+    si.cb = sizeof si;
+    /* NSS5.exe was launched by Steam for AppID 212780. Pass that to the child so our build's
+       steam_api (via extern/steamstub/steamnull.c) connects and achievements work. The child
+       inherits this process's environment, so setting it here is enough. NSS5.exe is parked
+       after this and never reads its own environment again. */
+    SetEnvironmentVariableW(L"SteamAppId", L"212780");
+    SetEnvironmentVariableW(L"SteamGameId", L"212780");
+    {
+        char u[PATHMAX * 3];
+        to_utf8(target, u, sizeof u);
+        log_line("anchor: starting %s", u);
+    }
+    if (!CreateProcessW(target, cmd, NULL, NULL, FALSE, 0, NULL, gamedir, &si, &pi)) {
+        log_line("anchor: could not start it (error %lu), running the original game",
+                 (unsigned long)GetLastError());
+        return;
+    }
+    WaitForSingleObject(pi.hProcess, INFINITE);
+    GetExitCodeProcess(pi.hProcess, &code);
+    CloseHandle(pi.hThread);
+    CloseHandle(pi.hProcess);
+    log_line("anchor: our build exited (%lu), closing", (unsigned long)code);
+    if (g_log != INVALID_HANDLE_VALUE) CloseHandle(g_log);
+    ExitProcess(code);
+}
+
 /* ------------------------------------------------------------------ start-up */
 
-static void start_loader(void)
+static void set_gamedir(const wchar_t *dir)
 {
-    wchar_t exe[PATHMAX], modsdir[PATHMAX], *slash;
-    char u[PATHMAX * 3], hex[65];
-    SYSTEMTIME t;
     int i;
-
-    GetModuleFileNameW(NULL, exe, PATHMAX);
-    slash = wcsrchr(exe, '\\');
-    if (!slash || _wcsicmp(slash + 1, L"NSS5.exe")) return;   /* not the game: proxy only */
-
-    *slash = 0;
-    _snwprintf(modsdir, PATHMAX, L"%ls\\Mods", exe);
-    for (i = 0; exe[i] && i < PATHMAX - 1; i++) {
-        wchar_t c = exe[i] == '\\' ? '/' : exe[i];
+    for (i = 0; dir[i] && i < PATHMAX - 1; i++) {
+        wchar_t c = dir[i] == '\\' ? '/' : dir[i];
         g_gamedir[i] = (c >= 'A' && c <= 'Z') ? c + 32 : c;
     }
     g_gamedir[i] = 0;
     g_gamedir_len = i;
+}
+
+static void open_log(const wchar_t *modsdir, const wchar_t *name)
+{
+    wchar_t logpath[PATHMAX];
+    SYSTEMTIME t;
+    InitializeCriticalSection(&g_log_cs);
+    _snwprintf(logpath, PATHMAX, L"%ls\\%ls", modsdir, name);
+    g_log = CreateFileW(logpath, GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, 0, NULL);
+    GetLocalTime(&t);
+    log_line("NSS5 mod loader " LOADER_VERSION ", %04d-%02d-%02d %02d:%02d:%02d",
+             t.wYear, t.wMonth, t.wDay, t.wHour, t.wMinute, t.wSecond);
+}
+
+static void check_log_all(const wchar_t *modsdir)
+{
+    wchar_t flag[PATHMAX];
+    _snwprintf(flag, PATHMAX, L"%ls\\log_all_reads", modsdir);
+    g_log_all = GetFileAttributesW(flag) != INVALID_FILE_ATTRIBUTES;
+    if (g_log_all) log_line("Mods\\log_all_reads found: logging every file read");
+}
+
+/* NSS5.exe: start our build if it is installed (anchor), otherwise apply file mods to the
+   original game. */
+static void run_as_game(wchar_t *exe, wchar_t *slash)
+{
+    wchar_t modsdir[PATHMAX];
+    char u[PATHMAX * 3], hex[65];
+    int i;
+
+    *slash = 0;
+    _snwprintf(modsdir, PATHMAX, L"%ls\\Mods", exe);
+    set_gamedir(exe);
     *slash = '\\';
 
     CreateDirectoryW(modsdir, NULL);
-    InitializeCriticalSection(&g_log_cs);
-    {
-        wchar_t logpath[PATHMAX];
-        _snwprintf(logpath, PATHMAX, L"%ls\\loader.log", modsdir);
-        g_log = CreateFileW(logpath, GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, 0, NULL);
-    }
-    GetLocalTime(&t);
-    log_line("NSS5 mod loader " LOADER_VERSION ", %04d-%02d-%02d %02d:%02d:%02d",
-         t.wYear, t.wMonth, t.wDay, t.wHour, t.wMinute, t.wSecond);
+    open_log(modsdir, L"loader.log");
     to_utf8(exe, u, sizeof u);
     log_line("game: %s", u);
     for (i = 0; i < EXPORT_COUNT && g_real[i]; i++) {}
@@ -536,17 +633,60 @@ static void start_loader(void)
         log_line("cannot read NSS5.exe to check it, file mods only, code hooks off");
     }
 
+    *slash = 0;                   /* exe -> game directory */
+    run_anchor(exe, modsdir);     /* does not return if our build is installed and starts */
+    *slash = '\\';                /* our build is not installed: fall through to vanilla + mods */
+
     read_order(modsdir);
-    {
-        wchar_t flag[PATHMAX];
-        _snwprintf(flag, PATHMAX, L"%ls\\log_all_reads", modsdir);
-        g_log_all = GetFileAttributesW(flag) != INVALID_FILE_ATTRIBUTES;
-        if (g_log_all) log_line("Mods\\log_all_reads found: logging every file the game reads");
-    }
+    check_log_all(modsdir);
     if (!g_nent && !g_log_all) { log_line("no mod files enabled, game left untouched"); return; }
     if (g_nent) build_table();
     log_line("%d mod files indexed", g_nent);
     hook_iat(GetModuleHandleW(NULL));
+}
+
+/* nss5_forge.exe in Mods\core: our build. It changes directory to Mods\core at start, so its
+   game-data reads resolve there and miss. Point them at the game root (two levels up) and
+   layer enabled mods on top. coredir = <root>\Mods\core. */
+static void run_as_reconstruction(wchar_t *coredir)
+{
+    wchar_t modsdir[PATHMAX], root[PATHMAX];
+    char u[PATHMAX * 3];
+    wchar_t *p;
+
+    wcsncpy(root, coredir, PATHMAX - 1);
+    root[PATHMAX - 1] = 0;
+    p = wcsrchr(root, '\\'); if (p) *p = 0;   /* strip "core" -> <root>\Mods */
+    wcsncpy(modsdir, root, PATHMAX - 1);
+    modsdir[PATHMAX - 1] = 0;
+    p = wcsrchr(root, '\\'); if (p) *p = 0;   /* strip "Mods" -> <root> (the game root) */
+    set_gamedir(root);
+
+    open_log(modsdir, L"run.log");
+    g_asset_mode = 1;
+    to_utf8(root, u, sizeof u);
+    log_line("our build; game data resolves to %s", u);
+    read_order(modsdir);
+    check_log_all(modsdir);
+    if (g_nent) build_table();
+    log_line("%d mod files indexed; game-data reads resolve to the root", g_nent);
+    hook_iat(GetModuleHandleW(NULL));
+}
+
+static void start_loader(void)
+{
+    wchar_t exe[PATHMAX], *slash;
+
+    GetModuleFileNameW(NULL, exe, PATHMAX);
+    slash = wcsrchr(exe, '\\');
+    if (!slash) return;
+    if (!_wcsicmp(slash + 1, L"NSS5.exe")) {
+        run_as_game(exe, slash);
+    } else if (!_wcsicmp(slash + 1, L"nss5_forge.exe")) {
+        *slash = 0;                   /* exe -> <root>\Mods\core */
+        run_as_reconstruction(exe);
+    }
+    /* any other host: pure winmm passthrough */
 }
 
 static HMODULE load_real_winmm(void)

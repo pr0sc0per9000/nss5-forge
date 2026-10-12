@@ -15,6 +15,7 @@ import hashlib
 import json
 import lzma
 import os
+import struct
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -30,6 +31,14 @@ def main():
         sys.exit("usage: pack.py <built exe> <out dir>")
     exe, out = sys.argv[1], sys.argv[2]
     d = bytearray(open(exe, "rb").read())
+    # The retail NSS5.exe is a GUI-subsystem program (no console). assemble.py builds a
+    # console app for its debug prints, so the shipped build shows a console the original
+    # never did. Flip the PE subsystem to GUI (2) to match; it only changes whether Windows
+    # allocates a console, not any recovered code.
+    pe = struct.unpack_from("<I", d, 0x3c)[0]
+    sub_off = pe + 24 + 68
+    if struct.unpack_from("<H", d, sub_off)[0] == 3:
+        struct.pack_into("<H", d, sub_off, 2)
     full_sha = sha(d)
     rows = incbin.spans(d)
     if len(rows) != 11:
