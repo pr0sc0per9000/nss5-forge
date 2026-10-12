@@ -57,6 +57,17 @@ def main():
         f.write(d)
     manifest["stub_sha256"] = stub_sha
     json.dump(manifest, open(os.path.join(out, "refill.json"), "w"), indent=2)
+
+    # Compact binary manifest the native launcher reads without a JSON parser. Assets are in
+    # source order, the same order the locator finds them in NSS5.exe, so the launcher pairs
+    # them by position. Layout: magic "NSSF" u32=1 version, target sha(32), stub sha(32),
+    # count u32, then per asset [offset u32, length u32, sha(32)].
+    with open(os.path.join(out, "refill.bin"), "wb") as f:
+        f.write(b"NSSF" + struct.pack("<I", 1))
+        f.write(bytes.fromhex(full_sha) + bytes.fromhex(stub_sha))
+        f.write(struct.pack("<I", len(manifest["assets"])))
+        for a in manifest["assets"]:
+            f.write(struct.pack("<II", a["offset"], a["length"]) + bytes.fromhex(a["sha256"]))
     embedded = sum(a["length"] for a in manifest["assets"])
     print("built exe %d bytes, embedded game assets %d bytes (%.0f%%)"
           % (len(d), embedded, 100.0 * embedded / len(d)))
