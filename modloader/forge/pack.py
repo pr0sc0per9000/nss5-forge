@@ -39,6 +39,11 @@ def main():
     sub_off = pe + 24 + 68
     if struct.unpack_from("<H", d, sub_off)[0] == 3:
         struct.pack_into("<H", d, sub_off, 2)
+    # Large address aware: 4 GB of address space on 64-bit Windows instead of 2 GB. The
+    # original runs out of memory after a while and crashes with EXCEPTION_ACCESS_VIOLATION
+    # (the "4GB patch" players apply to NSS5.exe). Header flag only, no code changes.
+    chars_off = pe + 22
+    struct.pack_into("<H", d, chars_off, struct.unpack_from("<H", d, chars_off)[0] | 0x20)
     full_sha = sha(d)
     rows = incbin.spans(d)
     if len(rows) != 11:
