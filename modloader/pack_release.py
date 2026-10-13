@@ -1,6 +1,7 @@
 """Assemble the mod-loader release a player unzips into their game folder.
 
     python modloader/pack_release.py <built nss5_forge exe> <out dir> [--version TAG]
+    python modloader/pack_release.py --core <dir> <out dir> [--version TAG]
 
 Lays out, from a freshly built exe and the compiled winmm.dll + launcher.exe in build/:
 
@@ -14,6 +15,9 @@ Lays out, from a freshly built exe and the compiled winmm.dll + launcher.exe in 
 
 Ships none of the game: nss5_forge.exe.stripped holds this project's own code with the game's
 embedded files zeroed; the launcher refills them from the player's own NSS5.exe on first play.
+
+--core takes nss5_forge.exe.stripped and refill.bin (and installed.txt, if there) from <dir>
+instead of a built exe. CI uses it, since it cannot build the game.
 """
 import os
 import shutil
@@ -36,18 +40,29 @@ NOTE = (
 
 def main():
     version = "0"
+    core_from = None
     rest = sys.argv[1:]
     if "--version" in rest:
         i = rest.index("--version")
         version = rest[i + 1] if i + 1 < len(rest) else "0"
         del rest[i:i + 2]
+    if "--core" in rest:
+        i = rest.index("--core")
+        core_from = rest[i + 1] if i + 1 < len(rest) else ""
+        del rest[i:i + 2]
     args = [a for a in rest if not a.startswith("--")]
-    if len(args) != 2:
-        sys.exit("usage: pack_release.py <built exe> <out dir> [--version TAG]")
-    exe, out = args
+    if len(args) != (1 if core_from else 2):
+        sys.exit("usage: pack_release.py <built exe> <out dir> [--version TAG]\n"
+                 "       pack_release.py --core <dir> <out dir> [--version TAG]")
+    out = args[-1]
     winmm = os.path.join(BUILD, "winmm.dll")
     launcher = os.path.join(BUILD, "launcher.exe")
-    for p in (exe, winmm, launcher):
+    need = [winmm, launcher]
+    if core_from:
+        need += [os.path.join(core_from, fn) for fn in ("nss5_forge.exe.stripped", "refill.bin")]
+    else:
+        need.append(args[0])
+    for p in need:
         if not os.path.isfile(p):
             sys.exit("missing %s (run modloader/build.py first)" % p)
 
@@ -56,9 +71,14 @@ def main():
         shutil.rmtree(out)
     os.makedirs(core)
 
-    subprocess.check_call([sys.executable, os.path.join(HERE, "forge", "pack.py"), exe, core])
-    os.remove(os.path.join(core, "nss5_forge.exe.xz"))     # the launcher uses the raw .stripped
-    os.remove(os.path.join(core, "refill.json"))           # tooling only; the launcher reads .bin
+    if core_from:
+        for fn in ("nss5_forge.exe.stripped", "refill.bin", "installed.txt"):
+            if os.path.isfile(os.path.join(core_from, fn)):
+                shutil.copy2(os.path.join(core_from, fn), os.path.join(core, fn))
+    else:
+        subprocess.check_call([sys.executable, os.path.join(HERE, "forge", "pack.py"), args[0], core])
+        os.remove(os.path.join(core, "nss5_forge.exe.xz"))     # the launcher uses the raw .stripped
+        os.remove(os.path.join(core, "refill.json"))           # tooling only; the launcher reads .bin
     shutil.copy2(winmm, os.path.join(out, "winmm.dll"))
     shutil.copy2(winmm, os.path.join(core, "winmm.dll"))
     shutil.copy2(launcher, os.path.join(core, "launcher.exe"))
