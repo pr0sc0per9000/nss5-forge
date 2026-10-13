@@ -9,6 +9,9 @@
 '!Field forcetxtalpha :Int = 1
 '!Field fntSize :Int = 1
 If Not g_allgadgets Then g_allgadgets = CreateList()
-g_allgadgets.AddLast(Self)
+' CRASH FIX: the original also did g_allgadgets.AddLast(Self). Nothing ever reads that list,
+' so it only kept every gadget and its images alive for good (message boxes, help boxes,
+' alerts, tooltips, menu credits). The 32-bit game ran out of memory and crashed with
+' EXCEPTION_ACCESS_VIOLATION, often while saving.
 Self.children = CreateList()
 Self.txtlines = CreateList()

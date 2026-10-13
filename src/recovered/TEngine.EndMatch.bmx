@@ -44,6 +44,7 @@
 		'!Global g_engine_memstart:Int
 		'!Global g_engine_memend:Int
 		'!Global g_engine_fnend:Int()
+		'!Global g_formlist:TList
 		FlushAllInput()
 		g_engine_int13 = 0
 		g_matchstate = 0
@@ -73,6 +74,9 @@
 		TPhotographer.ClearAll()
 		TCameraMan.ClearAll()
 		TDrawOb.ClearAll()
+		' CRASH FIX: the formation screen's draw list still held 11 player sprite sheets
+		' (12 MB each) after the match, through the autosave and the next match's load.
+		If g_formlist <> Null Then g_formlist.Clear()
 		TParticle.ClearAll()
 		If g_profile.contractwage > 0 Then PlayTrack(2)
 		GCCollect()

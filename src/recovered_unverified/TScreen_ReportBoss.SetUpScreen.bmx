@@ -214,4 +214,10 @@ If g_profile.helppages[22] = 0
 	TScreen.Tutorial()
 	g_profile.helppages[22] = 1
 EndIf
+' CRASH FIX: the original added one more help box on every visit and never removed any, so
+' they piled up in memory and Help showed the same page again for each visit. Keep only the
+' screen's own help box plus this one.
+While g_reportboss_screen.lHelp.Count() > 1
+	g_reportboss_screen.lHelp.RemoveLast()
+Wend
 g_reportboss_screen.lHelp.AddLast(THelpBox.Create(g_reportboss_lbl_coachboss, 0, 0, 0, 0, GetText("CHELP_REPORTRELATIONSHIPS"), 2, 2))
