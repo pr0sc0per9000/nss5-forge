@@ -10,6 +10,9 @@ is distributed.
 
 ## Install
 
+[Download NSS5-Mod-Loader.zip](https://github.com/pr0sc0per9000/nss5-forge/raw/download/NSS5-Mod-Loader.zip).
+Step by step with screenshots: [INSTALL.md](/INSTALL.md).
+
 Unzip into the game folder (the one with NSS5.exe), so it ends up with:
 
     New Star Soccer 5/
@@ -64,3 +67,9 @@ makes the loader log every file the game reads to `Mods/loader.log`, to find wha
 
 `pack_release.py` strips the game's embedded files out of a built exe and assembles the release
 layout. Needs the BlitzMax toolchain (see the main README) for the compiler.
+
+The download zip is rebuilt by CI ([`modloader.yml`](/.github/workflows/modloader.yml)) on every
+change here and on every release, and lives on the `download` branch. CI cannot build the game,
+so `download_zip.py` takes `nss5_forge.exe.stripped` and `refill.bin` from the newest release
+when it carries them, otherwise from the previous zip. Attach both to a release to ship a new game
+build: the launcher updates to it and the zip picks it up.

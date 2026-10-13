@@ -1,0 +1,94 @@
+name: Mod loader zip
+
+# Keeps NSS5-Mod-Loader.zip on the download branch current. INSTALL.md links it.
+#
+#   push to main touching modloader/   rebuild winmm.dll and launcher.exe, publish
+#   release published                  take that release's game part if it has one, publish
+#   pull request touching modloader/   build only, zip uploaded as an artifact
+#
+# CI cannot build the game itself (it needs NSS5.exe). download_zip.py takes the game part
+# from the newest release when it carries nss5_forge.exe.stripped and refill.bin, otherwise
+# from the zip already on the branch. The compiler is the 32-bit MinGW the BlitzMax toolchain
+# ships, the same one modloader/build.py uses locally.
+#
+# main only takes PRs, so the zip lives on its own branch: one commit, replaced each time.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'modloader/**'
+      - '!modloader/**.md'
+      - '.github/workflows/modloader.yml'
+  pull_request:
+    paths:
+      - 'modloader/**'
+      - '!modloader/**.md'
+      - '.github/workflows/modloader.yml'
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: modloader-${{ github.event_name == 'pull_request' && github.ref || 'publish' }}
+
+jobs:
+  zip:
+    name: Build NSS5-Mod-Loader.zip
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      # A release checks out its tag; the loader is always built from main.
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'release' && 'main' || '' }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: MinGW from the BlitzMax repo
+        run: |
+          cd "$RUNNER_TEMP"
+          curl -fsSL -o mingw.7z https://github.com/blitz-research/blitzmax/raw/56a9602858b6f0b5f21bb138cc94cecc63c99314/_src/win32_x86/mingw_v5b.7z
+          echo "8d1a99fa80a3b10bd10249019d03f7d7e8457e15bc277f642e2a9576516f0474  mingw.7z" | sha256sum -c -
+          7z x -y -omingw mingw.7z > /dev/null
+
+      - name: Previous zip
+        run: |
+          if git fetch -q --depth 1 origin download; then
+            git show FETCH_HEAD:NSS5-Mod-Loader.zip > "$RUNNER_TEMP/prev.zip"
+          fi
+
+      - name: Build
+        id: zip
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python modloader/download_zip.py "$RUNNER_TEMP/prev.zip" "$RUNNER_TEMP/NSS5-Mod-Loader" --gcc "$RUNNER_TEMP/mingw/mingw/bin/gcc.exe"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: NSS5-Mod-Loader
+          path: ${{ runner.temp }}/NSS5-Mod-Loader.zip
+
+      - name: Publish to the download branch
+        if: github.event_name != 'pull_request' && steps.zip.outputs.changed == 'true'
+        env:
+          GIT_AUTHOR_NAME: Joe
+          GIT_AUTHOR_EMAIL: pr0sc0per9000@gmail.com
+          GIT_COMMITTER_NAME: Joe
+          GIT_COMMITTER_EMAIL: pr0sc0per9000@gmail.com
+        run: |
+          zip=$(git hash-object -w --no-filters "$RUNNER_TEMP/NSS5-Mod-Loader.zip")
+          readme=$(printf '%s\n' \
+            '# NSS5-Mod-Loader.zip' '' \
+            'Built by `.github/workflows/modloader.yml` on main. Do not edit by hand.' '' \
+            'How to install: [INSTALL.md](https://github.com/pr0sc0per9000/nss5-forge/blob/main/INSTALL.md)' \
+            | git hash-object -w --stdin)
+          tree=$(printf '100644 blob %s\tNSS5-Mod-Loader.zip\n100644 blob %s\tREADME.md\n' "$zip" "$readme" | git mktree)
+          commit=$(git commit-tree "$tree" -m "Build NSS5-Mod-Loader.zip from main $(git rev-parse --short HEAD)")
+          git push -f origin "$commit:refs/heads/download"

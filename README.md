@@ -1,6 +1,6 @@
 # New Star Soccer 5 Reconstruction
 
-[Contributing](/CONTRIBUTING.md) | [Status](/docs/STATUS.md) | [Tools](/scripts/README.md) | [Game behaviour](/docs/game/README.md)
+[Install](/INSTALL.md) | [Contributing](/CONTRIBUTING.md) | [Status](/docs/STATUS.md) | [Tools](/scripts/README.md) | [Game behaviour](/docs/game/README.md)
 
 [![CI](https://github.com/pr0sc0per9000/nss5-forge/actions/workflows/ci.yml/badge.svg)](https://github.com/pr0sc0per9000/nss5-forge/actions/workflows/ci.yml)
 [![Reconstructed](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fpr0sc0per9000%2Fnss5-forge%2Fbyte-matched-reconstruction%2Fdocs%2Fprogress.json)](/docs/STATUS.md)
@@ -21,6 +21,13 @@ source code, in the same spirit as [re3](https://github.com/GTAmodding/re3) and
 
 > **You need your own copy of the game.** New Star Soccer 5 belongs to New Star
 > Games Ltd. None of it is included here. Windows only.
+
+## Mod loader
+
+Play the rebuilt game from Steam's Play button. Drop it into the game folder, nothing to
+build.
+
+**[Download NSS5-Mod-Loader.zip](https://github.com/pr0sc0per9000/nss5-forge/raw/download/NSS5-Mod-Loader.zip)** | **[Installation instructions](/INSTALL.md)**
 
 ## Status
 
