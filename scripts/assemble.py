@@ -2117,6 +2117,10 @@ def main():
                     "' scripts/extract_incbin.py --verify."] + \
                    ['Incbin "%s"' % p for p in INCBIN_ORDER]
     copied = copy_incbin_tree()
+    # The menu's Mods button loads mods_icon.png from beside the exe (the loader ships it in
+    # Mods\core). Put it beside the exe we build too, or local runs show the button bare.
+    import shutil
+    shutil.copy2(os.path.join(ROOT, "modloader", "mods_icon.png"), os.path.join(OUT_DIR, "mods_icon.png"))
 
     # NSS5_TAIL=exercise swaps in src/module_body/tail_exercise.bmx, which boots exactly as
     # GameMain does and then walks every screen and fires every button inside Try/Catch
