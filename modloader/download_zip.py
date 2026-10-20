@@ -74,7 +74,7 @@ def main():
             sys.exit("no game part: release %s does not carry one and there is no previous zip" % tag)
         print("game part: previous zip (release %s does not carry one)" % tag, flush=True)
 
-    subprocess.check_call([sys.executable, os.path.join(HERE, "build.py")] + gcc)
+    subprocess.check_call([sys.executable, os.path.join(HERE, "build.py"), "--version", tag] + gcc)
     subprocess.check_call([sys.executable, os.path.join(HERE, "pack_release.py"),
                            "--core", game, out, "--version", tag])
     shutil.rmtree(game)

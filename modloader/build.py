@@ -8,12 +8,23 @@ import shutil
 import subprocess
 import sys
 
+import stamp
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 GCC = os.path.join(ROOT, "tools", "blitzmax-legacy-src", "_mingw", "mingw", "bin", "gcc.exe")
 
 
+def default_version():
+    try:
+        return subprocess.check_output(["git", "describe", "--tags", "--abbrev=0"], cwd=ROOT,
+                                       stderr=subprocess.DEVNULL, text=True).strip()
+    except (OSError, subprocess.CalledProcessError):
+        return "0.0.0"
+
+
 def main():
+    version = sys.argv[sys.argv.index("--version") + 1] if "--version" in sys.argv else default_version()
     gcc = sys.argv[sys.argv.index("--gcc") + 1] if "--gcc" in sys.argv else GCC
     if not os.path.isfile(gcc):
         gcc = shutil.which("gcc") or gcc
@@ -37,10 +48,14 @@ def main():
           os.path.join(lau, "update.c"),
           "-I", lau, "-lcomctl32", "-lwininet"], "launcher.exe"),
     ]
+    desc = {"winmm.dll": "NSS5 Mod Loader (winmm proxy)", "launcher.exe": "NSS5 Mod Loader launcher"}
     for cmd, name in builds:
         if subprocess.run(cmd, env=env).returncode:
             sys.exit("build failed: " + name)
-        print("built", os.path.join(out, name))
+        exe = os.path.join(out, name)
+        stamp.update(exe, [(stamp.RT_VERSION, stamp.version_info(name, desc[name], version))]
+                     + ([(stamp.RT_MANIFEST, stamp.MANIFEST)] if name == "launcher.exe" else []))
+        print("built", exe, version)
 
 
 if __name__ == "__main__":

@@ -65,6 +65,9 @@ makes the loader log every file the game reads to `Mods/loader.log`, to find wha
     python modloader/build.py          # winmm.dll and launcher.exe (32-bit MinGW)
     python modloader/pack_release.py <built nss5_forge exe> <out dir>
 
+`build.py` also stamps version info into both files (and a manifest into launcher.exe) with
+`stamp.py`, since the toolchain has no resource compiler. Do any code signing after it.
+
 `pack_release.py` strips the game's embedded files out of a built exe and assembles the release
 layout. Needs the BlitzMax toolchain (see the main README) for the compiler.
 
