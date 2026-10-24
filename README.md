@@ -29,6 +29,11 @@ build.
 
 **[Download NSS5-Mod-Loader.zip](https://github.com/pr0sc0per9000/nss5-forge/raw/download/NSS5-Mod-Loader.zip)** | **[Installation instructions](/INSTALL.md)**
 
+Also coming to these sites (both are pending approval and may not be public yet):
+
+- [Nexus Mods](https://www.nexusmods.com/mods/1?game_id=10585)
+- [ModDB](https://www.moddb.com/downloads/nss5-modloader)
+
 ## Status
 
 The badge above shows how much of the machine code the byte-exact reconstruction
